@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:clipChildren="false"
+    android:orientation="vertical"
+    tools:context="com.feiyou.headstyle.ui.activity.MainActivity">
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/viewpager"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:background="@color/white"></android.support.v4.view.ViewPager>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/line_color"></View>
+
+    <LinearLayout
+        android:id="@+id/ll_bottom"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:id="@+id/layout_home"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="bottom"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <Button
+                android:id="@+id/iv_home"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:background="@drawable/home_item_selector"
+                android:clickable="false" />
+
+            <TextView
+                android:id="@+id/tv_home"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/iv_home"
+                android:layout_marginTop="2dp"
+                android:clickable="false"
+                android:text="首页"
+                android:textColor="@color/tab_normal_color"
+                android:textSize="10sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layout_community"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="bottom"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <Button
+                android:id="@+id/iv_community"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:background="@drawable/community_item_selector"
+                android:clickable="false" />
+
+            <TextView
+                android:id="@+id/tv_community"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/iv_community"
+                android:layout_marginTop="2dp"
+                android:clickable="false"
+                android:text="社区"
+                android:textColor="@color/tab_normal_color"
+                android:textSize="10sp" />
+
+        </LinearLayout>
+
+        <FrameLayout
+            android:id="@+id/layout_create"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_gravity="bottom">
+
+            <ImageView
+                android:id="@+id/iv_create"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_centerInParent="true"
+                android:layout_marginLeft="3dp"
+                android:src="@mipmap/main_create_icon" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/iv_create"
+                android:layout_centerInParent="true"
+                android:layout_gravity="center|bottom"
+                android:layout_marginBottom="12dp"
+                android:text="制作"
+                android:textColor="@color/white"
+                android:textSize="10sp" />
+
+        </FrameLayout>
+
+        <LinearLayout
+            android:id="@+id/layout_test"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="bottom"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <Button
+                android:id="@+id/iv_test"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:background="@drawable/test_item_selector"
+                android:clickable="false" />
+
+            <TextView
+                android:id="@+id/tv_test"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/iv_test"
+                android:layout_marginTop="2dp"
+                android:clickable="false"
+                android:text="测试"
+                android:textColor="@color/tab_normal_color"
+                android:textSize="10sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layout_my"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="bottom"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <Button
+                android:id="@+id/iv_my"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:background="@drawable/my_item_selector"
+                android:clickable="false" />
+
+            <TextView
+                android:id="@+id/tv_my"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/iv_my"
+                android:layout_marginTop="2dp"
+                android:clickable="false"
+                android:text="我的"
+                android:textColor="@color/tab_normal_color"
+                android:textSize="10sp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

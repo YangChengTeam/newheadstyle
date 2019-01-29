@@ -1,0 +1,32 @@
+<resources>
+    <string name="app_name">新个性头像</string>
+    <string name="word_read">新个性头像</string>
+
+    <string name="button_allow">开启</string>
+    <string name="button_deny">拒绝</string>
+
+    <string name="permission_storage_never_ask_again">不再询问</string>
+    <string name="permission_storage_rationale">必须要开启存储权限，才能正常使用，请开启</string>
+    <string name="permission_storage_denied">禁止了存储权限，开启权限才能正常使用</string>
+
+    <string name="search_txt">搜索头像</string>
+    <string name="rec_txt">为你推荐</string>
+    <string name="into_community_txt">进入社区</string>
+    <string name="follow_user_txt">+关注</string>
+
+    <string name="new_head_txt">最新头像</string>
+    <string name="refresh_head_txt">换一换</string>
+
+    <string name="cancel_txt">取消</string>
+
+    <string name="no_result_txt">糟糕，找不到你要的头像\n换个搜索词试试吧</string>
+
+    <string name="community_tab_follow_txt">关注</string>
+    <string name="community_tab_rec_txt">推荐</string>
+    <string name="community_tab_video_txt">视频</string>
+
+    <string name="share_txt">分享</string>
+
+    <string name="friends_select_txt">好友选择</string>
+    <string name="config_txt">确定</string>
+</resources>

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#78c8ff</color>
+    <color name="colorPrimaryDark">#78c8ff</color>
+    <color name="colorAccent">#78c8ff</color>
+
+    <color name="app_color_blue">#00A8E1</color>
+
+    <color name="transparent">#00000000</color>
+    <color name="white">#ffffff</color>
+
+    <color name="black">#000000</color>
+    <color name="black1">#333333</color>
+    <color name="black2">#a1a1a1</color>
+    <color name="black3">#555555</color>
+
+    <color name="gray999">#999999</color>
+    <color name="gray_aaa">#aaaaaa</color>
+    <color name="line_color">#dddddd</color>
+
+    <color name="search_bg_color">#f6f8fa</color>
+
+    <color name="tab_normal_color">#666666</color>
+    <color name="tab_select_color">#fb5161</color>
+
+    <color name="rec_color">#372e2e</color>
+    <color name="into_community_color">#6d6d6d</color>
+
+    <color name="community_type_color">#ff3c3c</color>
+
+    <color name="search_number_color1">#f62f2a</color>
+    <color name="search_number_color2">#2a8ff6</color>
+    <color name="search_number_color3">#ff9900</color>
+    <color name="search_number_def">#a8abad</color>
+
+    <color name="history_bg_color">#eff1f3</color>
+
+    <color name="tab_bg_color">#f2f2f2</color>
+
+    <color name="send_comment_bg">#7f555555</color>
+
+    <color name="my_info_bg_color">#f5f5f5</color>
+
+    <color name="update_sex_title_color">#666666</color>
+</resources>
