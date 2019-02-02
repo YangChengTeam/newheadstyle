@@ -28,9 +28,12 @@ public class NoteInfoAdapter extends BaseQuickAdapter<NoteInfo, BaseViewHolder> 
 
     private Context mContext;
 
-    public NoteInfoAdapter(Context context, List<NoteInfo> datas) {
+    private int showType = 1; //1.普通类别,2.个人操作列表
+
+    public NoteInfoAdapter(Context context, List<NoteInfo> datas, int type) {
         super(R.layout.note_item, datas);
         this.mContext = context;
+        this.showType = type;
     }
 
     @Override
@@ -41,6 +44,16 @@ public class NoteInfoAdapter extends BaseQuickAdapter<NoteInfo, BaseViewHolder> 
                 .setText(R.id.tv_note_content, item.getContent())
                 .setText(R.id.tv_message_count, item.getCommentNum() + "")
                 .setText(R.id.tv_zan_count, item.getZanNum() + "");
+
+        if (showType == 1) {
+            helper.setVisible(R.id.layout_follow, true);
+            helper.setVisible(R.id.layout_operation, false);
+            helper.addOnClickListener(R.id.layout_follow);
+        } else {
+            helper.setVisible(R.id.layout_follow, false);
+            helper.setVisible(R.id.layout_operation, true);
+            helper.addOnClickListener(R.id.layout_operation);
+        }
 
         Glide.with(mContext).load(item.getUserimg()).into((ImageView) helper.itemView.findViewById(R.id.iv_user_head));
 

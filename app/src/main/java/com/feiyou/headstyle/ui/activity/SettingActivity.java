@@ -1,5 +1,6 @@
 package com.feiyou.headstyle.ui.activity;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -10,10 +11,13 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.blankj.utilcode.util.SizeUtils;
+import com.blankj.utilcode.util.ToastUtils;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.bean.HeadType;
 import com.feiyou.headstyle.ui.adapter.MoreHeadTypeAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragmentActivity;
+import com.feiyou.headstyle.ui.custom.LoginDialog;
+import com.feiyou.headstyle.ui.custom.VersionUpdateDialog;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 import com.qmuiteam.qmui.widget.QMUITopBar;
 
@@ -36,6 +40,10 @@ public class SettingActivity extends BaseFragmentActivity {
     @BindView(R.id.layout_my_info)
     RelativeLayout mMyInfoLayout;
 
+    VersionUpdateDialog updateDialog;
+
+    private VersionUpdateDialog.UpdateListener listener;
+
     @Override
     protected int getContextViewId() {
         return R.layout.activity_setting;
@@ -46,6 +54,7 @@ public class SettingActivity extends BaseFragmentActivity {
         super.onCreate(savedInstanceState);
         initTopBar();
         initData();
+        initDialog();
     }
 
     private void initTopBar() {
@@ -70,9 +79,38 @@ public class SettingActivity extends BaseFragmentActivity {
 
     }
 
+    public void initDialog() {
+        listener = new VersionUpdateDialog.UpdateListener() {
+            @Override
+            public void update(Dialog dialog) {
+
+            }
+        };
+        updateDialog = new VersionUpdateDialog(this, R.style.login_dialog, listener);
+    }
+
+    @OnClick(R.id.layout_bind_phone)
+    void bindPhone() {
+        Intent intent = new Intent(this, BindPhoneActivity.class);
+        startActivity(intent);
+    }
+
     @OnClick(R.id.layout_my_info)
-    public void myInfo(){
-        Intent intent = new Intent(this,EditUserInfoActivity.class);
+    public void myInfo() {
+        Intent intent = new Intent(this, EditUserInfoActivity.class);
+        startActivity(intent);
+    }
+
+    @OnClick(R.id.layout_update_version)
+    void updateVersion() {
+        if (updateDialog != null && !updateDialog.isShowing()) {
+            updateDialog.show();
+        }
+    }
+
+    @OnClick(R.id.layout_black)
+    void blackList() {
+        Intent intent = new Intent(this, BlackListActivity.class);
         startActivity(intent);
     }
 

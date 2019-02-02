@@ -29,4 +29,9 @@
 
     <string name="friends_select_txt">好友选择</string>
     <string name="config_txt">确定</string>
+
+    <string name="version_update_txt">新版本邀请你内侧\n修复已知的bug</string>
+
+    <string name="no_photo_txt">你还没有头像\n快上传一个试试吧</string>
+
 </resources>

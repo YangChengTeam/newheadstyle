@@ -10,6 +10,9 @@ import java.util.List;
  */
 public class NoteItem {
 
+    @SerializedName("add_time")
+    private Long addTime;
+
     @SerializedName("comment_content")
     private String commentContent;
 
@@ -30,6 +33,12 @@ public class NoteItem {
 
     @SerializedName("zan_num")
     private String zanNum;
+
+    @SerializedName("list_num")
+    private String listNum;
+
+    @SerializedName("is_zan")
+    private int isZan;
 
     private List<NoteComment> comment;
 
@@ -193,6 +202,14 @@ public class NoteItem {
         }
     }
 
+    public Long getAddTime() {
+        return addTime;
+    }
+
+    public void setAddTime(Long addTime) {
+        this.addTime = addTime;
+    }
+
     public String getCommentContent() {
         return commentContent;
     }
@@ -255,5 +272,21 @@ public class NoteItem {
 
     public void setComment(List<NoteComment> comment) {
         this.comment = comment;
+    }
+
+    public String getListNum() {
+        return listNum;
+    }
+
+    public void setListNum(String listNum) {
+        this.listNum = listNum;
+    }
+
+    public int getIsZan() {
+        return isZan;
+    }
+
+    public void setIsZan(int isZan) {
+        this.isZan = isZan;
     }
 }

@@ -85,7 +85,7 @@ public class RecommendFragment extends BaseFragment implements NoteDataView {
             }
         });
 
-        noteInfoAdapter = new NoteInfoAdapter(getActivity(), null);
+        noteInfoAdapter = new NoteInfoAdapter(getActivity(), null,1);
         mRecommendListView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecommendListView.setAdapter(noteInfoAdapter);
 

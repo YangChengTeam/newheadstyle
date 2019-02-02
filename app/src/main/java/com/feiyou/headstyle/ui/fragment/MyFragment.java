@@ -22,15 +22,20 @@ import com.blankj.utilcode.util.SizeUtils;
 import com.blankj.utilcode.util.StringUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.bean.LoginRequest;
 import com.feiyou.headstyle.bean.UserInfo;
 import com.feiyou.headstyle.bean.UserInfoRet;
 import com.feiyou.headstyle.common.Constants;
 import com.feiyou.headstyle.presenter.UserInfoPresenterImp;
+import com.feiyou.headstyle.ui.activity.EditUserInfoActivity;
 import com.feiyou.headstyle.ui.activity.MainActivity;
+import com.feiyou.headstyle.ui.activity.MyNoteActivity;
 import com.feiyou.headstyle.ui.activity.SettingActivity;
+import com.feiyou.headstyle.ui.activity.UserInfoActivity;
 import com.feiyou.headstyle.ui.base.BaseFragment;
+import com.feiyou.headstyle.ui.custom.GlideRoundTransform;
 import com.feiyou.headstyle.ui.custom.LoginDialog;
 import com.feiyou.headstyle.view.UserInfoView;
 import com.orhanobut.logger.Logger;
@@ -77,6 +82,8 @@ public class MyFragment extends BaseFragment implements UserInfoView {
 
     private int loginType = 2; //1，qq，2微信
 
+    private UserInfo userInfo;
+
     @Override
     protected View onCreateView() {
         View root = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_my, null);
@@ -88,15 +95,24 @@ public class MyFragment extends BaseFragment implements UserInfoView {
 
     @OnClick(R.id.tv_setting)
     public void setting() {
-        Intent intent = new Intent(getActivity(),SettingActivity.class);
+        Intent intent = new Intent(getActivity(), SettingActivity.class);
         startActivity(intent);
     }
 
     @OnClick(R.id.iv_user_head)
     public void click() {
-        if (loginDialog != null && !loginDialog.isShowing()) {
+        if (userInfo == null && loginDialog != null && !loginDialog.isShowing()) {
             loginDialog.show();
+        }else{
+            Intent intent = new Intent(getActivity(), UserInfoActivity.class);
+            startActivity(intent);
         }
+    }
+
+    @OnClick(R.id.layout_my_note)
+    public void myNote() {
+        Intent intent = new Intent(getActivity(), MyNoteActivity.class);
+        startActivity(intent);
     }
 
     public void initViews() {
@@ -115,13 +131,25 @@ public class MyFragment extends BaseFragment implements UserInfoView {
         mShareAPI = UMShareAPI.get(getActivity());
         userInfoPresenterImp = new UserInfoPresenterImp(this, getActivity());
 
+    }
 
-//        if (!StringUtils.isEmpty(SPUtils.getInstance().getString(Constants.USER_INFO))) {
-//            Logger.i(SPUtils.getInstance().getString(Constants.USER_INFO));
-//            userInfo = JSON.parseObject(SPUtils.getInstance().getString(Constants.USER_INFO), new TypeReference<UserInfo>() {
-//            });
-//        }
+    @Override
+    public void onResume() {
+        super.onResume();
 
+        if (!StringUtils.isEmpty(SPUtils.getInstance().getString(Constants.USER_INFO))) {
+            Logger.i(SPUtils.getInstance().getString(Constants.USER_INFO));
+            userInfo = JSON.parseObject(SPUtils.getInstance().getString(Constants.USER_INFO), new TypeReference<UserInfo>() {
+            });
+        }
+
+        if (userInfo != null) {
+            RequestOptions options = new RequestOptions();
+            options.transform(new GlideRoundTransform(getActivity(), 30));
+            Glide.with(getActivity()).load(userInfo.getUserimg()).apply(options).into(mUserHeadImageView);
+            mUserNickNameTv.setText(userInfo.getNickname());
+            mUserIdTv.setText("ID：" + userInfo.getId());
+        }
     }
 
     public void initDialog() {
@@ -231,7 +259,10 @@ public class MyFragment extends BaseFragment implements UserInfoView {
         if (tData != null) {
             if (tData.getCode() == Constants.SUCCESS && tData.getData() != null) {
                 ToastUtils.showLong("登录成功");
-                Glide.with(getActivity()).load(tData.getData().getUserimg()).into(mUserHeadImageView);
+                RequestOptions options = new RequestOptions();
+                options.transform(new GlideRoundTransform(getActivity(), 30));
+                Glide.with(getActivity()).load(tData.getData().getUserimg()).apply(options).into(mUserHeadImageView);
+
                 mUserNickNameTv.setText(tData.getData().getNickname());
                 mUserIdTv.setText("ID：" + tData.getData().getId());
 

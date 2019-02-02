@@ -7,10 +7,13 @@ import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TabHost;
 import android.widget.TabWidget;
 import android.widget.TextView;
 
+import com.blankj.utilcode.util.BarUtils;
+import com.blankj.utilcode.util.SizeUtils;
 import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.bean.MessageEvent;
@@ -106,6 +109,10 @@ public class CommunityFragment extends BaseFragment implements ViewPager.OnPageC
         lineView.setVisibility(View.VISIBLE);
         tabText.setTextColor(ContextCompat.getColor(getActivity(), R.color.black));
         tabText.setTextSize(20);
+
+        LinearLayout.LayoutParams searchParams = new LinearLayout.LayoutParams(SizeUtils.dp2px(200), SizeUtils.dp2px(48));
+        searchParams.setMargins(0, BarUtils.getStatusBarHeight(), 0, 0);
+        mTabHost.setLayoutParams(searchParams);
     }
 
     private void initTabs() {
@@ -199,7 +206,7 @@ public class CommunityFragment extends BaseFragment implements ViewPager.OnPageC
             if (tData.getCode() == Constants.SUCCESS) {
                 App.topicInfoList = tData.getData();
                 //if (RecommendFragment.getInstance().isVisible()) {
-                   // RecommendFragment.getInstance().onRefresh();
+                // RecommendFragment.getInstance().onRefresh();
                 //}
                 EventBus.getDefault().post(new MessageEvent("测试"));
             }

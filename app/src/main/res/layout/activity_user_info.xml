@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="false">
+
+    <com.qmuiteam.qmui.widget.QMUIAppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="375dp"
+        android:fitsSystemWindows="true">
+
+        <com.qmuiteam.qmui.widget.QMUICollapsingTopBarLayout
+            android:id="@+id/collapsing_topbar_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:minHeight="?attr/qmui_topbar_height"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed"
+            app:qmui_collapsedTitleGravity="center"
+            app:qmui_contentScrim="@color/tab_select_color"
+            app:qmui_expandedTitleGravity="center_horizontal|bottom"
+            app:qmui_statusBarScrim="@color/tab_select_color">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="375dp"
+                android:background="@color/my_info_bg_color"
+                android:fitsSystemWindows="false"
+                android:orientation="horizontal"
+                app:qmui_layout_collapseMode="parallax"
+                app:qmui_layout_collapseParallaxMultiplier="0.7">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="183dp"
+                    android:layout_gravity="top|center"
+                    android:background="@mipmap/user_info_top_bg">
+
+                </LinearLayout>
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="250dp"
+                    android:layout_gravity="bottom"
+                    android:background="@color/transparent">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="213dp"
+                        android:layout_gravity="bottom"
+                        android:layout_marginLeft="12dp"
+                        android:layout_marginRight="12dp"
+                        android:background="@drawable/common_white_bg"
+                        android:gravity="top|center"
+                        android:orientation="vertical">
+
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="40dp"
+                            android:layout_marginLeft="30dp"
+                            android:layout_marginRight="30dp">
+
+                            <TextView
+                                android:id="@+id/tv_follow_txt"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentLeft="true"
+                                android:layout_centerVertical="true"
+                                android:gravity="center"
+                                android:text="关注"
+                                android:textColor="@color/gray999"
+                                android:textSize="16sp" />
+
+                            <TextView
+                                android:id="@+id/tv_follow_count"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_centerVertical="true"
+                                android:layout_marginLeft="10dp"
+                                android:layout_toRightOf="@+id/tv_follow_txt"
+                                android:text="250"
+                                android:textColor="@color/black1"
+                                android:textSize="18sp" />
+
+                            <TextView
+                                android:id="@+id/tv_fsns_txt"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_centerVertical="true"
+                                android:layout_marginRight="10dp"
+                                android:layout_toLeftOf="@+id/tv_fans_count"
+                                android:gravity="center"
+                                android:text="粉丝"
+                                android:textColor="@color/gray999"
+                                android:textSize="16sp" />
+
+                            <TextView
+                                android:id="@+id/tv_fans_count"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentRight="true"
+                                android:layout_centerVertical="true"
+                                android:text="168"
+                                android:textColor="@color/black1"
+                                android:textSize="18sp" />
+                        </RelativeLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="30dp"
+                            android:layout_marginLeft="30dp"
+                            android:layout_marginRight="30dp"
+                            android:gravity="center">
+
+                            <TextView
+                                android:id="@+id/tv_user_nick_name"
+                                android:layout_width="200dp"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentLeft="true"
+                                android:layout_centerVertical="true"
+                                android:ellipsize="end"
+                                android:gravity="center"
+                                android:maxLines="1"
+                                android:text="你是一个小笨猪"
+                                android:textColor="@color/black"
+                                android:textSize="16sp" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="30dp"
+                            android:layout_marginLeft="30dp"
+                            android:layout_marginRight="30dp"
+                            android:gravity="left|center"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="80dp"
+                                android:layout_height="wrap_content"
+                                android:text="头像ID："
+                                android:textColor="@color/gray999"
+                                android:textSize="14sp" />
+
+                            <TextView
+                                android:id="@+id/tv_user_id"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="2342342234"
+                                android:textColor="@color/black1"
+                                android:textSize="14sp" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="30dp"
+                            android:layout_marginLeft="30dp"
+                            android:layout_marginRight="30dp"
+                            android:gravity="left|center"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="80dp"
+                                android:layout_height="wrap_content"
+                                android:text="资料："
+                                android:textColor="@color/gray999"
+                                android:textSize="14sp" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="18岁"
+                                android:textColor="@color/black1"
+                                android:textSize="14sp" />
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="10dp"
+                                android:src="@mipmap/sex_girl" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="10dp"
+                                android:text="双鱼座"
+                                android:textColor="@color/black1"
+                                android:textSize="14sp" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="30dp"
+                            android:layout_marginLeft="30dp"
+                            android:layout_marginRight="30dp"
+                            android:gravity="left|center"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="80dp"
+                                android:layout_height="wrap_content"
+                                android:text="签名："
+                                android:textColor="@color/gray999"
+                                android:textSize="14sp" />
+
+                            <TextView
+                                android:id="@+id/tv_user_sign"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:ellipsize="end"
+                                android:maxLines="1"
+                                android:text="没有什么是一顿饭不能解决的，如果有，那就二顿"
+                                android:textColor="@color/black1"
+                                android:textSize="14sp" />
+                        </LinearLayout>
+
+                        <RelativeLayout
+                            android:id="@+id/layout_photos"
+                            android:layout_width="match_parent"
+                            android:layout_height="36dp"
+                            android:layout_marginLeft="30dp"
+                            android:layout_marginRight="30dp"
+                            android:layout_weight="1"
+                            android:gravity="left|center">
+
+                            <TextView
+                                android:id="@+id/tv_user_photo_txt"
+                                android:layout_width="80dp"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentLeft="true"
+                                android:layout_centerVertical="true"
+                                android:text="照片墙："
+                                android:textColor="@color/gray999"
+                                android:textSize="14sp" />
+
+                            <android.support.v7.widget.RecyclerView
+                                android:id="@+id/photo_list"
+                                android:layout_width="150dp"
+                                android:layout_height="32dp"
+                                android:layout_centerVertical="true"
+                                android:layout_toRightOf="@+id/tv_user_photo_txt"
+                                android:clickable="false"
+                                android:focusable="false"></android.support.v7.widget.RecyclerView>
+
+                            <ImageView
+                                android:id="@+id/iv_right"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentRight="true"
+                                android:layout_centerVertical="true"
+                                android:layout_gravity="center"
+                                android:src="@mipmap/iv_right_icon" />
+                        </RelativeLayout>
+
+                    </LinearLayout>
+
+                    <ImageView
+                        android:layout_width="60dp"
+                        android:layout_height="60dp"
+                        android:layout_gravity="top|center"
+                        android:src="@mipmap/head_def" />
+                </FrameLayout>
+            </FrameLayout>
+
+            <com.qmuiteam.qmui.widget.QMUITopBar
+                android:id="@+id/topbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/qmui_topbar_height"
+                android:fitsSystemWindows="true"
+                app:qmui_layout_collapseMode="pin"
+                app:qmui_topbar_bg_color="@color/qmui_config_color_transparent"
+                app:qmui_topbar_need_separator="false" />
+        </com.qmuiteam.qmui.widget.QMUICollapsingTopBarLayout>
+    </com.qmuiteam.qmui.widget.QMUIAppBarLayout>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/note_list"
+        android:layout_width="333dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="top|center"
+        android:scrollbars="none"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+</android.support.design.widget.CoordinatorLayout>

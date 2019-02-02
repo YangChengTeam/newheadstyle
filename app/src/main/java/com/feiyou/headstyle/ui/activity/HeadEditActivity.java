@@ -1,5 +1,6 @@
 package com.feiyou.headstyle.ui.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -79,6 +80,15 @@ public class HeadEditActivity extends BaseFragmentActivity {
             @Override
             public void onClick(View v) {
                 popBackStack();
+            }
+        });
+
+        //保存图片
+        mConfigTv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(HeadEditActivity.this,HeadSaveActivity.class);
+                startActivity(intent);
             }
         });
     }

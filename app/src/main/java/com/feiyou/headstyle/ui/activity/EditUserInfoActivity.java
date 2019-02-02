@@ -7,9 +7,11 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.BottomSheetDialog;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -17,15 +19,21 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
 import com.blankj.utilcode.util.PathUtils;
+import com.blankj.utilcode.util.SPUtils;
 import com.blankj.utilcode.util.SizeUtils;
+import com.blankj.utilcode.util.StringUtils;
 import com.blankj.utilcode.util.TimeUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.feiyou.headstyle.R;
+import com.feiyou.headstyle.bean.UserInfo;
+import com.feiyou.headstyle.common.Constants;
 import com.feiyou.headstyle.ui.adapter.CommonImageAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragmentActivity;
 import com.feiyou.headstyle.ui.custom.Glide4Engine;
@@ -60,6 +68,18 @@ public class EditUserInfoActivity extends BaseFragmentActivity implements View.O
     @BindView(R.id.photo_list)
     RecyclerView mPhotoListView;
 
+    @BindView(R.id.layout_wrapper)
+    LinearLayout mWrapperLayout;
+
+    @BindView(R.id.layout_no_photo)
+    LinearLayout mNoPhotoLayout;
+
+    @BindView(R.id.layout_photos)
+    RelativeLayout mPhotosLayout;
+
+    @BindView(R.id.tv_total_count)
+    TextView mTotalCountTv;
+
     ImageView mBackImageView;
 
     BottomSheetDialog bottomSheetDialog;
@@ -71,6 +91,10 @@ public class EditUserInfoActivity extends BaseFragmentActivity implements View.O
     LinearLayout mCancelLayout;
 
     CommonImageAdapter commonImageAdapter;
+
+    private UserInfo userInfo;
+
+    private List<Object> photoList;
 
     @Override
     protected int getContextViewId() {
@@ -115,25 +139,55 @@ public class EditUserInfoActivity extends BaseFragmentActivity implements View.O
         mGirlLayout.setOnClickListener(this);
         mCancelLayout.setOnClickListener(this);
         bottomSheetDialog.setContentView(sexView);
-        List<Object> list = new ArrayList<>();
-        list.add(R.mipmap.add_my_photo);
 
-        commonImageAdapter = new CommonImageAdapter(this, list);
+        commonImageAdapter = new CommonImageAdapter(this, null,60);
         mPhotoListView.setLayoutManager(new GridLayoutManager(this, 3));
         mPhotoListView.setAdapter(commonImageAdapter);
         commonImageAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
-                Matisse.from(EditUserInfoActivity.this)
-                        .choose(MimeType.ofImage())
-                        .countable(true)
-                        .maxSelectable(5)
-                        .restrictOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED)
-                        .thumbnailScale(0.85f)
-                        .imageEngine(new Glide4Engine())
-                        .forResult(REQUEST_CODE_CHOOSE);
+                Intent intent = new Intent(EditUserInfoActivity.this, PhotoWallActivity.class);
+                startActivity(intent);
             }
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (!StringUtils.isEmpty(SPUtils.getInstance().getString(Constants.USER_INFO))) {
+            Logger.i(SPUtils.getInstance().getString(Constants.USER_INFO));
+            userInfo = JSON.parseObject(SPUtils.getInstance().getString(Constants.USER_INFO), new TypeReference<UserInfo>() {
+            });
+        }
+
+        if (userInfo != null && userInfo.getImageWall() != null && userInfo.getImageWall().length > 0) {
+            mNoPhotoLayout.setVisibility(View.GONE);
+            mPhotosLayout.setVisibility(View.VISIBLE);
+
+            String[] tempPhotos = userInfo.getImageWall();
+            mTotalCountTv.setText(tempPhotos.length + "张");
+            photoList = new ArrayList<>();
+            for (int i = 0; i < tempPhotos.length; i++) {
+                photoList.add(tempPhotos[i]);
+            }
+            if (photoList.size() > 3) {
+                photoList = photoList.subList(0, 3);
+            }
+
+            //获取值后重新设置
+            commonImageAdapter.setNewData(photoList);
+        } else {
+            mNoPhotoLayout.setVisibility(View.VISIBLE);
+            mPhotosLayout.setVisibility(View.GONE);
+        }
+    }
+
+    @OnClick({R.id.layout_no_photo, R.id.layout_photos})
+    void photoList() {
+        Intent intent = new Intent(EditUserInfoActivity.this, PhotoWallActivity.class);
+        startActivity(intent);
     }
 
     @OnClick(R.id.layout_sex)
@@ -178,24 +232,5 @@ public class EditUserInfoActivity extends BaseFragmentActivity implements View.O
             default:
                 break;
         }
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (resultCode == RESULT_OK) {
-            switch (requestCode) {
-
-                case REQUEST_CODE_CHOOSE:
-                    Logger.i(JSONObject.toJSONString(Matisse.obtainPathResult(data)));
-                    if (Matisse.obtainResult(data) != null && Matisse.obtainResult(data).size() > 0) {
-                        commonImageAdapter.addData(Matisse.obtainPathResult(data));
-                    }
-                    break;
-
-            }
-        }
-
     }
 }

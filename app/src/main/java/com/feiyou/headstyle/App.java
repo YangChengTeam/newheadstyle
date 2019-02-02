@@ -6,6 +6,7 @@ import android.content.Context;
 import com.blankj.utilcode.util.Utils;
 import com.feiyou.headstyle.bean.TopicInfo;
 import com.feiyou.headstyle.utils.AppContextUtil;
+import com.mob.MobSDK;
 import com.umeng.commonsdk.UMConfigure;
 import com.umeng.socialize.PlatformConfig;
 
@@ -33,6 +34,7 @@ public class App extends Application {
         PlatformConfig.setQQZone("1105592461", "xCJux2hAAjyh1qdx");
         PlatformConfig.setWeixin("wxd1112ca9a216aeda", "0e18de42fc068c41f0aca921403b9932");
 
+        MobSDK.init(this);
         Utils.init(this);
         AppContextUtil.init(this);
         applicationContext = this;

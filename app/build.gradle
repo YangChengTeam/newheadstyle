@@ -1,5 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'com.jakewharton.butterknife'
+apply plugin: 'com.mob.sdk'
 
 android {
     compileSdkVersion 28
@@ -36,6 +37,12 @@ android {
             keyPassword "123456"
         }
     }
+}
+
+MobSDK {
+    appKey "29f8d2e904331"
+    appSecret "6118a68d72daeb4a658f5a5d4af613ba"
+    SMSSDK {}
 }
 
 dependencies {

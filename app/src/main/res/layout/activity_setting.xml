@@ -145,6 +145,7 @@
             android:background="@color/line_color"></View>
 
         <RelativeLayout
+            android:id="@+id/layout_bind_phone"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_marginLeft="12dp"
@@ -186,6 +187,7 @@
         android:orientation="vertical">
 
         <RelativeLayout
+            android:id="@+id/layout_black"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_marginLeft="12dp"
@@ -297,6 +299,7 @@
             android:background="@color/line_color"></View>
 
         <RelativeLayout
+            android:id="@+id/layout_update_version"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_marginLeft="12dp"

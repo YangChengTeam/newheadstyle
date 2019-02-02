@@ -64,7 +64,7 @@ public class NewFragment extends BaseFragment implements NoteTypeView {
             topicId = bundle.getString("topic_id");
         }
 
-        noteInfoAdapter = new NoteInfoAdapter(getActivity(), null);
+        noteInfoAdapter = new NoteInfoAdapter(getActivity(), null,1);
         mNewsListView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mNewsListView.setAdapter(noteInfoAdapter);
 

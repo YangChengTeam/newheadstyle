@@ -26,6 +26,7 @@ import com.feiyou.headstyle.ui.fragment.sub.FollowFragment;
 import com.feiyou.headstyle.ui.fragment.sub.NewFragment;
 import com.feiyou.headstyle.ui.fragment.sub.RecommendFragment;
 import com.feiyou.headstyle.ui.fragment.sub.VideoFragment;
+import com.feiyou.headstyle.ui.fragment.sub.WonderfulFragment;
 import com.feiyou.headstyle.view.NoteTypeView;
 import com.jcodecraeer.xrecyclerview.AppBarStateChangeListener;
 import com.orhanobut.logger.Logger;
@@ -66,8 +67,8 @@ public class CommunityTypeActivity extends BaseFragmentActivity implements NoteT
     @BindView(R.id.view_pager)
     ViewPager viewPager;
 
-    @BindView(R.id.scroll_view)
-    JudgeNestedScrollView scrollView;
+//    @BindView(R.id.scroll_view)
+//    JudgeNestedScrollView scrollView;
 
     @BindView(R.id.tv_topic_name)
     TextView mTopicNameTv;
@@ -132,7 +133,7 @@ public class CommunityTypeActivity extends BaseFragmentActivity implements NoteT
         mTitleDataList.add("最新");
         mTitleDataList.add("热门");
 
-        Fragment[] fragments = new Fragment[]{NewFragment.newInstance(topicId), NewFragment.newInstance(topicId)};
+        Fragment[] fragments = new Fragment[]{NewFragment.newInstance(topicId), WonderfulFragment.newInstance(topicId)};
 
         DetailFragmentAdapter viewPageAdapter = new DetailFragmentAdapter(getSupportFragmentManager(), fragments, mTitleDataList);
         viewPager.setAdapter(viewPageAdapter);

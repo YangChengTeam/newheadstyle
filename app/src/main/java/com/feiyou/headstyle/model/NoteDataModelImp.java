@@ -2,6 +2,8 @@ package com.feiyou.headstyle.model;
 
 import android.content.Context;
 
+import com.alibaba.fastjson.JSONException;
+import com.alibaba.fastjson.JSONObject;
 import com.feiyou.headstyle.api.NoteDataServiceApi;
 import com.feiyou.headstyle.api.TopicDataServiceApi;
 import com.feiyou.headstyle.base.BaseModel;
@@ -35,7 +37,15 @@ public class NoteDataModelImp extends BaseModel implements NoteDataModel<NoteInf
 
     @Override
     public void getNoteData(int page, int type, String userid, final IBaseRequestCallBack<NoteInfoRet> iBaseRequestCallBack) {
-        RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), "");
+        JSONObject params = new JSONObject();
+        try {
+            params.put("page", page + "");
+            params.put("type", type + "");
+            params.put("userid", userid);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), params.toString());
         mCompositeSubscription.add(noteDataServiceApi.getNoteData(requestBody)  //将subscribe添加到subscription，用于注销subscribe
                 .observeOn(AndroidSchedulers.mainThread())//指定事件消费线程
                 .subscribeOn(Schedulers.io())  //指定 subscribe() 发生在 IO 线程
