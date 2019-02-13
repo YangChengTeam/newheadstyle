@@ -12,6 +12,8 @@
         <item name="QMUITopBarStyle">@style/QDTopBar</item>
         <item name="android:windowNoTitle">true</item>
         <!--<item name="android:statusBarColor">@android:color/transparent</item>-->
+
+        <!--<item name="bottomSheetDialogTheme">@style/AppBottomSheetDialogTheme</item>-->
     </style>
 
     <style name="QDTopBar" parent="QMUI.TopBar">
@@ -57,5 +59,15 @@
         <item name="android:windowSoftInputMode">stateAlwaysVisible</item><!--显示软件盘-->
         <item name="android:backgroundDimAmount">0.5</item>
     </style>
+
+    <!--<style name="AppBottomSheetDialogTheme"-->
+        <!--parent="Theme.Design.Light.BottomSheetDialog">-->
+        <!--<item name="bottomSheetStyle">@style/AppModalStyle</item>-->
+    <!--</style>-->
+
+    <!--<style name="AppModalStyle"-->
+        <!--parent="Widget.Design.BottomSheet.Modal">-->
+        <!--<item name="behavior_peekHeight">@dimen/custom_peek_height</item>-->
+    <!--</style>-->
 
 </resources>

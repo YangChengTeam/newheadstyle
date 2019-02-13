@@ -98,4 +98,5 @@ dependencies {
     implementation files('libs/umeng-share-wechat-simplify-6.9.4.jar')
     implementation files('libs/umeng-sharetool-6.9.4.jar')
     implementation 'com.zhihu.android:matisse:0.5.2-beta4'
+
 }

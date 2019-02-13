@@ -50,4 +50,6 @@
     <color name="zan_txt_color">#888888</color>
 
     <color name="reply_bg_color">#f7f7f7</color>
+
+    <color name="comment_nick_name_color">#4b79ad</color>
 </resources>

@@ -35,104 +35,145 @@ public class NoteItem {
     private String zanNum;
 
     @SerializedName("list_num")
-    private String listNum;
+    private Integer listNum;
 
     @SerializedName("is_zan")
     private int isZan;
 
     private List<NoteComment> comment;
 
-    public class NoteComment implements MultiItemEntity {
-
-        public static final int TYPE_COMMENT = 1;
-        public static final int TYPE_REPEAT = 2;
-
-        private int itemType;
+    public class NoteComment {
 
         @SerializedName("add_time")
-        private String addTime;
+        private Long addTime;
 
-        @SerializedName("comment_id")
-        private String commentId;
+        @SerializedName("repeat_content")
+        private String repeatContent;
 
-        private String content;
+        @SerializedName("repeat_id")
+        private String repeatId;
 
-        private String nickname;
+        @SerializedName("repeat_nickname")
+        private String repeatNickname;
 
-        private String repeatNickName;
+        @SerializedName("repeat_user_id")
+        private String repeatUserId;
+
+        @SerializedName("repeat_userimg")
+        private String repeatUserimg;
+
+        @SerializedName("repeat_num")
+        private String repeatNum;
+
+        @SerializedName("is_zan")
+        private String isZan;
+
+        @SerializedName("zan_num")
+        private String zanNum;
+
+        @SerializedName("content")
+        private String oldContent;
+
+        @SerializedName("nickname")
+        private String oldNickname;
 
         @SerializedName("user_id")
-        private String userId;
+        private String oldUserId;
 
-        private List<NoteRepeat> repeat;
-
-        public NoteComment(int itemType) {
-            this.itemType = itemType;
-        }
-
-        public String getAddTime() {
+        public Long getAddTime() {
             return addTime;
         }
 
-        public void setAddTime(String addTime) {
+        public void setAddTime(Long addTime) {
             this.addTime = addTime;
         }
 
-        public String getCommentId() {
-            return commentId;
+        public String getRepeatContent() {
+            return repeatContent;
         }
 
-        public void setCommentId(String commentId) {
-            this.commentId = commentId;
+        public void setRepeatContent(String repeatContent) {
+            this.repeatContent = repeatContent;
         }
 
-        public String getContent() {
-            return content;
+        public String getRepeatId() {
+            return repeatId;
         }
 
-        public void setContent(String content) {
-            this.content = content;
+        public void setRepeatId(String repeatId) {
+            this.repeatId = repeatId;
         }
 
-        public String getNickname() {
-            return nickname;
+        public String getRepeatNickname() {
+            return repeatNickname;
         }
 
-        public void setNickname(String nickname) {
-            this.nickname = nickname;
+        public void setRepeatNickname(String repeatNickname) {
+            this.repeatNickname = repeatNickname;
         }
 
-        public String getUserId() {
-            return userId;
+        public String getRepeatUserId() {
+            return repeatUserId;
         }
 
-        public void setUserId(String userId) {
-            this.userId = userId;
+        public void setRepeatUserId(String repeatUserId) {
+            this.repeatUserId = repeatUserId;
         }
 
-        public List<NoteRepeat> getRepeat() {
-            return repeat;
+        public String getRepeatUserimg() {
+            return repeatUserimg;
         }
 
-        public void setRepeat(List<NoteRepeat> repeat) {
-            this.repeat = repeat;
+        public void setRepeatUserimg(String repeatUserimg) {
+            this.repeatUserimg = repeatUserimg;
         }
 
-        @Override
-        public int getItemType() {
-            return itemType;
+        public String getRepeatNum() {
+            return repeatNum;
         }
 
-        public void setItemType(int itemType) {
-            this.itemType = itemType;
+        public void setRepeatNum(String repeatNum) {
+            this.repeatNum = repeatNum;
         }
 
-        public String getRepeatNickName() {
-            return repeatNickName;
+        public String getIsZan() {
+            return isZan;
         }
 
-        public void setRepeatNickName(String repeatNickName) {
-            this.repeatNickName = repeatNickName;
+        public void setIsZan(String isZan) {
+            this.isZan = isZan;
+        }
+
+        public String getZanNum() {
+            return zanNum;
+        }
+
+        public void setZanNum(String zanNum) {
+            this.zanNum = zanNum;
+        }
+
+        public String getOldContent() {
+            return oldContent;
+        }
+
+        public void setOldContent(String oldContent) {
+            this.oldContent = oldContent;
+        }
+
+        public String getOldNickname() {
+            return oldNickname;
+        }
+
+        public void setOldNickname(String oldNickname) {
+            this.oldNickname = oldNickname;
+        }
+
+        public String getOldUserId() {
+            return oldUserId;
+        }
+
+        public void setOldUserId(String oldUserId) {
+            this.oldUserId = oldUserId;
         }
     }
 
@@ -274,11 +315,11 @@ public class NoteItem {
         this.comment = comment;
     }
 
-    public String getListNum() {
+    public Integer getListNum() {
         return listNum;
     }
 
-    public void setListNum(String listNum) {
+    public void setListNum(Integer listNum) {
         this.listNum = listNum;
     }
 

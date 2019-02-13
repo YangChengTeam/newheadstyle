@@ -49,4 +49,6 @@
     <dimen name="forty_two">42dp</dimen>
     <dimen name="seventeen">17dp</dimen>
     <dimen name="twenty_one">21dp</dimen>
+
+    <dimen name="custom_peek_height">500dp</dimen>
 </resources>
