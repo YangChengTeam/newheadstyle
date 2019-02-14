@@ -11,7 +11,7 @@ public class NoteInfo {
     private Long addTime;
 
     @SerializedName("comment_num")
-    private String commentNum;
+    private int commentNum;
 
     private String content;
 
@@ -43,11 +43,11 @@ public class NoteInfo {
         this.addTime = addTime;
     }
 
-    public String getCommentNum() {
+    public int getCommentNum() {
         return commentNum;
     }
 
-    public void setCommentNum(String commentNum) {
+    public void setCommentNum(int commentNum) {
         this.commentNum = commentNum;
     }
 

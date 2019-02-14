@@ -4,6 +4,7 @@ import com.feiyou.headstyle.bean.NoteCommentRet;
 import com.feiyou.headstyle.bean.NoteInfoDetailRet;
 import com.feiyou.headstyle.bean.NoteInfoRet;
 import com.feiyou.headstyle.bean.NoteTypeRet;
+import com.feiyou.headstyle.bean.ReplyResultInfoRet;
 import com.feiyou.headstyle.bean.ResultInfo;
 
 import java.util.List;
@@ -36,5 +37,8 @@ public interface NoteDataServiceApi {
 
     @POST("v1.message/setMessageInfo")
     Observable<ResultInfo> addNote(@Body MultipartBody multipartBody);
+
+    @POST("v1.message/messageDetailCommentRepeat")
+    Observable<ReplyResultInfoRet> replyComment(@Body RequestBody requestBody);
 
 }

@@ -1,5 +1,6 @@
 package com.feiyou.headstyle.ui.fragment.sub;
 
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.BottomSheetDialog;
@@ -13,11 +14,16 @@ import android.widget.ImageView;
 import com.alibaba.fastjson.JSONObject;
 import com.blankj.utilcode.util.BarUtils;
 import com.blankj.utilcode.util.ScreenUtils;
+import com.blankj.utilcode.util.ToastUtils;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.bean.NoteCommentRet;
+import com.feiyou.headstyle.bean.ReplyParams;
+import com.feiyou.headstyle.bean.ReplyResultInfoRet;
+import com.feiyou.headstyle.bean.ResultInfo;
 import com.feiyou.headstyle.common.Constants;
 import com.feiyou.headstyle.presenter.NoteCommentDataPresenterImp;
+import com.feiyou.headstyle.presenter.ReplyCommentPresenterImp;
 import com.feiyou.headstyle.ui.adapter.CommentAdapter;
 import com.feiyou.headstyle.ui.adapter.CommentReplyAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragment;
@@ -41,6 +47,8 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
 
     private NoteCommentDataPresenterImp noteCommentDataPresenterImp;
 
+    private ReplyCommentPresenterImp replyCommentPresenterImp;
+
     BottomSheetDialog commitReplyDialog;
 
     private View replyView;
@@ -56,6 +64,14 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
     public static WonderfulFragment getInstance() {
         return new WonderfulFragment();
     }
+
+    private int currentCommentPos = -1;
+
+    private String commentId;
+
+    private String repeatCommentUserId;
+
+    private ProgressDialog progressDialog = null;
 
     @Override
     protected View onCreateView() {
@@ -89,6 +105,8 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
         mWonderfulListView.setAdapter(commentAdapter);
 
         noteCommentDataPresenterImp = new NoteCommentDataPresenterImp(this, getActivity());
+        replyCommentPresenterImp = new ReplyCommentPresenterImp(this, getActivity());
+
         noteCommentDataPresenterImp.getNoteDetailData(1, "110634", 1);
 
         commentReplyAdapter = new CommentReplyAdapter(getActivity(), null);
@@ -98,6 +116,7 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
         commentAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
+                currentCommentPos = position;
                 showDialog();
             }
         });
@@ -122,6 +141,9 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
                 }
             }
         });
+
+        progressDialog = new ProgressDialog(getActivity());
+        progressDialog.setMessage("回复中");
     }
 
     public void showDialog() {
@@ -137,29 +159,62 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
 
     @Override
     public void dismissProgress() {
-
+        if (progressDialog != null && progressDialog.isShowing()) {
+            progressDialog.dismiss();
+        }
     }
 
     @Override
-    public void loadDataSuccess(NoteCommentRet tData) {
+    public void loadDataSuccess(ResultInfo tData) {
 
         Logger.i("tdata--->" + JSONObject.toJSONString(tData));
 
+        if (progressDialog != null && progressDialog.isShowing()) {
+            progressDialog.dismiss();
+        }
+
         if (tData != null && tData.getCode() == Constants.SUCCESS) {
-            if (tData.getData() != null) {
-                commentAdapter.setNewData(tData.getData());
+            if (tData instanceof NoteCommentRet) {
+                if (((NoteCommentRet) tData).getData() != null) {
+                    commentAdapter.setNewData(((NoteCommentRet) tData).getData());
+                }
+            }
+            if (tData instanceof ReplyResultInfoRet) {
+                ToastUtils.showLong("回复成功");
+                Integer tempNum = commentAdapter.getData().get(currentCommentPos).getListNum() + 1;
+                commentAdapter.getData().get(currentCommentPos).setListNum(tempNum);
+                commentAdapter.notifyDataSetChanged();
             }
         }
     }
 
     @Override
     public void loadDataError(Throwable throwable) {
-
+        if (progressDialog != null && progressDialog.isShowing()) {
+            progressDialog.dismiss();
+        }
     }
 
     @Override
     public void sendContent(String content, int type) {
         Logger.i("content--->" + content + "---type--->" + type);
+
+        if (progressDialog != null && !progressDialog.isShowing()) {
+            progressDialog.show();
+        }
+
+        commentId = commentAdapter.getData().get(currentCommentPos).getCommentId();
+        repeatCommentUserId = commentAdapter.getData().get(currentCommentPos).getUserId();
+
+        ReplyParams replyParams = new ReplyParams();
+        replyParams.setType(2);
+        replyParams.setContent("我只是测试回复内容");
+        replyParams.setRepeatUserId("1021601");
+        replyParams.setCommentId(commentId);
+        replyParams.setRepeatCommentUserId(repeatCommentUserId);
+
+        replyCommentPresenterImp.addReplyInfo(replyParams);
+
         if (content != null) {
             if (commentDialog != null) {
                 commentDialog.hideProgressDialog();
