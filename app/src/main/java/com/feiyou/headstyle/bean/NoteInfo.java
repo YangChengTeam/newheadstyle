@@ -33,7 +33,7 @@ public class NoteInfo {
     private String zanNum;
 
     @SerializedName("is_zan")
-    private String isZan;
+    private Integer isZan;
 
     public Long getAddTime() {
         return addTime;
@@ -115,11 +115,11 @@ public class NoteInfo {
         this.zanNum = zanNum;
     }
 
-    public String getIsZan() {
+    public Integer getIsZan() {
         return isZan;
     }
 
-    public void setIsZan(String isZan) {
+    public void setIsZan(Integer isZan) {
         this.isZan = isZan;
     }
 }

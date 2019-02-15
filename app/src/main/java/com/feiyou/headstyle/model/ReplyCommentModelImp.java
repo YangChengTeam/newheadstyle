@@ -58,6 +58,11 @@ public class ReplyCommentModelImp extends BaseModel implements ReplyCommentModel
                         params.put("user_id", replyParams.getRepeatCommentUserId());
                         break;
                     case 3:
+                        params.put("type", replyParams.getType() + "");
+                        params.put("content", replyParams.getContent());
+                        params.put("repeat_user_id", replyParams.getRepeatUserId());
+                        params.put("repeat_id", replyParams.getRepeatId());
+                        params.put("user_id", replyParams.getRepeatCommentUserId());
                         break;
                 }
             }

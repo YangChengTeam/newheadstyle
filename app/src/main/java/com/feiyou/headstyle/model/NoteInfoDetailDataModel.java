@@ -7,5 +7,5 @@ import com.feiyou.headstyle.base.IBaseRequestCallBack;
  */
 
 public interface NoteInfoDetailDataModel<T> {
-    void getNoteInfoDetailData(String msgId, IBaseRequestCallBack<T> iBaseRequestCallBack);
+    void getNoteInfoDetailData(String userId,String msgId, IBaseRequestCallBack<T> iBaseRequestCallBack);
 }

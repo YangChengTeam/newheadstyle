@@ -8,7 +8,6 @@
     <RelativeLayout
         android:id="@+id/layout_reply_top"
         android:layout_width="match_parent"
-        android:layout_alignParentTop="true"
         android:layout_height="48dp">
 
         <ImageView
@@ -38,17 +37,19 @@
         android:background="@color/line_color"></View>
 
     <LinearLayout
+        android:id="@+id/layout_content"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/view_top_line"
-        android:layout_marginBottom="48dp"
         android:orientation="vertical">
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="60dp"
+            android:layout_height="50dp"
             android:layout_marginLeft="12dp"
-            android:layout_marginRight="12dp">
+            android:layout_marginTop="6dp"
+            android:layout_marginRight="12dp"
+            android:layout_marginBottom="6dp">
 
             <ImageView
                 android:id="@+id/iv_user_head"
@@ -71,33 +72,16 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="用户昵称"
-                    android:textColor="@color/into_community_color"
+                    android:textColor="@color/black"
                     android:textSize="14sp" />
 
-                <LinearLayout
+                <TextView
+                    android:id="@+id/tv_add_date"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:gravity="center"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:id="@+id/tv_topic_name"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="处Q友"
-                        android:textColor="@color/community_type_color"
-                        android:textSize="11sp" />
-
-                    <TextView
-                        android:id="@+id/tv_add_date"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="6dp"
-                        android:text="10分钟前"
-                        android:textColor="@color/gray_aaa"
-                        android:textSize="9sp" />
-                </LinearLayout>
+                    android:text="10分钟前"
+                    android:textColor="@color/gray_aaa"
+                    android:textSize="11sp" />
             </LinearLayout>
 
             <FrameLayout
@@ -118,10 +102,29 @@
             </FrameLayout>
         </RelativeLayout>
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="12dp"
+            android:layout_marginTop="6dp"
+            android:layout_marginRight="12dp"
+            android:layout_marginBottom="6dp"
+            android:gravity="left">
+
+            <TextView
+                android:id="@+id/tv_content"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:lineSpacingMultiplier="1.3"
+                android:text="你这是一个傻子啊你这是一个傻子啊你这是一个傻子啊你这是一个傻子啊你这是一个傻子啊"
+                android:textColor="@color/black"
+                android:textSize="14sp" />
+        </LinearLayout>
+
         <View
             android:layout_width="match_parent"
-            android:layout_height="0.5dp"
-            android:background="@color/line_color"></View>
+            android:layout_height="4dp"
+            android:background="@color/line1_color"></View>
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/rv_reply_list"
@@ -130,83 +133,91 @@
             android:layout_margin="6dp"></android.support.v7.widget.RecyclerView>
     </LinearLayout>
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="0.3dp"
-        android:layout_above="@+id/layout_reply_bottom"
-        android:background="@color/line_color"></View>
-
     <LinearLayout
         android:id="@+id/layout_reply_bottom"
         android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:background="@color/colorPrimary"
+        android:layout_height="49dp"
         android:layout_alignParentBottom="true"
-        android:gravity="center">
+        android:layout_gravity="bottom"
+        android:background="@color/white"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:layout_above="@+id/layout_reply_bottom"
+            android:background="@color/line_color"></View>
 
         <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="horizontal">
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_gravity="bottom"
+            android:background="@color/white"
+            android:gravity="center">
 
-            <ImageView
-                android:layout_width="16dp"
-                android:layout_height="16dp"
-                android:src="@mipmap/note_share" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="horizontal">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="6dp"
-                android:text="@string/share_txt"
-                android:textColor="@color/black3"
-                android:textSize="12sp" />
-        </LinearLayout>
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@mipmap/note_share" />
 
-        <LinearLayout
-            android:id="@+id/layout_message_count"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="horizontal">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="6dp"
+                    android:text="@string/share_txt"
+                    android:textColor="@color/black3"
+                    android:textSize="12sp" />
+            </LinearLayout>
 
-            <ImageView
-                android:layout_width="16dp"
-                android:layout_height="16dp"
-                android:src="@mipmap/note_message" />
+            <LinearLayout
+                android:id="@+id/layout_add_message"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/tv_message_count"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="6dp"
-                android:textColor="@color/black3"
-                android:textSize="12sp" />
-        </LinearLayout>
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@mipmap/note_message" />
 
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="horizontal">
+                <TextView
+                    android:id="@+id/tv_message_count"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="6dp"
+                    android:text="回复"
+                    android:textColor="@color/black3"
+                    android:textSize="12sp" />
+            </LinearLayout>
 
-            <ImageView
-                android:layout_width="16dp"
-                android:layout_height="16dp"
-                android:src="@mipmap/note_zan" />
+            <LinearLayout
+                android:id="@+id/layout_comment_zan"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/tv_zan_count"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="6dp"
-                android:textColor="@color/black3"
-                android:textSize="12sp" />
+                <TextView
+                    android:id="@+id/tv_zan_count"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="6dp"
+                    android:textColor="@color/black3"
+                    android:textSize="12sp" />
+            </LinearLayout>
         </LinearLayout>
     </LinearLayout>
+
 
 </RelativeLayout>

@@ -25,7 +25,7 @@ public class NoteInfoDetailDataPresenterImp extends BasePresenterImp<NoteInfoDet
     }
 
     @Override
-    public void getNoteInfoDetailData(String msgId) {
-        noteInfoDetailDataModelImp.getNoteInfoDetailData(msgId, this);
+    public void getNoteInfoDetailData(String userId, String msgId) {
+        noteInfoDetailDataModelImp.getNoteInfoDetailData(userId, msgId, this);
     }
 }

@@ -5,5 +5,5 @@ package com.feiyou.headstyle.presenter;
  */
 
 public interface NoteInfoDetailDataPresenter {
-    void getNoteInfoDetailData(String msgId);
+    void getNoteInfoDetailData(String userId,String msgId);
 }

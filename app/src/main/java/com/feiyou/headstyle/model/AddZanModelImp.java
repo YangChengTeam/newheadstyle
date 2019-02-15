@@ -6,10 +6,16 @@ import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import com.feiyou.headstyle.api.NoteDataServiceApi;
 import com.feiyou.headstyle.base.BaseModel;
+import com.feiyou.headstyle.base.BaseNoRsaModel;
 import com.feiyou.headstyle.base.IBaseRequestCallBack;
-import com.feiyou.headstyle.bean.NoteInfoDetailRet;
+import com.feiyou.headstyle.bean.PhotoWallRet;
+import com.feiyou.headstyle.bean.ResultInfo;
+
+import java.io.File;
+import java.util.List;
 
 import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
@@ -20,13 +26,13 @@ import rx.subscriptions.CompositeSubscription;
  * Created by iflying on 2018/1/9.
  */
 
-public class NoteInfoDetailDataModelImp extends BaseModel implements NoteInfoDetailDataModel<NoteInfoDetailRet> {
+public class AddZanModelImp extends BaseModel implements AddZanModel<ResultInfo> {
 
     private Context context = null;
     private NoteDataServiceApi noteDataServiceApi;
     private CompositeSubscription mCompositeSubscription;
 
-    public NoteInfoDetailDataModelImp(Context mContext) {
+    public AddZanModelImp(Context mContext) {
         super();
         context = mContext;
         noteDataServiceApi = mRetrofit.create(NoteDataServiceApi.class);
@@ -34,20 +40,38 @@ public class NoteInfoDetailDataModelImp extends BaseModel implements NoteInfoDet
     }
 
     @Override
-    public void getNoteInfoDetailData(String userId,String msgId, final IBaseRequestCallBack<NoteInfoDetailRet> iBaseRequestCallBack) {
+    public void addZan(int type, String userId, String messageId, String commentId, String repeatId, final IBaseRequestCallBack<ResultInfo> iBaseRequestCallBack) {
+
         JSONObject params = new JSONObject();
         try {
-            params.put("user_id", userId);
-            params.put("message_id", msgId);
+            switch (type) {
+                case 1:
+                    params.put("type", type + "");
+                    params.put("user_id", userId);
+                    params.put("message_id", messageId);
+                    break;
+                case 2:
+                    params.put("type", type + "");
+                    params.put("user_id", userId);
+                    params.put("comment_id", commentId);
+                    break;
+                case 3:
+                    params.put("type", type + "");
+                    params.put("user_id", userId);
+                    params.put("repeat_id", repeatId);
+                    break;
+            }
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
+
         RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), params.toString());
 
-        mCompositeSubscription.add(noteDataServiceApi.getNoteInfoDetailData(requestBody)  //将subscribe添加到subscription，用于注销subscribe
+        mCompositeSubscription.add(noteDataServiceApi.addZan(requestBody)  //将subscribe添加到subscription，用于注销subscribe
                 .observeOn(AndroidSchedulers.mainThread())//指定事件消费线程
                 .subscribeOn(Schedulers.io())  //指定 subscribe() 发生在 IO 线程
-                .subscribe(new Subscriber<NoteInfoDetailRet>() {
+                .subscribe(new Subscriber<ResultInfo>() {
 
                     @Override
                     public void onStart() {
@@ -69,11 +93,10 @@ public class NoteInfoDetailDataModelImp extends BaseModel implements NoteInfoDet
                     }
 
                     @Override
-                    public void onNext(NoteInfoDetailRet noteInfoDetailRet) {
+                    public void onNext(ResultInfo resultInfo) {
                         //回调接口：请求成功，获取实体类对象
-                        iBaseRequestCallBack.requestSuccess(noteInfoDetailRet);
+                        iBaseRequestCallBack.requestSuccess(resultInfo);
                     }
                 }));
     }
-
 }

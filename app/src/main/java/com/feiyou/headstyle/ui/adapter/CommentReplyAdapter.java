@@ -5,7 +5,6 @@ import android.graphics.Color;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -19,7 +18,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
 import com.feiyou.headstyle.R;
-import com.feiyou.headstyle.bean.NoteItem;
+import com.feiyou.headstyle.bean.NoteSubComment;
 import com.feiyou.headstyle.view.MyClickText;
 import com.orhanobut.logger.Logger;
 
@@ -28,17 +27,17 @@ import java.util.List;
 /**
  * Created by myflying on 2018/12/25.
  */
-public class CommentReplyAdapter extends BaseQuickAdapter<NoteItem.NoteComment, BaseViewHolder> {
+public class CommentReplyAdapter extends BaseQuickAdapter<NoteSubComment, BaseViewHolder> {
 
     private Context mContext;
 
-    public CommentReplyAdapter(Context context, List<NoteItem.NoteComment> list) {
+    public CommentReplyAdapter(Context context, List<NoteSubComment> list) {
         super(R.layout.comment_reply_item, list);
         this.mContext = context;
     }
 
     @Override
-    protected void convert(final BaseViewHolder helper, NoteItem.NoteComment item) {
+    protected void convert(final BaseViewHolder helper, NoteSubComment item) {
         Logger.i("image url --->" + item.getRepeatUserimg());
         RequestOptions options = new RequestOptions();
         options.error(R.mipmap.head_def);

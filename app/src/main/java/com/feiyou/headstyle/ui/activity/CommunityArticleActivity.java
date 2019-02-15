@@ -1,11 +1,13 @@
 package com.feiyou.headstyle.ui.activity;
 
 import android.app.ProgressDialog;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -21,11 +23,13 @@ import com.blankj.utilcode.util.ToastUtils;
 import com.bumptech.glide.Glide;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.bean.HeadInfo;
+import com.feiyou.headstyle.bean.MessageEvent;
 import com.feiyou.headstyle.bean.NoteInfoDetailRet;
 import com.feiyou.headstyle.bean.ReplyParams;
 import com.feiyou.headstyle.bean.ReplyResultInfoRet;
 import com.feiyou.headstyle.bean.ResultInfo;
 import com.feiyou.headstyle.common.Constants;
+import com.feiyou.headstyle.presenter.AddZanPresenterImp;
 import com.feiyou.headstyle.presenter.NoteInfoDetailDataPresenterImp;
 import com.feiyou.headstyle.presenter.ReplyCommentPresenterImp;
 import com.feiyou.headstyle.ui.adapter.DetailFragmentAdapter;
@@ -37,6 +41,8 @@ import com.feiyou.headstyle.view.CommentDialog;
 import com.feiyou.headstyle.view.NoteInfoDetailDataView;
 import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -100,6 +106,8 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
 
     private NoteInfoDetailDataPresenterImp noteInfoDetailDataPresenterImp;
 
+    private AddZanPresenterImp addZanPresenterImp;
+
     private HeadInfoAdapter headInfoAdapter;
 
     CommentDialog commentDialog;
@@ -109,6 +117,12 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
     private ReplyCommentPresenterImp replyCommentPresenterImp;
 
     private int commentNum;
+
+    private String messageId;
+
+    private boolean isFirstLoad = true;
+
+    private boolean isZaned;
 
     @Override
     protected int getContextViewId() {
@@ -131,9 +145,11 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
         mNoteImageListView.setAdapter(headInfoAdapter);
 
         noteInfoDetailDataPresenterImp = new NoteInfoDetailDataPresenterImp(this, this);
+        addZanPresenterImp = new AddZanPresenterImp(this, this);
+
         replyCommentPresenterImp = new ReplyCommentPresenterImp(this, this);
 
-        noteInfoDetailDataPresenterImp.getNoteInfoDetailData("110600");
+        noteInfoDetailDataPresenterImp.getNoteInfoDetailData("1021601", "110600");
 
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("回复中");
@@ -163,6 +179,14 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
     @OnClick(R.id.layout_message_count)
     void addComment() {
         showDialog();
+    }
+
+    @OnClick(R.id.layout_zan)
+    void addZan() {
+        if (!isZaned) {
+            isFirstLoad = false;
+            addZanPresenterImp.addZan(1, "1021601", messageId, "", "");
+        }
     }
 
     @OnClick(R.id.iv_back)
@@ -196,7 +220,13 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
         Logger.i(JSONObject.toJSONString(tData));
 
         if (tData != null && tData.getCode() == Constants.SUCCESS) {
+
+            Drawable isZan = ContextCompat.getDrawable(this, R.mipmap.is_zan);
+            Drawable notZan = ContextCompat.getDrawable(this, R.mipmap.note_zan);
+
             if (tData instanceof NoteInfoDetailRet) {
+                messageId = ((NoteInfoDetailRet) tData).getData().getId();
+
                 commentNum = ((NoteInfoDetailRet) tData).getData().getCommentNum();
 
                 Glide.with(this).load(((NoteInfoDetailRet) tData).getData().getUserimg()).into(mUserHeadImageView);
@@ -207,6 +237,16 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
 
                 mMessageCountTextView.setText(commentNum > 0 ? commentNum + "" : "");
                 mZanCountTextView.setText(((NoteInfoDetailRet) tData).getData().getZanNum() + "");
+
+
+                if (((NoteInfoDetailRet) tData).getData().getIsZan() == 0) {
+                    isZaned = false;
+                    mZanCountTextView.setCompoundDrawablesWithIntrinsicBounds(notZan, null, null, null);
+                } else {
+                    isZaned = true;
+                    mZanCountTextView.setCompoundDrawablesWithIntrinsicBounds(isZan, null, null, null);
+                }
+                mZanCountTextView.setCompoundDrawablePadding(SizeUtils.dp2px(4));
 
                 //设置帖子图片
                 List<HeadInfo> headInfos = new ArrayList<>();
@@ -228,6 +268,14 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
                 ToastUtils.showLong("回复成功");
                 commentNum++;
                 mMessageCountTextView.setText(commentNum > 0 ? commentNum + "" : "");
+
+                EventBus.getDefault().post(new MessageEvent("更新精彩评论"));
+            }
+
+            if (tData instanceof ResultInfo && !isFirstLoad) {
+                mZanCountTextView.setText((((NoteInfoDetailRet) tData).getData().getZanNum() + 1) + "");
+                mZanCountTextView.setCompoundDrawablesWithIntrinsicBounds(isZan, null, null, null);
+                mZanCountTextView.setCompoundDrawablePadding(SizeUtils.dp2px(4));
             }
         }
     }
@@ -250,7 +298,7 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
         replyParams.setType(1);
         replyParams.setContent("我是帖子的一级回复");
         replyParams.setRepeatUserId("1021601");
-        replyParams.setMessageId("110600");
+        replyParams.setMessageId("110634");
 
         replyCommentPresenterImp.addReplyInfo(replyParams);
 
