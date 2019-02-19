@@ -16,6 +16,7 @@ import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.bean.BannerInfo;
 import com.feiyou.headstyle.bean.HeadInfo;
 import com.feiyou.headstyle.bean.HomeDataRet;
+import com.feiyou.headstyle.bean.ResultInfo;
 import com.feiyou.headstyle.common.Constants;
 import com.feiyou.headstyle.common.GlideImageLoader;
 import com.feiyou.headstyle.presenter.HomeDataPresenterImp;
@@ -228,47 +229,47 @@ public class HomeFragment extends BaseFragment implements MyScrollView.OnScrollL
     }
 
     @Override
-    public void loadDataSuccess(HomeDataRet tData) {
-        if (tData != null && tData.getCode() == Constants.SUCCESS) {
-            if (tData.getData() != null) {
-                currentPage = tData.getData().getPage();
-
-                if (tData.getData().getBannerList() != null && tData.getData().getBannerList().size() > 0) {
-                    bannerInfos = tData.getData().getBannerList();
-                    List<String> urls = new ArrayList<>();
-                    for (int i = 0; i < bannerInfos.size(); i++) {
-                        urls.add(bannerInfos.get(i).getIco());
-                    }
-                    //设置图片加载器
-                    mBanner.setImageLoader(new GlideImageLoader()).setImages(urls).start();
-                }
-
-                if (tData.getData().getCategoryInfoList() != null && tData.getData().getCategoryInfoList().size() > 0) {
-                    headTypeAdapter.setNewData(tData.getData().getCategoryInfoList());
-                }
-
-                if (tData.getData().getAdList() != null && tData.getData().getAdList().size() > 0) {
-                    Glide.with(getActivity()).load(tData.getData().getAdList().get(0).getIco()).into(mAdImageView);
-                } else {
-                    mAdLayout.setVisibility(View.GONE);
-                }
-
-                if (tData.getData().getImagesList() != null && tData.getData().getImagesList().size() > 0) {
-                    if (isFirstLoad) {
-                        headInfoAdapter.setNewData(tData.getData().getImagesList());
-                        isFirstLoad = false;
-                    } else {
-                        headInfoAdapter.addData(tData.getData().getImagesList());
-                    }
-
-                    if (tData.getData().getImagesList().size() < pageSize) {
-                        headInfoAdapter.loadMoreEnd();
-                    } else {
-                        headInfoAdapter.loadMoreComplete();
-                    }
-                }
-            }
-        }
+    public void loadDataSuccess(ResultInfo tData) {
+//        if (tData != null && tData.getCode() == Constants.SUCCESS) {
+//            if (tData.getData() != null) {
+//                currentPage = tData.getData().getPage();
+//
+//                if (tData.getData().getBannerList() != null && tData.getData().getBannerList().size() > 0) {
+//                    bannerInfos = tData.getData().getBannerList();
+//                    List<String> urls = new ArrayList<>();
+//                    for (int i = 0; i < bannerInfos.size(); i++) {
+//                        urls.add(bannerInfos.get(i).getIco());
+//                    }
+//                    //设置图片加载器
+//                    mBanner.setImageLoader(new GlideImageLoader()).setImages(urls).start();
+//                }
+//
+//                if (tData.getData().getCategoryInfoList() != null && tData.getData().getCategoryInfoList().size() > 0) {
+//                    headTypeAdapter.setNewData(tData.getData().getCategoryInfoList());
+//                }
+//
+//                if (tData.getData().getAdList() != null && tData.getData().getAdList().size() > 0) {
+//                    Glide.with(getActivity()).load(tData.getData().getAdList().get(0).getIco()).into(mAdImageView);
+//                } else {
+//                    mAdLayout.setVisibility(View.GONE);
+//                }
+//
+//                if (tData.getData().getImagesList() != null && tData.getData().getImagesList().size() > 0) {
+//                    if (isFirstLoad) {
+//                        headInfoAdapter.setNewData(tData.getData().getImagesList());
+//                        isFirstLoad = false;
+//                    } else {
+//                        headInfoAdapter.addData(tData.getData().getImagesList());
+//                    }
+//
+//                    if (tData.getData().getImagesList().size() < pageSize) {
+//                        headInfoAdapter.loadMoreEnd();
+//                    } else {
+//                        headInfoAdapter.loadMoreComplete();
+//                    }
+//                }
+//            }
+//        }
     }
 
     @Override

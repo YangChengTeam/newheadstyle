@@ -5,6 +5,7 @@ import android.content.Context;
 import com.feiyou.headstyle.base.BasePresenterImp;
 import com.feiyou.headstyle.base.IBaseView;
 import com.feiyou.headstyle.bean.ResultInfo;
+import com.feiyou.headstyle.bean.ZanResultRet;
 import com.feiyou.headstyle.model.AddNoteModelImp;
 import com.feiyou.headstyle.model.AddZanModelImp;
 
@@ -14,7 +15,7 @@ import java.util.List;
  * Created by iflying on 2018/1/9.
  */
 
-public class AddZanPresenterImp extends BasePresenterImp<IBaseView, ResultInfo> implements AddZanPresenter {
+public class AddZanPresenterImp extends BasePresenterImp<IBaseView, ZanResultRet> implements AddZanPresenter {
     private Context context = null;
     private AddZanModelImp addZanModelImp = null;
 

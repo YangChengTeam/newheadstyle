@@ -26,7 +26,7 @@ public class NoteCommentDataPresenterImp extends BasePresenterImp<IBaseView, Not
     }
 
     @Override
-    public void getNoteDetailData(int page, String msgId, int type) {
-        noteDetailDataModelImp.getNoteCommentData(page, msgId, type, this);
+    public void getNoteDetailData(String userId, int page, String msgId, int type) {
+        noteDetailDataModelImp.getNoteCommentData(userId, page, msgId, type, this);
     }
 }

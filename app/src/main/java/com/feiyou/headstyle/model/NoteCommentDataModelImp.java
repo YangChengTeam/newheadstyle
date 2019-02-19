@@ -34,9 +34,10 @@ public class NoteCommentDataModelImp extends BaseModel implements NoteCommentDat
     }
 
     @Override
-    public void getNoteCommentData(int page, String msgId, int type, final IBaseRequestCallBack<NoteCommentRet> iBaseRequestCallBack) {
+    public void getNoteCommentData(String userId, int page, String msgId, int type, final IBaseRequestCallBack<NoteCommentRet> iBaseRequestCallBack) {
         JSONObject params = new JSONObject();
         try {
+            params.put("user_id", userId);
             params.put("page", page + "");
             params.put("message_id", msgId);
             params.put("type", type + "");

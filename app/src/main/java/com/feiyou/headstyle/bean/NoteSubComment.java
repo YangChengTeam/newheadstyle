@@ -26,10 +26,10 @@ public class NoteSubComment {
     private String repeatNum;
 
     @SerializedName("is_zan")
-    private String isZan;
+    private Integer isZan;
 
     @SerializedName("zan_num")
-    private String zanNum;
+    private Integer zanNum;
 
     @SerializedName("content")
     private String oldContent;
@@ -96,19 +96,19 @@ public class NoteSubComment {
         this.repeatNum = repeatNum;
     }
 
-    public String getIsZan() {
+    public Integer getIsZan() {
         return isZan;
     }
 
-    public void setIsZan(String isZan) {
+    public void setIsZan(Integer isZan) {
         this.isZan = isZan;
     }
 
-    public String getZanNum() {
+    public Integer getZanNum() {
         return zanNum;
     }
 
-    public void setZanNum(String zanNum) {
+    public void setZanNum(Integer zanNum) {
         this.zanNum = zanNum;
     }
 

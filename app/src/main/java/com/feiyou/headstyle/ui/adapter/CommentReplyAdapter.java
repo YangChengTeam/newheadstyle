@@ -2,6 +2,8 @@ package com.feiyou.headstyle.ui.adapter;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
+import android.support.v4.content.ContextCompat;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
@@ -47,10 +49,21 @@ public class CommentReplyAdapter extends BaseQuickAdapter<NoteSubComment, BaseVi
         helper.setText(R.id.tv_nick_name, item.getRepeatNickname())
                 .setText(R.id.tv_comment_date, TimeUtils.millis2String(item.getAddTime() != null ? item.getAddTime() * 1000 : 0))
                 .setText(R.id.btn_reply_count, "回复")
-                .setText(R.id.tv_comment_content, item.getRepeatContent());
+                .setText(R.id.tv_comment_content, item.getRepeatContent())
+                .setText(R.id.tv_is_zan, item.getZanNum() + "");
+
+        TextView isZanTv = helper.itemView.findViewById(R.id.tv_is_zan);
+        Drawable isZan = ContextCompat.getDrawable(mContext, R.mipmap.is_zan);
+        Drawable notZan = ContextCompat.getDrawable(mContext, R.mipmap.note_zan);
+
+        if (item.getIsZan() == 0) {
+            isZanTv.setCompoundDrawablesWithIntrinsicBounds(notZan, null, null, null);
+        } else {
+            isZanTv.setCompoundDrawablesWithIntrinsicBounds(isZan, null, null, null);
+        }
+        helper.addOnClickListener(R.id.layout_zan);
 
         LinearLayout oldLayout = helper.itemView.findViewById(R.id.layout_old_content);
-
         if (StringUtils.isEmpty(item.getOldContent())) {
             helper.setVisible(R.id.layout_old_content, false);
             oldLayout.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0));

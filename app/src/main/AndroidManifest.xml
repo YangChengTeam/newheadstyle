@@ -48,6 +48,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".ui.activity.HeadEditActivity"></activity>
         <activity
             android:name=".ui.activity.Collection2Activity"
             android:configChanges="orientation|keyboardHidden|screenSize"
@@ -66,8 +67,7 @@
             android:name=".ui.activity.EditUserInfoActivity" />
         <activity
             android:name=".ui.activity.ShowImageListActivity" />
-        <activity
-            android:name=".ui.activity.HeadEditActivity" />
+
         <activity
             android:name=".ui.activity.HeadSaveActivity" />
         <activity

@@ -237,6 +237,7 @@ public class SearchActivity extends BaseFragmentActivity implements HotWordDataV
         Logger.i(JSONObject.toJSONString(tData));
 
         if (tData != null && tData.getCode() == Constants.SUCCESS) {
+
             if (tData instanceof SearchHotWordRet) {
                 searchHotWordAdapter.addData(((SearchHotWordRet) tData).getData());
             }

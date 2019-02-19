@@ -19,6 +19,8 @@ import com.bumptech.glide.Glide;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.bean.CollectInfoRet;
 import com.feiyou.headstyle.bean.HeadInfo;
+import com.feiyou.headstyle.bean.ResultInfo;
+import com.feiyou.headstyle.common.Constants;
 import com.feiyou.headstyle.presenter.CollectDataPresenterImp;
 import com.feiyou.headstyle.ui.adapter.HeadInfoAdapter;
 import com.feiyou.headstyle.ui.adapter.QDRecyclerViewAdapter;
@@ -123,17 +125,19 @@ public class Collection2Activity extends BaseFragmentActivity implements Collect
     }
 
     @Override
-    public void loadDataSuccess(CollectInfoRet tData) {
-        if (tData != null && tData.getData() != null) {
-            if (tData.getData().getList() != null && tData.getData().getList().size() > 0) {
-                headInfoAdapter.setNewData(tData.getData().getList());
-            }
+    public void loadDataSuccess(ResultInfo tData) {
+        if (tData != null && tData.getCode() == Constants.SUCCESS) {
+            if (tData instanceof CollectInfoRet) {
+                if (((CollectInfoRet) tData).getData().getList() != null && ((CollectInfoRet) tData).getData().getList().size() > 0) {
+                    headInfoAdapter.setNewData(((CollectInfoRet) tData).getData().getList());
+                }
 
-            if (tData.getData().getInfo() != null) {
-                Glide.with(this).load(tData.getData().getInfo().getIco()).into(mCollectImageView);
-                titleName = tData.getData().getInfo().getName();
-                mCollectNameTextView.setText(titleName);
-                mCollectContentTextView.setText(tData.getData().getInfo().getDesc());
+                if (((CollectInfoRet) tData).getData().getInfo() != null) {
+                    Glide.with(this).load(((CollectInfoRet) tData).getData().getInfo().getIco()).into(mCollectImageView);
+                    titleName = ((CollectInfoRet) tData).getData().getInfo().getName();
+                    mCollectNameTextView.setText(titleName);
+                    mCollectContentTextView.setText(((CollectInfoRet) tData).getData().getInfo().getDesc());
+                }
             }
         }
     }

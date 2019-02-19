@@ -6,6 +6,7 @@ package com.feiyou.headstyle.bean;
 public class HeadInfo {
 
     private String id;
+
     private String imgurl;
 
     public String getId() {

@@ -13,9 +13,11 @@
     <color name="black1">#333333</color>
     <color name="black2">#a1a1a1</color>
     <color name="black3">#555555</color>
+    <color name="black4">#535353</color>
 
     <color name="gray999">#999999</color>
     <color name="gray_aaa">#aaaaaa</color>
+    <color name="gray_eee">#eeeeee</color>
     <color name="line_color">#dddddd</color>
     <color name="line1_color">#eeeeee</color>
 

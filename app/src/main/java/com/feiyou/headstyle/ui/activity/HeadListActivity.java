@@ -13,6 +13,7 @@ import com.blankj.utilcode.util.StringUtils;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.bean.HeadInfoRet;
+import com.feiyou.headstyle.bean.ResultInfo;
 import com.feiyou.headstyle.common.Constants;
 import com.feiyou.headstyle.presenter.HeadListDataPresenterImp;
 import com.feiyou.headstyle.ui.adapter.HeadInfoAdapter;
@@ -128,22 +129,24 @@ public class HeadListActivity extends BaseFragmentActivity implements HeadListDa
     }
 
     @Override
-    public void loadDataSuccess(HeadInfoRet tData) {
+    public void loadDataSuccess(ResultInfo tData) {
         avi.hide();
         if (tData != null) {
             if (tData.getCode() == Constants.SUCCESS) {
-                mNoDataLayout.setVisibility(View.GONE);
+                if (tData instanceof HeadInfoRet) {
+                    mNoDataLayout.setVisibility(View.GONE);
 
-                if (currentPage == 1) {
-                    headInfoAdapter.setNewData(tData.getData());
-                } else {
-                    headInfoAdapter.addData(tData.getData());
-                }
+                    if (currentPage == 1) {
+                        headInfoAdapter.setNewData(((HeadInfoRet) tData).getData());
+                    } else {
+                        headInfoAdapter.addData(((HeadInfoRet) tData).getData());
+                    }
 
-                if (tData.getData().size() == pageSize) {
-                    headInfoAdapter.loadMoreComplete();
-                } else {
-                    headInfoAdapter.loadMoreEnd();
+                    if (((HeadInfoRet) tData).getData().size() == pageSize) {
+                        headInfoAdapter.loadMoreComplete();
+                    } else {
+                        headInfoAdapter.loadMoreEnd();
+                    }
                 }
             } else {
                 headInfoAdapter.loadMoreEnd();

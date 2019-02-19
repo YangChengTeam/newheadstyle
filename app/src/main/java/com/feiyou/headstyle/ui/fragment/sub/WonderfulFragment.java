@@ -33,6 +33,7 @@ import com.feiyou.headstyle.bean.NoteSubCommentRet;
 import com.feiyou.headstyle.bean.ReplyParams;
 import com.feiyou.headstyle.bean.ReplyResultInfoRet;
 import com.feiyou.headstyle.bean.ResultInfo;
+import com.feiyou.headstyle.bean.ZanResultRet;
 import com.feiyou.headstyle.common.Constants;
 import com.feiyou.headstyle.presenter.AddZanPresenterImp;
 import com.feiyou.headstyle.presenter.NoteCommentDataPresenterImp;
@@ -112,9 +113,8 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
 
     private String repeatId;
 
-    private boolean isFirstLoad = true;
-
     private Drawable isZan;
+
     private Drawable notZan;
 
     @Override
@@ -159,9 +159,8 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
         zanLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (commentAdapter.getData().get(currentCommentPos).getIsZan() == 0) {
-                    addZanPresenterImp.addZan(2, "1021601", "", commentId, "");
-                }
+                switchType = 1;
+                addZanPresenterImp.addZan(2, "1021601", "", commentId, "");
             }
         });
 
@@ -210,7 +209,7 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
         commentAdapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
             @Override
             public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
-                isFirstLoad = false;
+                switchType = 1;
                 currentCommentPos = position;
                 commentId = commentAdapter.getData().get(currentCommentPos).getCommentId();
                 if (view.getId() == R.id.btn_reply_count) {
@@ -224,7 +223,7 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
                     nickNameTv.setText(noteItem.getCommentNickname());
                     addDateTv.setText(TimeUtils.millis2String(noteItem.getAddTime() != null ? noteItem.getAddTime() * 1000 : 0));
                     commentContentTv.setText(noteItem.getCommentContent());
-                    noteSubCommentDataPresenterImp.getNoteSubCommentData(1, commentId);
+                    noteSubCommentDataPresenterImp.getNoteSubCommentData(1, "1021601", commentId);
 
                     zanCountTv.setText(noteItem.getZanNum() + "");
 
@@ -236,7 +235,7 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
                     zanCountTv.setCompoundDrawablePadding(SizeUtils.dp2px(4));
                 }
 
-                if (view.getId() == R.id.layout_zan && commentAdapter.getData().get(currentCommentPos).getIsZan() == 0) {
+                if (view.getId() == R.id.layout_zan) {
                     addZanPresenterImp.addZan(2, "1021601", "", commentId, "");
                 }
             }
@@ -260,6 +259,19 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
             }
         });
 
+        commentReplyAdapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
+            @Override
+            public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
+                switchType = 2;
+                currentReplyPos = position;
+                if (view.getId() == R.id.layout_zan) {
+                    repeatId = commentReplyAdapter.getData().get(position).getRepeatId();
+
+                    addZanPresenterImp.addZan(3, "1021601", "", "", repeatId);
+                }
+            }
+        });
+
         progressDialog = new ProgressDialog(getActivity());
         progressDialog.setMessage("回复中");
 
@@ -267,7 +279,7 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
         addZanPresenterImp = new AddZanPresenterImp(this, getActivity());
         noteCommentDataPresenterImp = new NoteCommentDataPresenterImp(this, getActivity());
         replyCommentPresenterImp = new ReplyCommentPresenterImp(this, getActivity());
-        noteCommentDataPresenterImp.getNoteDetailData(1, "110634", 1);
+        noteCommentDataPresenterImp.getNoteDetailData("1021601", 1, "110634", 1);
     }
 
     public void showDialog() {
@@ -278,7 +290,7 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void Event(MessageEvent messageEvent) {
-        noteCommentDataPresenterImp.getNoteDetailData(1, "110634", 1);
+        noteCommentDataPresenterImp.getNoteDetailData("1021601", 1, "110634", 1);
     }
 
     @Override
@@ -345,17 +357,39 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
                 }
             }
 
-            if (tData instanceof ResultInfo && !isFirstLoad) {
-                int tempNum = commentAdapter.getData().get(currentCommentPos).getZanNum() + 1;
+            if (tData instanceof ZanResultRet) {
+                if (switchType == 1) {
+                    int tempNum = commentAdapter.getData().get(currentCommentPos).getZanNum();
 
-                commentAdapter.getData().get(currentCommentPos).setZanNum(tempNum);
-                commentAdapter.getData().get(currentCommentPos).setIsZan(1);
+                    if (((ZanResultRet) tData).getData().getIsZan() == 0) {
+                        tempNum = tempNum - 1;
+                        zanCountTv.setCompoundDrawablesWithIntrinsicBounds(notZan, null, null, null);
+                        zanCountTv.setCompoundDrawablePadding(SizeUtils.dp2px(4));
+                    } else {
+                        tempNum = tempNum + 1;
+                        zanCountTv.setCompoundDrawablesWithIntrinsicBounds(isZan, null, null, null);
+                        zanCountTv.setCompoundDrawablePadding(SizeUtils.dp2px(4));
+                    }
 
-                commentAdapter.notifyDataSetChanged();
+                    commentAdapter.getData().get(currentCommentPos).setZanNum(tempNum);
+                    commentAdapter.getData().get(currentCommentPos).setIsZan(((ZanResultRet) tData).getData().getIsZan());
+                    commentAdapter.notifyDataSetChanged();
 
-                zanCountTv.setText(tempNum + "");
-                zanCountTv.setCompoundDrawablesWithIntrinsicBounds(isZan, null, null, null);
-                zanCountTv.setCompoundDrawablePadding(SizeUtils.dp2px(4));
+                    zanCountTv.setText(tempNum + "");
+                }
+
+                if (switchType == 2) {
+
+                    int tempNum = commentReplyAdapter.getData().get(currentReplyPos).getZanNum();
+                    if (((ZanResultRet) tData).getData().getIsZan() == 0) {
+                        tempNum = tempNum - 1;
+                    } else {
+                        tempNum = tempNum + 1;
+                    }
+                    commentReplyAdapter.getData().get(currentReplyPos).setZanNum(tempNum);
+                    commentReplyAdapter.getData().get(currentReplyPos).setIsZan(((ZanResultRet) tData).getData().getIsZan());
+                    commentReplyAdapter.notifyDataSetChanged();
+                }
             }
         }
     }

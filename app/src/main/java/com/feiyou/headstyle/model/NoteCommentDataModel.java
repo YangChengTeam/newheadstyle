@@ -7,5 +7,5 @@ import com.feiyou.headstyle.base.IBaseRequestCallBack;
  */
 
 public interface NoteCommentDataModel<T> {
-    void getNoteCommentData(int page, String msgId, int type, IBaseRequestCallBack<T> iBaseRequestCallBack);
+    void getNoteCommentData(String userId,int page, String msgId, int type, IBaseRequestCallBack<T> iBaseRequestCallBack);
 }

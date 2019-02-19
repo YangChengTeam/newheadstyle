@@ -17,6 +17,9 @@ import java.util.List;
  */
 
 public class App extends Application {
+
+    protected static App mInstance;
+
     public static Context applicationContext;
 
     public static Context getContext() {
@@ -24,6 +27,20 @@ public class App extends Application {
     }
 
     public static List<TopicInfo> topicInfoList;
+
+    public App() {
+        mInstance = this;
+    }
+
+    public static App getApp() {
+        if (mInstance != null && mInstance instanceof App) {
+            return (App) mInstance;
+        } else {
+            mInstance = new App();
+            mInstance.onCreate();
+            return (App) mInstance;
+        }
+    }
 
     @Override
     public void onCreate() {

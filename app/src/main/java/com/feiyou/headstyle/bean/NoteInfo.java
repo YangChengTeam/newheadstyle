@@ -30,7 +30,7 @@ public class NoteInfo {
     private String userimg;
 
     @SerializedName("zan_num")
-    private String zanNum;
+    private Integer zanNum;
 
     @SerializedName("is_zan")
     private Integer isZan;
@@ -107,11 +107,11 @@ public class NoteInfo {
         this.userimg = userimg;
     }
 
-    public String getZanNum() {
+    public Integer getZanNum() {
         return zanNum;
     }
 
-    public void setZanNum(String zanNum) {
+    public void setZanNum(Integer zanNum) {
         this.zanNum = zanNum;
     }
 

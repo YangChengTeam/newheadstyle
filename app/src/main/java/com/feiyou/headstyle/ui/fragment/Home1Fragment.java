@@ -1,9 +1,7 @@
 package com.feiyou.headstyle.ui.fragment;
 
 import android.content.Intent;
-import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,30 +14,28 @@ import android.widget.TextView;
 import com.blankj.utilcode.util.BarUtils;
 import com.blankj.utilcode.util.SizeUtils;
 import com.blankj.utilcode.util.TimeUtils;
-import com.blankj.utilcode.util.ToastUtils;
 import com.bumptech.glide.Glide;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.bean.ArticleInfo;
 import com.feiyou.headstyle.bean.BannerInfo;
-import com.feiyou.headstyle.bean.HeadInfo;
 import com.feiyou.headstyle.bean.HomeDataRet;
+import com.feiyou.headstyle.bean.HomeDataWrapper;
+import com.feiyou.headstyle.bean.ResultInfo;
 import com.feiyou.headstyle.common.Constants;
 import com.feiyou.headstyle.common.GlideImageLoader;
 import com.feiyou.headstyle.presenter.HomeDataPresenterImp;
 import com.feiyou.headstyle.ui.activity.Collection2Activity;
 import com.feiyou.headstyle.ui.activity.FriendListActivity;
 import com.feiyou.headstyle.ui.activity.HeadEditActivity;
+import com.feiyou.headstyle.ui.activity.HeadShowActivity;
 import com.feiyou.headstyle.ui.activity.HeadListActivity;
 import com.feiyou.headstyle.ui.activity.MoreTypeActivity;
-import com.feiyou.headstyle.ui.activity.SearchActivity;
 import com.feiyou.headstyle.ui.adapter.CommunityHeadAdapter;
 import com.feiyou.headstyle.ui.adapter.HeadInfoAdapter;
 import com.feiyou.headstyle.ui.adapter.HeadTypeAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragment;
 import com.feiyou.headstyle.view.HomeDataView;
-import com.orhanobut.logger.Logger;
-import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 import com.youth.banner.Banner;
 import com.youth.banner.listener.OnBannerListener;
 
@@ -122,9 +118,7 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
 
     public void initTopView() {
 
-
         //QMUIStatusBarHelper.setStatusBarLightMode(getActivity());
-
 
         topView = LayoutInflater.from(getActivity()).inflate(R.layout.home_top, null);
         mBanner = topView.findViewById(R.id.banner);
@@ -294,63 +288,68 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
     }
 
     @Override
-    public void loadDataSuccess(HomeDataRet tData) {
+    public void loadDataSuccess(ResultInfo tData) {
         if (tData != null && tData.getCode() == Constants.SUCCESS) {
-            if (tData.getData() != null) {
-                currentPage = tData.getData().getPage();
 
-                if (tData.getData().getBannerList() != null && tData.getData().getBannerList().size() > 0) {
-                    bannerInfos = tData.getData().getBannerList();
-                    List<String> urls = new ArrayList<>();
-                    for (int i = 0; i < bannerInfos.size(); i++) {
-                        urls.add(bannerInfos.get(i).getIco());
+            HomeDataWrapper homeDataRet = null;
+            if (tData instanceof HomeDataRet) {
+                homeDataRet = ((HomeDataRet) tData).getData();
+                if (homeDataRet != null) {
+                    currentPage = homeDataRet.getPage();
+
+                    if (homeDataRet.getBannerList() != null && homeDataRet.getBannerList().size() > 0) {
+                        bannerInfos = homeDataRet.getBannerList();
+                        List<String> urls = new ArrayList<>();
+                        for (int i = 0; i < bannerInfos.size(); i++) {
+                            urls.add(bannerInfos.get(i).getIco());
+                        }
+                        //设置图片加载器
+                        mBanner.setImageLoader(new GlideImageLoader()).setImages(urls).start();
                     }
-                    //设置图片加载器
-                    mBanner.setImageLoader(new GlideImageLoader()).setImages(urls).start();
-                }
 
-                if (tData.getData().getCategoryInfoList() != null && tData.getData().getCategoryInfoList().size() > 0) {
-                    headTypeAdapter.setNewData(tData.getData().getCategoryInfoList());
-                }
+                    if (homeDataRet.getCategoryInfoList() != null && homeDataRet.getCategoryInfoList().size() > 0) {
+                        headTypeAdapter.setNewData(homeDataRet.getCategoryInfoList());
+                    }
 
-                if (tData.getData().getAdList() != null && tData.getData().getAdList().size() > 0) {
-                    Glide.with(getActivity()).load(tData.getData().getAdList().get(0).getIco()).into(mAdImageView);
-                } else {
-                    mAdLayout.setVisibility(View.GONE);
-                }
+                    if (homeDataRet.getAdList() != null && homeDataRet.getAdList().size() > 0) {
+                        Glide.with(getActivity()).load(homeDataRet.getAdList().get(0).getIco()).into(mAdImageView);
+                    } else {
+                        mAdLayout.setVisibility(View.GONE);
+                    }
 
-                if (tData.getData().getMessageList() != null && tData.getData().getMessageList().size() > 0) {
+                    if (homeDataRet.getMessageList() != null && homeDataRet.getMessageList().size() > 0) {
 
-                    ArticleInfo articleInfo = tData.getData().getMessageList().get(0);
-                    List<String> articleImages = new ArrayList<>();
-                    if (articleInfo != null) {
+                        ArticleInfo articleInfo = homeDataRet.getMessageList().get(0);
+                        List<String> articleImages = new ArrayList<>();
+                        if (articleInfo != null) {
 
-                        mUserNickNameTv.setText(articleInfo.getNickname());
-                        mTopicNameTv.setText(articleInfo.getTopicName());
-                        mArticleDateTv.setText(TimeUtils.millis2String(articleInfo.getAddTime() * 1000));
-                        mArticleContentTv.setText(articleInfo.getContent());
+                            mUserNickNameTv.setText(articleInfo.getNickname());
+                            mTopicNameTv.setText(articleInfo.getTopicName());
+                            mArticleDateTv.setText(TimeUtils.millis2String(articleInfo.getAddTime() * 1000));
+                            mArticleContentTv.setText(articleInfo.getContent());
 
-                        if (articleInfo.getImageArr() != null) {
-                            for (int i = 0; i < articleInfo.getImageArr().length; i++) {
-                                articleImages.add(articleInfo.getImageArr()[i]);
+                            if (articleInfo.getImageArr() != null) {
+                                for (int i = 0; i < articleInfo.getImageArr().length; i++) {
+                                    articleImages.add(articleInfo.getImageArr()[i]);
+                                }
                             }
                         }
-                    }
-                    communityHeadAdapter.setNewData(articleImages);
-                }
-
-                if (tData.getData().getImagesList() != null && tData.getData().getImagesList().size() > 0) {
-                    if (isFirstLoad) {
-                        headInfoAdapter.setNewData(tData.getData().getImagesList());
-                        isFirstLoad = false;
-                    } else {
-                        headInfoAdapter.addData(tData.getData().getImagesList());
+                        communityHeadAdapter.setNewData(articleImages);
                     }
 
-                    if (tData.getData().getImagesList().size() < pageSize) {
-                        headInfoAdapter.loadMoreEnd();
-                    } else {
-                        headInfoAdapter.loadMoreComplete();
+                    if (homeDataRet.getImagesList() != null && homeDataRet.getImagesList().size() > 0) {
+                        if (isFirstLoad) {
+                            headInfoAdapter.setNewData(homeDataRet.getImagesList());
+                            isFirstLoad = false;
+                        } else {
+                            headInfoAdapter.addData(homeDataRet.getImagesList());
+                        }
+
+                        if (homeDataRet.getImagesList().size() < pageSize) {
+                            headInfoAdapter.loadMoreEnd();
+                        } else {
+                            headInfoAdapter.loadMoreComplete();
+                        }
                     }
                 }
             }

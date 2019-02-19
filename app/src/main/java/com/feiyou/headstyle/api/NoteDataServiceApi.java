@@ -7,6 +7,7 @@ import com.feiyou.headstyle.bean.NoteSubCommentRet;
 import com.feiyou.headstyle.bean.NoteTypeRet;
 import com.feiyou.headstyle.bean.ReplyResultInfoRet;
 import com.feiyou.headstyle.bean.ResultInfo;
+import com.feiyou.headstyle.bean.ZanResultRet;
 
 import java.util.List;
 
@@ -49,6 +50,6 @@ public interface NoteDataServiceApi {
 
     //帖子点赞
     @POST("v1.message/messageDetailCommentZan")
-    Observable<ResultInfo> addZan(@Body RequestBody requestBody);
+    Observable<ZanResultRet> addZan(@Body RequestBody requestBody);
 
 }

@@ -10,6 +10,7 @@ import com.feiyou.headstyle.base.BaseNoRsaModel;
 import com.feiyou.headstyle.base.IBaseRequestCallBack;
 import com.feiyou.headstyle.bean.PhotoWallRet;
 import com.feiyou.headstyle.bean.ResultInfo;
+import com.feiyou.headstyle.bean.ZanResultRet;
 
 import java.io.File;
 import java.util.List;
@@ -26,7 +27,7 @@ import rx.subscriptions.CompositeSubscription;
  * Created by iflying on 2018/1/9.
  */
 
-public class AddZanModelImp extends BaseModel implements AddZanModel<ResultInfo> {
+public class AddZanModelImp extends BaseModel implements AddZanModel<ZanResultRet> {
 
     private Context context = null;
     private NoteDataServiceApi noteDataServiceApi;
@@ -40,7 +41,7 @@ public class AddZanModelImp extends BaseModel implements AddZanModel<ResultInfo>
     }
 
     @Override
-    public void addZan(int type, String userId, String messageId, String commentId, String repeatId, final IBaseRequestCallBack<ResultInfo> iBaseRequestCallBack) {
+    public void addZan(int type, String userId, String messageId, String commentId, String repeatId, final IBaseRequestCallBack<ZanResultRet> iBaseRequestCallBack) {
 
         JSONObject params = new JSONObject();
         try {
@@ -71,7 +72,7 @@ public class AddZanModelImp extends BaseModel implements AddZanModel<ResultInfo>
         mCompositeSubscription.add(noteDataServiceApi.addZan(requestBody)  //将subscribe添加到subscription，用于注销subscribe
                 .observeOn(AndroidSchedulers.mainThread())//指定事件消费线程
                 .subscribeOn(Schedulers.io())  //指定 subscribe() 发生在 IO 线程
-                .subscribe(new Subscriber<ResultInfo>() {
+                .subscribe(new Subscriber<ZanResultRet>() {
 
                     @Override
                     public void onStart() {
@@ -93,9 +94,9 @@ public class AddZanModelImp extends BaseModel implements AddZanModel<ResultInfo>
                     }
 
                     @Override
-                    public void onNext(ResultInfo resultInfo) {
+                    public void onNext(ZanResultRet zanResultRet) {
                         //回调接口：请求成功，获取实体类对象
-                        iBaseRequestCallBack.requestSuccess(resultInfo);
+                        iBaseRequestCallBack.requestSuccess(zanResultRet);
                     }
                 }));
     }

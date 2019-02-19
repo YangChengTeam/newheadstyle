@@ -98,5 +98,6 @@ dependencies {
     implementation files('libs/umeng-share-wechat-simplify-6.9.4.jar')
     implementation files('libs/umeng-sharetool-6.9.4.jar')
     implementation 'com.zhihu.android:matisse:0.5.2-beta4'
-
+    //implementation 'jp.co.cyberagent.android:gpuimage:2.0.3'
+    implementation project(':Gpu-Image')
 }

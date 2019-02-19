@@ -28,6 +28,7 @@ import com.feiyou.headstyle.bean.NoteInfoDetailRet;
 import com.feiyou.headstyle.bean.ReplyParams;
 import com.feiyou.headstyle.bean.ReplyResultInfoRet;
 import com.feiyou.headstyle.bean.ResultInfo;
+import com.feiyou.headstyle.bean.ZanResultRet;
 import com.feiyou.headstyle.common.Constants;
 import com.feiyou.headstyle.presenter.AddZanPresenterImp;
 import com.feiyou.headstyle.presenter.NoteInfoDetailDataPresenterImp;
@@ -120,10 +121,6 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
 
     private String messageId;
 
-    private boolean isFirstLoad = true;
-
-    private boolean isZaned;
-
     @Override
     protected int getContextViewId() {
         return R.layout.activity_article_detail;
@@ -149,7 +146,7 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
 
         replyCommentPresenterImp = new ReplyCommentPresenterImp(this, this);
 
-        noteInfoDetailDataPresenterImp.getNoteInfoDetailData("1021601", "110600");
+        noteInfoDetailDataPresenterImp.getNoteInfoDetailData("1021601", "110634");
 
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("回复中");
@@ -183,10 +180,7 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
 
     @OnClick(R.id.layout_zan)
     void addZan() {
-        if (!isZaned) {
-            isFirstLoad = false;
-            addZanPresenterImp.addZan(1, "1021601", messageId, "", "");
-        }
+        addZanPresenterImp.addZan(1, "1021601", messageId, "", "");
     }
 
     @OnClick(R.id.iv_back)
@@ -219,10 +213,10 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
 
         Logger.i(JSONObject.toJSONString(tData));
 
-        if (tData != null && tData.getCode() == Constants.SUCCESS) {
+        Drawable isZan = ContextCompat.getDrawable(this, R.mipmap.is_zan);
+        Drawable notZan = ContextCompat.getDrawable(this, R.mipmap.note_zan);
 
-            Drawable isZan = ContextCompat.getDrawable(this, R.mipmap.is_zan);
-            Drawable notZan = ContextCompat.getDrawable(this, R.mipmap.note_zan);
+        if (tData != null && tData.getCode() == Constants.SUCCESS) {
 
             if (tData instanceof NoteInfoDetailRet) {
                 messageId = ((NoteInfoDetailRet) tData).getData().getId();
@@ -240,10 +234,8 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
 
 
                 if (((NoteInfoDetailRet) tData).getData().getIsZan() == 0) {
-                    isZaned = false;
                     mZanCountTextView.setCompoundDrawablesWithIntrinsicBounds(notZan, null, null, null);
                 } else {
-                    isZaned = true;
                     mZanCountTextView.setCompoundDrawablesWithIntrinsicBounds(isZan, null, null, null);
                 }
                 mZanCountTextView.setCompoundDrawablePadding(SizeUtils.dp2px(4));
@@ -272,10 +264,16 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
                 EventBus.getDefault().post(new MessageEvent("更新精彩评论"));
             }
 
-            if (tData instanceof ResultInfo && !isFirstLoad) {
-                mZanCountTextView.setText((((NoteInfoDetailRet) tData).getData().getZanNum() + 1) + "");
-                mZanCountTextView.setCompoundDrawablesWithIntrinsicBounds(isZan, null, null, null);
-                mZanCountTextView.setCompoundDrawablePadding(SizeUtils.dp2px(4));
+            if (tData instanceof ZanResultRet) {
+                if (((ZanResultRet) tData).getData().getIsZan() == 0) {
+                    mZanCountTextView.setText((((ZanResultRet) tData).getData().getZanNum()) + "");
+                    mZanCountTextView.setCompoundDrawablesWithIntrinsicBounds(notZan, null, null, null);
+                    mZanCountTextView.setCompoundDrawablePadding(SizeUtils.dp2px(4));
+                } else {
+                    mZanCountTextView.setText((((ZanResultRet) tData).getData().getZanNum()) + "");
+                    mZanCountTextView.setCompoundDrawablesWithIntrinsicBounds(isZan, null, null, null);
+                    mZanCountTextView.setCompoundDrawablePadding(SizeUtils.dp2px(4));
+                }
             }
         }
     }
