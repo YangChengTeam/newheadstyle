@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="10dp">
+
+    <LinearLayout
+        android:id="@+id/left_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:gravity="left|center"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/layout_left_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/iv_left_head"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_gravity="top"
+                android:src="@mipmap/test_info_logo" />
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="6dp"
+                android:layout_marginTop="6dp"
+                android:gravity="center">
+
+                <ImageView
+                    android:id="@+id/iv_chat_horn_left"
+                    android:layout_width="6dp"
+                    android:layout_height="9dp"
+                    android:layout_marginTop="6dp"
+                    android:layout_marginRight="-1dp"
+                    android:src="@mipmap/chat_left_horn" />
+
+                <TextView
+                    android:id="@+id/left_msg"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@+id/iv_chat_horn_left"
+                    android:background="@drawable/common_test_bg"
+                    android:gravity="left|center"
+                    android:lineSpacingMultiplier="1.3"
+                    android:minHeight="30dp"
+                    android:padding="6dp"
+                    android:textColor="@color/black"
+                    android:textSize="14sp" />
+            </RelativeLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layout_left_img"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <ImageView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_gravity="top"
+                android:src="@mipmap/test_info_logo" />
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="6dp"
+                android:layout_marginTop="6dp"
+                android:gravity="center">
+
+                <ImageView
+                    android:id="@+id/iv_chat_horn_left1"
+                    android:layout_width="6dp"
+                    android:layout_height="9dp"
+                    android:layout_marginTop="6dp"
+                    android:layout_marginRight="-1dp"
+                    android:src="@mipmap/chat_left_horn" />
+
+                <ImageView
+                    android:id="@+id/left_img"
+                    android:layout_width="250dp"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@+id/iv_chat_horn_left1"
+                    android:background="@color/white"
+                    android:padding="6dp"
+                    android:scaleType="fitXY"
+                    android:src="@mipmap/test_detail_def" />
+            </RelativeLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layout_answer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/answer_list"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="54dp"></android.support.v7.widget.RecyclerView>
+        </LinearLayout>
+    </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/right_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:gravity="center|right">
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="6dp"
+            android:layout_toLeftOf="@+id/iv_user_head">
+
+            <TextView
+                android:id="@+id/right_msg"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toLeftOf="@+id/iv_chat_horn_right"
+                android:background="@drawable/common_test_bg"
+                android:gravity="center|right"
+                android:lineSpacingMultiplier="1.3"
+                android:minHeight="30dp"
+                android:padding="6dp"
+                android:textSize="14sp"
+                android:textColor="@color/black" />
+
+            <ImageView
+                android:id="@+id/iv_chat_horn_right"
+                android:layout_width="6dp"
+                android:layout_height="9dp"
+                android:layout_alignParentRight="true"
+                android:layout_marginLeft="-1dp"
+                android:layout_marginTop="6dp"
+                android:src="@mipmap/chat_right_horn" />
+        </RelativeLayout>
+
+        <ImageView
+            android:id="@+id/iv_user_head"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:src="@mipmap/setting_head" />
+    </RelativeLayout>
+</RelativeLayout>

@@ -32,6 +32,8 @@ public class Constants {
 
     public static final String BASE_URL = "http://ytx.wk2.com/api/";
 
+    public static final String BASE_TEST_URL = "https://cj.197854.com/api/test/";
+
     public static final String WHETHER_URL = "http://api.avatardata.cn/";
 
     public static final String SHARES_URL = "http://web.juhe.cn:8080/finance/stock/";

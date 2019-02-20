@@ -94,9 +94,6 @@ public class HeadEditActivity extends BaseFragmentActivity implements StickerDat
 
     TextView mConfigTv;
 
-    @BindView(R.id.magic_indicator1)
-    MagicIndicator magicIndicator;
-
     //滤镜图片
     @BindView(R.id.gpuimage)
     GPUImageView mGPUImageView;
@@ -162,10 +159,6 @@ public class HeadEditActivity extends BaseFragmentActivity implements StickerDat
 
     private List<List<StickerInfo>> allStickerList;
 
-    private static final String[] CHANNELS = new String[]{"KITKAT", "NOUGAT", "DONUT"};
-
-    private List<String> mDataList = Arrays.asList(CHANNELS);
-
     @Override
     protected int getContextViewId() {
         return R.layout.activity_image_edit;
@@ -175,7 +168,6 @@ public class HeadEditActivity extends BaseFragmentActivity implements StickerDat
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         initTopBar();
-        initMagicIndicator3();
         initData();
     }
 
@@ -187,6 +179,7 @@ public class HeadEditActivity extends BaseFragmentActivity implements StickerDat
         mTitleTv = topSearchView.findViewById(R.id.tv_config_title);
         mConfigTv = topSearchView.findViewById(R.id.tv_config);
         mTitleTv.setText("头像编辑");
+        mConfigTv.setText("保存/分享");
 
         mTopBar.setCenterView(topSearchView);
         mBackImageView = topSearchView.findViewById(R.id.iv_back);
@@ -203,48 +196,6 @@ public class HeadEditActivity extends BaseFragmentActivity implements StickerDat
                 savePicture();
             }
         });
-    }
-
-    private void initMagicIndicator3() {
-
-        magicIndicator.setBackgroundResource(R.drawable.round_indicator_bg);
-        CommonNavigator commonNavigator = new CommonNavigator(this);
-        commonNavigator.setAdapter(new CommonNavigatorAdapter() {
-            @Override
-            public int getCount() {
-                return mDataList == null ? 0 : mDataList.size();
-            }
-
-            @Override
-            public IPagerTitleView getTitleView(Context context, final int index) {
-                ClipPagerTitleView clipPagerTitleView = new ClipPagerTitleView(context);
-                clipPagerTitleView.setText(mDataList.get(index));
-                clipPagerTitleView.setTextColor(Color.parseColor("#e94220"));
-                clipPagerTitleView.setClipColor(Color.WHITE);
-                clipPagerTitleView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        ToastUtils.showLong("index--->" + index);
-                        magicIndicator.onPageSelected(index);
-                    }
-                });
-                return clipPagerTitleView;
-            }
-
-            @Override
-            public IPagerIndicator getIndicator(Context context) {
-                LinePagerIndicator indicator = new LinePagerIndicator(context);
-                float navigatorHeight = SizeUtils.dp2px(48);
-                float borderWidth = UIUtil.dip2px(context, 1);
-                float lineHeight = navigatorHeight - 2 * borderWidth;
-                indicator.setLineHeight(lineHeight);
-                indicator.setRoundRadius(lineHeight / 2);
-                indicator.setYOffset(borderWidth);
-                indicator.setColors(Color.parseColor("#bc2a2a"));
-                return indicator;
-            }
-        });
-        magicIndicator.setNavigator(commonNavigator);
     }
 
     public void initData() {
@@ -549,7 +500,10 @@ public class HeadEditActivity extends BaseFragmentActivity implements StickerDat
                 MediaScannerConnection.scanFile(HeadEditActivity.this, new String[]{filePath}, null, null);
                 // 最后通知图库更新
                 sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.parse("file://" + filePath)));
-                ToastUtils.showLong("保存成功!");
+                //ToastUtils.showLong("保存成功!");
+
+                Intent intent = new Intent(this, HeadSaveActivity.class);
+                startActivity(intent);
             } else {
                 flag = false;
             }
@@ -560,4 +514,8 @@ public class HeadEditActivity extends BaseFragmentActivity implements StickerDat
         return flag;
     }
 
+    @Override
+    public void onBackPressed() {
+        popBackStack();
+    }
 }

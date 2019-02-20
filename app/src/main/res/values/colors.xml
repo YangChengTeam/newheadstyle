@@ -55,4 +55,6 @@
     <color name="reply_bg_color">#f7f7f7</color>
 
     <color name="comment_nick_name_color">#4b79ad</color>
+
+    <color name="test_bg_txt_color">#7234e1</color>
 </resources>
