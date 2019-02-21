@@ -2,15 +2,17 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="80dp"
+    android:layout_marginLeft="12dp"
+    android:layout_marginRight="12dp"
     android:gravity="center">
 
     <ImageView
         android:id="@+id/iv_test_thumb"
         android:layout_width="60dp"
         android:layout_height="60dp"
-        android:src="@mipmap/head_test"
         android:layout_marginRight="12dp"
-        android:scaleType="centerInside" />
+        android:scaleType="centerInside"
+        android:src="@mipmap/head_test" />
 
     <RelativeLayout
         android:layout_width="0dp"
@@ -29,7 +31,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="24dp"
                 android:gravity="left|center"
-                android:text="是打发打发阿斯顿发士大夫"
                 android:textColor="@color/black"
                 android:textSize="15sp" />
 
@@ -45,7 +46,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="24dp"
                     android:gravity="left|center"
-                    android:text="100万"
                     android:textColor="@color/tab_select_color"
                     android:textSize="13sp" />
 
@@ -65,7 +65,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="24dp"
                 android:gravity="left|center"
-                android:text="大沙发斯蒂芬网"
                 android:textColor="@color/gray999"
                 android:textSize="12sp" />
         </LinearLayout>

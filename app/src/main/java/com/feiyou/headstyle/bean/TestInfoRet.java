@@ -7,13 +7,13 @@ import java.util.List;
  */
 public class TestInfoRet extends ResultInfo {
 
-    private List<TestInfo> data;
+    private TestInfoWrapper data;
 
-    public List<TestInfo> getData() {
+    public TestInfoWrapper getData() {
         return data;
     }
 
-    public void setData(List<TestInfo> data) {
+    public void setData(TestInfoWrapper data) {
         this.data = data;
     }
 }

@@ -30,8 +30,11 @@ public class TestInfoAdapter extends BaseQuickAdapter<TestInfo, BaseViewHolder> 
     @Override
     protected void convert(final BaseViewHolder helper, final TestInfo item) {
         helper.setText(R.id.tv_test_title, item.getTestTitle())
-                .setText(R.id.tv_test_content, item.getTestSubTitle());
-
-        Glide.with(mContext).load(item.getTestThumb()).into((ImageView) helper.itemView.findViewById(R.id.iv_test_thumb));
+                .setText(R.id.tv_test_content, item.getTestSubTitle())
+                .setText(R.id.tv_test_count, item.getTestCount() + "");
+        RequestOptions options = new RequestOptions();
+        options.transform(new GlideRoundTransform(mContext, 6));
+        options.placeholder(R.mipmap.empty_icon).error(R.mipmap.empty_icon);
+        Glide.with(mContext).load(item.getTestThumb()).apply(options).into((ImageView) helper.itemView.findViewById(R.id.iv_test_thumb));
     }
 }

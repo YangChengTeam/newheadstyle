@@ -37,7 +37,8 @@
             android:layout_height="48dp"
             android:layout_gravity="bottom"
             android:background="@color/test_bg_txt_color"
-            android:gravity="center">
+            android:gravity="center"
+            android:visibility="gone">
 
             <TextView
                 android:id="@+id/tv_comment"
@@ -46,6 +47,46 @@
                 android:text="开始测试"
                 android:textColor="@color/white"
                 android:textSize="16sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layout_input"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_gravity="bottom"
+            android:background="@color/test_bg_txt_color"
+            android:gravity="center">
+
+            <RadioGroup
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <RadioButton
+                    android:id="@+id/btn_0"
+                    android:layout_width="100dp"
+                    android:layout_height="36dp"
+                    android:drawableLeft="@drawable/radio"
+                    android:button="@null"
+                    android:checked="true"
+                    android:gravity="center"
+                    android:text="男"
+                    android:textColor="@android:color/black"
+                    android:textSize="17.0sp" />
+
+                <RadioButton
+                    android:id="@+id/btn_1"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@drawable/radio"
+                    android:button="@null"
+                    android:gravity="center"
+                    android:text="女"
+                    android:textColor="@android:color/black"
+                    android:textSize="17.0sp" />
+            </RadioGroup>
         </LinearLayout>
     </FrameLayout>
 

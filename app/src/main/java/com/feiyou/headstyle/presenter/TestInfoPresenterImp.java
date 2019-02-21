@@ -15,7 +15,9 @@ import com.feiyou.headstyle.view.TopicDataView;
  */
 
 public class TestInfoPresenterImp extends BasePresenterImp<TestInfoView, TestInfoRet> implements TestInfoPresenter {
+
     private Context context = null;
+
     private TestInfoModelImp testInfoModelImp = null;
 
     /**
@@ -35,5 +37,10 @@ public class TestInfoPresenterImp extends BasePresenterImp<TestInfoView, TestInf
     @Override
     public void getDataListByCid(String cid) {
         testInfoModelImp.getDataListByCid(cid, this);
+    }
+
+    @Override
+    public void getHotAndRecommendList(int status) {
+        testInfoModelImp.getHotAndRecommendList(status, this);
     }
 }

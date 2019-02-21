@@ -12,6 +12,7 @@ public interface TestInfoModel<T> {
 
     void getDataList(IBaseRequestCallBack<T> iBaseRequestCallBack);
 
-    void getDataListByCid(String cid,IBaseRequestCallBack<T> iBaseRequestCallBack);
+    void getDataListByCid(String cid, IBaseRequestCallBack<T> iBaseRequestCallBack);
 
+    void getHotAndRecommendList(int status, IBaseRequestCallBack<T> iBaseRequestCallBack);
 }

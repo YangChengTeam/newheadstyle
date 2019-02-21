@@ -6,8 +6,6 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -26,8 +24,7 @@ import com.feiyou.headstyle.bean.TestResultParams;
 import com.feiyou.headstyle.common.Constants;
 import com.feiyou.headstyle.presenter.TestDetailInfoPresenterImp;
 import com.feiyou.headstyle.presenter.TestResultInfoPresenterImp;
-import com.feiyou.headstyle.ui.adapter.MsgAdapter;
-import com.feiyou.headstyle.ui.adapter.StickerTypeAdapter;
+import com.feiyou.headstyle.ui.adapter.TestChatImageListAdapter;
 import com.feiyou.headstyle.ui.adapter.TestChatListAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragmentActivity;
 import com.feiyou.headstyle.view.TestDetailInfoView;
@@ -44,7 +41,7 @@ import butterknife.OnClick;
 /**
  * Created by myflying on 2019/2/20.
  */
-public class TestDetailActivity extends BaseFragmentActivity implements TestDetailInfoView, TestChatListAdapter.AnswerItemClick {
+public class TestImageDetailActivity extends BaseFragmentActivity implements TestDetailInfoView, TestChatImageListAdapter.AnswerItemClick {
     @BindView(R.id.topbar)
     QMUITopBar mTopBar;
 
@@ -59,7 +56,7 @@ public class TestDetailActivity extends BaseFragmentActivity implements TestDeta
     @BindView(R.id.tv_comment)
     TextView mCommentTextView;
 
-    private TestChatListAdapter chatListAdapter;
+    private TestChatImageListAdapter chatListAdapter;
 
     private List<TestMsgInfo> msgList = new ArrayList<>();
 
@@ -67,23 +64,15 @@ public class TestDetailActivity extends BaseFragmentActivity implements TestDeta
 
     private TestResultInfoPresenterImp testResultInfoPresenterImp;
 
-    private List<List<String>> answer;
-
-    private List<String> question;
-
-    private List<QuestionJumpInfo> jump;
-
-    private int currentSubjectIndex;
-
-    private boolean isLastSubject;
-
     private ProgressDialog progressDialog = null;
 
-    private String selectResultIndex;
+    private boolean isShowSex;
+
+    private boolean isOver;
 
     @Override
     protected int getContextViewId() {
-        return R.layout.activity_test_detail;
+        return R.layout.activity_test_image_detail;
     }
 
     @Override
@@ -91,7 +80,6 @@ public class TestDetailActivity extends BaseFragmentActivity implements TestDeta
         super.onCreate(savedInstanceState);
         initTopBar();
         initData();
-        initMsg();
     }
 
     private void initTopBar() {
@@ -116,7 +104,7 @@ public class TestDetailActivity extends BaseFragmentActivity implements TestDeta
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("正在提交");
 
-        chatListAdapter = new TestChatListAdapter(this, null);
+        chatListAdapter = new TestChatImageListAdapter(this, null);
         mChatListView.setLayoutManager(new LinearLayoutManager(this));
         mChatListView.setAdapter(chatListAdapter);
         chatListAdapter.setAnswerItemClick(this);
@@ -124,12 +112,12 @@ public class TestDetailActivity extends BaseFragmentActivity implements TestDeta
         testDetailInfoPresenterImp = new TestDetailInfoPresenterImp(this, this);
         testResultInfoPresenterImp = new TestResultInfoPresenterImp(this, this);
 
-        testDetailInfoPresenterImp.getTestDetail("122", 1);
+        testDetailInfoPresenterImp.getTestDetail("164", 2);
     }
 
     @OnClick(R.id.layout_comment)
     void commentEvent() {
-        if (isLastSubject) {
+        if (isOver) {
             if (progressDialog != null && !progressDialog.isShowing()) {
                 progressDialog.show();
             }
@@ -139,7 +127,6 @@ public class TestDetailActivity extends BaseFragmentActivity implements TestDeta
             params.setTestType("1");
             params.setNickname("我是忍者");
             params.setHeadimg("http://thirdwx.qlogo.cn/mmopen/vi_32/g8lk9icgk6QfZLib2awxgnibnU4RTeRzobJNWc3ZxziabI0CncNfgUQG1godEgqGI3wfqqqSCr4kAlv9LOKiad2NEFw/132");
-            params.setResultId(selectResultIndex);
             params.setSex("0");
             params.setUserId("1021601");
 
@@ -157,61 +144,24 @@ public class TestDetailActivity extends BaseFragmentActivity implements TestDeta
     void showSubject() {
         TestMsgInfo testMsgInfo = new TestMsgInfo();
         testMsgInfo.setType(TestMsgInfo.TYPE_RECEIVED);
-        testMsgInfo.setImgUrl("");
-        testMsgInfo.setAnswer(answer.get(currentSubjectIndex));
-
-        testMsgInfo.setContent(question.get(currentSubjectIndex));
+        testMsgInfo.setContent(isShowSex ? "请告诉我你的性别?" : "请告诉我你的名字");
         chatListAdapter.addData(testMsgInfo);
-    }
 
-    private void initMsg() {
-        TestMsgInfo msg1 = new TestMsgInfo("", "Hello guy!", TestMsgInfo.TYPE_RECEIVED);
-        msgList.add(msg1);
-        TestMsgInfo msg2 = new TestMsgInfo("", "Hi!", TestMsgInfo.TYPE_SENT);
-        msgList.add(msg2);
-        TestMsgInfo msg3 = new TestMsgInfo("", "What's up?", TestMsgInfo.TYPE_SENT);
-        msgList.add(msg3);
-        TestMsgInfo msg4 = new TestMsgInfo("", "Fine.", TestMsgInfo.TYPE_RECEIVED);
-        msgList.add(msg4);
+        chatListAdapter.notifyItemInserted(chatListAdapter.getData().size() - 1);
+        mChatListView.scrollToPosition(chatListAdapter.getData().size() - 1);
     }
 
     @Override
     public void answerClick(int pos, String answerName) {
 
-        if (!isLastSubject) {
-            //回复选择的答案
-            TestMsgInfo answerInfo = new TestMsgInfo();
-            answerInfo.setType(TestMsgInfo.TYPE_SENT);
-            answerInfo.setContent(answerName);
-            chatListAdapter.addData(answerInfo);
+        //回复选择的答案
+        TestMsgInfo answerInfo = new TestMsgInfo();
+        answerInfo.setType(TestMsgInfo.TYPE_SENT);
+        answerInfo.setContent(answerName);
+        chatListAdapter.addData(answerInfo);
 
-            //回复答案后继续下一题
-            if (jump != null) {
-                currentSubjectIndex = Integer.parseInt(jump.get(currentSubjectIndex).getJumpQuestion()[pos]) - 1;
-            }
-            Logger.i("currentSubjectIndex--->" + currentSubjectIndex);
-
-            if (currentSubjectIndex < question.size()) {
-                showSubject();
-            }
-
-            //判断此题目是否是最后一个题目
-            if (jump != null && jump.get(currentSubjectIndex).getJumpType() == 2) {
-                isLastSubject = true;
-            }
-
-        } else {
-            selectResultIndex = jump.get(currentSubjectIndex).getJumpAnswer()[pos];
-            ToastUtils.showLong("最后一题,选择的答案是--->" + selectResultIndex);
-            //回复选择的答案
-            TestMsgInfo answerInfo = new TestMsgInfo();
-            answerInfo.setType(TestMsgInfo.TYPE_SENT);
-            answerInfo.setContent(answerName);
-            chatListAdapter.addData(answerInfo);
-
-            mCommentLayout.setVisibility(View.VISIBLE);
-            mCommentTextView.setText("提交");
-        }
+        mCommentLayout.setVisibility(View.VISIBLE);
+        mCommentTextView.setText("提交");
 
         //刷新列表页面
         chatListAdapter.notifyItemInserted(chatListAdapter.getData().size() - 1);
@@ -237,26 +187,22 @@ public class TestDetailActivity extends BaseFragmentActivity implements TestDeta
 
     @Override
     public void loadDataSuccess(ResultInfo tData) {
+        Logger.i("detail--->" + JSONObject.toJSONString(tData));
+
         if (tData != null && tData.getCode() == Constants.SUCCESS) {
-            //Logger.i("detail--->" + JSONObject.toJSONString(tData));
             if (tData instanceof TestDetailInfoRet) {
                 if (((TestDetailInfoRet) tData).getData() != null) {
                     TestMsgInfo guideInfo = new TestMsgInfo(((TestDetailInfoRet) tData).getData().getImage(), ((TestDetailInfoRet) tData).getData().getDesc(), TestMsgInfo.TYPE_RECEIVED);
                     chatListAdapter.addData(guideInfo);
                     chatListAdapter.notifyDataSetChanged();
-
-                    if (((TestDetailInfoRet) tData).getData().getList() != null) {
-                        question = ((TestDetailInfoRet) tData).getData().getList().getQuestion();
-                        answer = ((TestDetailInfoRet) tData).getData().getList().getAnswer();
-                        jump = ((TestDetailInfoRet) tData).getData().getList().getJump();
-                    }
+                    isShowSex = ((TestDetailInfoRet) tData).getData().getSex() == 1 ? true : false;
                 }
             }
             if (tData instanceof TestResultInfoRet) {
                 if (((TestResultInfoRet) tData).getData() != null) {
-                    Intent intent = new Intent(this,TestResultActivity.class);
-                    intent.putExtra("image_url",((TestResultInfoRet) tData).getData().getImage());
-                    intent.putExtra("nocode_image_url",((TestResultInfoRet) tData).getData().getImageNocode());
+                    Intent intent = new Intent(this, TestResultActivity.class);
+                    intent.putExtra("image_url", ((TestResultInfoRet) tData).getData().getImage());
+                    intent.putExtra("nocode_image_url", ((TestResultInfoRet) tData).getData().getImageNocode());
                     startActivity(intent);
                 }
             }

@@ -66,6 +66,10 @@
         <activity
             android:name=".ui.activity.TestDetailActivity" />
         <activity
+            android:name=".ui.activity.TestImageDetailActivity" />
+        <activity
+            android:name=".ui.activity.TestResultActivity" />
+        <activity
             android:name=".ui.activity.SettingActivity" />
         <activity
             android:name=".ui.activity.EditUserInfoActivity" />

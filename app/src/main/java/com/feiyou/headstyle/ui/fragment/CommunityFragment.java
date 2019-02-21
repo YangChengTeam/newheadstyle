@@ -1,6 +1,5 @@
 package com.feiyou.headstyle.ui.fragment;
 
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTabHost;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
@@ -20,7 +19,6 @@ import com.feiyou.headstyle.bean.MessageEvent;
 import com.feiyou.headstyle.bean.TopicInfoRet;
 import com.feiyou.headstyle.common.Constants;
 import com.feiyou.headstyle.presenter.TopicDataPresenterImp;
-import com.feiyou.headstyle.ui.adapter.MyFragmentAdapter;
 import com.feiyou.headstyle.ui.adapter.SubFragmentAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragment;
 import com.feiyou.headstyle.ui.fragment.sub.FollowFragment;
@@ -30,9 +28,6 @@ import com.feiyou.headstyle.view.TopicDataView;
 import com.orhanobut.logger.Logger;
 
 import org.greenrobot.eventbus.EventBus;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;

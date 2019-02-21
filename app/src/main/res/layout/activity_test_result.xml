@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/my_info_bg_color"
+    android:fitsSystemWindows="true"
+    android:gravity="top|center"
+    android:orientation="vertical">
+
+    <com.qmuiteam.qmui.widget.QMUITopBar
+        android:id="@+id/topbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/qmui_topbar_height"
+        android:background="@color/white" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="@color/line_color"></View>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="12dp"
+        android:background="@drawable/common_white_bg"
+        android:gravity="center">
+
+        <ImageView
+            android:id="@+id/iv_test_result"
+            android:layout_width="330dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|center"
+            android:scaleType="fitStart"
+            android:src="@mipmap/video_image" />
+
+        <LinearLayout
+            android:layout_width="330dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/iv_test_result"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center">
+
+                <Button
+                    android:id="@+id/btn_share"
+                    android:layout_width="138dp"
+                    android:layout_height="40dp"
+                    android:background="@mipmap/share_friends_bg" />
+
+                <Button
+                    android:id="@+id/btn_save"
+                    android:layout_width="138dp"
+                    android:layout_height="40dp"
+                    android:layout_marginLeft="10dp"
+                    android:background="@mipmap/save_test_result_bg" />
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/btn_test_again"
+                android:layout_width="290dp"
+                android:layout_height="40dp"
+                android:layout_marginTop="12dp"
+                android:background="@mipmap/test_again_bg" />
+        </LinearLayout>
+    </RelativeLayout>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recommend_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"></android.support.v7.widget.RecyclerView>
+</LinearLayout>

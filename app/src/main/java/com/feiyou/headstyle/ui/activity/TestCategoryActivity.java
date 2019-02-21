@@ -85,7 +85,7 @@ public class TestCategoryActivity extends BaseFragmentActivity implements TestIn
         mTypeListView.setLayoutManager(new LinearLayoutManager(this));
         mTypeListView.setAdapter(testInfoAdapter);
         avi.show();
-        testInfoPresenterImp.getDataListByCid("");
+        testInfoPresenterImp.getDataListByCid("1");
     }
 
     @Override
@@ -104,7 +104,7 @@ public class TestCategoryActivity extends BaseFragmentActivity implements TestIn
         if (tData != null) {
             if (tData.getCode() == Constants.SUCCESS) {
                 mNoDataLayout.setVisibility(View.GONE);
-                testInfoAdapter.setNewData(tData.getData());
+                testInfoAdapter.setNewData(tData.getData().getHotList());
             } else {
                 mNoDataLayout.setVisibility(View.VISIBLE);
             }

@@ -1,5 +1,7 @@
 package com.feiyou.headstyle.bean;
 
+import android.content.Intent;
+
 import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
@@ -24,7 +26,7 @@ public class TestDetailInfoWrapper {
 
     private String title;
 
-    private String sex;
+    private Integer sex;
 
     private TestDetailInfo list;
 
@@ -84,11 +86,11 @@ public class TestDetailInfoWrapper {
         this.title = title;
     }
 
-    public String getSex() {
+    public Integer getSex() {
         return sex;
     }
 
-    public void setSex(String sex) {
+    public void setSex(Integer sex) {
         this.sex = sex;
     }
 }

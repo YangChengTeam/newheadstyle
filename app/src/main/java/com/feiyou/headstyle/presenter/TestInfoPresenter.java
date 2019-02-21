@@ -7,4 +7,5 @@ package com.feiyou.headstyle.presenter;
 public interface TestInfoPresenter {
     void getDataList();
     void getDataListByCid(String cid);
+    void getHotAndRecommendList(int status);
 }

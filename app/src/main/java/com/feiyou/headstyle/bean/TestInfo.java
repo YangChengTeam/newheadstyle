@@ -8,6 +8,7 @@ import com.google.gson.annotations.SerializedName;
 public class TestInfo {
 
     private String id;
+
     @SerializedName("name")
     private String testTitle;
 
@@ -22,6 +23,7 @@ public class TestInfo {
 
     private String url;
 
+    @SerializedName("num")
     private String testCount;
 
     public String getId() {

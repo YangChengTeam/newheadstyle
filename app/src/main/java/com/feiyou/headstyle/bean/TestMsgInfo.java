@@ -13,6 +13,8 @@ public class TestMsgInfo {
 
     private List<String> answer;
 
+    private boolean clickable = true;
+
     public TestMsgInfo() {
     }
 
@@ -52,5 +54,13 @@ public class TestMsgInfo {
 
     public void setAnswer(List<String> answer) {
         this.answer = answer;
+    }
+
+    public boolean isClickable() {
+        return clickable;
+    }
+
+    public void setClickable(boolean clickable) {
+        this.clickable = clickable;
     }
 }
