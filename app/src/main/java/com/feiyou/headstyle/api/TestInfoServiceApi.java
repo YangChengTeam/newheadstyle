@@ -16,19 +16,19 @@ import rx.Observable;
 
 public interface TestInfoServiceApi {
 
-    @POST("appIndex")
+    @POST("test/appIndex")
     Observable<TestInfoRet> getDataList(@Body RequestBody requestBody);
 
-    @POST("testTypeInfoList")
+    @POST("test/testTypeInfoList")
     Observable<TestInfoRet> getDataListByCid(@Body RequestBody requestBody);
 
-    @POST("testTypeInfoView")
+    @POST("test/testTypeInfoView")
     Observable<TestDetailInfoRet> getTestDetail(@Body RequestBody requestBody);
 
-    @POST("testTextResult")
+    @POST("test/testTextResult")
     Observable<TestResultInfoRet> createImage(@Body RequestBody requestBody);
 
-    @POST("testClassInfoList")
+    @POST("test/testClassInfoList")
     Observable<TestInfoRet> getHotAndRecommendList(@Body RequestBody requestBody);
 
 }

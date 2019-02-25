@@ -151,7 +151,11 @@ public class TestResultActivity extends BaseFragmentActivity implements TestInfo
     @Override
     public void loadDataSuccess(TestInfoRet tData) {
         if (tData != null && tData.getCode() == Constants.SUCCESS) {
-            testInfoAdapter.setNewData(tData.getData().getHotList());
+            if (tData.getData() != null && tData.getData().size() > 6) {
+                testInfoAdapter.setNewData(tData.getData().subList(0, 6));
+            } else {
+                testInfoAdapter.setNewData(tData.getData());
+            }
         }
     }
 

@@ -85,6 +85,8 @@ public class TestInfoModelImp extends BaseTestModel implements TestInfoModel<Tes
         JSONObject params = new JSONObject();
         try {
             params.put("cid", cid);
+            params.put("is_app", "1");
+            params.put("app_id", "37");
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -126,11 +128,13 @@ public class TestInfoModelImp extends BaseTestModel implements TestInfoModel<Tes
         JSONObject params = new JSONObject();
         try {
             params.put("status", status + "");
+            params.put("is_app", "1");
+            params.put("app_id", "37");
         } catch (JSONException e) {
             e.printStackTrace();
         }
         RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), params.toString());
-        mCompositeSubscription.add(testInfoServiceApi.getDataListByCid(requestBody)  //将subscribe添加到subscription，用于注销subscribe
+        mCompositeSubscription.add(testInfoServiceApi.getHotAndRecommendList(requestBody)  //将subscribe添加到subscription，用于注销subscribe
                 .observeOn(AndroidSchedulers.mainThread())//指定事件消费线程
                 .subscribeOn(Schedulers.io())  //指定 subscribe() 发生在 IO 线程
                 .subscribe(new Subscriber<TestInfoRet>() {

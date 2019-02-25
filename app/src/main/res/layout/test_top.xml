@@ -42,8 +42,8 @@
         app:delay_time="4000"
         app:indicator_drawable_selected="@mipmap/indicator_select"
         app:indicator_drawable_unselected="@mipmap/indicator_normal"
-        app:indicator_height="12dp"
-        app:indicator_width="12dp" />
+        app:indicator_height="4dp"
+        app:indicator_width="4dp" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -179,7 +179,7 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="40dp"
+        android:layout_height="48dp"
         android:background="@color/white">
 
         <TextView
@@ -201,6 +201,6 @@
             android:layout_centerVertical="true"
             android:text="查看更多>"
             android:textColor="@color/gray_aaa"
-            android:textSize="15sp" />
+            android:textSize="14sp" />
     </RelativeLayout>
 </LinearLayout>

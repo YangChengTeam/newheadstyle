@@ -100,4 +100,5 @@ dependencies {
     implementation 'com.zhihu.android:matisse:0.5.2-beta4'
     //implementation 'jp.co.cyberagent.android:gpuimage:2.0.3'
     implementation project(':Gpu-Image')
+    implementation 'com.github.ome450901:SimpleRatingBar:1.4.2'
 }

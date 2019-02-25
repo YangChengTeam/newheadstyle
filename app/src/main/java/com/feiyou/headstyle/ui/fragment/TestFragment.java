@@ -17,6 +17,7 @@ import com.feiyou.headstyle.bean.TestInfoRet;
 import com.feiyou.headstyle.common.Constants;
 import com.feiyou.headstyle.common.GlideImageLoader;
 import com.feiyou.headstyle.presenter.TestInfoPresenterImp;
+import com.feiyou.headstyle.ui.activity.StarListActivity;
 import com.feiyou.headstyle.ui.activity.TestCategoryActivity;
 import com.feiyou.headstyle.ui.activity.TestDetailActivity;
 import com.feiyou.headstyle.ui.activity.TestImageDetailActivity;
@@ -47,6 +48,8 @@ public class TestFragment extends BaseFragment implements TestInfoView, View.OnC
 
     LinearLayout mFunTestLayout;
 
+    LinearLayout mStarLayout;
+
     private View topView;
 
     Banner mBanner;
@@ -68,7 +71,10 @@ public class TestFragment extends BaseFragment implements TestInfoView, View.OnC
         mSearchWrapperLayout = topView.findViewById(R.id.layout_search_wrapper);
         mBanner = topView.findViewById(R.id.test_banner);
         mFunTestLayout = topView.findViewById(R.id.layout_funs);
+        mStarLayout = topView.findViewById(R.id.layout_star);
+
         mFunTestLayout.setOnClickListener(this);
+        mStarLayout.setOnClickListener(this);
 
         testInfoPresenterImp = new TestInfoPresenterImp(this, getActivity());
         testInfoAdapter = new TestInfoAdapter(getActivity(), null);
@@ -97,7 +103,8 @@ public class TestFragment extends BaseFragment implements TestInfoView, View.OnC
 
         testInfoAdapter.setHeaderView(topView);
 
-        testInfoPresenterImp.getDataList();
+        testInfoPresenterImp.getHotAndRecommendList(1);
+
         testInfoAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
@@ -138,7 +145,7 @@ public class TestFragment extends BaseFragment implements TestInfoView, View.OnC
     public void loadDataSuccess(TestInfoRet tData) {
         Logger.i("test list data --->" + JSON.toJSONString(tData));
         if (tData != null && tData.getCode() == Constants.SUCCESS) {
-            testInfoAdapter.setNewData(tData.getData().getHotList());
+            testInfoAdapter.setNewData(tData.getData());
         }
     }
 
@@ -152,6 +159,10 @@ public class TestFragment extends BaseFragment implements TestInfoView, View.OnC
         switch (view.getId()) {
             case R.id.layout_funs:
                 funTest();
+                break;
+            case R.id.layout_star:
+                Intent intent = new Intent(getActivity(), StarListActivity.class);
+                startActivity(intent);
                 break;
         }
     }

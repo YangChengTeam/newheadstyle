@@ -34,6 +34,6 @@ public class VideoListAdapter extends BaseQuickAdapter<VideoInfo, BaseViewHolder
         LinearLayout itemLayout = helper.itemView.findViewById(R.id.layout_video_item);
         itemLayout.setLayoutParams(new LinearLayout.LayoutParams(ScreenUtils.getScreenWidth() / 2, LinearLayout.LayoutParams.WRAP_CONTENT));
 
-        Glide.with(mContext).asBitmap().load(R.mipmap.video_def).into((ImageView) helper.itemView.findViewById(R.id.iv_video_cover));
+        Glide.with(mContext).asBitmap().load(item.getVideoCover()).into((ImageView) helper.itemView.findViewById(R.id.iv_video_cover));
     }
 }

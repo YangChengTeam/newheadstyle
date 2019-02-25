@@ -11,6 +11,8 @@ public class TestMsgInfo {
     private String imgUrl;
     private int type;
 
+    private String resultImageUrl;
+
     private List<String> answer;
 
     private boolean clickable = true;
@@ -62,5 +64,13 @@ public class TestMsgInfo {
 
     public void setClickable(boolean clickable) {
         this.clickable = clickable;
+    }
+
+    public String getResultImageUrl() {
+        return resultImageUrl;
+    }
+
+    public void setResultImageUrl(String resultImageUrl) {
+        this.resultImageUrl = resultImageUrl;
     }
 }

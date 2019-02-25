@@ -57,4 +57,16 @@
     <color name="comment_nick_name_color">#4b79ad</color>
 
     <color name="test_bg_txt_color">#7234e1</color>
+
+    <color name="star_good_color">#f993bc</color>
+
+    <color name="forecast1_color">#ff6562</color>
+
+    <color name="forecast3_color">#f7709d</color>
+
+    <color name="forecast4_color">#ffba00</color>
+
+    <color name="forecast5_color">#6acb65</color>
+
+    <color name="forecast6_color">#28acff</color>
 </resources>

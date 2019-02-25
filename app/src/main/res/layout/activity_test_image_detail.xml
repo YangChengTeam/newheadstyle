@@ -37,8 +37,7 @@
             android:layout_height="48dp"
             android:layout_gravity="bottom"
             android:background="@color/test_bg_txt_color"
-            android:gravity="center"
-            android:visibility="gone">
+            android:gravity="center">
 
             <TextView
                 android:id="@+id/tv_comment"
@@ -54,39 +53,72 @@
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:layout_gravity="bottom"
-            android:background="@color/test_bg_txt_color"
-            android:gravity="center">
+            android:background="@color/white"
+            android:gravity="center"
+            android:visibility="gone">
 
             <RadioGroup
-                android:layout_width="fill_parent"
+                android:id="@+id/rg_sex_all"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:gravity="center"
                 android:orientation="horizontal">
 
                 <RadioButton
-                    android:id="@+id/btn_0"
-                    android:layout_width="100dp"
-                    android:layout_height="36dp"
-                    android:drawableLeft="@drawable/radio"
-                    android:button="@null"
-                    android:checked="true"
-                    android:gravity="center"
+                    android:id="@+id/rb_sex_boy"
+                    android:layout_width="96dp"
+                    android:layout_height="48dp"
+                    android:button="@drawable/radio"
+                    android:paddingHorizontal="10dp"
                     android:text="男"
-                    android:textColor="@android:color/black"
-                    android:textSize="17.0sp" />
+                    android:textColor="@color/black"
+                    android:textSize="14sp" />
 
                 <RadioButton
-                    android:id="@+id/btn_1"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:background="@drawable/radio"
-                    android:button="@null"
-                    android:gravity="center"
+                    android:id="@+id/rb_sex_girl"
+                    android:layout_width="96dp"
+                    android:layout_height="48dp"
+                    android:button="@drawable/radio"
+                    android:paddingHorizontal="10dp"
                     android:text="女"
-                    android:textColor="@android:color/black"
-                    android:textSize="17.0sp" />
+                    android:textColor="@color/black"
+                    android:textSize="14sp" />
             </RadioGroup>
+
+            <LinearLayout
+                android:id="@+id/layout_input_user_name"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:visibility="gone">
+
+                <EditText
+                    android:id="@+id/et_input_user_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@null"
+                    android:hint="请输入你的名字"
+                    android:maxLength="10"
+                    android:paddingLeft="10dp"
+                    android:textColor="@color/black"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/layout_config"
+                android:layout_width="100dp"
+                android:layout_height="match_parent"
+                android:background="@color/test_bg_txt_color"
+                android:gravity="center">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="确定"
+                    android:textColor="@color/white"
+                    android:textSize="16sp" />
+            </LinearLayout>
         </LinearLayout>
     </FrameLayout>
 

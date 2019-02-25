@@ -1,6 +1,7 @@
 package com.feiyou.headstyle.ui.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -8,12 +9,15 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.blankj.utilcode.util.StringUtils;
+import com.blankj.utilcode.util.ToastUtils;
 import com.bumptech.glide.Glide;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.bean.AnswerInfo;
 import com.feiyou.headstyle.bean.TestMsgInfo;
+import com.feiyou.headstyle.bean.TestResultInfoRet;
+import com.feiyou.headstyle.ui.activity.TestResultActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,16 +37,6 @@ public class TestChatImageListAdapter extends BaseQuickAdapter<TestMsgInfo, Base
         this.mContext = context;
     }
 
-    public interface AnswerItemClick {
-        void answerClick(int pos, String itemValue);
-    }
-
-    public AnswerItemClick answerItemClick;
-
-    public void setAnswerItemClick(AnswerItemClick answerItemClick) {
-        this.answerItemClick = answerItemClick;
-    }
-
     @Override
     protected void convert(final BaseViewHolder helper, final TestMsgInfo item) {
 
@@ -57,6 +51,20 @@ public class TestChatImageListAdapter extends BaseQuickAdapter<TestMsgInfo, Base
                     Glide.with(mContext).load(item.getImgUrl()).into((ImageView) helper.itemView.findViewById(R.id.left_img));
                 } else {
                     leftImageLayout.setVisibility(View.GONE);
+                }
+
+                if (!StringUtils.isEmpty(item.getResultImageUrl())) {
+                    helper.setVisible(R.id.layout_left_result, true);
+                    Glide.with(mContext).load(item.getResultImageUrl()).into((ImageView) helper.itemView.findViewById(R.id.iv_left_result));
+                    helper.itemView.findViewById(R.id.layout_left_result).setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            Intent intent = new Intent(mContext, TestResultActivity.class);
+                            intent.putExtra("image_url", item.getResultImageUrl());
+                            intent.putExtra("nocode_image_url", item.getResultImageUrl());
+                            mContext.startActivity(intent);
+                        }
+                    });
                 }
 
                 helper.setVisible(R.id.right_layout, false);

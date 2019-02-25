@@ -104,7 +104,7 @@ public class TestCategoryActivity extends BaseFragmentActivity implements TestIn
         if (tData != null) {
             if (tData.getCode() == Constants.SUCCESS) {
                 mNoDataLayout.setVisibility(View.GONE);
-                testInfoAdapter.setNewData(tData.getData().getHotList());
+                testInfoAdapter.setNewData(tData.getData());
             } else {
                 mNoDataLayout.setVisibility(View.VISIBLE);
             }

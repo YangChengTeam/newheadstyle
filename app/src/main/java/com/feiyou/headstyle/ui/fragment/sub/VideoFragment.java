@@ -15,15 +15,20 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.VideoView;
 
+import com.alibaba.fastjson.JSONObject;
 import com.blankj.utilcode.util.AppUtils;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.dingmouren.layoutmanagergroup.viewpager.OnViewPagerListener;
 import com.dingmouren.layoutmanagergroup.viewpager.ViewPagerLayoutManager;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.bean.VideoInfo;
+import com.feiyou.headstyle.bean.VideoInfoRet;
+import com.feiyou.headstyle.presenter.VideoInfoPresenterImp;
 import com.feiyou.headstyle.ui.activity.VideoShowActivity;
 import com.feiyou.headstyle.ui.adapter.VideoListAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragment;
+import com.feiyou.headstyle.view.VideoInfoView;
+import com.orhanobut.logger.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,12 +40,14 @@ import butterknife.OnClick;
 /**
  * Created by myflying on 2018/11/26.
  */
-public class VideoFragment extends BaseFragment {
+public class VideoFragment extends BaseFragment implements VideoInfoView {
 
     @BindView(R.id.video_list)
     RecyclerView mVideoListView;
 
     VideoListAdapter videoListAdapter;
+
+    private VideoInfoPresenterImp videoInfoPresenterImp;
 
     public static VideoFragment getInstance() {
         return new VideoFragment();
@@ -56,15 +63,9 @@ public class VideoFragment extends BaseFragment {
 
     public void initViews() {
 
-        List<VideoInfo> list = new ArrayList<>();
-        list.add(new VideoInfo());
-        list.add(new VideoInfo());
-        list.add(new VideoInfo());
-        list.add(new VideoInfo());
-        list.add(new VideoInfo());
-        list.add(new VideoInfo());
+        videoInfoPresenterImp = new VideoInfoPresenterImp(this, getActivity());
 
-        videoListAdapter = new VideoListAdapter(getActivity(), list);
+        videoListAdapter = new VideoListAdapter(getActivity(), null);
         mVideoListView.setLayoutManager(new GridLayoutManager(getActivity(), 2));
         mVideoListView.setAdapter(videoListAdapter);
 
@@ -74,10 +75,33 @@ public class VideoFragment extends BaseFragment {
                 showVideo();
             }
         });
+
+        videoInfoPresenterImp.getDataList(0);
     }
 
     void showVideo() {
         Intent intent = new Intent(getActivity(), VideoShowActivity.class);
         startActivity(intent);
+    }
+
+    @Override
+    public void showProgress() {
+
+    }
+
+    @Override
+    public void dismissProgress() {
+
+    }
+
+    @Override
+    public void loadDataSuccess(VideoInfoRet tData) {
+        Logger.i(JSONObject.toJSONString(tData));
+        videoListAdapter.setNewData(tData.getData().getList());
+    }
+
+    @Override
+    public void loadDataError(Throwable throwable) {
+
     }
 }
