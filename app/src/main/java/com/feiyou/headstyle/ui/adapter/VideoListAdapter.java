@@ -13,6 +13,7 @@ import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.bean.VideoInfo;
 import com.feiyou.headstyle.bean.WordInfo;
 import com.feiyou.headstyle.ui.custom.GlideRoundTransform;
+import com.feiyou.headstyle.ui.custom.GlideRoundedCornersTransform;
 
 import java.util.List;
 
@@ -34,6 +35,10 @@ public class VideoListAdapter extends BaseQuickAdapter<VideoInfo, BaseViewHolder
         LinearLayout itemLayout = helper.itemView.findViewById(R.id.layout_video_item);
         itemLayout.setLayoutParams(new LinearLayout.LayoutParams(ScreenUtils.getScreenWidth() / 2, LinearLayout.LayoutParams.WRAP_CONTENT));
 
-        Glide.with(mContext).asBitmap().load(item.getVideoCover()).into((ImageView) helper.itemView.findViewById(R.id.iv_video_cover));
+        //Glide.with(mContext).asBitmap().load(item.getVideoCover()).into((ImageView) helper.itemView.findViewById(R.id.iv_video_cover));
+
+        RequestOptions options = new RequestOptions();
+        options.optionalTransform(new GlideRoundedCornersTransform(5f, GlideRoundedCornersTransform.CornerType.TOP));
+        Glide.with(mContext).load(item.getVideoCover()).apply(options).into((ImageView) helper.itemView.findViewById(R.id.iv_video_cover));
     }
 }
