@@ -213,7 +213,7 @@ public class VideoShowActivity extends BaseFragmentActivity implements VideoInfo
             public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
                 if (view.getId() == R.id.tv_comment_num) {
                     currentVideoId = mVideoAdapter.getData().get(position).getId();
-                    videoCommentPresenterImp.getCommentList(1, currentVideoId, "");
+                    videoCommentPresenterImp.getCommentList(1, currentVideoId, "1021601");
                     if (popupWindow != null && !popupWindow.isShowing()) {
                         avi.show();
                         // 设置popupWindow的显示位置，此处是在手机屏幕底部且水平居中的位置
@@ -283,7 +283,7 @@ public class VideoShowActivity extends BaseFragmentActivity implements VideoInfo
 
                 if (view.getId() == R.id.layout_zan) {
                     switchType = 2;
-                    addZanPresenterImp.addZan(2, "1021601", "", commentId, "",2);
+                    addZanPresenterImp.addZan(2, "1021601", "", commentId, "", 2);
                 }
             }
         });
@@ -351,6 +351,19 @@ public class VideoShowActivity extends BaseFragmentActivity implements VideoInfo
                 showInputDialog();
             }
         });
+
+        commentReplyAdapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
+            @Override
+            public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
+                switchType = 3;
+                currentReplyPos = position;
+                if (view.getId() == R.id.layout_zan) {
+                    repeatId = commentReplyAdapter.getData().get(position).getRepeatId();
+                    addZanPresenterImp.addZan(3, "1021601", "", "", repeatId, 2);
+                }
+            }
+        });
+
     }
 
     public void showInputDialog() {
@@ -501,7 +514,7 @@ public class VideoShowActivity extends BaseFragmentActivity implements VideoInfo
                 if (switchType == 2) {
                     int tempNum = commentAdapter.getData().get(currentCommentPos).getZanNum();
                     if (((ZanResultRet) tData).getData().getIsZan() == 0) {
-                        tempNum = tempNum - 1;
+                        tempNum = tempNum - 1 < 0 ? 0 : tempNum - 1;
                     } else {
                         tempNum = tempNum + 1;
                     }
@@ -511,10 +524,9 @@ public class VideoShowActivity extends BaseFragmentActivity implements VideoInfo
                 }
 
                 if (switchType == 3) {
-
                     int tempNum = commentReplyAdapter.getData().get(currentReplyPos).getZanNum();
                     if (((ZanResultRet) tData).getData().getIsZan() == 0) {
-                        tempNum = tempNum - 1;
+                        tempNum = tempNum - 1 < 0 ? 0 : tempNum - 1;
                     } else {
                         tempNum = tempNum + 1;
                     }
