@@ -180,7 +180,7 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
 
     @OnClick(R.id.layout_zan)
     void addZan() {
-        addZanPresenterImp.addZan(1, "1021601", messageId, "", "");
+        addZanPresenterImp.addZan(1, "1021601", messageId, "", "",1);
     }
 
     @OnClick(R.id.iv_back)
@@ -293,6 +293,7 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
         }
 
         ReplyParams replyParams = new ReplyParams();
+        replyParams.setModelType(1);
         replyParams.setType(1);
         replyParams.setContent("我是帖子的一级回复");
         replyParams.setRepeatUserId("1021601");

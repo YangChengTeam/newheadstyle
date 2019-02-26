@@ -17,12 +17,15 @@ import android.widget.VideoView;
 
 import com.alibaba.fastjson.JSONObject;
 import com.blankj.utilcode.util.AppUtils;
+import com.blankj.utilcode.util.ToastUtils;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.dingmouren.layoutmanagergroup.viewpager.OnViewPagerListener;
 import com.dingmouren.layoutmanagergroup.viewpager.ViewPagerLayoutManager;
 import com.feiyou.headstyle.R;
+import com.feiyou.headstyle.bean.ResultInfo;
 import com.feiyou.headstyle.bean.VideoInfo;
 import com.feiyou.headstyle.bean.VideoInfoRet;
+import com.feiyou.headstyle.common.Constants;
 import com.feiyou.headstyle.presenter.VideoInfoPresenterImp;
 import com.feiyou.headstyle.ui.activity.VideoShowActivity;
 import com.feiyou.headstyle.ui.adapter.VideoListAdapter;
@@ -49,6 +52,14 @@ public class VideoFragment extends BaseFragment implements VideoInfoView {
 
     private VideoInfoPresenterImp videoInfoPresenterImp;
 
+    private int randomPage;
+
+    private int currentPage;
+
+    private int pageSize = 30;
+
+    private int clickPage;
+
     public static VideoFragment getInstance() {
         return new VideoFragment();
     }
@@ -72,16 +83,28 @@ public class VideoFragment extends BaseFragment implements VideoInfoView {
         videoListAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
-                showVideo();
+
+                Logger.i("video_id--->" + videoListAdapter.getData().get(position).getId());
+
+                int jumpPage = randomPage + position / pageSize;
+
+                int jumpPosition = position % pageSize;
+
+                Intent intent = new Intent(getActivity(), VideoShowActivity.class);
+                intent.putExtra("jump_page", jumpPage);
+                intent.putExtra("jump_position", jumpPosition);
+                startActivity(intent);
             }
         });
 
-        videoInfoPresenterImp.getDataList(0);
-    }
-
-    void showVideo() {
-        Intent intent = new Intent(getActivity(), VideoShowActivity.class);
-        startActivity(intent);
+        videoInfoPresenterImp.getDataList(1);
+        videoListAdapter.setOnLoadMoreListener(new BaseQuickAdapter.RequestLoadMoreListener() {
+            @Override
+            public void onLoadMoreRequested() {
+                currentPage++;
+                videoInfoPresenterImp.getDataList(1);
+            }
+        }, mVideoListView);
     }
 
     @Override
@@ -95,9 +118,30 @@ public class VideoFragment extends BaseFragment implements VideoInfoView {
     }
 
     @Override
-    public void loadDataSuccess(VideoInfoRet tData) {
+    public void loadDataSuccess(ResultInfo tData) {
         Logger.i(JSONObject.toJSONString(tData));
-        videoListAdapter.setNewData(tData.getData().getList());
+        if (tData != null && tData.getCode() == Constants.SUCCESS) {
+            if (tData instanceof VideoInfoRet) {
+                if (currentPage == 0) {
+                    randomPage = ((VideoInfoRet) tData).getData().getPage();
+                    currentPage = ((VideoInfoRet) tData).getData().getPage();
+
+                    if (((VideoInfoRet) tData).getData().getList() != null) {
+                        videoListAdapter.setNewData(((VideoInfoRet) tData).getData().getList());
+                    }
+                } else {
+                    if (((VideoInfoRet) tData).getData().getList() != null) {
+                        videoListAdapter.addData(((VideoInfoRet) tData).getData().getList());
+                    }
+                }
+
+                if (((VideoInfoRet) tData).getData().getList().size() == pageSize) {
+                    videoListAdapter.loadMoreComplete();
+                } else {
+                    videoListAdapter.loadMoreEnd();
+                }
+            }
+        }
     }
 
     @Override

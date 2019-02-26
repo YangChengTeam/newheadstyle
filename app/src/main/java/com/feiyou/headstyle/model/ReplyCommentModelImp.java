@@ -14,6 +14,7 @@ import com.feiyou.headstyle.bean.TopicInfoRet;
 
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
+import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -48,7 +49,7 @@ public class ReplyCommentModelImp extends BaseModel implements ReplyCommentModel
                         params.put("type", replyParams.getType() + "");
                         params.put("content", replyParams.getContent());
                         params.put("repeat_user_id", replyParams.getRepeatUserId());
-                        params.put("message_id", replyParams.getMessageId());
+                        params.put(replyParams.getModelType() == 1 ? "message_id" : "vedio_id", replyParams.getMessageId());
                         break;
                     case 2:
                         params.put("type", replyParams.getType() + "");
@@ -70,8 +71,8 @@ public class ReplyCommentModelImp extends BaseModel implements ReplyCommentModel
             e.printStackTrace();
         }
         RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), params.toString());
-
-        mCompositeSubscription.add(noteDataServiceApi.replyComment(requestBody)  //将subscribe添加到subscription，用于注销subscribe
+        Observable<ReplyResultInfoRet> observable = replyParams.getModelType() == 1 ? noteDataServiceApi.replyComment(requestBody) : noteDataServiceApi.replyVideoComment(requestBody);
+        mCompositeSubscription.add(observable  //将subscribe添加到subscription，用于注销subscribe
                 .observeOn(AndroidSchedulers.mainThread())//指定事件消费线程
                 .subscribeOn(Schedulers.io())  //指定 subscribe() 发生在 IO 线程
                 .subscribe(new Subscriber<ReplyResultInfoRet>() {

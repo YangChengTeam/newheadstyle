@@ -4,6 +4,9 @@ package com.feiyou.headstyle.bean;
  * Created by myflying on 2019/2/14.
  */
 public class ReplyParams {
+
+    private int modelType;//1：代表帖子回复，2代表视频列表回复
+
     private int type;
     private String content;
     private String repeatUserId;
@@ -75,5 +78,13 @@ public class ReplyParams {
 
     public void setRepeatCommentUserId(String repeatCommentUserId) {
         this.repeatCommentUserId = repeatCommentUserId;
+    }
+
+    public int getModelType() {
+        return modelType;
+    }
+
+    public void setModelType(int modelType) {
+        this.modelType = modelType;
     }
 }

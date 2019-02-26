@@ -4,16 +4,14 @@ import android.content.Context;
 
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
-import com.feiyou.headstyle.api.NoteDataServiceApi;
+import com.feiyou.headstyle.api.VideoInfoServiceApi;
 import com.feiyou.headstyle.base.BaseModel;
 import com.feiyou.headstyle.base.IBaseRequestCallBack;
-import com.feiyou.headstyle.bean.NoteCommentRet;
-import com.feiyou.headstyle.bean.NoteSubCommentRet;
-import com.feiyou.headstyle.bean.ReplyResultInfoRet;
+import com.feiyou.headstyle.bean.VideoCommentRet;
+import com.feiyou.headstyle.bean.VideoInfoRet;
 
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
-import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -23,37 +21,35 @@ import rx.subscriptions.CompositeSubscription;
  * Created by iflying on 2018/1/9.
  */
 
-public class NoteSubCommentDataModelImp extends BaseModel implements NoteSubCommentDataModel<NoteSubCommentRet> {
+public class VideoCommentModelImp extends BaseModel implements VideoCommentModel<VideoCommentRet> {
 
     private Context context = null;
-    private NoteDataServiceApi noteDataServiceApi;
+    private VideoInfoServiceApi videoInfoServiceApi;
     private CompositeSubscription mCompositeSubscription;
 
-    public NoteSubCommentDataModelImp(Context mContext) {
+    public VideoCommentModelImp(Context mContext) {
         super();
         context = mContext;
-        noteDataServiceApi = mRetrofit.create(NoteDataServiceApi.class);
+        videoInfoServiceApi = mRetrofit.create(VideoInfoServiceApi.class);
         mCompositeSubscription = new CompositeSubscription();
     }
 
     @Override
-    public void getNoteSubCommentData(int page, String userId,String commentId, int modelType,final IBaseRequestCallBack<NoteSubCommentRet> iBaseRequestCallBack) {
+    public void getCommentList(int page, String videoId, String userId, IBaseRequestCallBack<VideoCommentRet> iBaseRequestCallBack) {
         JSONObject params = new JSONObject();
         try {
             params.put("page", page + "");
+            params.put("vedio_id", videoId);
             params.put("user_id", userId);
-            params.put("comment_id", commentId);
         } catch (JSONException e) {
             e.printStackTrace();
         }
         RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), params.toString());
 
-        Observable<NoteSubCommentRet> observable = modelType == 1 ? noteDataServiceApi.getNoteSubCommentData(requestBody) : noteDataServiceApi.getVideoNoteSubCommentData(requestBody);
-
-        mCompositeSubscription.add(observable  //将subscribe添加到subscription，用于注销subscribe
+        mCompositeSubscription.add(videoInfoServiceApi.getCommentList(requestBody)  //将subscribe添加到subscription，用于注销subscribe
                 .observeOn(AndroidSchedulers.mainThread())//指定事件消费线程
                 .subscribeOn(Schedulers.io())  //指定 subscribe() 发生在 IO 线程
-                .subscribe(new Subscriber<NoteSubCommentRet>() {
+                .subscribe(new Subscriber<VideoCommentRet>() {
 
                     @Override
                     public void onStart() {
@@ -75,9 +71,9 @@ public class NoteSubCommentDataModelImp extends BaseModel implements NoteSubComm
                     }
 
                     @Override
-                    public void onNext(NoteSubCommentRet noteSubCommentRet) {
+                    public void onNext(VideoCommentRet videoCommentRet) {
                         //回调接口：请求成功，获取实体类对象
-                        iBaseRequestCallBack.requestSuccess(noteSubCommentRet);
+                        iBaseRequestCallBack.requestSuccess(videoCommentRet);
                     }
                 }));
     }

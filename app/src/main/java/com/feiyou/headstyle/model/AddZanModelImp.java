@@ -8,6 +8,7 @@ import com.feiyou.headstyle.api.NoteDataServiceApi;
 import com.feiyou.headstyle.base.BaseModel;
 import com.feiyou.headstyle.base.BaseNoRsaModel;
 import com.feiyou.headstyle.base.IBaseRequestCallBack;
+import com.feiyou.headstyle.bean.NoteSubCommentRet;
 import com.feiyou.headstyle.bean.PhotoWallRet;
 import com.feiyou.headstyle.bean.ResultInfo;
 import com.feiyou.headstyle.bean.ZanResultRet;
@@ -18,6 +19,7 @@ import java.util.List;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
+import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -41,7 +43,7 @@ public class AddZanModelImp extends BaseModel implements AddZanModel<ZanResultRe
     }
 
     @Override
-    public void addZan(int type, String userId, String messageId, String commentId, String repeatId, final IBaseRequestCallBack<ZanResultRet> iBaseRequestCallBack) {
+    public void addZan(int type, String userId, String messageId, String commentId, String repeatId,int modelType, final IBaseRequestCallBack<ZanResultRet> iBaseRequestCallBack) {
 
         JSONObject params = new JSONObject();
         try {
@@ -49,7 +51,7 @@ public class AddZanModelImp extends BaseModel implements AddZanModel<ZanResultRe
                 case 1:
                     params.put("type", type + "");
                     params.put("user_id", userId);
-                    params.put("message_id", messageId);
+                    params.put(modelType == 1 ? "message_id": "vedioe_id", messageId);
                     break;
                 case 2:
                     params.put("type", type + "");
@@ -69,7 +71,8 @@ public class AddZanModelImp extends BaseModel implements AddZanModel<ZanResultRe
 
         RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), params.toString());
 
-        mCompositeSubscription.add(noteDataServiceApi.addZan(requestBody)  //将subscribe添加到subscription，用于注销subscribe
+        Observable<ZanResultRet> observable = modelType == 1 ? noteDataServiceApi.addZan(requestBody) : noteDataServiceApi.addVideoZan(requestBody);
+        mCompositeSubscription.add(observable  //将subscribe添加到subscription，用于注销subscribe
                 .observeOn(AndroidSchedulers.mainThread())//指定事件消费线程
                 .subscribeOn(Schedulers.io())  //指定 subscribe() 发生在 IO 线程
                 .subscribe(new Subscriber<ZanResultRet>() {

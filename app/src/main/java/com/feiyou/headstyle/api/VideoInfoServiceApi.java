@@ -1,6 +1,7 @@
 package com.feiyou.headstyle.api;
 
 import com.feiyou.headstyle.bean.CollectInfoRet;
+import com.feiyou.headstyle.bean.VideoCommentRet;
 import com.feiyou.headstyle.bean.VideoInfoRet;
 
 import okhttp3.RequestBody;
@@ -16,4 +17,7 @@ public interface VideoInfoServiceApi {
 
     @POST("v1.vedio/vedioList")
     Observable<VideoInfoRet> getDataList(@Body RequestBody requestBody);
+
+    @POST("v1.vedio/vedioCommentDetail")
+    Observable<VideoCommentRet> getCommentList(@Body RequestBody requestBody);
 }

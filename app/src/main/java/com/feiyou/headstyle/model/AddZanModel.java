@@ -9,5 +9,5 @@ import java.util.List;
  */
 
 public interface AddZanModel<T> {
-    void addZan(int type, String userId, String messageId, String commentId, String repeatId, IBaseRequestCallBack<T> iBaseRequestCallBack);
+    void addZan(int type, String userId, String messageId, String commentId, String repeatId, int modelType,IBaseRequestCallBack<T> iBaseRequestCallBack);
 }

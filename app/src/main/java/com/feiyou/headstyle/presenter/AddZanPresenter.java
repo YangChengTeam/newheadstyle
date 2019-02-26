@@ -7,5 +7,5 @@ import java.util.List;
  */
 
 public interface AddZanPresenter {
-    void addZan(int type, String userId, String messageId, String commentId, String repeatId);
+    void addZan(int type, String userId, String messageId, String commentId, String repeatId,int modelType);
 }

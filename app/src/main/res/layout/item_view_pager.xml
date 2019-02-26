@@ -33,12 +33,14 @@
             android:gravity="left|center">
 
             <ImageView
+                android:id="@+id/iv_user_head"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_marginLeft="12dp"
                 android:src="@mipmap/head_def" />
 
             <TextView
+                android:id="@+id/tv_user_nick_name"
                 android:layout_width="100dp"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="6dp"
@@ -49,6 +51,7 @@
                 android:textSize="14sp" />
 
             <Button
+                android:id="@+id/btn_is_follow"
                 android:layout_width="66dp"
                 android:layout_height="30dp"
                 android:background="@drawable/follow_bg"
@@ -65,12 +68,14 @@
             android:gravity="left|center">
 
             <TextView
+                android:id="@+id/tv_video_content"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="12dp"
+                android:layout_marginLeft="14dp"
+                android:layout_marginRight="12dp"
                 android:ellipsize="end"
                 android:gravity="center"
-                android:maxLines="1"
+                android:maxLines="2"
                 android:text="这里有最美的歌声，最好看的舞蹈"
                 android:textColor="@color/white"
                 android:textSize="14sp" />
@@ -103,6 +108,7 @@
                 android:orientation="horizontal">
 
                 <TextView
+                    android:id="@+id/tv_comment_num"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:drawableLeft="@mipmap/comment_icon"
@@ -113,6 +119,7 @@
                     android:textSize="12sp" />
 
                 <TextView
+                    android:id="@+id/tv_collect_num"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="16dp"

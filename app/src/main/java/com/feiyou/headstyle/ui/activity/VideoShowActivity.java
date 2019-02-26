@@ -1,30 +1,72 @@
 package com.feiyou.headstyle.ui.activity;
 
-import android.content.Intent;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.BottomSheetBehavior;
+import android.support.design.widget.BottomSheetDialog;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.VideoView;
 
-import com.blankj.utilcode.util.AppUtils;
+import com.alibaba.fastjson.JSONObject;
+import com.blankj.utilcode.util.BarUtils;
+import com.blankj.utilcode.util.KeyboardUtils;
+import com.blankj.utilcode.util.ScreenUtils;
+import com.blankj.utilcode.util.SizeUtils;
+import com.blankj.utilcode.util.StringUtils;
+import com.blankj.utilcode.util.TimeUtils;
+import com.blankj.utilcode.util.ToastUtils;
+import com.bumptech.glide.Glide;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.dingmouren.layoutmanagergroup.viewpager.OnViewPagerListener;
 import com.dingmouren.layoutmanagergroup.viewpager.ViewPagerLayoutManager;
 import com.feiyou.headstyle.R;
+import com.feiyou.headstyle.bean.MessageEvent;
+import com.feiyou.headstyle.bean.NoteItem;
+import com.feiyou.headstyle.bean.NoteSubComment;
+import com.feiyou.headstyle.bean.NoteSubCommentRet;
+import com.feiyou.headstyle.bean.ReplyParams;
+import com.feiyou.headstyle.bean.ReplyResultInfoRet;
+import com.feiyou.headstyle.bean.ResultInfo;
+import com.feiyou.headstyle.bean.VideoCommentRet;
+import com.feiyou.headstyle.bean.VideoInfoRet;
+import com.feiyou.headstyle.bean.ZanResultRet;
+import com.feiyou.headstyle.common.Constants;
+import com.feiyou.headstyle.presenter.AddZanPresenterImp;
+import com.feiyou.headstyle.presenter.NoteSubCommentDataPresenterImp;
+import com.feiyou.headstyle.presenter.ReplyCommentPresenterImp;
+import com.feiyou.headstyle.presenter.VideoCommentPresenterImp;
+import com.feiyou.headstyle.presenter.VideoInfoPresenterImp;
+import com.feiyou.headstyle.ui.adapter.CommentAdapter;
+import com.feiyou.headstyle.ui.adapter.CommentReplyAdapter;
 import com.feiyou.headstyle.ui.adapter.VideoItemAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragmentActivity;
-import com.feiyou.headstyle.ui.fragment.sub.VideoFragment;
+import com.feiyou.headstyle.view.CommentDialog;
+import com.feiyou.headstyle.view.VideoInfoView;
+import com.orhanobut.logger.Logger;
+import com.wang.avi.AVLoadingIndicatorView;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.greenrobot.eventbus.EventBus;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -32,18 +74,91 @@ import butterknife.OnClick;
 /**
  * Created by myflying on 2018/11/23.
  */
-public class VideoShowActivity extends BaseFragmentActivity {
+public class VideoShowActivity extends BaseFragmentActivity implements VideoInfoView, CommentDialog.SendBackListener {
 
     private static final String TAG = "VideoShowActivity";
 
-    private int[] videos = {R.raw.video11, R.raw.video12, R.raw.video13, R.raw.video14, R.raw.video_2};
+    @BindView(R.id.layout_video_show)
+    FrameLayout mVideoShowLayout;
+
+    AVLoadingIndicatorView avi;
 
     @BindView(R.id.recycler)
-    RecyclerView mRecyclerView;
+    RecyclerView mVideoListView;
 
-    private VideoItemAdapter mAdapter;
+    LinearLayout mNoDataLayout;
+
+    ImageView mCloseComment;
+
+    private VideoItemAdapter mVideoAdapter;
 
     private ViewPagerLayoutManager mLayoutManager;
+
+    private VideoInfoPresenterImp videoInfoPresenterImp;
+
+    private VideoCommentPresenterImp videoCommentPresenterImp;
+
+    private NoteSubCommentDataPresenterImp noteSubCommentDataPresenterImp;
+
+    private int currentPage;
+
+    private int pageSize = 30;
+
+    private int startPosition;
+
+    private boolean isFirstLoad = true;
+
+    private String currentVideoId;
+
+    PopupWindow popupWindow;
+
+    private View commentView;
+
+    private RecyclerView commentListView;
+
+    BottomSheetDialog commentDialog;
+
+    private CommentAdapter commentAdapter;
+
+    private View replyView;
+
+    ImageView topUserHeadImageView;
+
+    TextView nickNameTv;
+
+    TextView addDateTv;
+
+    TextView commentContentTv;
+
+    TextView zanCountTv;
+
+    private RecyclerView replyListView;
+
+    BottomSheetDialog commitReplyDialog;
+
+    private CommentReplyAdapter commentReplyAdapter;
+
+    CommentDialog inputDialog;
+
+    private ReplyCommentPresenterImp replyCommentPresenterImp;
+
+    private Drawable isZan;
+
+    private Drawable notZan;
+
+    private int switchType;
+
+    private String commentId;
+
+    private String repeatId;
+
+    private String repeatCommentUserId;
+
+    private int currentCommentPos = -1;
+
+    private int currentReplyPos = -1;
+
+    private AddZanPresenterImp addZanPresenterImp;
 
     @Override
     protected int getContextViewId() {
@@ -54,23 +169,194 @@ public class VideoShowActivity extends BaseFragmentActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         initView();
+        initCommentPop();
+        initReplyView();
         initListener();
     }
 
     private void initView() {
+
+        Bundle bundle = getIntent().getExtras();
+        if (bundle != null && bundle.getInt("jump_page") > 0) {
+            currentPage = bundle.getInt("jump_page");
+        }
+
+        if (bundle != null && bundle.getInt("jump_position") > 0) {
+            startPosition = bundle.getInt("jump_position");
+        }
+
+        isZan = ContextCompat.getDrawable(this, R.mipmap.is_zan);
+        notZan = ContextCompat.getDrawable(this, R.mipmap.note_zan);
+
         mLayoutManager = new ViewPagerLayoutManager(this, OrientationHelper.VERTICAL);
+        mVideoAdapter = new VideoItemAdapter(this, null);
+        mVideoListView.setLayoutManager(mLayoutManager);
+        mVideoListView.setAdapter(mVideoAdapter);
 
-        List<Integer> imgList = new ArrayList<>();
-        imgList.add(R.mipmap.video11);
-        imgList.add(R.mipmap.video12);
-        imgList.add(R.mipmap.video13);
-        imgList.add(R.mipmap.video14);
-        imgList.add(R.mipmap.img_video_2);
+        videoInfoPresenterImp = new VideoInfoPresenterImp(this, this);
+        videoCommentPresenterImp = new VideoCommentPresenterImp(this, this);
+        replyCommentPresenterImp = new ReplyCommentPresenterImp(this, this);
+        noteSubCommentDataPresenterImp = new NoteSubCommentDataPresenterImp(this, this);
+        addZanPresenterImp = new AddZanPresenterImp(this, this);
 
-        mAdapter = new VideoItemAdapter(this, imgList, videos);
-        mRecyclerView.setLayoutManager(mLayoutManager);
-        mRecyclerView.setAdapter(mAdapter);
+        videoInfoPresenterImp.getDataList(currentPage);
+        mVideoAdapter.setOnLoadMoreListener(new BaseQuickAdapter.RequestLoadMoreListener() {
+            @Override
+            public void onLoadMoreRequested() {
+                currentPage++;
+                videoInfoPresenterImp.getDataList(currentPage);
+            }
+        }, mVideoListView);
 
+        mVideoAdapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
+            @Override
+            public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
+                if (view.getId() == R.id.tv_comment_num) {
+                    currentVideoId = mVideoAdapter.getData().get(position).getId();
+                    videoCommentPresenterImp.getCommentList(1, currentVideoId, "");
+                    if (popupWindow != null && !popupWindow.isShowing()) {
+                        avi.show();
+                        // 设置popupWindow的显示位置，此处是在手机屏幕底部且水平居中的位置
+                        popupWindow.showAtLocation(mVideoShowLayout, Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL, 0, 0);
+                    }
+                }
+            }
+        });
+    }
+
+    //评论窗口
+    public void initCommentPop() {
+        commentView = LayoutInflater.from(this).inflate(R.layout.video_comment_dialog, null);
+        avi = commentView.findViewById(R.id.avi);
+        mNoDataLayout = commentView.findViewById(R.id.layout_no_data);
+        mCloseComment = commentView.findViewById(R.id.iv_close);
+        commentListView = commentView.findViewById(R.id.video_comment_list);
+        commentAdapter = new CommentAdapter(this, null);
+        commentListView.setLayoutManager(new LinearLayoutManager(this));
+        commentListView.setAdapter(commentAdapter);
+
+        mCloseComment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (popupWindow != null && popupWindow.isShowing()) {
+                    popupWindow.dismiss();
+                }
+            }
+        });
+
+        LinearLayout addMessageLayout = commentView.findViewById(R.id.layout_add_message);
+
+        addMessageLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                switchType = 1;
+                showInputDialog();
+            }
+        });
+
+        commentAdapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
+            @Override
+            public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
+                currentCommentPos = position;
+                commentId = commentAdapter.getData().get(currentCommentPos).getCommentId();
+
+                if (view.getId() == R.id.btn_reply_count) {
+                    if (commitReplyDialog != null && !commitReplyDialog.isShowing()) {
+                        commitReplyDialog.show();
+                    }
+                    //设置头部信息
+                    NoteItem noteItem = commentAdapter.getData().get(position);
+                    Glide.with(VideoShowActivity.this).load(noteItem.getCommentUserimg()).into(topUserHeadImageView);
+                    nickNameTv.setText(noteItem.getCommentNickname());
+                    addDateTv.setText(TimeUtils.millis2String(noteItem.getAddTime() != null ? noteItem.getAddTime() * 1000 : 0));
+                    commentContentTv.setText(noteItem.getCommentContent());
+                    zanCountTv.setText(noteItem.getZanNum() + "");
+                    if (noteItem.getIsZan() == 0) {
+                        zanCountTv.setCompoundDrawablesWithIntrinsicBounds(notZan, null, null, null);
+                    } else {
+                        zanCountTv.setCompoundDrawablesWithIntrinsicBounds(isZan, null, null, null);
+                    }
+                    zanCountTv.setCompoundDrawablePadding(SizeUtils.dp2px(4));
+
+                    noteSubCommentDataPresenterImp.getNoteSubCommentData(1, "1021601", commentId, 2);
+                }
+
+                if (view.getId() == R.id.layout_zan) {
+                    switchType = 2;
+                    addZanPresenterImp.addZan(2, "1021601", "", commentId, "",2);
+                }
+            }
+        });
+
+        //用于PopupWindow的View
+        popupWindow = new PopupWindow(commentView, ScreenUtils.getScreenWidth(), SizeUtils.dp2px(420), true);
+        popupWindow.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        popupWindow.setFocusable(false);
+        popupWindow.setOutsideTouchable(true);
+    }
+
+    public void initReplyView() {
+        commitReplyDialog = new BottomSheetDialog(this);
+
+        replyView = LayoutInflater.from(this).inflate(R.layout.comment_reply_view, null);
+        replyListView = replyView.findViewById(R.id.rv_reply_list);
+
+        LinearLayout contentLayout = replyView.findViewById(R.id.layout_content);
+        LinearLayout bottomLayout = replyView.findViewById(R.id.layout_reply_bottom);
+        LinearLayout zanLayout = replyView.findViewById(R.id.layout_comment_zan);
+
+        LinearLayout addMessageLayout = replyView.findViewById(R.id.layout_add_message);
+
+        addMessageLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                switchType = 2;
+                showInputDialog();
+            }
+        });
+
+        //顶部个人的回复信息
+        topUserHeadImageView = replyView.findViewById(R.id.iv_user_head);
+        nickNameTv = replyView.findViewById(R.id.tv_user_nick_name);
+        addDateTv = replyView.findViewById(R.id.tv_add_date);
+        commentContentTv = replyView.findViewById(R.id.tv_content);
+        zanCountTv = replyView.findViewById(R.id.tv_zan_count);
+
+        RelativeLayout.LayoutParams contentParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+        int contentMarginHeight = BarUtils.getNavBarHeight() + SizeUtils.dp2px(62);
+        contentParams.setMargins(0, SizeUtils.dp2px(49), 0, contentMarginHeight);
+        contentLayout.setLayoutParams(contentParams);
+
+        RelativeLayout.LayoutParams bottomParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, SizeUtils.dp2px(49));
+        int tempHeight = ScreenUtils.getScreenHeight() - BarUtils.getNavBarHeight() - BarUtils.getStatusBarHeight() - SizeUtils.dp2px(49);
+        bottomParams.setMargins(0, tempHeight, 0, BarUtils.getNavBarHeight());
+        bottomLayout.setLayoutParams(bottomParams);
+
+        replyView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ScreenUtils.getScreenHeight()));
+        commitReplyDialog.setContentView(replyView);
+
+        //setPeekHeight,设置弹出窗口的高度为全屏的状态.
+        BottomSheetBehavior mBehavior = BottomSheetBehavior.from((View) replyView.getParent());
+        mBehavior.setPeekHeight(ScreenUtils.getScreenHeight() - BarUtils.getStatusBarHeight());
+
+        commentReplyAdapter = new CommentReplyAdapter(this, null);
+        replyListView.setLayoutManager(new LinearLayoutManager(this));
+        replyListView.setAdapter(commentReplyAdapter);
+
+        commentReplyAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
+                switchType = 3;
+                currentReplyPos = position;
+                showInputDialog();
+            }
+        });
+    }
+
+    public void showInputDialog() {
+        inputDialog = new CommentDialog(this, 1);
+        inputDialog.setSendBackListener(this);
+        inputDialog.show(getFragmentManager(), "dialog");
     }
 
     private void initListener() {
@@ -107,7 +393,7 @@ public class VideoShowActivity extends BaseFragmentActivity {
     }
 
     private void playVideo(int position) {
-        View itemView = mRecyclerView.getChildAt(0);
+        View itemView = mVideoListView.getChildAt(0);
         final VideoView videoView = itemView.findViewById(R.id.video_view);
         final ImageView imgThumb = itemView.findViewById(R.id.img_thumb);
         final RelativeLayout rootView = itemView.findViewById(R.id.root_view);
@@ -133,13 +419,118 @@ public class VideoShowActivity extends BaseFragmentActivity {
     }
 
     private void releaseVideo(int index) {
-        View itemView = mRecyclerView.getChildAt(index);
+        View itemView = mVideoListView.getChildAt(index);
         final VideoView videoView = itemView.findViewById(R.id.video_view);
         final ImageView imgThumb = itemView.findViewById(R.id.img_thumb);
         videoView.stopPlayback();
         imgThumb.animate().alpha(1).start();
     }
 
+    @Override
+    public void showProgress() {
+
+    }
+
+    @Override
+    public void dismissProgress() {
+
+    }
+
+    @Override
+    public void loadDataSuccess(ResultInfo tData) {
+        Logger.i("data--->" + JSONObject.toJSONString(tData));
+
+        if (avi != null) {
+            avi.hide();
+        }
+
+        if (tData != null) {
+            if (tData instanceof VideoInfoRet) {
+                if (tData.getCode() == Constants.SUCCESS && ((VideoInfoRet) tData).getData().getList() != null) {
+                    if (isFirstLoad) {
+                        if (startPosition < ((VideoInfoRet) tData).getData().getList().size()) {
+                            mVideoAdapter.setNewData(((VideoInfoRet) tData).getData().getList().subList(startPosition, ((VideoInfoRet) tData).getData().getList().size() - 1));
+                        } else {
+                            mVideoAdapter.setNewData(((VideoInfoRet) tData).getData().getList());
+                        }
+                        isFirstLoad = false;
+                    } else {
+                        mVideoAdapter.addData(((VideoInfoRet) tData).getData().getList());
+                    }
+
+                    if (((VideoInfoRet) tData).getData().getList().size() == pageSize) {
+                        mVideoAdapter.loadMoreComplete();
+                    } else {
+                        mVideoAdapter.loadMoreEnd();
+                    }
+                }
+            }
+
+            if (tData instanceof VideoCommentRet) {
+                if (tData.getCode() == Constants.SUCCESS && ((VideoCommentRet) tData).getData() != null) {
+                    mNoDataLayout.setVisibility(View.GONE);
+                    commentListView.setVisibility(View.VISIBLE);
+                    commentAdapter.setNewData(((VideoCommentRet) tData).getData());
+                } else {
+                    mNoDataLayout.setVisibility(View.VISIBLE);
+                    commentListView.setVisibility(View.GONE);
+                }
+            }
+
+            if (tData instanceof NoteSubCommentRet) {
+                if (((NoteSubCommentRet) tData).getData() != null) {
+                    commentReplyAdapter.setNewData(((NoteSubCommentRet) tData).getData());
+                }
+            }
+
+            if (tData instanceof ReplyResultInfoRet) {
+                if (tData.getCode() == Constants.SUCCESS) {
+                    if (switchType == 1) {
+                        videoCommentPresenterImp.getCommentList(1, currentVideoId, "");
+                    }
+                    if (switchType == 2 || switchType == 3) {
+                        commentReplyAdapter.addData(0, ((ReplyResultInfoRet) tData).getData());
+                        commentReplyAdapter.notifyDataSetChanged();
+                    }
+                } else {
+                    ToastUtils.showLong(StringUtils.isEmpty(tData.getMsg()) ? "回复失败" : tData.getMsg());
+                }
+            }
+
+            if (tData instanceof ZanResultRet) {
+                if (switchType == 2) {
+                    int tempNum = commentAdapter.getData().get(currentCommentPos).getZanNum();
+                    if (((ZanResultRet) tData).getData().getIsZan() == 0) {
+                        tempNum = tempNum - 1;
+                    } else {
+                        tempNum = tempNum + 1;
+                    }
+                    commentAdapter.getData().get(currentCommentPos).setZanNum(tempNum);
+                    commentAdapter.getData().get(currentCommentPos).setIsZan(((ZanResultRet) tData).getData().getIsZan());
+                    commentAdapter.notifyDataSetChanged();
+                }
+
+                if (switchType == 3) {
+
+                    int tempNum = commentReplyAdapter.getData().get(currentReplyPos).getZanNum();
+                    if (((ZanResultRet) tData).getData().getIsZan() == 0) {
+                        tempNum = tempNum - 1;
+                    } else {
+                        tempNum = tempNum + 1;
+                    }
+                    commentReplyAdapter.getData().get(currentReplyPos).setZanNum(tempNum);
+                    commentReplyAdapter.getData().get(currentReplyPos).setIsZan(((ZanResultRet) tData).getData().getIsZan());
+                    commentReplyAdapter.notifyDataSetChanged();
+                }
+            }
+
+        }
+    }
+
+    @Override
+    public void loadDataError(Throwable throwable) {
+
+    }
 
     @OnClick(R.id.iv_back)
     void back() {
@@ -149,5 +540,53 @@ public class VideoShowActivity extends BaseFragmentActivity {
     @Override
     public void onBackPressed() {
         popBackStack();
+    }
+
+    @Override
+    public void sendContent(String content, int type) {
+        //关闭软键盘
+        KeyboardUtils.hideSoftInput(commentView);
+
+        ReplyParams replyParams = new ReplyParams();
+        if (switchType == 1) {
+            replyParams.setModelType(2);
+            replyParams.setType(1);
+            replyParams.setContent("我是视频的一级回复内容");
+            replyParams.setRepeatUserId("1021601");
+            replyParams.setMessageId("2");
+        }
+        if (switchType == 2) {
+            commentId = commentAdapter.getData().get(currentCommentPos).getCommentId();
+            repeatCommentUserId = commentAdapter.getData().get(currentCommentPos).getUserId();
+
+            replyParams.setModelType(1);
+            replyParams.setType(2);
+            replyParams.setContent("我是视频的二级的回复内容");
+            replyParams.setRepeatUserId("1021601");
+            replyParams.setCommentId(commentId);
+            replyParams.setRepeatCommentUserId(repeatCommentUserId);
+        }
+
+        if (switchType == 3) {
+            repeatId = commentReplyAdapter.getData().get(currentReplyPos).getRepeatId();
+            repeatCommentUserId = commentReplyAdapter.getData().get(currentReplyPos).getOldUserId();
+
+            replyParams.setModelType(1);
+            replyParams.setType(3);
+            replyParams.setContent("我是视频的三级的回复内容");
+            replyParams.setRepeatUserId("1021601");
+            replyParams.setRepeatId(repeatId);
+            replyParams.setRepeatCommentUserId(repeatCommentUserId);
+        }
+
+        replyCommentPresenterImp.addReplyInfo(replyParams);
+
+        if (content != null) {
+            if (inputDialog != null) {
+                inputDialog.hideProgressDialog();
+                inputDialog.dismiss();
+            }
+        }
+
     }
 }

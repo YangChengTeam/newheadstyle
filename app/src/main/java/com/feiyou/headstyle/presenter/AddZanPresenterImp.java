@@ -29,7 +29,7 @@ public class AddZanPresenterImp extends BasePresenterImp<IBaseView, ZanResultRet
     }
 
     @Override
-    public void addZan(int type, String userId, String messageId, String commentId, String repeatId) {
-        addZanModelImp.addZan(type, userId, messageId, commentId, repeatId, this);
+    public void addZan(int type, String userId, String messageId, String commentId, String repeatId,int modelType) {
+        addZanModelImp.addZan(type, userId, messageId, commentId, repeatId, modelType,this);
     }
 }

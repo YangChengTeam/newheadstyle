@@ -160,7 +160,7 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
             @Override
             public void onClick(View view) {
                 switchType = 1;
-                addZanPresenterImp.addZan(2, "1021601", "", commentId, "");
+                addZanPresenterImp.addZan(2, "1021601", "", commentId, "",1);
             }
         });
 
@@ -223,7 +223,7 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
                     nickNameTv.setText(noteItem.getCommentNickname());
                     addDateTv.setText(TimeUtils.millis2String(noteItem.getAddTime() != null ? noteItem.getAddTime() * 1000 : 0));
                     commentContentTv.setText(noteItem.getCommentContent());
-                    noteSubCommentDataPresenterImp.getNoteSubCommentData(1, "1021601", commentId);
+                    noteSubCommentDataPresenterImp.getNoteSubCommentData(1, "1021601", commentId,1);
 
                     zanCountTv.setText(noteItem.getZanNum() + "");
 
@@ -236,7 +236,7 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
                 }
 
                 if (view.getId() == R.id.layout_zan) {
-                    addZanPresenterImp.addZan(2, "1021601", "", commentId, "");
+                    addZanPresenterImp.addZan(2, "1021601", "", commentId, "",1);
                 }
             }
         });
@@ -267,7 +267,7 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
                 if (view.getId() == R.id.layout_zan) {
                     repeatId = commentReplyAdapter.getData().get(position).getRepeatId();
 
-                    addZanPresenterImp.addZan(3, "1021601", "", "", repeatId);
+                    addZanPresenterImp.addZan(3, "1021601", "", "", repeatId,1);
                 }
             }
         });
@@ -414,6 +414,7 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
             repeatCommentUserId = commentAdapter.getData().get(currentCommentPos).getUserId();
 
             ReplyParams replyParams = new ReplyParams();
+            replyParams.setModelType(1);
             replyParams.setType(2);
             replyParams.setContent("我是type=2的回复内容");
             replyParams.setRepeatUserId("1021601");
@@ -435,6 +436,7 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
             repeatCommentUserId = commentReplyAdapter.getData().get(currentReplyPos).getOldUserId();
 
             ReplyParams replyParams = new ReplyParams();
+            replyParams.setModelType(1);
             replyParams.setType(3);
             replyParams.setContent("我是type=3的回复内容");
             replyParams.setRepeatUserId("1021601");

@@ -22,6 +22,20 @@ public class VideoInfo {
     @SerializedName("click_num")
     private int clickNum;
 
+    @SerializedName("collect_num")
+    private int collectNum;
+
+    @SerializedName("comment_num")
+    private int commentNum;
+
+    @SerializedName("is_collect")
+    private int isCollect;
+
+    @SerializedName("zan_num")
+    private int zanNum;
+
+    private String topic;
+
     public String getId() {
         return id;
     }
@@ -76,5 +90,45 @@ public class VideoInfo {
 
     public void setClickNum(int clickNum) {
         this.clickNum = clickNum;
+    }
+
+    public int getCollectNum() {
+        return collectNum;
+    }
+
+    public void setCollectNum(int collectNum) {
+        this.collectNum = collectNum;
+    }
+
+    public int getCommentNum() {
+        return commentNum;
+    }
+
+    public void setCommentNum(int commentNum) {
+        this.commentNum = commentNum;
+    }
+
+    public int getIsCollect() {
+        return isCollect;
+    }
+
+    public void setIsCollect(int isCollect) {
+        this.isCollect = isCollect;
+    }
+
+    public int getZanNum() {
+        return zanNum;
+    }
+
+    public void setZanNum(int zanNum) {
+        this.zanNum = zanNum;
+    }
+
+    public String getTopic() {
+        return topic;
+    }
+
+    public void setTopic(String topic) {
+        this.topic = topic;
     }
 }

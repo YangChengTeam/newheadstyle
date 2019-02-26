@@ -10,7 +10,7 @@
         android:layout_width="166dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_marginBottom="10dp"
+        android:layout_marginTop="10dp"
         android:background="@drawable/video_item_bg"
         android:gravity="top|center"
         android:orientation="vertical">
@@ -36,12 +36,15 @@
                 android:src="@mipmap/head_def" />
 
             <TextView
-                android:layout_width="100dp"
+                android:id="@+id/tv_user_nick_name"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:layout_marginLeft="2dp"
                 android:layout_toRightOf="@+id/iv_user_head"
                 android:ellipsize="end"
+                android:gravity="left|center"
+                android:maxWidth="100dp"
                 android:maxLines="1"
                 android:text="火星用户"
                 android:textColor="@color/into_community_color"

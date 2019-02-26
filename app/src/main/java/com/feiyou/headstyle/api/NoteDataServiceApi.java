@@ -52,4 +52,15 @@ public interface NoteDataServiceApi {
     @POST("v1.message/messageDetailCommentZan")
     Observable<ZanResultRet> addZan(@Body RequestBody requestBody);
 
+    @POST("v1.vedio/vedioDetailCommentRepeat")
+    Observable<ReplyResultInfoRet> replyVideoComment(@Body RequestBody requestBody);
+
+    //回复下面的子回复列表
+    @POST("v1.vedio/vedioCommentRepeatDetail")
+    Observable<NoteSubCommentRet> getVideoNoteSubCommentData(@Body RequestBody requestBody);
+
+    //帖子点赞
+    @POST("v1.vedio/vedioDetailCommentZan")
+    Observable<ZanResultRet> addVideoZan(@Body RequestBody requestBody);
+
 }
