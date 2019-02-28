@@ -62,9 +62,8 @@ public class HeadShowItemAdapter extends BaseAdapter {
     public void addDatas(List<HeadInfo> images) {
         if (heads == null) {
             heads = new ArrayList<HeadInfo>();
-        } else {
-            heads.clear();
         }
+
         heads.addAll(images);
     }
 

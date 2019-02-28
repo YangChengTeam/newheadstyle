@@ -18,9 +18,12 @@ import android.widget.TextView;
 
 import com.alibaba.fastjson.JSONObject;
 import com.blankj.utilcode.util.SizeUtils;
+import com.blankj.utilcode.util.StringUtils;
 import com.blankj.utilcode.util.TimeUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
+import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.bean.HeadInfo;
 import com.feiyou.headstyle.bean.MessageEvent;
@@ -33,9 +36,11 @@ import com.feiyou.headstyle.common.Constants;
 import com.feiyou.headstyle.presenter.AddZanPresenterImp;
 import com.feiyou.headstyle.presenter.NoteInfoDetailDataPresenterImp;
 import com.feiyou.headstyle.presenter.ReplyCommentPresenterImp;
+import com.feiyou.headstyle.ui.adapter.CommunityHeadAdapter;
 import com.feiyou.headstyle.ui.adapter.DetailFragmentAdapter;
 import com.feiyou.headstyle.ui.adapter.HeadInfoAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragmentActivity;
+import com.feiyou.headstyle.ui.custom.GlideRoundTransform;
 import com.feiyou.headstyle.ui.fragment.sub.VideoFragment;
 import com.feiyou.headstyle.ui.fragment.sub.WonderfulFragment;
 import com.feiyou.headstyle.view.CommentDialog;
@@ -109,7 +114,7 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
 
     private AddZanPresenterImp addZanPresenterImp;
 
-    private HeadInfoAdapter headInfoAdapter;
+    private CommunityHeadAdapter communityHeadAdapter;
 
     CommentDialog commentDialog;
 
@@ -134,26 +139,31 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
     }
 
     public void initViews() {
+        Bundle bundle = getIntent().getExtras();
+        if (bundle != null && !StringUtils.isEmpty(bundle.getString("msg_id"))) {
+            messageId = bundle.getString("msg_id");
+        }
+
         QMUIStatusBarHelper.setStatusBarLightMode(this);
         mTopContentLayout.setLayoutParams(new CollapsingToolbarLayout.LayoutParams(CollapsingToolbarLayout.LayoutParams.MATCH_PARENT, SizeUtils.dp2px(392)));
 
-        headInfoAdapter = new HeadInfoAdapter(this, null);
+        communityHeadAdapter = new CommunityHeadAdapter(this, null, 116, false);
         mNoteImageListView.setLayoutManager(new GridLayoutManager(this, 3));
-        mNoteImageListView.setAdapter(headInfoAdapter);
+        mNoteImageListView.setAdapter(communityHeadAdapter);
 
         noteInfoDetailDataPresenterImp = new NoteInfoDetailDataPresenterImp(this, this);
         addZanPresenterImp = new AddZanPresenterImp(this, this);
 
         replyCommentPresenterImp = new ReplyCommentPresenterImp(this, this);
 
-        noteInfoDetailDataPresenterImp.getNoteInfoDetailData("1021601", "110634");
+        noteInfoDetailDataPresenterImp.getNoteInfoDetailData(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", messageId);
 
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("回复中");
     }
 
     public void initFragments() {
-        Fragment[] fragments = new Fragment[]{new WonderfulFragment(), new VideoFragment()};
+        Fragment[] fragments = new Fragment[]{WonderfulFragment.newInstance(messageId), new VideoFragment()};
         mTitleDataList = new ArrayList<>();
         mTitleDataList.add("精彩评论");
         mTitleDataList.add("最新评论");
@@ -180,7 +190,7 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
 
     @OnClick(R.id.layout_zan)
     void addZan() {
-        addZanPresenterImp.addZan(1, "1021601", messageId, "", "",1);
+        addZanPresenterImp.addZan(1, App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", messageId, "", "", 1);
     }
 
     @OnClick(R.id.iv_back)
@@ -219,11 +229,13 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
         if (tData != null && tData.getCode() == Constants.SUCCESS) {
 
             if (tData instanceof NoteInfoDetailRet) {
-                messageId = ((NoteInfoDetailRet) tData).getData().getId();
-
                 commentNum = ((NoteInfoDetailRet) tData).getData().getCommentNum();
 
-                Glide.with(this).load(((NoteInfoDetailRet) tData).getData().getUserimg()).into(mUserHeadImageView);
+                RequestOptions options = new RequestOptions();
+                options.transform(new GlideRoundTransform(this, 21));
+                options.placeholder(R.mipmap.empty_icon).error(R.mipmap.empty_icon);
+                Glide.with(this).load(((NoteInfoDetailRet) tData).getData().getUserimg()).apply(options).into(mUserHeadImageView);
+
                 mNickNameTextView.setText(((NoteInfoDetailRet) tData).getData().getNickname());
                 mTopicNameTextView.setText(((NoteInfoDetailRet) tData).getData().getName());
                 mAddDateTextView.setText(TimeUtils.millis2String(((NoteInfoDetailRet) tData).getData().getAddTime() * 1000));
@@ -253,7 +265,7 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
                     imageUrls.add(tempImg[i]);
                 }
 
-                headInfoAdapter.setNewData(headInfos);
+                communityHeadAdapter.setNewData(imageUrls);
             }
 
             if (tData instanceof ReplyResultInfoRet) {
@@ -296,8 +308,8 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
         replyParams.setModelType(1);
         replyParams.setType(1);
         replyParams.setContent("我是帖子的一级回复");
-        replyParams.setRepeatUserId("1021601");
-        replyParams.setMessageId("110634");
+        replyParams.setRepeatUserId(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "");
+        replyParams.setMessageId(messageId);
 
         replyCommentPresenterImp.addReplyInfo(replyParams);
 

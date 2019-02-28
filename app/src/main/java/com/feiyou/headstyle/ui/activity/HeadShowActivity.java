@@ -14,6 +14,7 @@ import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.bean.HeadInfo;
 import com.feiyou.headstyle.bean.HomeDataRet;
 import com.feiyou.headstyle.bean.ResultInfo;
+import com.feiyou.headstyle.bean.VideoInfoRet;
 import com.feiyou.headstyle.common.Constants;
 import com.feiyou.headstyle.presenter.HomeDataPresenterImp;
 import com.feiyou.headstyle.ui.adapter.HeadShowItemAdapter;
@@ -73,7 +74,11 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
 
     private int pageSize = 30;
 
+    private int startPosition;
+
     private StickerFragment stickerFragment;
+
+    private boolean isFirstLoad = true;
 
     @Override
     protected int getContextViewId() {
@@ -118,17 +123,12 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
 
     public void initData() {
 
-        List<HeadInfo> temps = new ArrayList<>();
-        for (int i = 0; i < 3; i++) {
-            HeadInfo headInfo = new HeadInfo();
-            headInfo.setImgurl("http://img4.duitang.com/uploads/item/201411/08/20141108120621_ziUZK.thumb.700_0.jpeg");
-            temps.add(headInfo);
-            headInfo = new HeadInfo();
-            headInfo.setImgurl("http://cdn.duitang.com/uploads/item/201602/23/20160223124339_d2NkX.jpeg");
-            temps.add(headInfo);
-            headInfo = new HeadInfo();
-            headInfo.setImgurl("http://img5.duitang.com/uploads/item/201409/26/20140926200335_hGkmk.jpeg");
-            temps.add(headInfo);
+        Bundle bundle = getIntent().getExtras();
+        if (bundle != null && bundle.getInt("jump_page") > 0) {
+            currentPage = bundle.getInt("jump_page");
+        }
+        if (bundle != null && bundle.getInt("jump_position") > 0) {
+            startPosition = bundle.getInt("jump_position");
         }
 
         adapter = new HeadShowItemAdapter(HeadShowActivity.this, null, showShape);
@@ -139,7 +139,7 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
         swipeView.setOnItemClickListener(this);
 
         homeDataPresenterImp = new HomeDataPresenterImp(this, this);
-        homeDataPresenterImp.getData(currentPage + "", "", "");
+        homeDataPresenterImp.getData(currentPage + "", "", "", 1);
 
     }
 
@@ -162,16 +162,9 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
     @OnClick(R.id.layout_edit)
     public void editImage() {
         isEdit = !isEdit;
-        if (isEdit) {
-            mConfigTv.setVisibility(View.VISIBLE);
-            mConfigTv.setText("保存/分享");
-        } else {
-            mConfigTv.setVisibility(View.GONE);
-        }
-        if (adapter != null && adapter.getHeads().size() > 0) {
-            stickerFragment = StickerFragment.newInstance(adapter.getHeads().get(0).getImgurl());
-            stickerFragment.show(getSupportFragmentManager(), "sticker");
-        }
+        Intent intent = new Intent(HeadShowActivity.this, HeadEditActivity.class);
+        intent.putExtra("image_url", adapter.getHeads().get(0).getImgurl());
+        startActivity(intent);
     }
 
     @Override
@@ -224,7 +217,17 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
     public void loadDataSuccess(ResultInfo tData) {
         if (tData != null && tData.getCode() == Constants.SUCCESS) {
             if (tData instanceof HomeDataRet) {
-                adapter.addDatas(((HomeDataRet) tData).getData().getImagesList());
+                if (isFirstLoad) {
+                    if (startPosition < ((HomeDataRet) tData).getData().getImagesList().size()) {
+                        adapter.addDatas(((HomeDataRet) tData).getData().getImagesList().subList(startPosition, ((HomeDataRet) tData).getData().getImagesList().size() - 1));
+                    } else {
+                        adapter.addDatas(((HomeDataRet) tData).getData().getImagesList());
+                    }
+                    isFirstLoad = false;
+                } else {
+                    adapter.addDatas(((HomeDataRet) tData).getData().getImagesList());
+                }
+
                 adapter.notifyDataSetChanged();
             }
         }

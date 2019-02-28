@@ -7,5 +7,5 @@ import com.feiyou.headstyle.base.IBaseRequestCallBack;
  */
 
 public interface HomeDataModel<T> {
-    void getData(String page,String pageSize,String change, IBaseRequestCallBack<T> iBaseRequestCallBack);
+    void getData(String page,String pageSize,String change, int isDetail,IBaseRequestCallBack<T> iBaseRequestCallBack);
 }

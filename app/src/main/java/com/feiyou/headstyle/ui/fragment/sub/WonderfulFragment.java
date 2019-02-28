@@ -20,6 +20,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.blankj.utilcode.util.BarUtils;
 import com.blankj.utilcode.util.ScreenUtils;
 import com.blankj.utilcode.util.SizeUtils;
+import com.blankj.utilcode.util.StringUtils;
 import com.blankj.utilcode.util.TimeUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.bumptech.glide.Glide;
@@ -117,6 +118,12 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
 
     private Drawable notZan;
 
+    private String messageId;
+
+    private int currentPage = 1;
+
+    private int subCurrentPage = 1;
+
     @Override
     protected View onCreateView() {
         View root = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_wonderful, null);
@@ -125,8 +132,11 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
         return root;
     }
 
-    public static WonderfulFragment newInstance(String topId) {
+    public static WonderfulFragment newInstance(String msgId) {
         WonderfulFragment fragment = new WonderfulFragment();
+        Bundle bundle = new Bundle();
+        bundle.putString("msg_id", msgId);
+        fragment.setArguments(bundle);
         return fragment;
     }
 
@@ -160,7 +170,7 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
             @Override
             public void onClick(View view) {
                 switchType = 1;
-                addZanPresenterImp.addZan(2, "1021601", "", commentId, "",1);
+                addZanPresenterImp.addZan(2, App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId():"", "", commentId, "", 1);
             }
         });
 
@@ -187,6 +197,10 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
     }
 
     public void initData() {
+        Bundle bundle = getArguments();
+        if (bundle != null && !StringUtils.isEmpty(bundle.getString("msg_id"))) {
+            messageId = bundle.getString("msg_id");
+        }
 
         isZan = ContextCompat.getDrawable(getActivity(), R.mipmap.is_zan);
         notZan = ContextCompat.getDrawable(getActivity(), R.mipmap.note_zan);
@@ -223,7 +237,7 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
                     nickNameTv.setText(noteItem.getCommentNickname());
                     addDateTv.setText(TimeUtils.millis2String(noteItem.getAddTime() != null ? noteItem.getAddTime() * 1000 : 0));
                     commentContentTv.setText(noteItem.getCommentContent());
-                    noteSubCommentDataPresenterImp.getNoteSubCommentData(1, "1021601", commentId,1);
+                    noteSubCommentDataPresenterImp.getNoteSubCommentData(subCurrentPage, App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", commentId, 1);
 
                     zanCountTv.setText(noteItem.getZanNum() + "");
 
@@ -236,7 +250,7 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
                 }
 
                 if (view.getId() == R.id.layout_zan) {
-                    addZanPresenterImp.addZan(2, "1021601", "", commentId, "",1);
+                    addZanPresenterImp.addZan(2, App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId():"", "", commentId, "", 1);
                 }
             }
         });
@@ -267,7 +281,7 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
                 if (view.getId() == R.id.layout_zan) {
                     repeatId = commentReplyAdapter.getData().get(position).getRepeatId();
 
-                    addZanPresenterImp.addZan(3, "1021601", "", "", repeatId,1);
+                    addZanPresenterImp.addZan(3, App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId():"", "", "", repeatId, 1);
                 }
             }
         });
@@ -279,7 +293,7 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
         addZanPresenterImp = new AddZanPresenterImp(this, getActivity());
         noteCommentDataPresenterImp = new NoteCommentDataPresenterImp(this, getActivity());
         replyCommentPresenterImp = new ReplyCommentPresenterImp(this, getActivity());
-        noteCommentDataPresenterImp.getNoteDetailData("1021601", 1, "110634", 1);
+        noteCommentDataPresenterImp.getNoteDetailData(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", currentPage, messageId, 1);
     }
 
     public void showDialog() {
@@ -290,7 +304,7 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void Event(MessageEvent messageEvent) {
-        noteCommentDataPresenterImp.getNoteDetailData("1021601", 1, "110634", 1);
+        noteCommentDataPresenterImp.getNoteDetailData(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", currentPage, messageId, 1);
     }
 
     @Override
@@ -416,8 +430,8 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
             ReplyParams replyParams = new ReplyParams();
             replyParams.setModelType(1);
             replyParams.setType(2);
-            replyParams.setContent("我是type=2的回复内容");
-            replyParams.setRepeatUserId("1021601");
+            replyParams.setContent(content);
+            replyParams.setRepeatUserId(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId():"");
             replyParams.setCommentId(commentId);
             replyParams.setRepeatCommentUserId(repeatCommentUserId);
 
@@ -438,8 +452,8 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
             ReplyParams replyParams = new ReplyParams();
             replyParams.setModelType(1);
             replyParams.setType(3);
-            replyParams.setContent("我是type=3的回复内容");
-            replyParams.setRepeatUserId("1021601");
+            replyParams.setContent(content);
+            replyParams.setRepeatUserId(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId():"");
             replyParams.setRepeatId(repeatId);
             replyParams.setRepeatCommentUserId(repeatCommentUserId);
 

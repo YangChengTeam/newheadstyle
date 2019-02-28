@@ -9,4 +9,5 @@ import com.feiyou.headstyle.bean.LoginRequest;
 
 public interface UserInfoModel<T> {
     void login(LoginRequest loginRequest, IBaseRequestCallBack<T> iBaseRequestCallBack);
+    void getUserSig(String userName, IBaseRequestCallBack<T> iBaseRequestCallBack);
 }

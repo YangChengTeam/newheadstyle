@@ -1,5 +1,6 @@
 package com.feiyou.headstyle.ui.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -7,6 +8,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.blankj.utilcode.util.SizeUtils;
 import com.blankj.utilcode.util.StringUtils;
@@ -55,6 +57,8 @@ public class HeadListActivity extends BaseFragmentActivity implements HeadListDa
 
     private String tagId;
 
+    private String tagName;
+
     @Override
     protected int getContextViewId() {
         return R.layout.activity_head_list;
@@ -68,16 +72,26 @@ public class HeadListActivity extends BaseFragmentActivity implements HeadListDa
     }
 
     private void initTopBar() {
-        mTopBar.setTitle(getResources().getString(R.string.app_name));
-        View topSearchView = getLayoutInflater().inflate(R.layout.common_top_back, null);
-        topSearchView.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, SizeUtils.dp2px(48)));
+        Bundle bundle = getIntent().getExtras();
+        if (bundle != null && !StringUtils.isEmpty(bundle.getString("tag_id"))) {
+            tagId = bundle.getString("tag_id");
+        }
+
+        if (bundle != null && !StringUtils.isEmpty(bundle.getString("tag_name"))) {
+            tagName = bundle.getString("tag_name");
+        }
+
+        View topView = getLayoutInflater().inflate(R.layout.common_top_back, null);
+        topView.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, SizeUtils.dp2px(48)));
 
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, SizeUtils.dp2px(48));
         params.setMargins(0, StatusBarUtil.getStatusBarHeight(this), 0, 0);
-        mTopBar.setCenterView(topSearchView);
-        //mTopBar.setLayoutParams(params);
+        mTopBar.setCenterView(topView);
+        mBackImageView = topView.findViewById(R.id.iv_back);
 
-        mBackImageView = topSearchView.findViewById(R.id.iv_back);
+        TextView mTitleTv = topView.findViewById(R.id.tv_title);
+        mTitleTv.setText(StringUtils.isEmpty(tagName) ? "个性头像" : tagName);
+
         mBackImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -89,16 +103,22 @@ public class HeadListActivity extends BaseFragmentActivity implements HeadListDa
     }
 
     public void initData() {
-        Bundle bundle = getIntent().getExtras();
-        if (bundle != null && !StringUtils.isEmpty(bundle.getString("tag_id"))) {
-            tagId = bundle.getString("tag_id");
-        }
+
 
         headListDataPresenterImp = new HeadListDataPresenterImp(this, this);
 
         headInfoAdapter = new HeadInfoAdapter(this, null);
         mHeadInfoListView.setLayoutManager(new GridLayoutManager(this, 3));
         mHeadInfoListView.setAdapter(headInfoAdapter);
+
+        headInfoAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
+                Intent intent = new Intent(HeadListActivity.this, HeadEditActivity.class);
+                intent.putExtra("image_url", headInfoAdapter.getData().get(position).getImgurl());
+                startActivity(intent);
+            }
+        });
 
         headInfoAdapter.setOnLoadMoreListener(new BaseQuickAdapter.RequestLoadMoreListener() {
             @Override

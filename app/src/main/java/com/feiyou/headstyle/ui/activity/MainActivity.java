@@ -12,17 +12,26 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
+import com.blankj.utilcode.util.SPUtils;
+import com.blankj.utilcode.util.StringUtils;
 import com.blankj.utilcode.util.ToastUtils;
+import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
+import com.feiyou.headstyle.bean.UserInfo;
+import com.feiyou.headstyle.bean.UserInfoRet;
+import com.feiyou.headstyle.common.Constants;
+import com.feiyou.headstyle.presenter.UserInfoPresenterImp;
 import com.feiyou.headstyle.ui.adapter.MyFragmentAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragmentActivity;
+import com.feiyou.headstyle.view.UserInfoView;
+import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 import com.umeng.socialize.UMShareAPI;
 
@@ -36,7 +45,7 @@ import permissions.dispatcher.RuntimePermissions;
 
 
 @RuntimePermissions
-public class MainActivity extends BaseFragmentActivity implements View.OnClickListener, ViewPager.OnPageChangeListener {
+public class MainActivity extends BaseFragmentActivity implements View.OnClickListener, ViewPager.OnPageChangeListener, UserInfoView {
 
     @BindView(R.id.viewpager)
     ViewPager viewPager;
@@ -79,6 +88,10 @@ public class MainActivity extends BaseFragmentActivity implements View.OnClickLi
 
     private MyFragmentAdapter adapter;
 
+    private UserInfo userInfo;
+
+    private UserInfoPresenterImp userInfoPresenterImp;
+
     public interface IOnFocusListener {
         void onWindowFocusChanged(boolean hasFocus);
     }
@@ -97,7 +110,6 @@ public class MainActivity extends BaseFragmentActivity implements View.OnClickLi
 
     private void initTopBar() {
         QMUIStatusBarHelper.setStatusBarLightMode(this);
-
     }
 
     @Override
@@ -137,6 +149,22 @@ public class MainActivity extends BaseFragmentActivity implements View.OnClickLi
         mMyLayout.setOnClickListener(this);
         viewPager.addOnPageChangeListener(this);
         setCheckedItem(0);
+
+        userInfoPresenterImp = new UserInfoPresenterImp(this, this);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        if (!StringUtils.isEmpty(SPUtils.getInstance().getString(Constants.USER_INFO))) {
+            Logger.i(SPUtils.getInstance().getString(Constants.USER_INFO));
+            userInfo = JSON.parseObject(SPUtils.getInstance().getString(Constants.USER_INFO), new TypeReference<UserInfo>() {
+            });
+
+            App.getApp().setmUserInfo(userInfo);
+        }
+
     }
 
     public void wordType() {
@@ -205,6 +233,29 @@ public class MainActivity extends BaseFragmentActivity implements View.OnClickLi
         }
 
     }
+
+    @Override
+    public void showProgress() {
+
+    }
+
+    @Override
+    public void dismissProgress() {
+
+    }
+
+    @Override
+    public void loadDataSuccess(UserInfoRet tData) {
+        if (tData.getCode() == Constants.SUCCESS) {
+
+        }
+    }
+
+    @Override
+    public void loadDataError(Throwable throwable) {
+
+    }
+
 
     @Override
     public void onPageScrolled(int i, float v, int i1) {

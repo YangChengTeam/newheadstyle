@@ -134,7 +134,7 @@ public class HomeFragment extends BaseFragment implements MyScrollView.OnScrollL
 
         mHeadTypeList.setAdapter(headTypeAdapter);
 
-        communityHeadAdapter = new CommunityHeadAdapter(getActivity(), null);
+        communityHeadAdapter = new CommunityHeadAdapter(getActivity(), null, 72, true);
         mCommunityHeadList.setLayoutManager(new GridLayoutManager(getActivity(), 4) {
             @Override
             public boolean canScrollVertically() {
@@ -157,13 +157,13 @@ public class HomeFragment extends BaseFragment implements MyScrollView.OnScrollL
         mHeadInfoList.setNestedScrollingEnabled(false);
         myScrollView.setOnScrollListener(this);
 
-        homeDataPresenterImp.getData("", "", "");
+        homeDataPresenterImp.getData("", "", "", 0);
 
         headInfoAdapter.setOnLoadMoreListener(new BaseQuickAdapter.RequestLoadMoreListener() {
             @Override
             public void onLoadMoreRequested() {
                 currentPage++;
-                homeDataPresenterImp.getData(currentPage + "", "", "");
+                homeDataPresenterImp.getData(currentPage + "", "", "", 0);
             }
         }, mHeadInfoList);
 
@@ -280,6 +280,6 @@ public class HomeFragment extends BaseFragment implements MyScrollView.OnScrollL
     @OnClick({R.id.tv_refresh, R.id.iv_refresh})
     void refresh() {
         isFirstLoad = true;
-        homeDataPresenterImp.getData("", "", "1");
+        homeDataPresenterImp.getData("", "", "1", 0);
     }
 }

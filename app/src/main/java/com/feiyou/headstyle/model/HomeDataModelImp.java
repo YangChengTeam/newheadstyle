@@ -36,13 +36,14 @@ public class HomeDataModelImp extends BaseModel implements HomeDataModel<HomeDat
     }
 
     @Override
-    public void getData(String page, String pageSize, String change, final IBaseRequestCallBack<HomeDataRet> iBaseRequestCallBack) {
+    public void getData(String page, String pageSize, String change, int isDetail, final IBaseRequestCallBack<HomeDataRet> iBaseRequestCallBack) {
 
         JSONObject params = new JSONObject();
         try {
             params.put("page", page);
             params.put("pageSize", pageSize);
             params.put("change", change);
+            params.put("is_detail", isDetail + "");
         } catch (JSONException e) {
             e.printStackTrace();
         }

@@ -25,4 +25,7 @@ public interface UserInfoServiceApi {
 
     @POST("v1.userinfo/userImageWallDel")
     Observable<PhotoWallRet> deletePhoto(@Body RequestBody requestBody);
+
+    @POST("v1.imchat/getUserSig")
+    Observable<UserInfoRet> getUserSig(@Body RequestBody requestBody);
 }

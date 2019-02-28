@@ -101,9 +101,10 @@
                 android:orientation="vertical">
 
                 <TextView
+                    android:id="@+id/tv_follow_count"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="250"
+                    android:text="0"
                     android:textColor="@color/black"
                     android:textSize="22sp"
                     android:textStyle="bold" />
@@ -126,9 +127,10 @@
                 android:orientation="vertical">
 
                 <TextView
+                    android:id="@+id/tv_fans_count"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="250"
+                    android:text="0"
                     android:textColor="@color/black"
                     android:textSize="22sp"
                     android:textStyle="bold" />
@@ -152,9 +154,10 @@
                 android:orientation="vertical">
 
                 <TextView
+                    android:id="@+id/tv_keep_count"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="250"
+                    android:text="0"
                     android:textColor="@color/black"
                     android:textSize="22sp"
                     android:textStyle="bold" />
@@ -180,6 +183,7 @@
         android:orientation="vertical">
 
         <RelativeLayout
+            android:id="@+id/layout_my_message"
             android:layout_width="match_parent"
             android:layout_height="48dp">
 

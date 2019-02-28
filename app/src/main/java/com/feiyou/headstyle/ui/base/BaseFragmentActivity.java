@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.widget.FrameLayout;
 
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 
@@ -133,4 +132,5 @@ public abstract class BaseFragmentActivity extends AppCompatActivity {
     public void popBackStackInclusive(Class<? extends BaseFragment> clazz) {
         getSupportFragmentManager().popBackStack(clazz.getSimpleName(), FragmentManager.POP_BACK_STACK_INCLUSIVE);
     }
+
 }

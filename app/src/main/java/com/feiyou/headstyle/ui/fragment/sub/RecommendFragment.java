@@ -113,6 +113,7 @@ public class RecommendFragment extends BaseFragment implements NoteDataView {
         topicAdapter.setNewData(App.topicInfoList);
     }
 
+
     @Override
     public void onStart() {
         super.onStart();

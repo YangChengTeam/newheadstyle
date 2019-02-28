@@ -42,8 +42,8 @@
         app:delay_time="4000"
         app:indicator_drawable_selected="@mipmap/indicator_select"
         app:indicator_drawable_unselected="@mipmap/indicator_normal"
-        app:indicator_height="12dp"
-        app:indicator_width="12dp" />
+        app:indicator_height="6dp"
+        app:indicator_width="10dp" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/head_type_list"
@@ -110,6 +110,7 @@
     </RelativeLayout>
 
     <LinearLayout
+        android:id="@+id/layout_recommend"
         android:layout_width="330dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="10dp"
@@ -120,18 +121,17 @@
             android:layout_height="50dp">
 
             <ImageView
-                android:id="@+id/iv_user_head"
+                android:id="@+id/iv_comment_user_head"
                 android:layout_width="42dp"
                 android:layout_height="42dp"
-                android:layout_centerVertical="true"
-                android:src="@mipmap/head_def" />
+                android:layout_centerVertical="true" />
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_centerVertical="true"
                 android:layout_marginLeft="12dp"
-                android:layout_toRightOf="@+id/iv_user_head"
+                android:layout_toRightOf="@+id/iv_comment_user_head"
                 android:gravity="left|center"
                 android:orientation="vertical">
 
@@ -187,9 +187,9 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="left|center"
             android:layout_marginTop="6dp"
             android:layout_marginBottom="6dp"
+            android:gravity="left|center"
             android:minHeight="40dp">
 
             <TextView

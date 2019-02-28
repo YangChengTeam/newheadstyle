@@ -8,4 +8,5 @@ import com.feiyou.headstyle.bean.LoginRequest;
 
 public interface UserInfoPresenter {
     void login(LoginRequest loginRequest);
+    void getUserSig(String userName);
 }

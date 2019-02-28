@@ -21,8 +21,6 @@ public class HeadInfoAdapter extends BaseQuickAdapter<HeadInfo, BaseViewHolder> 
 
     private Context mContext;
 
-    String baseUrl = "http://192.168.80.97:8888/words/";
-
     public HeadInfoAdapter(Context context, List<HeadInfo> datas) {
         super(R.layout.head_info_item, datas);
         this.mContext = context;

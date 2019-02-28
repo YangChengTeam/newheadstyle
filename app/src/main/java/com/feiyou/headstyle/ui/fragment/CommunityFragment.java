@@ -26,6 +26,7 @@ import com.feiyou.headstyle.ui.fragment.sub.RecommendFragment;
 import com.feiyou.headstyle.ui.fragment.sub.VideoFragment;
 import com.feiyou.headstyle.view.TopicDataView;
 import com.orhanobut.logger.Logger;
+import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -64,7 +65,7 @@ public class CommunityFragment extends BaseFragment implements ViewPager.OnPageC
     protected View onCreateView() {
         View root = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_community, null);
         ButterKnife.bind(this, root);
-        initViews();
+        initView();
         initTabs();
         initData();
         return root;
@@ -73,7 +74,7 @@ public class CommunityFragment extends BaseFragment implements ViewPager.OnPageC
     /**
      * 初始化组件
      */
-    public void initViews() {
+    public void initView() {
         //实例化布局对象
         layoutInflater = LayoutInflater.from(getActivity());
 

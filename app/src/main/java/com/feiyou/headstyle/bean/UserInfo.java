@@ -21,6 +21,17 @@ public class UserInfo {
     private String qq;
     private String weixin;
 
+    private String sig;
+
+    @SerializedName("collect_num")
+    private int collectNum;
+
+    @SerializedName("guan_num")
+    private int guanNum;
+
+    @SerializedName("fen_num")
+    private int fenNum;
+
     public String getId() {
         return id;
     }
@@ -115,5 +126,37 @@ public class UserInfo {
 
     public void setWeixin(String weixin) {
         this.weixin = weixin;
+    }
+
+    public String getSig() {
+        return sig;
+    }
+
+    public void setSig(String sig) {
+        this.sig = sig;
+    }
+
+    public int getCollectNum() {
+        return collectNum;
+    }
+
+    public void setCollectNum(int collectNum) {
+        this.collectNum = collectNum;
+    }
+
+    public int getGuanNum() {
+        return guanNum;
+    }
+
+    public void setGuanNum(int guanNum) {
+        this.guanNum = guanNum;
+    }
+
+    public int getFenNum() {
+        return fenNum;
+    }
+
+    public void setFenNum(int fenNum) {
+        this.fenNum = fenNum;
     }
 }

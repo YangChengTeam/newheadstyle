@@ -110,8 +110,6 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="12dp"
-                        android:layout_marginRight="12dp"
                         android:gravity="left|center"
                         android:minHeight="40dp">
 
@@ -119,6 +117,7 @@
                             android:id="@+id/tv_note_content"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:padding="12dp"
                             android:textColor="@color/black"
                             android:textSize="14sp" />
                     </LinearLayout>

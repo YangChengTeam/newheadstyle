@@ -32,4 +32,9 @@ public class UserInfoPresenterImp extends BasePresenterImp<UserInfoView, UserInf
     public void login(LoginRequest loginRequest) {
         userInfoModelImp.login(loginRequest, this);
     }
+
+    @Override
+    public void getUserSig(String userName) {
+        userInfoModelImp.getUserSig(userName, this);
+    }
 }

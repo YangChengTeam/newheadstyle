@@ -152,7 +152,7 @@ public class UrlTouchImageView extends RelativeLayout {
         protected void onPostExecute(Bitmap bitmap) {
             if (bitmap == null) {
                 mImageView.setScaleType(ScaleType.CENTER);
-                bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.logo);
+                bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.app_logo);
                 mImageView.setImageBitmap(bitmap);
             } else {
                 mImageView.setScaleType(ScaleType.MATRIX);

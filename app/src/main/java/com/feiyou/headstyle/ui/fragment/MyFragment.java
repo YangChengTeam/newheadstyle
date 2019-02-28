@@ -10,7 +10,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -29,8 +28,7 @@ import com.feiyou.headstyle.bean.UserInfo;
 import com.feiyou.headstyle.bean.UserInfoRet;
 import com.feiyou.headstyle.common.Constants;
 import com.feiyou.headstyle.presenter.UserInfoPresenterImp;
-import com.feiyou.headstyle.ui.activity.EditUserInfoActivity;
-import com.feiyou.headstyle.ui.activity.MainActivity;
+import com.feiyou.headstyle.ui.activity.MyMessageActivity;
 import com.feiyou.headstyle.ui.activity.MyNoteActivity;
 import com.feiyou.headstyle.ui.activity.SettingActivity;
 import com.feiyou.headstyle.ui.activity.UserInfoActivity;
@@ -39,7 +37,6 @@ import com.feiyou.headstyle.ui.custom.GlideRoundTransform;
 import com.feiyou.headstyle.ui.custom.LoginDialog;
 import com.feiyou.headstyle.view.UserInfoView;
 import com.orhanobut.logger.Logger;
-import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 import com.umeng.socialize.UMAuthListener;
 import com.umeng.socialize.UMShareAPI;
 import com.umeng.socialize.bean.SHARE_MEDIA;
@@ -70,6 +67,15 @@ public class MyFragment extends BaseFragment implements UserInfoView {
     @BindView(R.id.tv_user_id)
     TextView mUserIdTv;
 
+    @BindView(R.id.tv_follow_count)
+    TextView mFollowTv;
+
+    @BindView(R.id.tv_fans_count)
+    TextView mFansCountTv;
+
+    @BindView(R.id.tv_keep_count)
+    TextView mKeepCountTv;
+
     LoginDialog loginDialog;
 
     LoginDialog.LoginWayListener loginWayListener;
@@ -88,7 +94,6 @@ public class MyFragment extends BaseFragment implements UserInfoView {
     protected View onCreateView() {
         View root = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_my, null);
         ButterKnife.bind(this, root);
-        QMUIStatusBarHelper.translucent(getActivity());
         initViews();
         return root;
     }
@@ -103,7 +108,7 @@ public class MyFragment extends BaseFragment implements UserInfoView {
     public void click() {
         if (userInfo == null && loginDialog != null && !loginDialog.isShowing()) {
             loginDialog.show();
-        }else{
+        } else {
             Intent intent = new Intent(getActivity(), UserInfoActivity.class);
             startActivity(intent);
         }
@@ -112,6 +117,12 @@ public class MyFragment extends BaseFragment implements UserInfoView {
     @OnClick(R.id.layout_my_note)
     public void myNote() {
         Intent intent = new Intent(getActivity(), MyNoteActivity.class);
+        startActivity(intent);
+    }
+
+    @OnClick(R.id.layout_my_message)
+    public void myMessage() {
+        Intent intent = new Intent(getActivity(), MyMessageActivity.class);
         startActivity(intent);
     }
 
@@ -149,6 +160,10 @@ public class MyFragment extends BaseFragment implements UserInfoView {
             Glide.with(getActivity()).load(userInfo.getUserimg()).apply(options).into(mUserHeadImageView);
             mUserNickNameTv.setText(userInfo.getNickname());
             mUserIdTv.setText("ID：" + userInfo.getId());
+
+            mFollowTv.setText(userInfo.getGuanNum() + "");
+            mFansCountTv.setText(userInfo.getFenNum() + "");
+            mKeepCountTv.setText(userInfo.getCollectNum() + "");
         }
     }
 
@@ -258,13 +273,18 @@ public class MyFragment extends BaseFragment implements UserInfoView {
 
         if (tData != null) {
             if (tData.getCode() == Constants.SUCCESS && tData.getData() != null) {
+                userInfo = tData.getData();
+
                 ToastUtils.showLong("登录成功");
                 RequestOptions options = new RequestOptions();
                 options.transform(new GlideRoundTransform(getActivity(), 30));
-                Glide.with(getActivity()).load(tData.getData().getUserimg()).apply(options).into(mUserHeadImageView);
+                Glide.with(getActivity()).load(userInfo.getUserimg()).apply(options).into(mUserHeadImageView);
 
-                mUserNickNameTv.setText(tData.getData().getNickname());
-                mUserIdTv.setText("ID：" + tData.getData().getId());
+                mUserNickNameTv.setText(userInfo.getNickname());
+                mUserIdTv.setText("ID：" + userInfo.getId());
+                mFollowTv.setText(userInfo.getGuanNum() + "");
+                mFansCountTv.setText(userInfo.getFenNum() + "");
+                mKeepCountTv.setText(userInfo.getCollectNum() + "");
 
                 SPUtils.getInstance().put(Constants.USER_INFO, JSONObject.toJSONString(tData.getData()));
             }
@@ -282,4 +302,26 @@ public class MyFragment extends BaseFragment implements UserInfoView {
             progressDialog.dismiss();
         }
     }
+
+    public void setUserInfoToIM() {
+
+        //初始化参数，修改昵称为"cat"
+//        TIMFriendshipManager.ModifyUserProfileParam param = new TIMFriendshipManager.ModifyUserProfileParam();
+//        param.setNickname("cat");
+//
+//        TIMFriendshipManager.getInstance().modifyProfile(param, new TIMCallBack() {
+//            @Override
+//            public void onError(int code, String desc) {
+//                //错误码 code 和错误描述 desc，可用于定位请求失败原因
+//                //错误码 code 列表请参见错误码表
+//                Log.e(tag, "modifyProfile failed: " + code + " desc" + desc);
+//            }
+//
+//            @Override
+//            public void onSuccess() {
+//                Log.e(tag, "modifyProfile succ");
+//            }
+//        });
+    }
+
 }

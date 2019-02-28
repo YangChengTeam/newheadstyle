@@ -29,7 +29,7 @@ public class HomeDataPresenterImp extends BasePresenterImp<IBaseView, HomeDataRe
     }
 
     @Override
-    public void getData(String page, String pageSize, String change) {
-        homeDataModelImp.getData(page, pageSize, change, this);
+    public void getData(String page, String pageSize, String change, int isDetail) {
+        homeDataModelImp.getData(page, pageSize, change, isDetail, this);
     }
 }

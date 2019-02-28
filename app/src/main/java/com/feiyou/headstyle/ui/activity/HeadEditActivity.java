@@ -12,6 +12,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -23,6 +24,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.blankj.utilcode.util.ImageUtils;
 import com.blankj.utilcode.util.PathUtils;
@@ -32,7 +34,13 @@ import com.blankj.utilcode.util.StringUtils;
 import com.blankj.utilcode.util.TimeUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.request.transition.Transition;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.feiyou.headstyle.R;
@@ -201,23 +209,22 @@ public class HeadEditActivity extends BaseFragmentActivity implements StickerDat
     public void initData() {
         EffectUtil.clear();
         stickerPresenterImp = new StickerPresenterImp(this, this);
-//        Intent intent = getIntent();
-//        if (intent.getExtras() != null) {
-//            imagePath = intent.getExtras().getString("image_path");
-//        }
-//
-//        RequestOptions options = new RequestOptions()
-//                .diskCacheStrategy(DiskCacheStrategy.NONE)
-//                .skipMemoryCache(true);
-//        Glide.with(this).asBitmap().apply(options).load(imagePath).into(new SimpleTarget<Bitmap>() {
-//            @Override
-//            public void onResourceReady(Bitmap resource, Transition<? super Bitmap> transition) {
-//                currentBitmap = resource;
-//                smallImageBackgroud = resource;
-//                mGPUImageView.setImage(currentBitmap);
-//            }
-//        });
+        Intent intent = getIntent();
 
+        if (intent.getExtras() != null) {
+            imagePath = intent.getExtras().getString("image_url");
+        }
+
+        RequestOptions options = new RequestOptions().diskCacheStrategy(DiskCacheStrategy.NONE).skipMemoryCache(true);
+
+        Glide.with(this).asBitmap().apply(options).load(imagePath).into(new SimpleTarget<Bitmap>() {
+            @Override
+            public void onResourceReady(Bitmap resource, Transition<? super Bitmap> transition) {
+                currentBitmap = resource;
+                smallImageBackgroud = resource;
+                mGPUImageView.setImage(currentBitmap);
+            }
+        });
 
         //画布高度
         int canvasHeight = (int) (ScreenUtils.getScreenWidth() * 0.8);
@@ -236,8 +243,27 @@ public class HeadEditActivity extends BaseFragmentActivity implements StickerDat
         mGPUImageView.setLayoutParams(bgParams);
         mGPUImageView.getGPUImage().setScaleType(GPUImage.ScaleType.CENTER_INSIDE);
 
-        currentBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.logo);
-        mGPUImageView.setImage(currentBitmap);
+//        Glide.with(this).asBitmap().load("")
+//                .listener(new RequestListener<Bitmap>() {
+//                              @Override
+//                              public boolean onLoadFailed(@Nullable GlideException e, Object o, Target<Bitmap> target, boolean b) {
+//                                  currentBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.app_logo);
+//                                  mGPUImageView.setImage(currentBitmap);
+//                                  return false;
+//                              }
+//
+//                              @Override
+//                              public boolean onResourceReady(Bitmap bitmap, Object o, Target<Bitmap> target, DataSource dataSource, boolean b) {
+//                                  if (bitmap != null) {
+//                                      currentBitmap = bitmap;
+//                                  } else {
+//                                      currentBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.app_logo);
+//                                  }
+//                                  mGPUImageView.setImage(currentBitmap);
+//                                  return false;
+//                              }
+//                          }
+//                ).submit();
 
         tabLayout.addTab(tabLayout.newTab().setCustomView(getTabView(0)));
         tabLayout.addTab(tabLayout.newTab().setCustomView(getTabView(1)));

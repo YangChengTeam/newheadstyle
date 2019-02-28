@@ -11,6 +11,9 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        ndk {
+            abiFilters "armeabi-v7a"
+        }
     }
     buildTypes {
         release {
@@ -84,7 +87,7 @@ dependencies {
     implementation 'de.hdodenhof:circleimageview:2.1.0'
     implementation 'me.codeboy.android:align-text-view:2.3.1'
     implementation 'com.github.yuruiyin:AppbarLayoutBehavior:v1.0.1'
-    implementation 'com.jaeger.statusbaruitl:library:1.1.1'
+    //implementation 'com.jaeger.statusbarutil:library:1.5.1'
     implementation 'com.github.DingMouRen:LayoutManagerGroup:1e6f4f96eb'
     implementation 'de.hdodenhof:circleimageview:2.2.0'
     implementation 'com.jcodecraeer:xrecyclerview:1.5.9'
@@ -101,4 +104,5 @@ dependencies {
     //implementation 'jp.co.cyberagent.android:gpuimage:2.0.3'
     implementation project(':Gpu-Image')
     implementation 'com.github.ome450901:SimpleRatingBar:1.4.2'
+    implementation 'cn.yc:YCStatusBarLib:1.4.0'
 }

@@ -132,7 +132,7 @@ public class StickerFragment extends BottomSheetDialogFragment {
         effects = EffectService.getInst().getLocalFilters();
         imageFilterAdapter = new ImageFilterAdapter(getActivity(), filterDatas, effects);
 
-        currentBitmap = BitmapFactory.decodeResource(this.getContext().getResources(), R.drawable.logo);
+        currentBitmap = BitmapFactory.decodeResource(this.getContext().getResources(), R.drawable.app_logo);
         mGPUImageView.setImage(currentBitmap);
 
         GPUImageFilter filter = GPUImageFilterTools.createFilterForType(getActivity(), effects.get(0).getType());

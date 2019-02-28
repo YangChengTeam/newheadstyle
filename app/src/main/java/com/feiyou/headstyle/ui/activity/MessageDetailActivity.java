@@ -1,44 +1,35 @@
 package com.feiyou.headstyle.ui.activity;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.blankj.utilcode.util.SizeUtils;
+import com.blankj.utilcode.util.StringUtils;
 import com.feiyou.headstyle.R;
-import com.feiyou.headstyle.ui.adapter.BlackListAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragmentActivity;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 import com.qmuiteam.qmui.widget.QMUITopBar;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import butterknife.BindView;
-import jp.co.cyberagent.android.gpuimage.GPUImageView;
 
 /**
  * Created by myflying on 2018/11/23.
  */
-public class TestActivity extends BaseFragmentActivity {
+public class MessageDetailActivity extends BaseFragmentActivity {
 
     @BindView(R.id.topbar)
     QMUITopBar mTopBar;
 
-    @BindView(R.id.gpuimage)
-    GPUImageView mGPUImageView;
+    ImageView mBackImageView;
 
-    Bitmap currentBitmap;
+    private String chatId;
 
     @Override
     protected int getContextViewId() {
-        return R.layout.activity_test;
+        return R.layout.activity_message_detail;
     }
 
     @Override
@@ -57,12 +48,22 @@ public class TestActivity extends BaseFragmentActivity {
         titleTv.setText("黑名单");
 
         mTopBar.setCenterView(topSearchView);
-
+        mBackImageView = topSearchView.findViewById(R.id.iv_back);
+        mBackImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                popBackStack();
+            }
+        });
     }
 
+
     public void initData() {
-        currentBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.app_logo);
-        mGPUImageView.setImage(currentBitmap);
+
+        Bundle bundle = getIntent().getExtras();
+        if (bundle != null && !StringUtils.isEmpty(bundle.getString("chatId"))) {
+            chatId = bundle.getString("chatId");
+        }
     }
 
     @Override

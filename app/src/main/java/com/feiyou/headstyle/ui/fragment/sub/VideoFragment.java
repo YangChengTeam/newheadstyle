@@ -124,7 +124,7 @@ public class VideoFragment extends BaseFragment implements VideoInfoView {
             if (tData instanceof VideoInfoRet) {
                 if (currentPage == 0) {
                     randomPage = ((VideoInfoRet) tData).getData().getPage();
-                    currentPage = ((VideoInfoRet) tData).getData().getPage();
+                    currentPage = randomPage;
 
                     if (((VideoInfoRet) tData).getData().getList() != null) {
                         videoListAdapter.setNewData(((VideoInfoRet) tData).getData().getList());

@@ -5,6 +5,7 @@ import android.content.Context;
 
 import com.blankj.utilcode.util.Utils;
 import com.feiyou.headstyle.bean.TopicInfo;
+import com.feiyou.headstyle.bean.UserInfo;
 import com.feiyou.headstyle.utils.AppContextUtil;
 import com.mob.MobSDK;
 import com.umeng.commonsdk.UMConfigure;
@@ -27,6 +28,8 @@ public class App extends Application {
     }
 
     public static List<TopicInfo> topicInfoList;
+
+    public UserInfo mUserInfo;
 
     public App() {
         mInstance = this;
@@ -55,5 +58,13 @@ public class App extends Application {
         Utils.init(this);
         AppContextUtil.init(this);
         applicationContext = this;
+    }
+
+    public UserInfo getmUserInfo() {
+        return mUserInfo;
+    }
+
+    public void setmUserInfo(UserInfo mUserInfo) {
+        this.mUserInfo = mUserInfo;
     }
 }

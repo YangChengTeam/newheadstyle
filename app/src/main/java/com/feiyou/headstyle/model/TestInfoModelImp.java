@@ -84,7 +84,7 @@ public class TestInfoModelImp extends BaseTestModel implements TestInfoModel<Tes
     public void getDataListByCid(String cid, final IBaseRequestCallBack<TestInfoRet> iBaseRequestCallBack) {
         JSONObject params = new JSONObject();
         try {
-            params.put("cid", cid);
+            params.put("type_id", cid);
             params.put("is_app", "1");
             params.put("app_id", "37");
         } catch (JSONException e) {
