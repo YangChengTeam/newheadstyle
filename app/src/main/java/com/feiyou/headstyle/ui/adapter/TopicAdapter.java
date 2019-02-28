@@ -22,8 +22,6 @@ public class TopicAdapter extends BaseQuickAdapter<TopicInfo, BaseViewHolder> {
 
     private Context mContext;
 
-    String baseUrl = "http://192.168.80.97:8888/words/";
-
     public TopicAdapter(Context context, List<TopicInfo> datas) {
         super(R.layout.topic_item, datas);
         this.mContext = context;

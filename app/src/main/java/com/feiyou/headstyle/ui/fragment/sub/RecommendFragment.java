@@ -6,8 +6,10 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
+import com.blankj.utilcode.util.SizeUtils;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
@@ -42,11 +44,12 @@ import butterknife.OnClick;
  */
 public class RecommendFragment extends BaseFragment implements NoteDataView {
 
-    @BindView(R.id.topic_list_view)
-    RecyclerView mTopicListView;
-
     @BindView(R.id.recommend_list)
     RecyclerView mRecommendListView;
+
+    View topView;
+
+    RecyclerView mTopicListView;
 
     TopicAdapter topicAdapter;
 
@@ -71,8 +74,12 @@ public class RecommendFragment extends BaseFragment implements NoteDataView {
     }
 
     public void initData() {
-        noteDataPresenterImp = new NoteDataPresenterImp(this, getActivity());
+        //顶部view
+        topView = LayoutInflater.from(getActivity()).inflate(R.layout.recommend_top, null);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,SizeUtils.dp2px(80));
+        topView.setLayoutParams(params);
 
+        mTopicListView = topView.findViewById(R.id.topic_list_view);
         topicAdapter = new TopicAdapter(getActivity(), null);
         mTopicListView.setLayoutManager(new GridLayoutManager(getActivity(), 5));
         mTopicListView.setAdapter(topicAdapter);
@@ -85,14 +92,16 @@ public class RecommendFragment extends BaseFragment implements NoteDataView {
             }
         });
 
-        noteInfoAdapter = new NoteInfoAdapter(getActivity(), null,1);
+        noteInfoAdapter = new NoteInfoAdapter(getActivity(), null, 1);
         mRecommendListView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecommendListView.setAdapter(noteInfoAdapter);
+        noteInfoAdapter.setHeaderView(topView);
 
         noteInfoAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
                 Intent intent = new Intent(getActivity(), CommunityArticleActivity.class);
+                intent.putExtra("msg_id", noteInfoAdapter.getData().get(position).getId());
                 startActivity(intent);
             }
         });
@@ -105,6 +114,7 @@ public class RecommendFragment extends BaseFragment implements NoteDataView {
             }
         }, mRecommendListView);
 
+        noteDataPresenterImp = new NoteDataPresenterImp(this, getActivity());
         noteDataPresenterImp.getNoteData(currentPage, 2, "");
     }
 

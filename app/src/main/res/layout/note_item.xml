@@ -19,7 +19,6 @@
         android:layout_marginLeft="12dp"
         android:layout_marginTop="12dp"
         android:layout_marginRight="12dp"
-        android:layout_marginBottom="6dp"
         android:background="@color/white"
         android:gravity="center"
         android:orientation="vertical">
@@ -32,8 +31,8 @@
                 android:id="@+id/iv_user_head"
                 android:layout_width="42dp"
                 android:layout_height="42dp"
-                android:layout_centerVertical="true"
-                android:src="@mipmap/head_def" />
+                android:scaleType="centerInside"
+                android:layout_centerVertical="true"/>
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -80,8 +79,8 @@
 
             <FrameLayout
                 android:id="@+id/layout_follow"
-                android:layout_width="72dp"
-                android:layout_height="33dp"
+                android:layout_width="68dp"
+                android:layout_height="30dp"
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
                 android:background="@drawable/into_bg"
@@ -93,7 +92,7 @@
                     android:layout_gravity="center"
                     android:text="@string/follow_user_txt"
                     android:textColor="@color/tab_select_color"
-                    android:textSize="15sp" />
+                    android:textSize="14sp" />
             </FrameLayout>
 
             <LinearLayout
@@ -136,7 +135,8 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="36dp"
+            android:layout_height="32dp"
+            android:layout_marginTop="10dp"
             android:gravity="center">
 
             <LinearLayout

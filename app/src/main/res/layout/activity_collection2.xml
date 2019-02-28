@@ -84,7 +84,7 @@
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/collection_list"
-        android:layout_width="333dp"
+        android:layout_width="330dp"
         android:layout_height="match_parent"
         android:layout_gravity="top|center"
         android:scrollbars="none"

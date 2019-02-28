@@ -7,15 +7,18 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.blankj.utilcode.util.SizeUtils;
 import com.blankj.utilcode.util.StringUtils;
 import com.blankj.utilcode.util.TimeUtils;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.bean.HeadInfo;
 import com.feiyou.headstyle.bean.NoteInfo;
 import com.feiyou.headstyle.ui.activity.ShowImageListActivity;
+import com.feiyou.headstyle.ui.custom.GlideRoundTransform;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,7 +58,10 @@ public class NoteInfoAdapter extends BaseQuickAdapter<NoteInfo, BaseViewHolder> 
             helper.addOnClickListener(R.id.layout_operation);
         }
 
-        Glide.with(mContext).load(item.getUserimg()).into((ImageView) helper.itemView.findViewById(R.id.iv_user_head));
+        RequestOptions options = new RequestOptions();
+        options.override(SizeUtils.dp2px(42),SizeUtils.dp2px(42));
+        options.transform(new GlideRoundTransform(mContext,21));
+        Glide.with(mContext).load(item.getUserimg()).apply(options).into((ImageView) helper.itemView.findViewById(R.id.iv_user_head));
 
         List<HeadInfo> headInfos = new ArrayList<>();
         String[] tempImg = item.getImageArr();

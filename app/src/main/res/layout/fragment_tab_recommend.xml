@@ -9,31 +9,10 @@
     android:nestedScrollingEnabled="false"
     android:orientation="vertical">
 
-    <LinearLayout
-        android:id="@+id/top_type_layout"
-        android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:layout_centerHorizontal="true"
-        android:gravity="center">
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/topic_list_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"></android.support.v7.widget.RecyclerView>
-    </LinearLayout>
-
-    <View
-        android:id="@+id/line_layout"
-        android:layout_width="match_parent"
-        android:layout_height="8dp"
-        android:layout_below="@+id/top_type_layout"
-        android:background="@color/search_bg_color"></View>
-
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recommend_list"
-        android:layout_width="338dp"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/line_layout"
         android:layout_centerHorizontal="true"
         android:overScrollMode="never"></android.support.v7.widget.RecyclerView>
 </RelativeLayout>
