@@ -17,10 +17,14 @@ import com.blankj.utilcode.util.SizeUtils;
 import com.blankj.utilcode.util.StringUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.chad.library.adapter.base.BaseQuickAdapter;
+import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
+import com.feiyou.headstyle.bean.FollowInfoRet;
 import com.feiyou.headstyle.bean.HeadInfoRet;
+import com.feiyou.headstyle.bean.ResultInfo;
 import com.feiyou.headstyle.bean.UserInfoListRet;
 import com.feiyou.headstyle.common.Constants;
+import com.feiyou.headstyle.presenter.FollowInfoPresenterImp;
 import com.feiyou.headstyle.presenter.UserInfoListPresenterImp;
 import com.feiyou.headstyle.ui.adapter.AddFriendsListAdapter;
 import com.feiyou.headstyle.ui.adapter.BlackListAdapter;
@@ -55,6 +59,8 @@ public class AddFriendsActivity extends BaseFragmentActivity implements UserInfo
 
     UserInfoListPresenterImp userInfoListPresenterImp;
 
+    FollowInfoPresenterImp followInfoPresenterImp;
+
     private int currentPage = 1;
 
     private int pageSize = 30;
@@ -62,6 +68,8 @@ public class AddFriendsActivity extends BaseFragmentActivity implements UserInfo
     private int searchPage = 1;
 
     String keyWord;
+
+    private int currentPosition;
 
     @Override
     protected int getContextViewId() {
@@ -112,8 +120,17 @@ public class AddFriendsActivity extends BaseFragmentActivity implements UserInfo
                 }
             }
         }, mFriendsListView);
-        userInfoListPresenterImp = new UserInfoListPresenterImp(this, this);
 
+        addFriendsListAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
+                currentPosition = position;
+                followInfoPresenterImp.addFollow(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", addFriendsListAdapter.getData().get(position).getId());
+            }
+        });
+
+        userInfoListPresenterImp = new UserInfoListPresenterImp(this, this);
+        followInfoPresenterImp = new FollowInfoPresenterImp(this, this);
         userInfoListPresenterImp.addFriendsList(currentPage);
     }
 
@@ -157,37 +174,42 @@ public class AddFriendsActivity extends BaseFragmentActivity implements UserInfo
     }
 
     @Override
-    public void loadDataSuccess(UserInfoListRet tData) {
+    public void loadDataSuccess(ResultInfo tData) {
         dismissDialog();
         if (tData != null && tData.getCode() == Constants.SUCCESS) {
+            if (tData instanceof UserInfoListRet) {
+                if (StringUtils.isEmpty(keyWord)) {
+                    if (currentPage == 1) {
+                        addFriendsListAdapter.setNewData(((UserInfoListRet) tData).getData());
+                    } else {
+                        addFriendsListAdapter.addData(((UserInfoListRet) tData).getData());
+                    }
 
+                    if (((UserInfoListRet) tData).getData().size() == pageSize) {
+                        addFriendsListAdapter.loadMoreComplete();
+                    } else {
+                        addFriendsListAdapter.loadMoreEnd();
+                    }
+                } else {
+                    if (searchPage == 1) {
+                        addFriendsListAdapter.setNewData(((UserInfoListRet) tData).getData());
+                    } else {
+                        addFriendsListAdapter.addData(((UserInfoListRet) tData).getData());
+                    }
 
-            if (StringUtils.isEmpty(keyWord)) {
-                if (currentPage == 1) {
-                    addFriendsListAdapter.setNewData(tData.getData());
-                } else {
-                    addFriendsListAdapter.addData(tData.getData());
-                }
-
-                if (tData.getData().size() == pageSize) {
-                    addFriendsListAdapter.loadMoreComplete();
-                } else {
-                    addFriendsListAdapter.loadMoreEnd();
-                }
-            } else {
-                if (searchPage == 1) {
-                    addFriendsListAdapter.setNewData(tData.getData());
-                } else {
-                    addFriendsListAdapter.addData(tData.getData());
-                }
-
-                if (tData.getData().size() == pageSize) {
-                    addFriendsListAdapter.loadMoreComplete();
-                } else {
-                    addFriendsListAdapter.loadMoreEnd();
+                    if (((UserInfoListRet) tData).getData().size() == pageSize) {
+                        addFriendsListAdapter.loadMoreComplete();
+                    } else {
+                        addFriendsListAdapter.loadMoreEnd();
+                    }
                 }
             }
-
+            if (tData instanceof FollowInfoRet) {
+                int tempResult = ((FollowInfoRet) tData).getData().getIsGuan();
+                ToastUtils.showLong(tempResult == 0 ? "已取消" : "已关注");
+                addFriendsListAdapter.getData().get(currentPosition).setFollow(tempResult == 0 ? false : true);
+                addFriendsListAdapter.notifyDataSetChanged();
+            }
         } else {
             ToastUtils.showLong(StringUtils.isEmpty(tData.getMsg()) ? "操作失败" : tData.getMsg());
         }

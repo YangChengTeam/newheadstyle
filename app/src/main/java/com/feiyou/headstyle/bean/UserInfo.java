@@ -32,6 +32,8 @@ public class UserInfo {
     @SerializedName("fen_num")
     private int fenNum;
 
+    private boolean isFollow;
+
     public String getId() {
         return id;
     }
@@ -158,5 +160,13 @@ public class UserInfo {
 
     public void setFenNum(int fenNum) {
         this.fenNum = fenNum;
+    }
+
+    public boolean isFollow() {
+        return isFollow;
+    }
+
+    public void setFollow(boolean follow) {
+        isFollow = follow;
     }
 }

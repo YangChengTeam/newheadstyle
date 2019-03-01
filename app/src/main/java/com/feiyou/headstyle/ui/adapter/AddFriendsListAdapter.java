@@ -1,6 +1,7 @@
 package com.feiyou.headstyle.ui.adapter;
 
 import android.content.Context;
+import android.support.v4.content.ContextCompat;
 import android.widget.ImageView;
 
 import com.blankj.utilcode.util.SizeUtils;
@@ -29,6 +30,7 @@ public class AddFriendsListAdapter extends BaseQuickAdapter<UserInfo, BaseViewHo
 
     @Override
     protected void convert(final BaseViewHolder helper, final UserInfo item) {
+
         helper.setText(R.id.tv_user_id, "头像号：" + item.getId())
                 .setText(R.id.tv_user_sign, item.getIntro())
                 .setText(R.id.tv_user_nick_name, item.getNickname());
@@ -37,5 +39,10 @@ public class AddFriendsListAdapter extends BaseQuickAdapter<UserInfo, BaseViewHo
         options.override(SizeUtils.dp2px(60), SizeUtils.dp2px(60));
         options.transform(new GlideRoundTransform(mContext, 30));
         Glide.with(mContext).load(item.getUserimg()).apply(options).into((ImageView) helper.itemView.findViewById(R.id.iv_user_head));
+
+        helper.setBackgroundRes(R.id.layout_follow, item.isFollow() ? R.drawable.is_follow_bg : R.drawable.into_bg);
+        helper.setTextColor(R.id.tv_follow_txt, ContextCompat.getColor(mContext, item.isFollow() ? R.color.black2 : R.color.tab_select_color));
+        helper.setText(R.id.tv_follow_txt, item.isFollow() ? "已关注" : "+关注");
+
     }
 }
