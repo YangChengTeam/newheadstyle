@@ -35,6 +35,9 @@ public class NoteInfo {
     @SerializedName("is_zan")
     private Integer isZan;
 
+    @SerializedName("is_guan")
+    private int isGuan;
+
     public Long getAddTime() {
         return addTime;
     }
@@ -121,5 +124,13 @@ public class NoteInfo {
 
     public void setIsZan(Integer isZan) {
         this.isZan = isZan;
+    }
+
+    public int getIsGuan() {
+        return isGuan;
+    }
+
+    public void setIsGuan(int isGuan) {
+        this.isGuan = isGuan;
     }
 }

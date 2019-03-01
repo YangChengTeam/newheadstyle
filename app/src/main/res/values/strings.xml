@@ -35,4 +35,6 @@
     <string name="no_photo_txt">你还没有头像\n快上传一个试试吧</string>
 
     <string name="search_test_txt">搜索测试</string>
+
+    <string name="search_fiends_txt">输入用户昵称或者ID号搜索</string>
 </resources>

@@ -205,10 +205,14 @@ public class SearchActivity extends BaseFragmentActivity implements HotWordDataV
 
     @OnClick(R.id.tv_cancel)
     public void cancel() {
-        mHotLayout.setVisibility(View.VISIBLE);
-        mResultLayout.setVisibility(View.GONE);
-        mNoDataLayout.setVisibility(View.GONE);
-        onResume();
+        if (StringUtils.isEmpty(mHotWordEditText.getText())) {
+            finish();
+        } else {
+            mHotLayout.setVisibility(View.VISIBLE);
+            mResultLayout.setVisibility(View.GONE);
+            mNoDataLayout.setVisibility(View.GONE);
+            onResume();
+        }
     }
 
     @OnClick(R.id.layout_clear)

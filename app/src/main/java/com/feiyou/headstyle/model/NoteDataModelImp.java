@@ -41,7 +41,7 @@ public class NoteDataModelImp extends BaseModel implements NoteDataModel<NoteInf
         try {
             params.put("page", page + "");
             params.put("type", type + "");
-            params.put("userid", userid);
+            params.put("user_id", userid);
         } catch (JSONException e) {
             e.printStackTrace();
         }

@@ -1,5 +1,6 @@
 package com.feiyou.headstyle.api;
 
+import com.feiyou.headstyle.bean.FollowInfoRet;
 import com.feiyou.headstyle.bean.NoteCommentRet;
 import com.feiyou.headstyle.bean.NoteInfoDetailRet;
 import com.feiyou.headstyle.bean.NoteInfoRet;
@@ -63,4 +64,7 @@ public interface NoteDataServiceApi {
     @POST("v1.vedio/vedioDetailCommentZan")
     Observable<ZanResultRet> addVideoZan(@Body RequestBody requestBody);
 
+    //关注用户
+    @POST("v1.message/userFriendsGuan")
+    Observable<FollowInfoRet> userFollow(@Body RequestBody requestBody);
 }

@@ -1,12 +1,15 @@
 package com.feiyou.headstyle.ui.fragment;
 
+import android.content.Intent;
 import android.support.v4.app.FragmentTabHost;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TabHost;
 import android.widget.TabWidget;
 import android.widget.TextView;
@@ -19,6 +22,7 @@ import com.feiyou.headstyle.bean.MessageEvent;
 import com.feiyou.headstyle.bean.TopicInfoRet;
 import com.feiyou.headstyle.common.Constants;
 import com.feiyou.headstyle.presenter.TopicDataPresenterImp;
+import com.feiyou.headstyle.ui.activity.AddFriendsActivity;
 import com.feiyou.headstyle.ui.adapter.SubFragmentAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragment;
 import com.feiyou.headstyle.ui.fragment.sub.FollowFragment;
@@ -32,6 +36,7 @@ import org.greenrobot.eventbus.EventBus;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 /**
  * Created by iflying on 2018/2/6.
@@ -39,11 +44,17 @@ import butterknife.ButterKnife;
 
 public class CommunityFragment extends BaseFragment implements ViewPager.OnPageChangeListener, TabHost.OnTabChangeListener, TopicDataView {
 
+    @BindView(R.id.layout_recommend_top)
+    RelativeLayout recommendTopLayout;
+
     @BindView(android.R.id.tabhost)
     FragmentTabHost mTabHost;
 
     @BindView(R.id.view_pager)
     ViewPager viewPager;
+
+    @BindView(R.id.iv_add_friends)
+    ImageView mAddFriendsImageView;
 
     //定义一个布局
     private LayoutInflater layoutInflater;
@@ -106,9 +117,9 @@ public class CommunityFragment extends BaseFragment implements ViewPager.OnPageC
         tabText.setTextColor(ContextCompat.getColor(getActivity(), R.color.black));
         tabText.setTextSize(20);
 
-        LinearLayout.LayoutParams searchParams = new LinearLayout.LayoutParams(SizeUtils.dp2px(200), SizeUtils.dp2px(48));
+        LinearLayout.LayoutParams searchParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, SizeUtils.dp2px(48));
         searchParams.setMargins(0, BarUtils.getStatusBarHeight(), 0, 0);
-        mTabHost.setLayoutParams(searchParams);
+        recommendTopLayout.setLayoutParams(searchParams);
     }
 
     private void initTabs() {
@@ -184,6 +195,12 @@ public class CommunityFragment extends BaseFragment implements ViewPager.OnPageC
 
         //重新赋值
         lastTabView = mTabHost.getCurrentTabView();
+    }
+
+    @OnClick(R.id.iv_add_friends)
+    void addFriends() {
+        Intent intent = new Intent(getActivity(), AddFriendsActivity.class);
+        startActivity(intent);
     }
 
     @Override

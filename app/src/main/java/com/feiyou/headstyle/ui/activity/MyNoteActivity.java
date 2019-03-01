@@ -13,10 +13,13 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.blankj.utilcode.util.SizeUtils;
+import com.blankj.utilcode.util.StringUtils;
+import com.blankj.utilcode.util.ToastUtils;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.bean.HeadType;
 import com.feiyou.headstyle.bean.NoteInfoRet;
+import com.feiyou.headstyle.bean.ResultInfo;
 import com.feiyou.headstyle.common.Constants;
 import com.feiyou.headstyle.presenter.NoteDataPresenterImp;
 import com.feiyou.headstyle.ui.adapter.MoreHeadTypeAdapter;
@@ -141,25 +144,25 @@ public class MyNoteActivity extends BaseFragmentActivity implements NoteDataView
     }
 
     @Override
-    public void loadDataSuccess(NoteInfoRet tData) {
-        if (tData != null) {
-            if (tData.getCode() == Constants.SUCCESS) {
+    public void loadDataSuccess(ResultInfo tData) {
+        if (tData != null && tData.getCode() == Constants.SUCCESS) {
 
+            if (tData instanceof NoteInfoRet) {
                 if (currentPage == 1) {
-                    noteInfoAdapter.setNewData(tData.getData());
+                    noteInfoAdapter.setNewData(((NoteInfoRet) tData).getData());
                 } else {
-                    noteInfoAdapter.addData(tData.getData());
+                    noteInfoAdapter.addData(((NoteInfoRet) tData).getData());
                 }
 
-                if (tData.getData().size() == pageSize) {
+                if (((NoteInfoRet) tData).getData().size() == pageSize) {
                     noteInfoAdapter.loadMoreComplete();
                 } else {
                     noteInfoAdapter.loadMoreEnd();
                 }
-            } else {
-                //error
-                //noteInfoAdapter.loadMoreEnd();
             }
+
+        } else {
+            ToastUtils.showLong(StringUtils.isEmpty(tData.getMsg()) ? "操作错误" : tData.getMsg());
         }
     }
 

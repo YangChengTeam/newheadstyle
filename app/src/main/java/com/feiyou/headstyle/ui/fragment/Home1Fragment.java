@@ -35,12 +35,14 @@ import com.feiyou.headstyle.ui.activity.FriendListActivity;
 import com.feiyou.headstyle.ui.activity.HeadListActivity;
 import com.feiyou.headstyle.ui.activity.HeadShowActivity;
 import com.feiyou.headstyle.ui.activity.MoreTypeActivity;
+import com.feiyou.headstyle.ui.activity.SearchActivity;
 import com.feiyou.headstyle.ui.activity.ShowImageListActivity;
 import com.feiyou.headstyle.ui.adapter.CommunityHeadAdapter;
 import com.feiyou.headstyle.ui.adapter.HeadInfoAdapter;
 import com.feiyou.headstyle.ui.adapter.HeadTypeAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragment;
 import com.feiyou.headstyle.ui.custom.GlideRoundTransform;
+import com.feiyou.headstyle.ui.custom.GridSpacingItemDecoration;
 import com.feiyou.headstyle.view.HomeDataView;
 import com.orhanobut.logger.Logger;
 import com.youth.banner.Banner;
@@ -257,10 +259,10 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
 
                 if (tempY > 686) {
                     refreshLayout1.setVisibility(View.VISIBLE);
-                    refreshLayout2.setVisibility(View.INVISIBLE);
+                    //refreshLayout2.setVisibility(View.INVISIBLE);
                 } else {
                     refreshLayout1.setVisibility(View.INVISIBLE);
-                    refreshLayout2.setVisibility(View.VISIBLE);
+                    //refreshLayout2.setVisibility(View.VISIBLE);
                 }
             }
         });
@@ -398,7 +400,7 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.layout_search:
-                Intent intent = new Intent(getActivity(), FriendListActivity.class);
+                Intent intent = new Intent(getActivity(), SearchActivity.class);
                 startActivity(intent);
                 break;
             default:

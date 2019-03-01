@@ -3,6 +3,7 @@ package com.feiyou.headstyle.api;
 import com.feiyou.headstyle.bean.CollectInfoRet;
 import com.feiyou.headstyle.bean.PhotoWallRet;
 import com.feiyou.headstyle.bean.ResultInfo;
+import com.feiyou.headstyle.bean.UserInfoListRet;
 import com.feiyou.headstyle.bean.UserInfoRet;
 
 import okhttp3.MultipartBody;
@@ -28,4 +29,10 @@ public interface UserInfoServiceApi {
 
     @POST("v1.imchat/getUserSig")
     Observable<UserInfoRet> getUserSig(@Body RequestBody requestBody);
+
+    @POST("v1.userinfo/friendAddList")
+    Observable<UserInfoListRet> addFriendsList(@Body RequestBody requestBody);
+
+    @POST("v1.userinfo/friendAddSearchList")
+    Observable<UserInfoListRet> searchFriendsList(@Body RequestBody requestBody);
 }

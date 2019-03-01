@@ -64,6 +64,9 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
     @BindView(R.id.wonderful_list)
     RecyclerView mWonderfulListView;
 
+    @BindView(R.id.layout_no_data)
+    LinearLayout mNoDataLayout;
+
     private CommentAdapter commentAdapter;
 
     private NoteCommentDataPresenterImp noteCommentDataPresenterImp;
@@ -170,7 +173,7 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
             @Override
             public void onClick(View view) {
                 switchType = 1;
-                addZanPresenterImp.addZan(2, App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId():"", "", commentId, "", 1);
+                addZanPresenterImp.addZan(2, App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", commentAdapter.getData().get(currentCommentPos).getUserId(), "", commentId, "", 1);
             }
         });
 
@@ -197,6 +200,9 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
     }
 
     public void initData() {
+
+        Logger.i("wonderful initData --->");
+
         Bundle bundle = getArguments();
         if (bundle != null && !StringUtils.isEmpty(bundle.getString("msg_id"))) {
             messageId = bundle.getString("msg_id");
@@ -250,7 +256,7 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
                 }
 
                 if (view.getId() == R.id.layout_zan) {
-                    addZanPresenterImp.addZan(2, App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId():"", "", commentId, "", 1);
+                    addZanPresenterImp.addZan(2, App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", commentAdapter.getData().get(position).getUserId(), "", commentId, "", 1);
                 }
             }
         });
@@ -281,7 +287,7 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
                 if (view.getId() == R.id.layout_zan) {
                     repeatId = commentReplyAdapter.getData().get(position).getRepeatId();
 
-                    addZanPresenterImp.addZan(3, App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId():"", "", "", repeatId, 1);
+                    addZanPresenterImp.addZan(3, App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", commentReplyAdapter.getData().get(position).getRepeatUserId(), "", "", repeatId, 1);
                 }
             }
         });
@@ -345,6 +351,9 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
             if (tData instanceof NoteCommentRet) {
                 if (((NoteCommentRet) tData).getData() != null) {
                     commentAdapter.setNewData(((NoteCommentRet) tData).getData());
+                    mNoDataLayout.setVisibility(View.GONE);
+                } else {
+                    mNoDataLayout.setVisibility(View.VISIBLE);
                 }
             }
 
@@ -405,6 +414,13 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
                     commentReplyAdapter.notifyDataSetChanged();
                 }
             }
+        } else {
+            if (tData instanceof NoteCommentRet) {
+                mNoDataLayout.setVisibility(View.VISIBLE);
+            } else {
+                mNoDataLayout.setVisibility(View.GONE);
+                ToastUtils.showLong(StringUtils.isEmpty(tData.getMsg()) ? "操作失败" : tData.getMsg());
+            }
         }
     }
 
@@ -431,7 +447,7 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
             replyParams.setModelType(1);
             replyParams.setType(2);
             replyParams.setContent(content);
-            replyParams.setRepeatUserId(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId():"");
+            replyParams.setRepeatUserId(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "");
             replyParams.setCommentId(commentId);
             replyParams.setRepeatCommentUserId(repeatCommentUserId);
 
@@ -453,7 +469,7 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
             replyParams.setModelType(1);
             replyParams.setType(3);
             replyParams.setContent(content);
-            replyParams.setRepeatUserId(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId():"");
+            replyParams.setRepeatUserId(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "");
             replyParams.setRepeatId(repeatId);
             replyParams.setRepeatCommentUserId(repeatCommentUserId);
 

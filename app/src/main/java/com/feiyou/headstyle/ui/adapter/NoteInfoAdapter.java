@@ -2,10 +2,13 @@ package com.feiyou.headstyle.ui.adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.blankj.utilcode.util.SizeUtils;
 import com.blankj.utilcode.util.StringUtils;
@@ -48,6 +51,15 @@ public class NoteInfoAdapter extends BaseQuickAdapter<NoteInfo, BaseViewHolder> 
                 .setText(R.id.tv_message_count, item.getCommentNum() + "")
                 .setText(R.id.tv_zan_count, item.getZanNum() + "");
 
+        TextView isZanTv = helper.itemView.findViewById(R.id.tv_zan_count);
+        Drawable isZan = ContextCompat.getDrawable(mContext, R.mipmap.is_zan);
+        Drawable notZan = ContextCompat.getDrawable(mContext, R.mipmap.note_zan);
+        if (item.getIsZan() == 0) {
+            isZanTv.setCompoundDrawablesWithIntrinsicBounds(notZan, null, null, null);
+        } else {
+            isZanTv.setCompoundDrawablesWithIntrinsicBounds(isZan, null, null, null);
+        }
+
         if (showType == 1) {
             helper.setVisible(R.id.layout_follow, true);
             helper.setVisible(R.id.layout_operation, false);
@@ -58,9 +70,15 @@ public class NoteInfoAdapter extends BaseQuickAdapter<NoteInfo, BaseViewHolder> 
             helper.addOnClickListener(R.id.layout_operation);
         }
 
+        helper.setBackgroundRes(R.id.layout_follow, item.getIsGuan() == 0 ? R.drawable.into_bg : R.drawable.is_follow_bg);
+        helper.setTextColor(R.id.tv_follow_txt, ContextCompat.getColor(mContext, item.getIsGuan() == 0 ? R.color.tab_select_color : R.color.black2));
+        helper.setText(R.id.tv_follow_txt, item.getIsGuan() == 0 ? "+关注" : "已关注");
+
+        helper.addOnClickListener(R.id.layout_item_zan);
+
         RequestOptions options = new RequestOptions();
-        options.override(SizeUtils.dp2px(42),SizeUtils.dp2px(42));
-        options.transform(new GlideRoundTransform(mContext,21));
+        options.override(SizeUtils.dp2px(42), SizeUtils.dp2px(42));
+        options.transform(new GlideRoundTransform(mContext, 21));
         Glide.with(mContext).load(item.getUserimg()).apply(options).into((ImageView) helper.itemView.findViewById(R.id.iv_user_head));
 
         List<HeadInfo> headInfos = new ArrayList<>();

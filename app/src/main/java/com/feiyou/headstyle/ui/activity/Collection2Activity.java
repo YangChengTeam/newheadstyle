@@ -1,6 +1,7 @@
 package com.feiyou.headstyle.ui.activity;
 
 import android.animation.ValueAnimator;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -16,6 +17,7 @@ import android.widget.TextView;
 import com.blankj.utilcode.util.SizeUtils;
 import com.blankj.utilcode.util.StringUtils;
 import com.bumptech.glide.Glide;
+import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.bean.CollectInfoRet;
 import com.feiyou.headstyle.bean.HeadInfo;
@@ -88,6 +90,15 @@ public class Collection2Activity extends BaseFragmentActivity implements Collect
         headInfoAdapter = new HeadInfoAdapter(this, null);
         mCollectionListView.setLayoutManager(new GridLayoutManager(this, 3));
         mCollectionListView.setAdapter(headInfoAdapter);
+
+        headInfoAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
+                Intent intent = new Intent(Collection2Activity.this, HeadEditActivity.class);
+                intent.putExtra("image_url", headInfoAdapter.getData().get(position).getImgurl());
+                startActivity(intent);
+            }
+        });
 
         mCollapsingTopBarLayout.setScrimUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override

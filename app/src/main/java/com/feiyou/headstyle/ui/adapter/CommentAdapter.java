@@ -14,6 +14,7 @@ import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.bean.NoteItem;
+import com.feiyou.headstyle.ui.custom.GlideRoundTransform;
 import com.orhanobut.logger.Logger;
 
 import java.util.List;
@@ -46,6 +47,7 @@ public class CommentAdapter extends BaseQuickAdapter<NoteItem, BaseViewHolder> {
             RequestOptions options = new RequestOptions();
             options.error(R.mipmap.head_def);
             options.placeholder(R.mipmap.empty_icon);
+            options.transform(new GlideRoundTransform(mContext,21));
             Glide.with(mContext).load(item.getCommentUserimg()).apply(options).into((ImageView) helper.itemView.findViewById(R.id.iv_user_head));
 
             helper.setText(R.id.tv_nick_name, item.getCommentNickname())

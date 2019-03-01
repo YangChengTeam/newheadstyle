@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import com.blankj.utilcode.util.SizeUtils;
 import com.blankj.utilcode.util.StringUtils;
+import com.blankj.utilcode.util.ToastUtils;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.bean.HeadInfoRet;
@@ -151,28 +152,28 @@ public class HeadListActivity extends BaseFragmentActivity implements HeadListDa
     @Override
     public void loadDataSuccess(ResultInfo tData) {
         avi.hide();
-        if (tData != null) {
-            if (tData.getCode() == Constants.SUCCESS) {
-                if (tData instanceof HeadInfoRet) {
-                    mNoDataLayout.setVisibility(View.GONE);
+        if (tData != null && tData.getCode() == Constants.SUCCESS) {
+            if (tData instanceof HeadInfoRet) {
+                mNoDataLayout.setVisibility(View.GONE);
 
-                    if (currentPage == 1) {
-                        headInfoAdapter.setNewData(((HeadInfoRet) tData).getData());
-                    } else {
-                        headInfoAdapter.addData(((HeadInfoRet) tData).getData());
-                    }
-
-                    if (((HeadInfoRet) tData).getData().size() == pageSize) {
-                        headInfoAdapter.loadMoreComplete();
-                    } else {
-                        headInfoAdapter.loadMoreEnd();
-                    }
+                if (currentPage == 1) {
+                    headInfoAdapter.setNewData(((HeadInfoRet) tData).getData());
+                } else {
+                    headInfoAdapter.addData(((HeadInfoRet) tData).getData());
                 }
-            } else {
-                headInfoAdapter.loadMoreEnd();
-                mNoDataLayout.setVisibility(View.VISIBLE);
+
+                if (((HeadInfoRet) tData).getData().size() == pageSize) {
+                    headInfoAdapter.loadMoreComplete();
+                } else {
+                    headInfoAdapter.loadMoreEnd();
+                }
             }
+        } else {
+            mHeadInfoListView.setVisibility(View.GONE);
+            mNoDataLayout.setVisibility(View.VISIBLE);
+            ToastUtils.showLong(StringUtils.isEmpty(tData.getMsg()) ? "操作失败" : tData.getMsg());
         }
+
     }
 
     @Override

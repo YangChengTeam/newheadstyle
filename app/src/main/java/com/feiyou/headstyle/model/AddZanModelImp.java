@@ -43,7 +43,7 @@ public class AddZanModelImp extends BaseModel implements AddZanModel<ZanResultRe
     }
 
     @Override
-    public void addZan(int type, String userId, String messageId, String commentId, String repeatId,int modelType, final IBaseRequestCallBack<ZanResultRet> iBaseRequestCallBack) {
+    public void addZan(int type, String userId,String zanUserId, String messageId, String commentId, String repeatId,int modelType, final IBaseRequestCallBack<ZanResultRet> iBaseRequestCallBack) {
 
         JSONObject params = new JSONObject();
         try {
@@ -51,16 +51,19 @@ public class AddZanModelImp extends BaseModel implements AddZanModel<ZanResultRe
                 case 1:
                     params.put("type", type + "");
                     params.put("user_id", userId);
-                    params.put(modelType == 1 ? "message_id": "vedioe_id", messageId);
+                    params.put("zan_user_id", zanUserId);
+                    params.put(modelType == 1 ? "message_id": "vedio_id", messageId);
                     break;
                 case 2:
                     params.put("type", type + "");
                     params.put("user_id", userId);
+                    params.put("zan_user_id", zanUserId);
                     params.put("comment_id", commentId);
                     break;
                 case 3:
                     params.put("type", type + "");
                     params.put("user_id", userId);
+                    params.put("zan_user_id", zanUserId);
                     params.put("repeat_id", repeatId);
                     break;
             }

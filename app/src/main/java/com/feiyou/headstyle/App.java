@@ -31,6 +31,8 @@ public class App extends Application {
 
     public UserInfo mUserInfo;
 
+    public boolean isLogin;
+
     public App() {
         mInstance = this;
     }
@@ -66,5 +68,13 @@ public class App extends Application {
 
     public void setmUserInfo(UserInfo mUserInfo) {
         this.mUserInfo = mUserInfo;
+    }
+
+    public boolean isLogin() {
+        return isLogin;
+    }
+
+    public void setLogin(boolean login) {
+        isLogin = login;
     }
 }

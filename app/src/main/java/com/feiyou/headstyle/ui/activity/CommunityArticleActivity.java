@@ -1,17 +1,21 @@
 package com.feiyou.headstyle.ui.activity;
 
+
+import android.content.Intent;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.app.ProgressDialog;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
-import android.support.design.widget.TabLayout;
-import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.view.ViewPager;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -23,10 +27,13 @@ import com.blankj.utilcode.util.TimeUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
+import com.feiyou.headstyle.bean.FollowInfoRet;
 import com.feiyou.headstyle.bean.HeadInfo;
 import com.feiyou.headstyle.bean.MessageEvent;
+import com.feiyou.headstyle.bean.NoteInfo;
 import com.feiyou.headstyle.bean.NoteInfoDetailRet;
 import com.feiyou.headstyle.bean.ReplyParams;
 import com.feiyou.headstyle.bean.ReplyResultInfoRet;
@@ -34,14 +41,13 @@ import com.feiyou.headstyle.bean.ResultInfo;
 import com.feiyou.headstyle.bean.ZanResultRet;
 import com.feiyou.headstyle.common.Constants;
 import com.feiyou.headstyle.presenter.AddZanPresenterImp;
+import com.feiyou.headstyle.presenter.FollowInfoPresenterImp;
 import com.feiyou.headstyle.presenter.NoteInfoDetailDataPresenterImp;
 import com.feiyou.headstyle.presenter.ReplyCommentPresenterImp;
 import com.feiyou.headstyle.ui.adapter.CommunityHeadAdapter;
-import com.feiyou.headstyle.ui.adapter.DetailFragmentAdapter;
-import com.feiyou.headstyle.ui.adapter.HeadInfoAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragmentActivity;
 import com.feiyou.headstyle.ui.custom.GlideRoundTransform;
-import com.feiyou.headstyle.ui.fragment.sub.VideoFragment;
+import com.feiyou.headstyle.ui.fragment.MyFragment;
 import com.feiyou.headstyle.ui.fragment.sub.WonderfulFragment;
 import com.feiyou.headstyle.view.CommentDialog;
 import com.feiyou.headstyle.view.NoteInfoDetailDataView;
@@ -63,12 +69,6 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
 
     @BindView(R.id.iv_back)
     ImageView mBackImageView;
-
-    @BindView(R.id.view_pager)
-    ViewPager mViewPager;
-
-    @BindView(R.id.tab_layout)
-    TabLayout tabLayout;
 
     @BindView(R.id.appBarLayout)
     AppBarLayout appBarLayout;
@@ -106,6 +106,15 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
     @BindView(R.id.tv_zan_count)
     TextView mZanCountTextView;
 
+    @BindView(R.id.layout_fragment)
+    FrameLayout mFragmentLayout;
+
+    @BindView(R.id.layout_follow)
+    FrameLayout mFollowLayout;
+
+    @BindView(R.id.tv_follow_txt)
+    TextView mFollowTv;
+
     List<String> mTitleDataList;
 
     private String newsId;
@@ -113,6 +122,8 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
     private NoteInfoDetailDataPresenterImp noteInfoDetailDataPresenterImp;
 
     private AddZanPresenterImp addZanPresenterImp;
+
+    private FollowInfoPresenterImp followInfoPresenterImp;
 
     private CommunityHeadAdapter communityHeadAdapter;
 
@@ -126,6 +137,12 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
 
     private String messageId;
 
+    private NoteInfo currentNoteInfo;
+
+    private ArrayList<String> imageUrls;
+
+    private boolean isFollow;
+
     @Override
     protected int getContextViewId() {
         return R.layout.activity_article_detail;
@@ -135,7 +152,6 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         initViews();
-        initFragments();
     }
 
     public void initViews() {
@@ -144,15 +160,33 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
             messageId = bundle.getString("msg_id");
         }
 
-        QMUIStatusBarHelper.setStatusBarLightMode(this);
-        mTopContentLayout.setLayoutParams(new CollapsingToolbarLayout.LayoutParams(CollapsingToolbarLayout.LayoutParams.MATCH_PARENT, SizeUtils.dp2px(392)));
+        FragmentManager manager = getSupportFragmentManager();
+        FragmentTransaction transaction = manager.beginTransaction();
+        transaction.add(R.id.layout_fragment, WonderfulFragment.newInstance(messageId));
+        transaction.commit();
 
-        communityHeadAdapter = new CommunityHeadAdapter(this, null, 116, false);
+        QMUIStatusBarHelper.setStatusBarLightMode(this);
+        mTopContentLayout.setLayoutParams(new CollapsingToolbarLayout.LayoutParams(CollapsingToolbarLayout.LayoutParams.MATCH_PARENT, CollapsingToolbarLayout.LayoutParams.WRAP_CONTENT));
+
+        communityHeadAdapter = new CommunityHeadAdapter(this, null, 100, false);
         mNoteImageListView.setLayoutManager(new GridLayoutManager(this, 3));
         mNoteImageListView.setAdapter(communityHeadAdapter);
 
+        communityHeadAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
+                if (imageUrls != null && imageUrls.size() > 0) {
+                    Intent intent = new Intent(CommunityArticleActivity.this, ShowImageListActivity.class);
+                    intent.putExtra("image_index", position);
+                    intent.putStringArrayListExtra("image_list", imageUrls);
+                    CommunityArticleActivity.this.startActivity(intent);
+                }
+            }
+        });
+
         noteInfoDetailDataPresenterImp = new NoteInfoDetailDataPresenterImp(this, this);
         addZanPresenterImp = new AddZanPresenterImp(this, this);
+        followInfoPresenterImp = new FollowInfoPresenterImp(this, this);
 
         replyCommentPresenterImp = new ReplyCommentPresenterImp(this, this);
 
@@ -162,25 +196,15 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
         progressDialog.setMessage("回复中");
     }
 
-    public void initFragments() {
-        Fragment[] fragments = new Fragment[]{WonderfulFragment.newInstance(messageId), new VideoFragment()};
-        mTitleDataList = new ArrayList<>();
-        mTitleDataList.add("精彩评论");
-        mTitleDataList.add("最新评论");
-
-        if (mTitleDataList.size() > 0) {
-            DetailFragmentAdapter viewPageAdapter = new DetailFragmentAdapter(getSupportFragmentManager(), fragments, mTitleDataList);
-            mViewPager.setAdapter(viewPageAdapter);
-
-            tabLayout.setTabMode(TabLayout.MODE_SCROLLABLE);
-            tabLayout.setupWithViewPager(mViewPager);
-        }
-    }
-
     public void showDialog() {
         commentDialog = new CommentDialog(this, 1);
         commentDialog.setSendBackListener(this);
         commentDialog.show(getFragmentManager(), "dialog");
+    }
+
+    @OnClick(R.id.layout_follow)
+    void addFollow() {
+        followInfoPresenterImp.addFollow(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", currentNoteInfo != null ? currentNoteInfo.getUserId() : "");
     }
 
     @OnClick(R.id.layout_message_count)
@@ -190,7 +214,7 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
 
     @OnClick(R.id.layout_zan)
     void addZan() {
-        addZanPresenterImp.addZan(1, App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", messageId, "", "", 1);
+        addZanPresenterImp.addZan(1, App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", currentNoteInfo.getUserId(), messageId, "", "", 1);
     }
 
     @OnClick(R.id.iv_back)
@@ -229,23 +253,24 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
         if (tData != null && tData.getCode() == Constants.SUCCESS) {
 
             if (tData instanceof NoteInfoDetailRet) {
-                commentNum = ((NoteInfoDetailRet) tData).getData().getCommentNum();
+                currentNoteInfo = ((NoteInfoDetailRet) tData).getData();
 
+                commentNum = currentNoteInfo.getCommentNum();
                 RequestOptions options = new RequestOptions();
                 options.transform(new GlideRoundTransform(this, 21));
                 options.placeholder(R.mipmap.empty_icon).error(R.mipmap.empty_icon);
-                Glide.with(this).load(((NoteInfoDetailRet) tData).getData().getUserimg()).apply(options).into(mUserHeadImageView);
+                Glide.with(this).load(currentNoteInfo.getUserimg()).apply(options).into(mUserHeadImageView);
 
-                mNickNameTextView.setText(((NoteInfoDetailRet) tData).getData().getNickname());
-                mTopicNameTextView.setText(((NoteInfoDetailRet) tData).getData().getName());
-                mAddDateTextView.setText(TimeUtils.millis2String(((NoteInfoDetailRet) tData).getData().getAddTime() * 1000));
-                mNoteContentTextView.setText(((NoteInfoDetailRet) tData).getData().getContent());
+                mNickNameTextView.setText(currentNoteInfo.getNickname());
+                mTopicNameTextView.setText(currentNoteInfo.getName());
+                mAddDateTextView.setText(TimeUtils.millis2String(currentNoteInfo.getAddTime() * 1000));
+                mNoteContentTextView.setText(currentNoteInfo.getContent());
 
                 mMessageCountTextView.setText(commentNum > 0 ? commentNum + "" : "");
-                mZanCountTextView.setText(((NoteInfoDetailRet) tData).getData().getZanNum() + "");
+                mZanCountTextView.setText(currentNoteInfo.getZanNum() + "");
 
 
-                if (((NoteInfoDetailRet) tData).getData().getIsZan() == 0) {
+                if (currentNoteInfo.getIsZan() == 0) {
                     mZanCountTextView.setCompoundDrawablesWithIntrinsicBounds(notZan, null, null, null);
                 } else {
                     mZanCountTextView.setCompoundDrawablesWithIntrinsicBounds(isZan, null, null, null);
@@ -254,9 +279,9 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
 
                 //设置帖子图片
                 List<HeadInfo> headInfos = new ArrayList<>();
-                String[] tempImg = ((NoteInfoDetailRet) tData).getData().getImageArr();
+                String[] tempImg = currentNoteInfo.getImageArr();
 
-                final ArrayList<String> imageUrls = new ArrayList<>();
+                imageUrls = new ArrayList<>();
 
                 for (int i = 0; i < tempImg.length; i++) {
                     HeadInfo headInfo = new HeadInfo();
@@ -264,8 +289,16 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
                     headInfos.add(headInfo);
                     imageUrls.add(tempImg[i]);
                 }
-
+                int temp = imageUrls.size() % 3 == 0 ? imageUrls.size() / 3 : imageUrls.size() / 3 + 1;
+                mNoteImageListView.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, SizeUtils.dp2px(112 * temp)));
                 communityHeadAdapter.setNewData(imageUrls);
+
+
+                int tempResult = currentNoteInfo.getIsGuan();
+
+                mFollowLayout.setBackgroundResource(tempResult == 0 ? R.drawable.into_bg : R.drawable.is_follow_bg);
+                mFollowTv.setTextColor(ContextCompat.getColor(this, tempResult == 0 ? R.color.tab_select_color : R.color.black2));
+                mFollowTv.setText(tempResult == 0 ? "+关注" : "已关注");
             }
 
             if (tData instanceof ReplyResultInfoRet) {
@@ -287,6 +320,23 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
                     mZanCountTextView.setCompoundDrawablePadding(SizeUtils.dp2px(4));
                 }
             }
+
+            if (tData instanceof FollowInfoRet) {
+                int tempResult = ((FollowInfoRet) tData).getData().getIsGuan();
+
+                ToastUtils.showLong(tempResult == 0 ? "已取消" : "已关注");
+                mFollowLayout.setBackgroundResource(tempResult == 0 ? R.drawable.into_bg : R.drawable.is_follow_bg);
+                mFollowTv.setTextColor(ContextCompat.getColor(this, tempResult == 0 ? R.color.tab_select_color : R.color.black2));
+                mFollowTv.setText(tempResult == 0 ? "+关注" : "已关注");
+            }
+
+        } else {
+            int tempResult = 0;
+            mFollowLayout.setBackgroundResource(tempResult == 0 ? R.drawable.into_bg : R.drawable.is_follow_bg);
+            mFollowTv.setTextColor(ContextCompat.getColor(this, tempResult == 0 ? R.color.tab_select_color : R.color.black2));
+            mFollowTv.setText(tempResult == 0 ? "+关注" : "已关注");
+
+            ToastUtils.showLong(StringUtils.isEmpty(tData.getMsg()) ? "操作失败" : tData.getMsg());
         }
     }
 
@@ -307,7 +357,7 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
         ReplyParams replyParams = new ReplyParams();
         replyParams.setModelType(1);
         replyParams.setType(1);
-        replyParams.setContent("我是帖子的一级回复");
+        replyParams.setContent(content);
         replyParams.setRepeatUserId(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "");
         replyParams.setMessageId(messageId);
 

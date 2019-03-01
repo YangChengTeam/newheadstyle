@@ -3,6 +3,8 @@ package com.feiyou.headstyle.ui.adapter;
 import android.content.Context;
 import android.widget.ImageView;
 
+import com.blankj.utilcode.util.ScreenUtils;
+import com.blankj.utilcode.util.SizeUtils;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.chad.library.adapter.base.BaseQuickAdapter;
@@ -28,9 +30,13 @@ public class HeadInfoAdapter extends BaseQuickAdapter<HeadInfo, BaseViewHolder> 
 
     @Override
     protected void convert(final BaseViewHolder helper, final HeadInfo item) {
+        int tempWidth = (ScreenUtils.getScreenWidth() - SizeUtils.dp2px(36)) / 3;
         RequestOptions options = new RequestOptions();
         options.transform(new GlideRoundTransform(mContext, 5));
-        options.placeholder(R.mipmap.empty_icon).error(R.mipmap.empty_icon);
+        options.placeholder(R.mipmap.image_def).error(R.mipmap.image_def);
+        options.override(tempWidth, tempWidth);
+        options.centerCrop();
+
         Glide.with(mContext).load(item.getImgurl()).apply(options).into((ImageView) helper.itemView.findViewById(R.id.iv_head_info));
     }
 }

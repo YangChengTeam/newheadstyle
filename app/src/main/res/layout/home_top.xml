@@ -14,7 +14,7 @@
 
         <LinearLayout
             android:id="@+id/layout_search"
-            android:layout_width="330dp"
+            android:layout_width="match_parent"
             android:layout_height="35dp"
             android:background="@drawable/search_bg"
             android:gravity="center"
@@ -37,7 +37,7 @@
 
     <com.youth.banner.Banner
         android:id="@+id/banner"
-        android:layout_width="330dp"
+        android:layout_width="match_parent"
         android:layout_height="130dp"
         app:delay_time="4000"
         app:indicator_drawable_selected="@mipmap/indicator_select"
@@ -47,9 +47,8 @@
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/head_type_list"
-        android:layout_width="332dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="1dp"
         android:layout_marginTop="10dp"
         android:nestedScrollingEnabled="false"></android.support.v7.widget.RecyclerView>
 
@@ -66,9 +65,11 @@
     </LinearLayout>
 
     <RelativeLayout
-        android:layout_width="330dp"
+        android:layout_width="match_parent"
         android:layout_height="33dp"
-        android:layout_marginTop="6dp">
+        android:layout_marginLeft="12dp"
+        android:layout_marginTop="6dp"
+        android:layout_marginRight="12dp">
 
         <ImageView
             android:id="@+id/iv_rec"
@@ -111,9 +112,9 @@
 
     <LinearLayout
         android:id="@+id/layout_recommend"
-        android:layout_width="330dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp"
+        android:layout_marginBottom="12dp"
         android:orientation="vertical">
 
         <RelativeLayout
@@ -219,6 +220,7 @@
         android:layout_height="48dp"
         android:background="@color/white"
         android:gravity="center"
+        android:visibility="gone"
         android:orientation="vertical">
 
         <RelativeLayout

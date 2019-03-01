@@ -161,8 +161,8 @@ public class MainActivity extends BaseFragmentActivity implements View.OnClickLi
             Logger.i(SPUtils.getInstance().getString(Constants.USER_INFO));
             userInfo = JSON.parseObject(SPUtils.getInstance().getString(Constants.USER_INFO), new TypeReference<UserInfo>() {
             });
-
             App.getApp().setmUserInfo(userInfo);
+            App.getApp().setLogin(true);
         }
 
     }

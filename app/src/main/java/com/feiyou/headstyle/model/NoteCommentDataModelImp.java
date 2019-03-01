@@ -40,7 +40,7 @@ public class NoteCommentDataModelImp extends BaseModel implements NoteCommentDat
             params.put("user_id", userId);
             params.put("page", page + "");
             params.put("message_id", msgId);
-            params.put("type", type + "");
+            params.put("type", "2");
         } catch (JSONException e) {
             e.printStackTrace();
         }

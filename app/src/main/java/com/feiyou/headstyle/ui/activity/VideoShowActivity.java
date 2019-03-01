@@ -283,7 +283,7 @@ public class VideoShowActivity extends BaseFragmentActivity implements VideoInfo
 
                 if (view.getId() == R.id.layout_zan) {
                     switchType = 2;
-                    addZanPresenterImp.addZan(2, "1021601", "", commentId, "", 2);
+                    addZanPresenterImp.addZan(2, "1021601","", "", commentId, "", 2);
                 }
             }
         });
@@ -359,7 +359,7 @@ public class VideoShowActivity extends BaseFragmentActivity implements VideoInfo
                 currentReplyPos = position;
                 if (view.getId() == R.id.layout_zan) {
                     repeatId = commentReplyAdapter.getData().get(position).getRepeatId();
-                    addZanPresenterImp.addZan(3, "1021601", "", "", repeatId, 2);
+                    addZanPresenterImp.addZan(3, "1021601","", "", "", repeatId, 2);
                 }
             }
         });
