@@ -10,6 +10,8 @@ public class TopicInfo {
     private String name;
     private String num;
 
+    private boolean isSelected;
+
     public String getIco() {
         return ico;
     }
@@ -48,5 +50,13 @@ public class TopicInfo {
 
     public void setNum(String num) {
         this.num = num;
+    }
+
+    public boolean isSelected() {
+        return isSelected;
+    }
+
+    public void setSelected(boolean selected) {
+        isSelected = selected;
     }
 }

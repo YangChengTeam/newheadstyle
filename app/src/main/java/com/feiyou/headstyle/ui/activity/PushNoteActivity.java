@@ -6,6 +6,8 @@ import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -15,8 +17,10 @@ import android.widget.TextView;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.blankj.utilcode.util.SizeUtils;
+import com.blankj.utilcode.util.StringUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.chad.library.adapter.base.BaseQuickAdapter;
+import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.base.IBaseView;
 import com.feiyou.headstyle.bean.ResultInfo;
@@ -25,6 +29,7 @@ import com.feiyou.headstyle.presenter.AddNotePresenterImp;
 import com.feiyou.headstyle.ui.adapter.AddNoteImageAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragmentActivity;
 import com.feiyou.headstyle.ui.custom.Glide4Engine;
+import com.feiyou.headstyle.ui.custom.MsgEditText;
 import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 import com.qmuiteam.qmui.widget.QMUITopBar;
@@ -32,7 +37,10 @@ import com.zhihu.matisse.Matisse;
 import com.zhihu.matisse.MimeType;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -42,7 +50,17 @@ import butterknife.OnClick;
  */
 public class PushNoteActivity extends BaseFragmentActivity implements IBaseView {
 
-    private static final int REQUEST_CODE_CHOOSE = 23;
+    public static final int REQUEST_CODE_CHOOSE = 23;
+
+    public static final int REQUEST_FRIENDS = 0;
+
+    public static final int RESULT_FRIEND_CODE = 2;
+
+    public static final int RESULT_TOPIC_CODE = 3;
+
+    public final static String MASK_STR = "@";
+
+    public final static String SPLIT_STR = "*#";
 
     @BindView(R.id.topbar)
     QMUITopBar mTopBar;
@@ -59,6 +77,12 @@ public class PushNoteActivity extends BaseFragmentActivity implements IBaseView 
     @BindView(R.id.layout_friends)
     LinearLayout mFriendsLayout;
 
+    @BindView(R.id.tv_topic_txt)
+    TextView mTopicTv;
+
+    @BindView(R.id.et_input_note_content)
+    MsgEditText mInputNoteEditText;
+
     TextView mCancelTv;
 
     Button mAddNoteBtn;
@@ -70,6 +94,16 @@ public class PushNoteActivity extends BaseFragmentActivity implements IBaseView 
     AddNotePresenterImp addNotePresenterImp;
 
     private ProgressDialog progressDialog = null;
+
+    private Map<String, String> friendsMap;
+
+    private StringBuffer ids;
+
+    private int topicSelectIndex = -1;
+
+    private String topicId;
+
+    private StringBuffer sendContent;
 
     @Override
     protected int getContextViewId() {
@@ -102,6 +136,11 @@ public class PushNoteActivity extends BaseFragmentActivity implements IBaseView 
         mAddNoteBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                String tempInputContent = mInputNoteEditText.getText().toString();
+                if (StringUtils.isEmpty(tempInputContent)) {
+                    ToastUtils.showLong("请输入内容");
+                    return;
+                }
 
                 List<Object> tempList = addNoteImageAdapter.getData();
                 List<String> result = new ArrayList<>();
@@ -111,11 +150,14 @@ public class PushNoteActivity extends BaseFragmentActivity implements IBaseView 
                         result.add(tempList.get(i).toString());
                     }
                 }
+
+                String tempIds = setFriendIds(tempInputContent);
+
                 if (progressDialog != null && !progressDialog.isShowing()) {
                     progressDialog.show();
                 }
 
-                addNotePresenterImp.addNote("1", "测试发帖的消息", "1", "2,3", result);
+                addNotePresenterImp.addNote(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", tempInputContent, "1", tempIds, result);
             }
         });
 
@@ -156,10 +198,43 @@ public class PushNoteActivity extends BaseFragmentActivity implements IBaseView 
     }
 
     public void initData() {
+        friendsMap = new HashMap<>();
+        ids = new StringBuffer("");
+        sendContent = new StringBuffer("");
+
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("正在发布");
 
         addNotePresenterImp = new AddNotePresenterImp(this, this);
+    }
+
+    public String setFriendIds(String input) {
+        Iterator iterator = friendsMap.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry entry = (Map.Entry) iterator.next();
+            Object key = entry.getKey();
+            Object val = entry.getValue();
+
+            if (input.indexOf(val.toString()) > -1) {
+                ids.append(key).append(",");
+            }
+        }
+
+        Logger.i("result ids --->" + ids.substring(0, ids.length() - 1));
+        return ids.substring(0, ids.length() - 1);
+    }
+
+    @OnClick(R.id.layout_topic)
+    void addTopic() {
+        Intent intent = new Intent(this, TopicSelectActivity.class);
+        intent.putExtra("topic_select_index", topicSelectIndex);
+        startActivityForResult(intent, REQUEST_FRIENDS);
+    }
+
+    @OnClick(R.id.layout_friends)
+    void addFriends() {
+        Intent intent = new Intent(this, FriendListActivity.class);
+        startActivityForResult(intent, REQUEST_FRIENDS);
     }
 
     @Override
@@ -198,6 +273,30 @@ public class PushNoteActivity extends BaseFragmentActivity implements IBaseView 
             }
         }
 
+        //选择了好友时返回
+        if (resultCode == RESULT_FRIEND_CODE) {
+            if (requestCode == REQUEST_FRIENDS) {
+                Logger.i("select ids--->" + JSONObject.toJSONString(data.getIntegerArrayListExtra("friend_ids")));
+                Logger.i("select names--->" + JSONObject.toJSONString(data.getStringArrayListExtra("friend_names")));
+                ArrayList<String> ids = data.getStringArrayListExtra("friend_ids");
+                ArrayList<String> names = data.getStringArrayListExtra("friend_names");
+                for (int i = 0; i < names.size(); i++) {
+                    friendsMap.put(ids.get(i), names.get(i));
+                    mInputNoteEditText.addAtSpan(MASK_STR, names.get(i), 100000);
+                }
+            }
+        }
+
+        //选择了话题时返回
+        if (resultCode == RESULT_TOPIC_CODE) {
+            if (requestCode == REQUEST_FRIENDS) {
+                topicSelectIndex = data.getIntExtra("topic_select_index", -1);
+                topicId = data.getStringExtra("topic_id");
+
+                Logger.i("topic info--->" + topicId + "---" + data.getStringExtra("topic_name"));
+                mTopicTv.setText(data.getStringExtra("topic_name"));
+            }
+        }
     }
 
     @Override

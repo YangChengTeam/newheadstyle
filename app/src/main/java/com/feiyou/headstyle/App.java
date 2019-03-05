@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Context;
 
 import com.blankj.utilcode.util.Utils;
+import com.bumptech.glide.Glide;
 import com.feiyou.headstyle.bean.TopicInfo;
 import com.feiyou.headstyle.bean.UserInfo;
 import com.feiyou.headstyle.utils.AppContextUtil;

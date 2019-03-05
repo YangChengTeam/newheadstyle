@@ -26,6 +26,8 @@
     <color name="tab_normal_color">#666666</color>
     <color name="tab_select_color">#fb5161</color>
 
+    <color name="is_follow_color">#777777</color>
+
     <color name="rec_color">#372e2e</color>
     <color name="into_community_color">#6d6d6d</color>
 

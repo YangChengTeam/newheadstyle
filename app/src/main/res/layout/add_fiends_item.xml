@@ -73,12 +73,12 @@
 
         <LinearLayout
             android:id="@+id/layout_follow"
-            android:layout_width="68dp"
+            android:layout_width="70dp"
             android:layout_height="30dp"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:layout_marginRight="12dp"
-            android:background="@drawable/into_bg"
+            android:background="@drawable/square_into_bg"
             android:gravity="center">
 
             <TextView

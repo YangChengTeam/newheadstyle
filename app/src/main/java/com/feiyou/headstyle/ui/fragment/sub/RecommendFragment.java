@@ -184,7 +184,8 @@ public class RecommendFragment extends BaseFragment implements NoteDataView {
             loginDialog.dismiss();
         }
 
-        noteDataPresenterImp.getNoteData(currentPage, 2, userInfo != null ? userInfo.getId() : "");
+        //noteDataPresenterImp.getNoteData(currentPage, 2, userInfo != null ? userInfo.getId() : "");
+        noteDataPresenterImp.getNoteData(currentPage, 2, "");
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -256,7 +257,9 @@ public class RecommendFragment extends BaseFragment implements NoteDataView {
             }
 
         } else {
-            ToastUtils.showLong(StringUtils.isEmpty(tData.getMsg()) ? "操作错误" : tData.getMsg());
+            if (tData instanceof FollowInfoRet) {
+                Logger.i(StringUtils.isEmpty(tData.getMsg()) ? "操作错误" : tData.getMsg());
+            }
         }
 
     }

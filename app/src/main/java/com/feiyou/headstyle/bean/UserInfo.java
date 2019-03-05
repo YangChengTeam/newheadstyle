@@ -1,6 +1,9 @@
 package com.feiyou.headstyle.bean;
 
+import com.feiyou.headstyle.R;
 import com.google.gson.annotations.SerializedName;
+
+import butterknife.BindView;
 
 /**
  * Created by myflying on 2019/1/25.
@@ -33,6 +36,12 @@ public class UserInfo {
     private int fenNum;
 
     private boolean isFollow;
+
+    @SerializedName("is_all_guan")
+    private int isAllGuan;
+
+    @SerializedName("type")
+    private int loginType;
 
     public String getId() {
         return id;
@@ -168,5 +177,21 @@ public class UserInfo {
 
     public void setFollow(boolean follow) {
         isFollow = follow;
+    }
+
+    public int getIsAllGuan() {
+        return isAllGuan;
+    }
+
+    public void setIsAllGuan(int isAllGuan) {
+        this.isAllGuan = isAllGuan;
+    }
+
+    public int getLoginType() {
+        return loginType;
+    }
+
+    public void setLoginType(int loginType) {
+        this.loginType = loginType;
     }
 }

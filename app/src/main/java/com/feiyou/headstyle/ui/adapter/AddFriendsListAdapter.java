@@ -40,8 +40,8 @@ public class AddFriendsListAdapter extends BaseQuickAdapter<UserInfo, BaseViewHo
         options.transform(new GlideRoundTransform(mContext, 30));
         Glide.with(mContext).load(item.getUserimg()).apply(options).into((ImageView) helper.itemView.findViewById(R.id.iv_user_head));
 
-        helper.setBackgroundRes(R.id.layout_follow, item.isFollow() ? R.drawable.is_follow_bg : R.drawable.into_bg);
-        helper.setTextColor(R.id.tv_follow_txt, ContextCompat.getColor(mContext, item.isFollow() ? R.color.black2 : R.color.tab_select_color));
+        helper.setBackgroundRes(R.id.layout_follow, item.isFollow() ? R.drawable.square_is_follow_bg : R.drawable.square_into_bg);
+        helper.setTextColor(R.id.tv_follow_txt, ContextCompat.getColor(mContext, item.isFollow() ? R.color.is_follow_color : R.color.tab_select_color));
         helper.setText(R.id.tv_follow_txt, item.isFollow() ? "已关注" : "+关注");
 
     }

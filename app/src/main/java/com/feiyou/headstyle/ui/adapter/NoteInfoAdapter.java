@@ -71,7 +71,7 @@ public class NoteInfoAdapter extends BaseQuickAdapter<NoteInfo, BaseViewHolder> 
         }
 
         helper.setBackgroundRes(R.id.layout_follow, item.getIsGuan() == 0 ? R.drawable.into_bg : R.drawable.is_follow_bg);
-        helper.setTextColor(R.id.tv_follow_txt, ContextCompat.getColor(mContext, item.getIsGuan() == 0 ? R.color.tab_select_color : R.color.black2));
+        helper.setTextColor(R.id.tv_follow_txt, ContextCompat.getColor(mContext, item.getIsGuan() == 0 ? R.color.tab_select_color : R.color.is_follow_color));
         helper.setText(R.id.tv_follow_txt, item.getIsGuan() == 0 ? "+关注" : "已关注");
 
         helper.addOnClickListener(R.id.layout_item_zan);
@@ -79,6 +79,7 @@ public class NoteInfoAdapter extends BaseQuickAdapter<NoteInfo, BaseViewHolder> 
         RequestOptions options = new RequestOptions();
         options.override(SizeUtils.dp2px(42), SizeUtils.dp2px(42));
         options.transform(new GlideRoundTransform(mContext, 21));
+        options.placeholder(R.mipmap.head_def);
         Glide.with(mContext).load(item.getUserimg()).apply(options).into((ImageView) helper.itemView.findViewById(R.id.iv_user_head));
 
         List<HeadInfo> headInfos = new ArrayList<>();

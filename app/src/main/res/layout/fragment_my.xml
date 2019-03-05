@@ -92,6 +92,7 @@
             android:background="@drawable/common_white_bg">
 
             <LinearLayout
+                android:id="@+id/layout_my_guan"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -119,6 +120,7 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/layout_my_fen"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"

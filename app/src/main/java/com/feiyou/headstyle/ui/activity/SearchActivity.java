@@ -123,11 +123,24 @@ public class SearchActivity extends BaseFragmentActivity implements HotWordDataV
         mSearchHotListView.setLayoutManager(new GridLayoutManager(this, 2));
         searchHotWordAdapter = new SearchHotWordAdapter(this, null);
         mSearchHotListView.setAdapter(searchHotWordAdapter);
+        searchHotWordAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
+                startSearch(searchHotWordAdapter.getData().get(position).getName());
+            }
+        });
 
         //搜索记录
         mHistoryListView.setLayoutManager(new GridLayoutManager(this, 3));
         searchHistoryAdapter = new SearchHistoryAdapter(this, null);
         mHistoryListView.setAdapter(searchHistoryAdapter);
+
+        searchHistoryAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
+                startSearch(searchHistoryAdapter.getData().get(position));
+            }
+        });
 
         //搜索结果
         List<HeadInfo> headInfoList = new ArrayList<>();
@@ -162,15 +175,7 @@ public class SearchActivity extends BaseFragmentActivity implements HotWordDataV
     public void addSearchKey(String keyWord) {
 
         if (historySearchList != null) {
-            String temp = "";
-            boolean isExist = false;
-            for (int i = 0; i < historySearchList.size(); i++) {
-                temp = historySearchList.get(i);
-                if (temp.equals(keyWord)) {
-                    isExist = true;
-                }
-            }
-            if (!isExist) {
+            if (!historySearchList.contains(keyWord)) {
                 historySearchList.add(keyWord);
                 SPUtils.getInstance().put(Constants.SEARCH_HISTORY, JSON.toJSONString(historySearchList));
                 searchHistoryAdapter.addData(keyWord);
@@ -188,12 +193,9 @@ public class SearchActivity extends BaseFragmentActivity implements HotWordDataV
                             ToastUtils.showLong("请输入关键词后搜索");
                             break;
                         }
-                        showDialog();
                         String keyWord = textView.getText().toString();
-                        addSearchKey(keyWord);
 
-                        headListDataPresenterImp.getSearchList(currentPage, keyWord, "");
-                        KeyboardUtils.hideSoftInput(SearchActivity.this);
+                        startSearch(keyWord);
                     }
                     break;
                 default:
@@ -201,6 +203,15 @@ public class SearchActivity extends BaseFragmentActivity implements HotWordDataV
             }
             return false;
         }
+    }
+
+    public void startSearch(String keyWord) {
+        currentPage = 1;
+        showDialog();
+        addSearchKey(keyWord);
+        mHotWordEditText.setText(keyWord);
+        headListDataPresenterImp.getSearchList(currentPage, keyWord, "");
+        KeyboardUtils.hideSoftInput(SearchActivity.this);
     }
 
     @OnClick(R.id.tv_cancel)
@@ -239,8 +250,8 @@ public class SearchActivity extends BaseFragmentActivity implements HotWordDataV
     @Override
     public void loadDataSuccess(ResultInfo tData) {
         Logger.i(JSONObject.toJSONString(tData));
-
-        if (tData != null && tData.getCode() == Constants.SUCCESS) {
+        dismissDialog();
+        if (tData.getCode() == Constants.SUCCESS && tData != null) {
 
             if (tData instanceof SearchHotWordRet) {
                 searchHotWordAdapter.addData(((SearchHotWordRet) tData).getData());

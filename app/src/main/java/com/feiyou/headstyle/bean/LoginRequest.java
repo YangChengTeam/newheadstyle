@@ -5,7 +5,7 @@ package com.feiyou.headstyle.bean;
  */
 public class LoginRequest {
 
-    private String type;
+    private int type;
     private String openid;
     private String imeil;
     private String sex;
@@ -14,11 +14,11 @@ public class LoginRequest {
     private String nickname;
     private String userimg;
 
-    public String getType() {
+    public int getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(int type) {
         this.type = type;
     }
 

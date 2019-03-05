@@ -30,6 +30,7 @@ import com.feiyou.headstyle.bean.UserInfo;
 import com.feiyou.headstyle.bean.UserInfoRet;
 import com.feiyou.headstyle.common.Constants;
 import com.feiyou.headstyle.presenter.UserInfoPresenterImp;
+import com.feiyou.headstyle.ui.activity.MyFollowActivity;
 import com.feiyou.headstyle.ui.activity.MyMessageActivity;
 import com.feiyou.headstyle.ui.activity.MyNoteActivity;
 import com.feiyou.headstyle.ui.activity.SettingActivity;
@@ -56,7 +57,7 @@ import butterknife.OnClick;
 /**
  * Created by myflying on 2019/1/24.
  */
-public class MyFragment extends BaseFragment {
+public class MyFragment extends BaseFragment implements UserInfoView {
 
     @BindView(R.id.layout_my_info_top)
     RelativeLayout mMyInfoTopLayout;
@@ -86,6 +87,8 @@ public class MyFragment extends BaseFragment {
 
     private UserInfo userInfo;
 
+    private UserInfoPresenterImp userInfoPresenterImp;
+
     @Override
     protected View onCreateView() {
         View root = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_my, null);
@@ -104,6 +107,7 @@ public class MyFragment extends BaseFragment {
         mUserInfoLayout.setLayoutParams(userInfoParams);
 
         loginDialog = new LoginDialog(getActivity(), R.style.login_dialog);
+        userInfoPresenterImp = new UserInfoPresenterImp(this, getActivity());
     }
 
     @Override
@@ -131,13 +135,33 @@ public class MyFragment extends BaseFragment {
         if (loginDialog != null && loginDialog.isShowing()) {
             loginDialog.dismiss();
         }
-
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void Event(MessageEvent messageEvent) {
         if (messageEvent.getMessage().equals("login_success")) {
-            onResume();
+            if (!StringUtils.isEmpty(SPUtils.getInstance().getString(Constants.USER_INFO))) {
+                Logger.i(SPUtils.getInstance().getString(Constants.USER_INFO));
+                userInfo = JSON.parseObject(SPUtils.getInstance().getString(Constants.USER_INFO), new TypeReference<UserInfo>() {
+                });
+            }
+            if (userInfo != null) {
+
+                RequestOptions options = new RequestOptions();
+                options.transform(new GlideRoundTransform(getActivity(), 30));
+                Glide.with(getActivity()).load(userInfo.getUserimg()).apply(options).into(mUserHeadImageView);
+                mUserNickNameTv.setText(userInfo.getNickname());
+                mUserIdTv.setText("ID：" + userInfo.getId());
+
+                mFollowTv.setText(userInfo.getGuanNum() + "");
+                mFansCountTv.setText(userInfo.getFenNum() + "");
+                mKeepCountTv.setText(userInfo.getCollectNum() + "");
+
+                LoginRequest loginRequest = new LoginRequest();
+                loginRequest.setOpenid(userInfo.getOpenid());//openid全部大写
+                loginRequest.setType(userInfo.getLoginType());
+                userInfoPresenterImp.login(loginRequest);
+            }
         }
     }
 
@@ -151,6 +175,20 @@ public class MyFragment extends BaseFragment {
     public void onStop() {
         super.onStop();
         EventBus.getDefault().unregister(this);
+    }
+
+    @OnClick(R.id.layout_my_guan)
+    public void guanzhu() {
+        Intent intent = new Intent(getActivity(), MyFollowActivity.class);
+        intent.putExtra("type", 0);
+        startActivity(intent);
+    }
+
+    @OnClick(R.id.layout_my_fen)
+    public void fensi() {
+        Intent intent = new Intent(getActivity(), MyFollowActivity.class);
+        intent.putExtra("type", 1);
+        startActivity(intent);
     }
 
     @OnClick(R.id.tv_setting)
@@ -181,4 +219,41 @@ public class MyFragment extends BaseFragment {
         startActivity(intent);
     }
 
+    @Override
+    public void showProgress() {
+
+    }
+
+    @Override
+    public void dismissProgress() {
+
+    }
+
+    @Override
+    public void loadDataSuccess(UserInfoRet tData) {
+        Logger.i("my fragment user info --->" + JSONObject.toJSONString(tData));
+
+        if (tData != null && tData.getCode() == Constants.SUCCESS) {
+            userInfo = tData.getData();
+
+            App.getApp().setmUserInfo(userInfo);
+            App.getApp().setLogin(true);
+            SPUtils.getInstance().put(Constants.USER_INFO, JSONObject.toJSONString(tData.getData()));
+
+            mUserNickNameTv.setText(userInfo.getNickname());
+            mUserIdTv.setText("ID：" + userInfo.getId());
+
+            mFollowTv.setText(userInfo.getGuanNum() + "");
+            mFansCountTv.setText(userInfo.getFenNum() + "");
+            mKeepCountTv.setText(userInfo.getCollectNum() + "");
+
+        } else {
+            ToastUtils.showLong(StringUtils.isEmpty(tData.getMsg()) ? "登录失败" : tData.getMsg());
+        }
+    }
+
+    @Override
+    public void loadDataError(Throwable throwable) {
+
+    }
 }

@@ -10,12 +10,15 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.blankj.utilcode.util.SizeUtils;
+import com.blankj.utilcode.util.StringUtils;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.bean.HeadInfo;
+import com.feiyou.headstyle.bean.HeadInfoRet;
 import com.feiyou.headstyle.bean.HomeDataRet;
 import com.feiyou.headstyle.bean.ResultInfo;
 import com.feiyou.headstyle.bean.VideoInfoRet;
 import com.feiyou.headstyle.common.Constants;
+import com.feiyou.headstyle.presenter.HeadListDataPresenterImp;
 import com.feiyou.headstyle.presenter.HomeDataPresenterImp;
 import com.feiyou.headstyle.ui.adapter.HeadShowItemAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragmentActivity;
@@ -70,6 +73,8 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
 
     private HomeDataPresenterImp homeDataPresenterImp;
 
+    private HeadListDataPresenterImp headListDataPresenterImp;
+
     private int currentPage = 1;
 
     private int pageSize = 30;
@@ -79,6 +84,8 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
     private StickerFragment stickerFragment;
 
     private boolean isFirstLoad = true;
+
+    private String tagId;
 
     @Override
     protected int getContextViewId() {
@@ -131,6 +138,12 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
             startPosition = bundle.getInt("jump_position");
         }
 
+        if (bundle != null && !StringUtils.isEmpty(bundle.getString("tag_id"))) {
+            tagId = bundle.getString("tag_id");
+        }
+
+        Logger.i("head show page--->" + currentPage + "---head start position--->" + startPosition);
+
         adapter = new HeadShowItemAdapter(HeadShowActivity.this, null, showShape);
         swipeView.setAdapter(adapter);
 
@@ -139,8 +152,12 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
         swipeView.setOnItemClickListener(this);
 
         homeDataPresenterImp = new HomeDataPresenterImp(this, this);
-        homeDataPresenterImp.getData(currentPage + "", "", "", 1);
-
+        headListDataPresenterImp = new HeadListDataPresenterImp(this, this);
+        if (StringUtils.isEmpty(tagId)) {
+            homeDataPresenterImp.getData(currentPage + "", "", "", 1);
+        } else {
+            headListDataPresenterImp.getDataByTagId(tagId, currentPage, pageSize);
+        }
     }
 
     @OnClick(R.id.btn_square)
@@ -179,8 +196,20 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
 
     @Override
     public void removeFirstObjectInAdapter() {
+        Logger.i("total size--->" + adapter.getCount() + "---" + adapter.getHeads().get(0).getId());
+
+        if (adapter.getCount() < 6) {
+            currentPage++;
+
+            if (StringUtils.isEmpty(tagId)) {
+                homeDataPresenterImp.getData(currentPage + "", "", "", 1);
+            } else {
+                headListDataPresenterImp.getDataByTagId(tagId, currentPage, pageSize);
+            }
+        }
+
         adapter.remove(0);
-        Logger.i(adapter.getHeads().get(0).getImgurl());
+        //Logger.i(adapter.getHeads().get(0).getImgurl());
     }
 
     @Override
@@ -226,6 +255,21 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
                     isFirstLoad = false;
                 } else {
                     adapter.addDatas(((HomeDataRet) tData).getData().getImagesList());
+                }
+
+                adapter.notifyDataSetChanged();
+            }
+
+            if (tData instanceof HeadInfoRet) {
+                if (isFirstLoad) {
+                    if (startPosition < ((HeadInfoRet) tData).getData().size()) {
+                        adapter.addDatas(((HeadInfoRet) tData).getData().subList(startPosition, ((HeadInfoRet) tData).getData().size() - 1));
+                    } else {
+                        adapter.addDatas(((HeadInfoRet) tData).getData());
+                    }
+                    isFirstLoad = false;
+                } else {
+                    adapter.addDatas(((HeadInfoRet) tData).getData());
                 }
 
                 adapter.notifyDataSetChanged();

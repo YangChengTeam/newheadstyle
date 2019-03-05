@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -33,6 +34,7 @@ import com.feiyou.headstyle.ui.custom.NormalDecoration;
 import com.feiyou.headstyle.view.UserInfoListView;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 import com.qmuiteam.qmui.widget.QMUITopBar;
+import com.wang.avi.AVLoadingIndicatorView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,8 +54,14 @@ public class AddFriendsActivity extends BaseFragmentActivity implements UserInfo
 
     ImageView mBackImageView;
 
+    @BindView(R.id.avi)
+    AVLoadingIndicatorView avi;
+
     @BindView(R.id.friends_list)
     RecyclerView mFriendsListView;
+
+    @BindView(R.id.layout_no_data)
+    LinearLayout mNoDataLayout;
 
     AddFriendsListAdapter addFriendsListAdapter;
 
@@ -170,13 +178,18 @@ public class AddFriendsActivity extends BaseFragmentActivity implements UserInfo
 
     @Override
     public void dismissProgress() {
+        avi.hide();
         dismissDialog();
     }
 
     @Override
     public void loadDataSuccess(ResultInfo tData) {
+        avi.hide();
         dismissDialog();
         if (tData != null && tData.getCode() == Constants.SUCCESS) {
+            mFriendsListView.setVisibility(View.VISIBLE);
+            mNoDataLayout.setVisibility(View.GONE);
+
             if (tData instanceof UserInfoListRet) {
                 if (StringUtils.isEmpty(keyWord)) {
                     if (currentPage == 1) {
@@ -211,12 +224,17 @@ public class AddFriendsActivity extends BaseFragmentActivity implements UserInfo
                 addFriendsListAdapter.notifyDataSetChanged();
             }
         } else {
+            if (tData instanceof UserInfoListRet) {
+                mFriendsListView.setVisibility(View.GONE);
+                mNoDataLayout.setVisibility(View.VISIBLE);
+            }
             ToastUtils.showLong(StringUtils.isEmpty(tData.getMsg()) ? "操作失败" : tData.getMsg());
         }
     }
 
     @Override
     public void loadDataError(Throwable throwable) {
+        avi.hide();
         dismissDialog();
     }
 }
