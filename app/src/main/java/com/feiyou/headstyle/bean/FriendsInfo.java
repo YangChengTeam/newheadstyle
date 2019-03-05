@@ -6,18 +6,18 @@ import com.google.gson.annotations.SerializedName;
  * Created by myflying on 2019/1/24.
  */
 public class FriendsInfo {
-    private String id;
+    private int id;
     private String nickname;
     private String userimg;
     @SerializedName("first_word")
     private String firstWord;
     private boolean isSelected;
 
-    public String getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(int id) {
         this.id = id;
     }
 

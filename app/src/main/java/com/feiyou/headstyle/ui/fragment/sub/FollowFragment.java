@@ -15,13 +15,15 @@ import butterknife.ButterKnife;
  */
 public class FollowFragment extends BaseFragment {
 
+
+
     public static FollowFragment getInstance() {
         return new FollowFragment();
     }
 
     @Override
     protected View onCreateView() {
-        View root = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_tab_follow, null);
+        View root = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_my_friends, null);
         ButterKnife.bind(this, root);
         return root;
     }

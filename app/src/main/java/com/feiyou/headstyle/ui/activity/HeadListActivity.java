@@ -23,6 +23,7 @@ import com.feiyou.headstyle.ui.adapter.HeadInfoAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragmentActivity;
 import com.feiyou.headstyle.utils.StatusBarUtil;
 import com.feiyou.headstyle.view.HeadListDataView;
+import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 import com.qmuiteam.qmui.widget.QMUITopBar;
 import com.wang.avi.AVLoadingIndicatorView;
@@ -115,8 +116,15 @@ public class HeadListActivity extends BaseFragmentActivity implements HeadListDa
         headInfoAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
-                Intent intent = new Intent(HeadListActivity.this, HeadEditActivity.class);
-                intent.putExtra("image_url", headInfoAdapter.getData().get(position).getImgurl());
+                int jumpPage = position / pageSize;
+                int jumpPosition = position % pageSize;
+
+                Logger.i("jumpPage page--->" + jumpPage + "---jumpPosition--->" + jumpPosition);
+
+                Intent intent = new Intent(HeadListActivity.this, HeadShowActivity.class);
+                intent.putExtra("tag_id", tagId);
+                intent.putExtra("jump_page", jumpPage + 1);
+                intent.putExtra("jump_position", jumpPosition);
                 startActivity(intent);
             }
         });

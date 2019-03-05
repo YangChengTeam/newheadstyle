@@ -2,6 +2,7 @@ package com.feiyou.headstyle.ui.adapter;
 
 import android.content.Context;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 import com.blankj.utilcode.util.ScreenUtils;
 import com.blankj.utilcode.util.SizeUtils;
@@ -30,12 +31,16 @@ public class HeadInfoAdapter extends BaseQuickAdapter<HeadInfo, BaseViewHolder> 
 
     @Override
     protected void convert(final BaseViewHolder helper, final HeadInfo item) {
-        int tempWidth = (ScreenUtils.getScreenWidth() - SizeUtils.dp2px(36)) / 3;
+        int tempWidth = (ScreenUtils.getScreenWidth() - SizeUtils.dp2px(24)) / 3;
+        LinearLayout itemLayout = helper.itemView.findViewById(R.id.head_item_layout);
+        LinearLayout.LayoutParams itemParams = new LinearLayout.LayoutParams(tempWidth, tempWidth);
+        itemLayout.setLayoutParams(itemParams);
+
         RequestOptions options = new RequestOptions();
         options.transform(new GlideRoundTransform(mContext, 5));
         options.placeholder(R.mipmap.image_def).error(R.mipmap.image_def);
-        options.override(tempWidth, tempWidth);
-        options.centerCrop();
+        options.override(tempWidth - 8, tempWidth - 8);
+        //options.centerCrop();
 
         Glide.with(mContext).load(item.getImgurl()).apply(options).into((ImageView) helper.itemView.findViewById(R.id.iv_head_info));
     }

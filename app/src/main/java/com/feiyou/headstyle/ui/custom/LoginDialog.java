@@ -49,6 +49,8 @@ public class LoginDialog extends Dialog implements View.OnClickListener, UserInf
 
     private ProgressDialog progressDialog = null;
 
+    private int loginType = 1; //1qq.2微信
+
     public LoginDialog(Context context) {
         super(context);
         this.mContext = context;
@@ -90,7 +92,7 @@ public class LoginDialog extends Dialog implements View.OnClickListener, UserInf
                 if (progressDialog != null && !progressDialog.isShowing()) {
                     progressDialog.show();
                 }
-
+                loginType = 2;
                 mShareAPI.getPlatformInfo((Activity) mContext, SHARE_MEDIA.WEIXIN, authListener);
                 this.dismiss();
                 break;
@@ -98,7 +100,7 @@ public class LoginDialog extends Dialog implements View.OnClickListener, UserInf
                 if (progressDialog != null && !progressDialog.isShowing()) {
                     progressDialog.show();
                 }
-
+                loginType = 1;
                 mShareAPI.getPlatformInfo((Activity) mContext, SHARE_MEDIA.QQ, authListener);
                 this.dismiss();
                 break;
@@ -122,6 +124,8 @@ public class LoginDialog extends Dialog implements View.OnClickListener, UserInf
 
     @Override
     public void loadDataSuccess(UserInfoRet tData) {
+        Logger.i("login dialog user info --->" + JSONObject.toJSONString(tData));
+
         if (tData != null && tData.getCode() == Constants.SUCCESS) {
             UserInfo userInfo = tData.getData();
             ToastUtils.showLong("登录成功");
@@ -169,7 +173,7 @@ public class LoginDialog extends Dialog implements View.OnClickListener, UserInf
 
                 LoginRequest loginRequest = new LoginRequest();
                 loginRequest.setOpenid(data.get("uid").toUpperCase());//openid全部大写
-                loginRequest.setType(2 + "");
+                loginRequest.setType(loginType);
                 loginRequest.setNickname(data.get("name"));
                 loginRequest.setSex(data.get("gender").equals("男") ? "1" : "2");
                 loginRequest.setUserimg(data.get("iconurl"));

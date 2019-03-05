@@ -79,6 +79,8 @@
         <activity android:name=".ui.activity.StarListActivity" />
         <activity android:name=".ui.activity.StarDetailActivity" />
         <activity android:name=".ui.activity.AddFriendsActivity" />
+        <activity android:name=".ui.activity.MyFollowActivity" />
+        <activity android:name=".ui.activity.TopicSelectActivity" />
         <activity
             android:name=".ui.activity.CommunityTypeActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"

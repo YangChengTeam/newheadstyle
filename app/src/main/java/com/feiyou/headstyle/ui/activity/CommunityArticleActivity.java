@@ -1,14 +1,14 @@
 package com.feiyou.headstyle.ui.activity;
 
 
-import android.content.Intent;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -47,7 +47,6 @@ import com.feiyou.headstyle.presenter.ReplyCommentPresenterImp;
 import com.feiyou.headstyle.ui.adapter.CommunityHeadAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragmentActivity;
 import com.feiyou.headstyle.ui.custom.GlideRoundTransform;
-import com.feiyou.headstyle.ui.fragment.MyFragment;
 import com.feiyou.headstyle.ui.fragment.sub.WonderfulFragment;
 import com.feiyou.headstyle.view.CommentDialog;
 import com.feiyou.headstyle.view.NoteInfoDetailDataView;
@@ -168,7 +167,7 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
         QMUIStatusBarHelper.setStatusBarLightMode(this);
         mTopContentLayout.setLayoutParams(new CollapsingToolbarLayout.LayoutParams(CollapsingToolbarLayout.LayoutParams.MATCH_PARENT, CollapsingToolbarLayout.LayoutParams.WRAP_CONTENT));
 
-        communityHeadAdapter = new CommunityHeadAdapter(this, null, 100, false);
+        communityHeadAdapter = new CommunityHeadAdapter(this, null, 3, false);
         mNoteImageListView.setLayoutManager(new GridLayoutManager(this, 3));
         mNoteImageListView.setAdapter(communityHeadAdapter);
 

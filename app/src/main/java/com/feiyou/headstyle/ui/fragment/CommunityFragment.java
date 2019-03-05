@@ -221,7 +221,7 @@ public class CommunityFragment extends BaseFragment implements ViewPager.OnPageC
                 //if (RecommendFragment.getInstance().isVisible()) {
                 // RecommendFragment.getInstance().onRefresh();
                 //}
-                EventBus.getDefault().post(new MessageEvent("测试"));
+                EventBus.getDefault().post(new MessageEvent("topic_list"));
             }
         }
     }

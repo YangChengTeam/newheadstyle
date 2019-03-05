@@ -10,5 +10,8 @@ import java.util.List;
 
 public interface UserInfoListModel<T> {
     void addFriendsList(int page, IBaseRequestCallBack<T> iBaseRequestCallBack);
-    void searchFriendsList(int page,String keyWord, IBaseRequestCallBack<T> iBaseRequestCallBack);
+
+    void searchFriendsList(int page, String keyWord, IBaseRequestCallBack<T> iBaseRequestCallBack);
+
+    void getMyGuanFenList(int page, String userId, int type, IBaseRequestCallBack<T> iBaseRequestCallBack);
 }

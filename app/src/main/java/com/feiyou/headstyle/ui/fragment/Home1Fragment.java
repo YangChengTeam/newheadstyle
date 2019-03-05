@@ -1,6 +1,8 @@
 package com.feiyou.headstyle.ui.fragment;
 
 import android.content.Intent;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -13,36 +15,27 @@ import android.widget.TextView;
 
 import com.blankj.utilcode.util.BarUtils;
 import com.blankj.utilcode.util.SizeUtils;
-import com.blankj.utilcode.util.StringUtils;
-import com.blankj.utilcode.util.TimeUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.RequestOptions;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.bean.ArticleInfo;
 import com.feiyou.headstyle.bean.BannerInfo;
 import com.feiyou.headstyle.bean.HomeDataRet;
 import com.feiyou.headstyle.bean.HomeDataWrapper;
-import com.feiyou.headstyle.bean.NoteInfoDetailRet;
 import com.feiyou.headstyle.bean.ResultInfo;
 import com.feiyou.headstyle.common.Constants;
 import com.feiyou.headstyle.common.GlideImageLoader;
 import com.feiyou.headstyle.presenter.HomeDataPresenterImp;
 import com.feiyou.headstyle.ui.activity.Collection2Activity;
-import com.feiyou.headstyle.ui.activity.CommunityArticleActivity;
-import com.feiyou.headstyle.ui.activity.FriendListActivity;
 import com.feiyou.headstyle.ui.activity.HeadListActivity;
 import com.feiyou.headstyle.ui.activity.HeadShowActivity;
 import com.feiyou.headstyle.ui.activity.MoreTypeActivity;
 import com.feiyou.headstyle.ui.activity.SearchActivity;
-import com.feiyou.headstyle.ui.activity.ShowImageListActivity;
 import com.feiyou.headstyle.ui.adapter.CommunityHeadAdapter;
 import com.feiyou.headstyle.ui.adapter.HeadInfoAdapter;
 import com.feiyou.headstyle.ui.adapter.HeadTypeAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragment;
-import com.feiyou.headstyle.ui.custom.GlideRoundTransform;
-import com.feiyou.headstyle.ui.custom.GridSpacingItemDecoration;
 import com.feiyou.headstyle.view.HomeDataView;
 import com.orhanobut.logger.Logger;
 import com.youth.banner.Banner;
@@ -59,6 +52,9 @@ import butterknife.ButterKnife;
  */
 public class Home1Fragment extends BaseFragment implements HomeDataView, View.OnClickListener {
 
+    @BindView(R.id.scroll_view)
+    NestedScrollView scrollView;
+
     LinearLayout mSearchLayout;
 
     LinearLayout mSearchWrapperLayout;
@@ -74,9 +70,6 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
 
     RecyclerView mCommunityHeadList;
 
-    @BindView(R.id.layout_top_refresh1)
-    LinearLayout refreshLayout1;
-
     LinearLayout refreshLayout2;
 
     RelativeLayout floatLayout;
@@ -87,21 +80,7 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
 
     LinearLayout mAdLayout;
 
-    ImageView mUserHeadImageView;
-
-    TextView mUserNickNameTv;
-
-    TextView mTopicNameTv;
-
-    TextView mArticleDateTv;
-
-    FrameLayout mFollowLayout;
-
-    TextView mArticleContentTv;
-
     HeadTypeAdapter headTypeAdapter;
-
-    CommunityHeadAdapter communityHeadAdapter;
 
     HeadInfoAdapter headInfoAdapter;
 
@@ -109,7 +88,7 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
 
     private HomeDataPresenterImp homeDataPresenterImp;
 
-    private int randomPage;
+    private int randomPage = -1;
 
     private int currentPage = 1;
 
@@ -149,18 +128,20 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
 
         mSearchWrapperLayout = topView.findViewById(R.id.layout_search_wrapper);
         mSearchLayout = topView.findViewById(R.id.layout_search);
-        mRecommendLayout = topView.findViewById(R.id.layout_recommend);
-        mUserHeadImageView = topView.findViewById(R.id.iv_comment_user_head);
-        mUserNickNameTv = topView.findViewById(R.id.tv_user_nick_name);
-        mTopicNameTv = topView.findViewById(R.id.tv_topic_name);
-        mArticleDateTv = topView.findViewById(R.id.tv_article_date);
-        mFollowLayout = topView.findViewById(R.id.layout_follow);
-        mArticleContentTv = topView.findViewById(R.id.tv_article_content);
+
         mSearchLayout.setOnClickListener(this);
 
         LinearLayout.LayoutParams searchParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, SizeUtils.dp2px(48));
         searchParams.setMargins(0, BarUtils.getStatusBarHeight(), 0, 0);
         mSearchWrapperLayout.setLayoutParams(searchParams);
+
+        LinearLayout adLayout = topView.findViewById(R.id.layout_ad);
+        adLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
     }
 
     public void initData() {
@@ -184,50 +165,36 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
             }
         });
 
-        communityHeadAdapter = new CommunityHeadAdapter(getActivity(), null, 72, true);
-        mCommunityHeadList.setLayoutManager(new GridLayoutManager(getActivity(), 4));
-        mCommunityHeadList.setAdapter(communityHeadAdapter);
-        communityHeadAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
-                if (articleImages != null && articleImages.size() > 0) {
-                    Intent intent = new Intent(getActivity(), ShowImageListActivity.class);
-                    intent.putExtra("image_index", position);
-                    intent.putStringArrayListExtra("image_list", articleImages);
-                    getActivity().startActivity(intent);
-                }
-            }
-        });
-
-        mRecommendLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(getActivity(), CommunityArticleActivity.class);
-                intent.putExtra("msg_id", articleInfo.getId());
-                startActivity(intent);
-            }
-        });
-
-        mFollowLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                ToastUtils.showLong("点击了关注");
-            }
-        });
+//        scrollView.setOnScrollChangeListener(new NestedScrollView.OnScrollChangeListener() {
+//            @Override
+//            public void onScrollChange(NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+//                int tempY = SizeUtils.px2dp(scrollY);
+//                if (tempY > 520) {
+//                    mSearchWrapperLayout.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.colorPrimary));
+//                } else {
+//                    mSearchWrapperLayout.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.transparent));
+//                }
+//
+//                //判断是否滑动到了底部
+//                if (scrollY + SizeUtils.dp2px(48) >= (v.getChildAt(0).getMeasuredHeight() - v.getMeasuredHeight())) {
+//                    ToastUtils.showLong("滑动到了底部");
+//                }
+//            }
+//        });
 
         headInfoAdapter = new HeadInfoAdapter(getActivity(), null);
         mHeadInfoListView.setLayoutManager(new GridLayoutManager(getActivity(), 3));
-        mHeadInfoListView.setAdapter(headInfoAdapter);
         headInfoAdapter.addHeaderView(topView);
+        mHeadInfoListView.setAdapter(headInfoAdapter);
+        mHeadInfoListView.setNestedScrollingEnabled(false);
 
         headInfoAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
-                Logger.i("video_id--->" + headInfoAdapter.getData().get(position).getId());
-
                 int jumpPage = randomPage + position / pageSize;
-
                 int jumpPosition = position % pageSize;
+
+                Logger.i("jumpPage page--->" + jumpPage + "---jumpPosition--->" + jumpPosition);
 
                 Intent intent = new Intent(getActivity(), HeadShowActivity.class);
                 intent.putExtra("jump_page", jumpPage);
@@ -236,13 +203,13 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
             }
         });
 
-        headInfoAdapter.setOnLoadMoreListener(new BaseQuickAdapter.RequestLoadMoreListener() {
-            @Override
-            public void onLoadMoreRequested() {
-                currentPage++;
-                homeDataPresenterImp.getData(currentPage + "", "", "", 0);
-            }
-        }, mHeadInfoListView);
+//        headInfoAdapter.setOnLoadMoreListener(new BaseQuickAdapter.RequestLoadMoreListener() {
+//            @Override
+//            public void onLoadMoreRequested() {
+//                currentPage++;
+//                homeDataPresenterImp.getData(currentPage + "", "", "", 0);
+//            }
+//        }, mHeadInfoListView);
 
         mHeadInfoListView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -253,17 +220,9 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-                int tempY = SizeUtils.px2dp(getScrollYDistance()); //686
 
-                //ToastUtils.showLong("tempY--->" + tempY);
+                Logger.i("top--->" + refreshLayout2.getTop() + "scroll--->" + dy);
 
-                if (tempY > 686) {
-                    refreshLayout1.setVisibility(View.VISIBLE);
-                    //refreshLayout2.setVisibility(View.INVISIBLE);
-                } else {
-                    refreshLayout1.setVisibility(View.INVISIBLE);
-                    //refreshLayout2.setVisibility(View.VISIBLE);
-                }
             }
         });
 
@@ -310,7 +269,6 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
         mBanner.stopAutoPlay();
     }
 
-
     @Override
     public void showProgress() {
 
@@ -330,7 +288,11 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
                 homeDataRet = ((HomeDataRet) tData).getData();
                 if (homeDataRet != null) {
                     currentPage = homeDataRet.getPage();
-                    randomPage = currentPage;
+                    if (randomPage == -1) {
+                        randomPage = currentPage;
+                    }
+
+                    Logger.i("random page--->" + randomPage);
 
                     if (homeDataRet.getBannerList() != null && homeDataRet.getBannerList().size() > 0) {
                         bannerInfos = homeDataRet.getBannerList();
@@ -352,32 +314,8 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
                         mAdLayout.setVisibility(View.GONE);
                     }
 
-                    if (homeDataRet.getMessageList() != null && homeDataRet.getMessageList().size() > 0) {
-
-                        articleInfo = homeDataRet.getMessageList().get(0);
-                        articleImages = new ArrayList<>();
-                        if (articleInfo != null) {
-
-                            mUserNickNameTv.setText(StringUtils.isEmpty(articleInfo.getNickname()) ? "火星用户" : articleInfo.getNickname());
-                            mTopicNameTv.setText(articleInfo.getTopicName());
-                            mArticleDateTv.setText(TimeUtils.millis2String(articleInfo.getAddTime() * 1000));
-                            mArticleContentTv.setText(articleInfo.getContent());
-
-                            RequestOptions options = new RequestOptions();
-                            options.transform(new GlideRoundTransform(getActivity(), 21));
-                            options.placeholder(R.mipmap.head_def).error(R.mipmap.head_def);
-                            Glide.with(this).load(articleInfo.getUserimg()).apply(options).into(mUserHeadImageView);
-
-                            if (articleInfo.getImageArr() != null) {
-                                for (int i = 0; i < articleInfo.getImageArr().length; i++) {
-                                    articleImages.add(articleInfo.getImageArr()[i]);
-                                }
-                            }
-                        }
-                        communityHeadAdapter.setNewData(articleImages);
-                    }
-
                     if (homeDataRet.getImagesList() != null && homeDataRet.getImagesList().size() > 0) {
+
                         if (isFirstLoad) {
                             headInfoAdapter.setNewData(homeDataRet.getImagesList());
                             isFirstLoad = false;

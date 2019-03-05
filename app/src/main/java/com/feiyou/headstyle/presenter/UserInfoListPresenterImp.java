@@ -37,4 +37,9 @@ public class UserInfoListPresenterImp extends BasePresenterImp<UserInfoListView,
     public void searchFriendsList(int page, String keyWord) {
         userInfoListModelImp.searchFriendsList(page, keyWord, this);
     }
+
+    @Override
+    public void getMyGuanFenList(int page, String userId, int type) {
+        userInfoListModelImp.getMyGuanFenList(page, userId, type, this);
+    }
 }

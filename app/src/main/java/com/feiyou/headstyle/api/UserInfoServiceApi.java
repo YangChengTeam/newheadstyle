@@ -35,4 +35,7 @@ public interface UserInfoServiceApi {
 
     @POST("v1.userinfo/friendAddSearchList")
     Observable<UserInfoListRet> searchFriendsList(@Body RequestBody requestBody);
+
+    @POST("v1.userinfo/userGuanFenList")
+    Observable<UserInfoListRet> getMyGuanFenList(@Body RequestBody requestBody);
 }
