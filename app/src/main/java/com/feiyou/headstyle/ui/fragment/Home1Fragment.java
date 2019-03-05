@@ -59,6 +59,12 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
 
     LinearLayout mSearchWrapperLayout;
 
+    @BindView(R.id.layout_top_refresh1)
+    LinearLayout refreshLayout1;
+
+    @BindView(R.id.layout_top_refresh1_wrapper)
+    RelativeLayout refreshLayout1Wrapper;
+
     @BindView(R.id.home_head_list)
     RecyclerView mHeadInfoListView;
 
@@ -135,6 +141,9 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
         searchParams.setMargins(0, BarUtils.getStatusBarHeight(), 0, 0);
         mSearchWrapperLayout.setLayoutParams(searchParams);
 
+        FrameLayout.LayoutParams refreshParams = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, SizeUtils.dp2px(48) + BarUtils.getStatusBarHeight());
+        refreshLayout1Wrapper.setLayoutParams(refreshParams);
+
         LinearLayout adLayout = topView.findViewById(R.id.layout_ad);
         adLayout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -165,22 +174,27 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
             }
         });
 
-//        scrollView.setOnScrollChangeListener(new NestedScrollView.OnScrollChangeListener() {
-//            @Override
-//            public void onScrollChange(NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
-//                int tempY = SizeUtils.px2dp(scrollY);
-//                if (tempY > 520) {
-//                    mSearchWrapperLayout.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.colorPrimary));
-//                } else {
-//                    mSearchWrapperLayout.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.transparent));
-//                }
-//
-//                //判断是否滑动到了底部
-//                if (scrollY + SizeUtils.dp2px(48) >= (v.getChildAt(0).getMeasuredHeight() - v.getMeasuredHeight())) {
-//                    ToastUtils.showLong("滑动到了底部");
-//                }
-//            }
-//        });
+        scrollView.setOnScrollChangeListener(new NestedScrollView.OnScrollChangeListener() {
+            @Override
+            public void onScrollChange(NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+                int tempY = SizeUtils.px2dp(scrollY);
+
+                if (tempY > 510 - 48) {
+                    refreshLayout1Wrapper.setVisibility(View.VISIBLE);
+                    refreshLayout2.setVisibility(View.INVISIBLE);
+                } else {
+                    refreshLayout1Wrapper.setVisibility(View.INVISIBLE);
+                    refreshLayout2.setVisibility(View.VISIBLE);
+                }
+
+                //判断是否滑动到了底部
+                if (scrollY + SizeUtils.dp2px(48) >= (v.getChildAt(0).getMeasuredHeight() - v.getMeasuredHeight())) {
+                    headInfoAdapter.loadMoreComplete();
+                    currentPage++;
+                    homeDataPresenterImp.getData(currentPage + "", "", "", 0);
+                }
+            }
+        });
 
         headInfoAdapter = new HeadInfoAdapter(getActivity(), null);
         mHeadInfoListView.setLayoutManager(new GridLayoutManager(getActivity(), 3));
@@ -211,39 +225,7 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
 //            }
 //        }, mHeadInfoListView);
 
-        mHeadInfoListView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-                super.onScrollStateChanged(recyclerView, newState);
-            }
-
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-
-                Logger.i("top--->" + refreshLayout2.getTop() + "scroll--->" + dy);
-
-            }
-        });
-
         homeDataPresenterImp.getData("", "", "", 0);
-    }
-
-    public int getScrollYDistance() {
-        GridLayoutManager gridLayoutManager = (GridLayoutManager) mHeadInfoListView.getLayoutManager();
-        //得出spanCount几列或几排
-        int itemSpanCount = gridLayoutManager.getSpanCount();
-        //得出的position是一排或一列总和
-        int position = gridLayoutManager.findFirstVisibleItemPosition();
-        //需要算出才是即将移出屏幕Item的position
-        int itemPosition = position / itemSpanCount;
-        //因为是相同的Item所以取那个都一样
-        View firstVisiableChildView = gridLayoutManager.findViewByPosition(position);
-        int itemHeight = firstVisiableChildView.getHeight();
-        int itemTop = firstVisiableChildView.getTop();
-        int iposition = itemPosition * itemHeight;
-        int iResult = iposition - itemTop;
-        return iResult;
     }
 
     public void initBanner() {
