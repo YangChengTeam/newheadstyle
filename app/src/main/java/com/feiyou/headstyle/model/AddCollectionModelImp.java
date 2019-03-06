@@ -4,12 +4,10 @@ import android.content.Context;
 
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
-import com.feiyou.headstyle.api.HomeDataServiceApi;
-import com.feiyou.headstyle.api.LetterDataServiceApi;
+import com.feiyou.headstyle.api.CollectionDataServiceApi;
 import com.feiyou.headstyle.base.BaseModel;
 import com.feiyou.headstyle.base.IBaseRequestCallBack;
-import com.feiyou.headstyle.bean.HomeDataRet;
-import com.feiyou.headstyle.bean.LetterInfoRet;
+import com.feiyou.headstyle.bean.AddCollectionRet;
 
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
@@ -22,38 +20,34 @@ import rx.subscriptions.CompositeSubscription;
  * Created by iflying on 2018/1/9.
  */
 
-public class HomeDataModelImp extends BaseModel implements HomeDataModel<HomeDataRet> {
+public class AddCollectionModelImp extends BaseModel implements AddCollectionModel<AddCollectionRet> {
 
     private Context context = null;
-    private HomeDataServiceApi homeDataServiceApi;
+    private CollectionDataServiceApi collectionDataServiceApi;
     private CompositeSubscription mCompositeSubscription;
 
-    public HomeDataModelImp(Context mContext) {
+    public AddCollectionModelImp(Context mContext) {
         super();
         context = mContext;
-        homeDataServiceApi = mRetrofit.create(HomeDataServiceApi.class);
+        collectionDataServiceApi = mRetrofit.create(CollectionDataServiceApi.class);
         mCompositeSubscription = new CompositeSubscription();
     }
 
     @Override
-    public void getData(String uid, String page, String pageSize, String change, int isDetail, final IBaseRequestCallBack<HomeDataRet> iBaseRequestCallBack) {
-
+    public void addCollection(String uid, String imgId, IBaseRequestCallBack<AddCollectionRet> iBaseRequestCallBack) {
         JSONObject params = new JSONObject();
         try {
             params.put("user_id", uid);
-            params.put("page", page);
-            params.put("pageSize", pageSize);
-            params.put("change", change);
-            params.put("is_detail", isDetail + "");
+            params.put("image_id", imgId);
         } catch (JSONException e) {
             e.printStackTrace();
         }
         RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), params.toString());
 
-        mCompositeSubscription.add(homeDataServiceApi.getData(requestBody)  //将subscribe添加到subscription，用于注销subscribe
+        mCompositeSubscription.add(collectionDataServiceApi.addCollection(requestBody)  //将subscribe添加到subscription，用于注销subscribe
                 .observeOn(AndroidSchedulers.mainThread())//指定事件消费线程
                 .subscribeOn(Schedulers.io())  //指定 subscribe() 发生在 IO 线程
-                .subscribe(new Subscriber<HomeDataRet>() {
+                .subscribe(new Subscriber<AddCollectionRet>() {
 
                     @Override
                     public void onStart() {
@@ -75,10 +69,11 @@ public class HomeDataModelImp extends BaseModel implements HomeDataModel<HomeDat
                     }
 
                     @Override
-                    public void onNext(HomeDataRet homeDataRet) {
+                    public void onNext(AddCollectionRet addCollectionRet) {
                         //回调接口：请求成功，获取实体类对象
-                        iBaseRequestCallBack.requestSuccess(homeDataRet);
+                        iBaseRequestCallBack.requestSuccess(addCollectionRet);
                     }
                 }));
     }
+
 }

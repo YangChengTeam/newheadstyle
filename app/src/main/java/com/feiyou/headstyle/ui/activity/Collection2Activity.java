@@ -14,6 +14,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.alibaba.fastjson.JSON;
 import com.blankj.utilcode.util.SizeUtils;
 import com.blankj.utilcode.util.StringUtils;
 import com.bumptech.glide.Glide;
@@ -28,6 +29,7 @@ import com.feiyou.headstyle.ui.adapter.HeadInfoAdapter;
 import com.feiyou.headstyle.ui.adapter.QDRecyclerViewAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragmentActivity;
 import com.feiyou.headstyle.view.CollectDataView;
+import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 import com.qmuiteam.qmui.widget.QMUICollapsingTopBarLayout;
 import com.qmuiteam.qmui.widget.QMUITopBar;
@@ -68,6 +70,8 @@ public class Collection2Activity extends BaseFragmentActivity implements Collect
 
     private String titleName;
 
+    private ArrayList<HeadInfo> collectionList;
+
     @Override
     protected int getContextViewId() {
         return R.layout.activity_collection2;
@@ -91,11 +95,17 @@ public class Collection2Activity extends BaseFragmentActivity implements Collect
         mCollectionListView.setLayoutManager(new GridLayoutManager(this, 3));
         mCollectionListView.setAdapter(headInfoAdapter);
 
+        View topView = new TextView(this);
+        topView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, SizeUtils.dp2px(12)));
+        headInfoAdapter.setHeaderView(topView);
+
         headInfoAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
-                Intent intent = new Intent(Collection2Activity.this, HeadEditActivity.class);
-                intent.putExtra("image_url", headInfoAdapter.getData().get(position).getImgurl());
+                Intent intent = new Intent(Collection2Activity.this, HeadShowActivity.class);
+                intent.putExtra("from_type",2);
+                intent.putExtra("jump_position", position);
+                intent.putExtra("collection_list", JSON.toJSONString(collectionList));
                 startActivity(intent);
             }
         });
@@ -140,7 +150,8 @@ public class Collection2Activity extends BaseFragmentActivity implements Collect
         if (tData != null && tData.getCode() == Constants.SUCCESS) {
             if (tData instanceof CollectInfoRet) {
                 if (((CollectInfoRet) tData).getData().getList() != null && ((CollectInfoRet) tData).getData().getList().size() > 0) {
-                    headInfoAdapter.setNewData(((CollectInfoRet) tData).getData().getList());
+                    collectionList = ((CollectInfoRet) tData).getData().getList();
+                    headInfoAdapter.setNewData(collectionList);
                 }
 
                 if (((CollectInfoRet) tData).getData().getInfo() != null) {

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:swipe="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/my_info_bg_color"
@@ -23,18 +23,16 @@
         android:layout_below="@+id/topbar"
         android:gravity="center|bottom">
 
-        <Button
-            android:id="@+id/btn_square"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="方形" />
-
-        <Button
-            android:id="@+id/btn_circle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="20dp"
-            android:text="圆形" />
+        <lib.kingja.switchbutton.SwitchMultiButton
+            android:id="@+id/switch_type_btn"
+            android:layout_width="150dp"
+            android:layout_height="40dp"
+            app:selectedColor="@color/tab_select_color"
+            app:selectedTab="0"
+            app:strokeRadius="20dp"
+            app:strokeWidth="1dp"
+            app:switchTabs="@array/switch_tabs"
+            app:textSize="14sp" />
     </LinearLayout>
 
     <LinearLayout
@@ -125,6 +123,7 @@
                 android:gravity="center">
 
                 <TextView
+                    android:id="@+id/tv_keep"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:drawableTop="@mipmap/add_keep"

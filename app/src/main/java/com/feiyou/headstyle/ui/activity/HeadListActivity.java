@@ -14,6 +14,7 @@ import com.blankj.utilcode.util.SizeUtils;
 import com.blankj.utilcode.util.StringUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.chad.library.adapter.base.BaseQuickAdapter;
+import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.bean.HeadInfoRet;
 import com.feiyou.headstyle.bean.ResultInfo;
@@ -122,6 +123,7 @@ public class HeadListActivity extends BaseFragmentActivity implements HeadListDa
                 Logger.i("jumpPage page--->" + jumpPage + "---jumpPosition--->" + jumpPosition);
 
                 Intent intent = new Intent(HeadListActivity.this, HeadShowActivity.class);
+                intent.putExtra("from_type",1);
                 intent.putExtra("tag_id", tagId);
                 intent.putExtra("jump_page", jumpPage + 1);
                 intent.putExtra("jump_position", jumpPosition);
@@ -133,12 +135,12 @@ public class HeadListActivity extends BaseFragmentActivity implements HeadListDa
             @Override
             public void onLoadMoreRequested() {
                 currentPage++;
-                headListDataPresenterImp.getDataByTagId(tagId, currentPage, pageSize);
+                headListDataPresenterImp.getDataByTagId(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", tagId, currentPage, pageSize);
             }
         }, mHeadInfoListView);
 
         avi.show();
-        headListDataPresenterImp.getDataByTagId(tagId, currentPage, pageSize);
+        headListDataPresenterImp.getDataByTagId(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", tagId, currentPage, pageSize);
     }
 
     @Override

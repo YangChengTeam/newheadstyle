@@ -9,19 +9,27 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.blankj.utilcode.util.StringUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
+import com.feiyou.headstyle.bean.FollowInfoRet;
 import com.feiyou.headstyle.bean.NoteTypeRet;
+import com.feiyou.headstyle.bean.NoteTypeWrapper;
+import com.feiyou.headstyle.bean.ResultInfo;
 import com.feiyou.headstyle.common.Constants;
+import com.feiyou.headstyle.presenter.FollowInfoPresenterImp;
 import com.feiyou.headstyle.presenter.NoteTypePresenterImp;
 import com.feiyou.headstyle.ui.adapter.DetailFragmentAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragmentActivity;
 import com.feiyou.headstyle.ui.custom.JudgeNestedScrollView;
+import com.feiyou.headstyle.ui.custom.LoginDialog;
 import com.feiyou.headstyle.ui.fragment.sub.FollowFragment;
 import com.feiyou.headstyle.ui.fragment.sub.NewFragment;
 import com.feiyou.headstyle.ui.fragment.sub.RecommendFragment;
@@ -85,6 +93,9 @@ public class CommunityTypeActivity extends BaseFragmentActivity implements NoteT
     @BindView(R.id.tv_top2_note_name)
     TextView mTop2NoteNameTv;
 
+    @BindView(R.id.layout_is_follow)
+    FrameLayout mFollowLayout;
+
     int toolBarPositionY = 0;
 
     List<String> mTitleDataList;
@@ -96,6 +107,10 @@ public class CommunityTypeActivity extends BaseFragmentActivity implements NoteT
     private int currentPage = 1;
 
     private int pageSize = 30;
+
+    FollowInfoPresenterImp followInfoPresenterImp;
+
+    LoginDialog loginDialog;
 
     @Override
     protected int getContextViewId() {
@@ -129,11 +144,13 @@ public class CommunityTypeActivity extends BaseFragmentActivity implements NoteT
             }
         });
 
+        loginDialog = new LoginDialog(this, R.style.login_dialog);
+
         mTitleDataList = new ArrayList<>();
         mTitleDataList.add("最新");
         mTitleDataList.add("热门");
 
-        Fragment[] fragments = new Fragment[]{NewFragment.newInstance(topicId), WonderfulFragment.newInstance(topicId)};
+        Fragment[] fragments = new Fragment[]{NewFragment.newInstance(topicId, 1), NewFragment.newInstance(topicId, 2)};
 
         DetailFragmentAdapter viewPageAdapter = new DetailFragmentAdapter(getSupportFragmentManager(), fragments, mTitleDataList);
         viewPager.setAdapter(viewPageAdapter);
@@ -141,8 +158,9 @@ public class CommunityTypeActivity extends BaseFragmentActivity implements NoteT
         mTabLayout.setTabMode(TabLayout.MODE_SCROLLABLE);
         mTabLayout.setupWithViewPager(viewPager);
 
+        followInfoPresenterImp = new FollowInfoPresenterImp(this, this);
         noteTypePresenterImp = new NoteTypePresenterImp(this, this);
-        noteTypePresenterImp.getNoteTypeData(topicId, currentPage, 1, "");
+        noteTypePresenterImp.getNoteTypeData(topicId, currentPage, 1, App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "");
     }
 
     //设置折叠展开状态
@@ -162,6 +180,19 @@ public class CommunityTypeActivity extends BaseFragmentActivity implements NoteT
         }
     }
 
+    @OnClick(R.id.layout_is_follow)
+    void followTopic() {
+
+        if (!App.getApp().isLogin) {
+            if (loginDialog != null && !loginDialog.isShowing()) {
+                loginDialog.show();
+            }
+            return;
+        }
+
+        followInfoPresenterImp.followTopic(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", topicId);
+    }
+
     @Override
     public void showProgress() {
 
@@ -173,25 +204,55 @@ public class CommunityTypeActivity extends BaseFragmentActivity implements NoteT
     }
 
     @Override
-    public void loadDataSuccess(NoteTypeRet tData) {
+    public void loadDataSuccess(ResultInfo tData) {
         if (tData != null && tData.getCode() == Constants.SUCCESS) {
 
-            if (tData.getData() != null && tData.getData().getTopicArr() != null) {
-                RequestOptions options = new RequestOptions();
-                options.error(R.mipmap.community_type_top);
-                Glide.with(this).load(tData.getData().getTopicArr().getBackground()).into(mTopBarImageView);
-                mTopicNameTv.setText(tData.getData().getTopicArr().getName());
+            if (tData instanceof NoteTypeRet) {
+                NoteTypeWrapper noteTypeWrapper = ((NoteTypeRet) tData).getData();
+                if (noteTypeWrapper != null && noteTypeWrapper.getTopicArr() != null) {
+                    RequestOptions options = new RequestOptions();
+                    options.error(R.mipmap.community_type_top);
+                    Glide.with(this).load(noteTypeWrapper.getTopicArr().getBackground()).into(mTopBarImageView);
+                    mTopicNameTv.setText(noteTypeWrapper.getTopicArr().getName());
+                }
+
+                mFansCountTv.setText("关注：" + noteTypeWrapper.getGuanNum());
+                mNoteCountTv.setText("贴子：" + noteTypeWrapper.getMessageNum());
+
+                if (noteTypeWrapper != null && noteTypeWrapper.getNoticeList() != null) {
+                    if (noteTypeWrapper.getNoticeList().size() > 0) {
+                        mTop1NoteNameTv.setText(noteTypeWrapper.getNoticeList().get(0).getTitle());
+                    }
+                    if (noteTypeWrapper.getNoticeList().size() > 1) {
+                        mTop2NoteNameTv.setText(noteTypeWrapper.getNoticeList().get(1).getTitle());
+                    }
+                }
+
+                if (noteTypeWrapper.getIsGuan() == 0) {
+                    mFollowLayout.setVisibility(View.VISIBLE);
+                } else {
+                    mFollowLayout.setVisibility(View.GONE);
+                }
             }
 
-            mFansCountTv.setText(tData.getData().getMessageNum());
-            mNoteCountTv.setText(tData.getData().getMessageNum());
-            if (tData.getData() != null && tData.getData().getNoticeList() != null) {
-                if (tData.getData().getNoticeList().size() > 0) {
-                    mTop1NoteNameTv.setText(tData.getData().getNoticeList().get(0).getTitle());
+            if (tData instanceof FollowInfoRet) {
+                if (((FollowInfoRet) tData).getData() != null) {
+                    if (((FollowInfoRet) tData).getData().getIsGuan() == 0) {
+                        mFollowLayout.setVisibility(View.VISIBLE);
+                    } else {
+                        mFollowLayout.setVisibility(View.GONE);
+                    }
+                } else {
+                    ToastUtils.showLong(StringUtils.isEmpty(tData.getMsg()) ? "操作错误" : tData.getMsg());
                 }
-                if (tData.getData().getNoticeList().size() > 1) {
-                    mTop2NoteNameTv.setText(tData.getData().getNoticeList().get(1).getTitle());
-                }
+            }
+        } else {
+
+            mFollowLayout.setVisibility(View.VISIBLE);
+            if (tData instanceof FollowInfoRet) {
+                ToastUtils.showLong(StringUtils.isEmpty(tData.getMsg()) ? "操作错误" : tData.getMsg());
+            } else {
+                Logger.i("error--->" + tData.getMsg());
             }
         }
     }

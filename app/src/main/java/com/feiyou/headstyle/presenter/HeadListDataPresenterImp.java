@@ -26,8 +26,8 @@ public class HeadListDataPresenterImp extends BasePresenterImp<IBaseView, HeadIn
     }
 
     @Override
-    public void getDataByTagId(String tagId, int page, int pageSize) {
-        headListDataModelImp.getDataByTagId(tagId, page, pageSize, this);
+    public void getDataByTagId(String uid,String tagId, int page, int pageSize) {
+        headListDataModelImp.getDataByTagId(uid,tagId, page, pageSize, this);
     }
 
     @Override

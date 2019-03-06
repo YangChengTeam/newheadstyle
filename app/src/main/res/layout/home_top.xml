@@ -68,53 +68,44 @@
         android:id="@+id/layout_top_refresh2"
         android:layout_width="match_parent"
         android:layout_height="48dp"
-        android:background="@color/white"
+        android:background="@color/colorPrimary"
         android:gravity="center"
         android:orientation="vertical">
 
         <RelativeLayout
             android:id="@+id/float_layout"
-            android:layout_width="330dp"
-            android:layout_height="48dp">
-
-            <ImageView
-                android:id="@+id/iv_new"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_centerVertical="true"
-                android:src="@mipmap/iv_new" />
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="@color/white">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
                 android:layout_centerVertical="true"
-                android:layout_marginLeft="6dp"
+                android:padding="6dp"
                 android:layout_toRightOf="@+id/iv_new"
+                android:drawableLeft="@mipmap/iv_new"
+                android:drawablePadding="6dp"
+                android:gravity="center"
                 android:text="@string/new_head_txt"
                 android:textColor="@color/rec_color"
                 android:textFontWeight="800"
-                android:textSize="14sp" />
+                android:textSize="16sp" />
 
             <TextView
-                android:id="@+id/tv_refresh"
+                android:id="@+id/tv_refresh2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_marginLeft="6dp"
-                android:layout_marginRight="6dp"
-                android:layout_toLeftOf="@+id/iv_refresh"
-                android:text="@string/refresh_head_txt"
-                android:textColor="@color/into_community_color"
-                android:textSize="13sp" />
-
-            <ImageView
-                android:id="@+id/iv_refresh"
-                android:layout_width="18dp"
-                android:layout_height="18dp"
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
-                android:layout_marginRight="2dp"
-                android:src="@mipmap/refresh_head" />
+                android:padding="6dp"
+                android:layout_toLeftOf="@+id/iv_refresh"
+                android:drawableRight="@mipmap/refresh_head"
+                android:drawablePadding="6dp"
+                android:text="@string/refresh_head_txt"
+                android:textColor="@color/into_community_color"
+                android:textSize="16sp" />
         </RelativeLayout>
     </LinearLayout>
 

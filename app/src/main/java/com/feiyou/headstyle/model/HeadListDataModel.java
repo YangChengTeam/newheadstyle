@@ -7,7 +7,7 @@ import com.feiyou.headstyle.base.IBaseRequestCallBack;
  */
 
 public interface HeadListDataModel<T> {
-    void getDataByTagId(String tagId, int page, int pageSize, IBaseRequestCallBack<T> iBaseRequestCallBack);
+    void getDataByTagId(String uid,String tagId, int page, int pageSize, IBaseRequestCallBack<T> iBaseRequestCallBack);
 
     void getSearchList(int page, String keyword, String userId, IBaseRequestCallBack<T> iBaseRequestCallBack);
 }

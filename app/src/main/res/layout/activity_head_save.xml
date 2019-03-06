@@ -23,11 +23,11 @@
         android:orientation="vertical">
 
         <ImageView
+            android:id="@+id/iv_result"
             android:layout_width="243dp"
             android:layout_height="243dp"
             android:background="@drawable/head_pre_bg"
-            android:padding="5dp"
-            android:src="@mipmap/head_test" />
+            android:padding="5dp" />
 
         <LinearLayout
             android:layout_width="280dp"
@@ -35,6 +35,7 @@
             android:layout_marginTop="12dp">
 
             <LinearLayout
+                android:id="@+id/layout_home"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"

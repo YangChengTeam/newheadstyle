@@ -89,7 +89,7 @@
         android:layout_gravity="top|center"
         android:layout_marginLeft="12dp"
         android:layout_marginRight="12dp"
-        android:layout_marginBottom="24dp"
+        android:layout_marginBottom="12dp"
         android:scrollbars="none"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 </android.support.design.widget.CoordinatorLayout>

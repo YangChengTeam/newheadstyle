@@ -135,18 +135,19 @@ public class RecommendFragment extends BaseFragment implements NoteDataView {
             @Override
             public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
                 currentClickIndex = position;
-                if (App.getApp().isLogin) {
-                    if (view.getId() == R.id.layout_follow) {
-                        followInfoPresenterImp.addFollow(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", noteInfoAdapter.getData().get(position).getUserId());
-                    }
-                    if (view.getId() == R.id.layout_item_zan) {
-                        String messageId = noteInfoAdapter.getData().get(position).getId();
-                        addZanPresenterImp.addZan(1, App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", noteInfoAdapter.getData().get(position).getUserId(), messageId, "", "", 1);
-                    }
-                } else {
+                if (!App.getApp().isLogin) {
                     if (loginDialog != null && !loginDialog.isShowing()) {
                         loginDialog.show();
                     }
+                    return;
+                }
+
+                if (view.getId() == R.id.layout_follow) {
+                    followInfoPresenterImp.addFollow(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", noteInfoAdapter.getData().get(position).getUserId());
+                }
+                if (view.getId() == R.id.layout_item_zan) {
+                    String messageId = noteInfoAdapter.getData().get(position).getId();
+                    addZanPresenterImp.addZan(1, App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", noteInfoAdapter.getData().get(position).getUserId(), messageId, "", "", 1);
                 }
             }
         });
@@ -157,13 +158,11 @@ public class RecommendFragment extends BaseFragment implements NoteDataView {
             @Override
             public void onLoadMoreRequested() {
                 currentPage++;
-                noteDataPresenterImp.getNoteData(currentPage, 2, "");
+                noteDataPresenterImp.getNoteData(currentPage, 2, userInfo != null ? userInfo.getId() : "");
             }
         }, mRecommendListView);
 
-        loginDialog = new
-
-                LoginDialog(getActivity(), R.style.login_dialog);
+        loginDialog = new LoginDialog(getActivity(), R.style.login_dialog);
 
         noteDataPresenterImp = new NoteDataPresenterImp(this, getActivity());
         followInfoPresenterImp = new FollowInfoPresenterImp(this, getActivity());
@@ -184,8 +183,8 @@ public class RecommendFragment extends BaseFragment implements NoteDataView {
             loginDialog.dismiss();
         }
 
-        //noteDataPresenterImp.getNoteData(currentPage, 2, userInfo != null ? userInfo.getId() : "");
-        noteDataPresenterImp.getNoteData(currentPage, 2, "");
+        noteDataPresenterImp.getNoteData(currentPage, 2, userInfo != null ? userInfo.getId() : "");
+        //noteDataPresenterImp.getNoteData(currentPage, 2, "");
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -238,9 +237,13 @@ public class RecommendFragment extends BaseFragment implements NoteDataView {
             }
 
             if (tData instanceof FollowInfoRet) {
-                ToastUtils.showLong(((FollowInfoRet) tData).getData().getIsGuan() == 0 ? "已取消" : "已关注");
-                noteInfoAdapter.getData().get(currentClickIndex).setIsGuan(((FollowInfoRet) tData).getData().getIsGuan());
-                noteInfoAdapter.notifyDataSetChanged();
+                if (((FollowInfoRet) tData).getData() != null) {
+                    ToastUtils.showLong(((FollowInfoRet) tData).getData().getIsGuan() == 0 ? "已取消" : "已关注");
+                    noteInfoAdapter.getData().get(currentClickIndex).setIsGuan(((FollowInfoRet) tData).getData().getIsGuan());
+                    noteInfoAdapter.notifyDataSetChanged();
+                } else {
+                    ToastUtils.showLong(StringUtils.isEmpty(tData.getMsg()) ? "操作错误" : tData.getMsg());
+                }
             }
 
             if (tData instanceof ZanResultRet) {
@@ -258,7 +261,7 @@ public class RecommendFragment extends BaseFragment implements NoteDataView {
 
         } else {
             if (tData instanceof FollowInfoRet) {
-                Logger.i(StringUtils.isEmpty(tData.getMsg()) ? "操作错误" : tData.getMsg());
+                Logger.i("error--->" + tData.getMsg());
             }
         }
 

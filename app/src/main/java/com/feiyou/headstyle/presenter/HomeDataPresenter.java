@@ -5,5 +5,5 @@ package com.feiyou.headstyle.presenter;
  */
 
 public interface HomeDataPresenter {
-    void getData(String page,String pageSize,String change,int isDetail);
+    void getData(String uid, String page, String pageSize, String change, int isDetail);
 }

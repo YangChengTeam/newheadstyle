@@ -34,9 +34,10 @@ public class HeadListDataModelImp extends BaseModel implements HeadListDataModel
     }
 
     @Override
-    public void getDataByTagId(String tagId, int page, int pageSize, final IBaseRequestCallBack<HeadInfoRet> iBaseRequestCallBack) {
+    public void getDataByTagId(String uid,String tagId, int page, int pageSize, final IBaseRequestCallBack<HeadInfoRet> iBaseRequestCallBack) {
         JSONObject params = new JSONObject();
         try {
+            params.put("user_id", uid);
             params.put("tag_id", tagId);
             params.put("page", page + "");
             params.put("pagesize", pageSize + "");

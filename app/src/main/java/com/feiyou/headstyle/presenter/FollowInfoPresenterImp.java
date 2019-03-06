@@ -29,4 +29,9 @@ public class FollowInfoPresenterImp extends BasePresenterImp<IBaseView, FollowIn
     public void addFollow(String owenUserId, String userId) {
         followModelImp.addFollow(owenUserId, userId, this);
     }
+
+    @Override
+    public void followTopic(String userId, String topicId) {
+        followModelImp.followTopic(userId, topicId, this);
+    }
 }

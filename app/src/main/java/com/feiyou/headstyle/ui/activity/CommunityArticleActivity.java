@@ -47,6 +47,7 @@ import com.feiyou.headstyle.presenter.ReplyCommentPresenterImp;
 import com.feiyou.headstyle.ui.adapter.CommunityHeadAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragmentActivity;
 import com.feiyou.headstyle.ui.custom.GlideRoundTransform;
+import com.feiyou.headstyle.ui.custom.LoginDialog;
 import com.feiyou.headstyle.ui.fragment.sub.WonderfulFragment;
 import com.feiyou.headstyle.view.CommentDialog;
 import com.feiyou.headstyle.view.NoteInfoDetailDataView;
@@ -142,6 +143,8 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
 
     private boolean isFollow;
 
+    LoginDialog loginDialog;
+
     @Override
     protected int getContextViewId() {
         return R.layout.activity_article_detail;
@@ -193,6 +196,8 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
 
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("回复中");
+
+        loginDialog = new LoginDialog(this, R.style.login_dialog);
     }
 
     public void showDialog() {
@@ -203,16 +208,37 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
 
     @OnClick(R.id.layout_follow)
     void addFollow() {
+        if (!App.getApp().isLogin) {
+            if (loginDialog != null && !loginDialog.isShowing()) {
+                loginDialog.show();
+            }
+            return;
+        }
+
         followInfoPresenterImp.addFollow(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", currentNoteInfo != null ? currentNoteInfo.getUserId() : "");
     }
 
     @OnClick(R.id.layout_message_count)
     void addComment() {
+        if (!App.getApp().isLogin) {
+            if (loginDialog != null && !loginDialog.isShowing()) {
+                loginDialog.show();
+            }
+            return;
+        }
+
         showDialog();
     }
 
     @OnClick(R.id.layout_zan)
     void addZan() {
+        if (!App.getApp().isLogin) {
+            if (loginDialog != null && !loginDialog.isShowing()) {
+                loginDialog.show();
+            }
+            return;
+        }
+
         addZanPresenterImp.addZan(1, App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", currentNoteInfo.getUserId(), messageId, "", "", 1);
     }
 

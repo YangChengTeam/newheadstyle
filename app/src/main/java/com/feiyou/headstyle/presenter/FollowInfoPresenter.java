@@ -8,4 +8,6 @@ import java.util.List;
 
 public interface FollowInfoPresenter {
     void addFollow(String owenUserId, String userId);
+
+    void followTopic(String userId, String topicId);
 }

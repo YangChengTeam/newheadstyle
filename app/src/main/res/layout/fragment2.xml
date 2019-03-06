@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white">
@@ -35,69 +33,49 @@
     </android.support.v4.widget.NestedScrollView>
 
     <RelativeLayout
-        android:id="@+id/layout_top_refresh1_wrapper"
+        android:id="@+id/layout_top_refresh1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/white"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
         android:visibility="invisible">
 
-        <LinearLayout
-            android:id="@+id/layout_top_refresh1"
+        <RelativeLayout
+            android:id="@+id/float_layout"
             android:layout_width="match_parent"
             android:layout_height="48dp"
-            android:layout_marginLeft="12dp"
-            android:layout_marginRight="12dp"
             android:layout_alignParentBottom="true"
-            android:background="@color/white"
-            android:gravity="center"
-            android:orientation="vertical">
+            android:background="@color/white">
 
-            <RelativeLayout
-                android:id="@+id/float_layout"
-                android:layout_width="match_parent"
-                android:layout_height="48dp">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:padding="6dp"
+                android:layout_toRightOf="@+id/iv_new"
+                android:drawableLeft="@mipmap/iv_new"
+                android:drawablePadding="6dp"
+                android:gravity="center"
+                android:text="@string/new_head_txt"
+                android:textColor="@color/rec_color"
+                android:textFontWeight="800"
+                android:textSize="16sp" />
 
-                <ImageView
-                    android:id="@+id/iv_new"
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:layout_centerVertical="true"
-                    android:src="@mipmap/iv_new" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_marginLeft="6dp"
-                    android:layout_toRightOf="@+id/iv_new"
-                    android:text="@string/new_head_txt"
-                    android:textColor="@color/rec_color"
-                    android:textFontWeight="800"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:id="@+id/tv_refresh"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_marginLeft="6dp"
-                    android:layout_marginRight="6dp"
-                    android:layout_toLeftOf="@+id/iv_refresh"
-                    android:text="@string/refresh_head_txt"
-                    android:textColor="@color/into_community_color"
-                    android:textSize="13sp" />
-
-                <ImageView
-                    android:id="@+id/iv_refresh"
-                    android:layout_width="18dp"
-                    android:layout_height="18dp"
-                    android:layout_alignParentRight="true"
-                    android:layout_centerVertical="true"
-                    android:layout_marginRight="2dp"
-                    android:src="@mipmap/refresh_head" />
-            </RelativeLayout>
-        </LinearLayout>
+            <TextView
+                android:id="@+id/tv_refresh1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:padding="6dp"
+                android:layout_toLeftOf="@+id/iv_refresh"
+                android:drawableRight="@mipmap/refresh_head"
+                android:drawablePadding="6dp"
+                android:text="@string/refresh_head_txt"
+                android:textColor="@color/into_community_color"
+                android:textSize="16sp" />
+        </RelativeLayout>
     </RelativeLayout>
-
-
 </FrameLayout>

@@ -1,5 +1,6 @@
 package com.feiyou.headstyle.ui.activity;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -207,6 +208,7 @@ public class HeadEditActivity extends BaseFragmentActivity implements StickerDat
     }
 
     public void initData() {
+
         EffectUtil.clear();
         stickerPresenterImp = new StickerPresenterImp(this, this);
         Intent intent = getIntent();
@@ -484,7 +486,6 @@ public class HeadEditActivity extends BaseFragmentActivity implements StickerDat
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-
         }
 
         @Override
@@ -529,6 +530,7 @@ public class HeadEditActivity extends BaseFragmentActivity implements StickerDat
                 //ToastUtils.showLong("保存成功!");
 
                 Intent intent = new Intent(this, HeadSaveActivity.class);
+                intent.putExtra("file_path",filePath);
                 startActivity(intent);
             } else {
                 flag = false;

@@ -1,8 +1,12 @@
 package com.feiyou.headstyle.ui.adapter;
 
 import android.content.Context;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 
+import com.blankj.utilcode.util.ScreenUtils;
+import com.blankj.utilcode.util.SizeUtils;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.chad.library.adapter.base.BaseQuickAdapter;
@@ -27,7 +31,17 @@ public class AddNoteImageAdapter extends BaseQuickAdapter<Object, BaseViewHolder
 
     @Override
     protected void convert(final BaseViewHolder helper, final Object url) {
-        Glide.with(mContext).load(url).into((ImageView) helper.itemView.findViewById(R.id.iv_photo));
+        int tempWidth = (ScreenUtils.getScreenWidth() - SizeUtils.dp2px(24)) / 3;
+        FrameLayout itemLayout = helper.itemView.findViewById(R.id.layout_item);
+        FrameLayout.LayoutParams itemParams = new FrameLayout.LayoutParams(tempWidth, tempWidth);
+        itemLayout.setLayoutParams(itemParams);
+
+        RequestOptions options = new RequestOptions();
+        options.placeholder(R.mipmap.image_def).error(R.mipmap.image_def);
+        options.override(tempWidth - 8, tempWidth - 8);
+
+        Glide.with(mContext).load(url).apply(options).into((ImageView) helper.itemView.findViewById(R.id.iv_photo));
+
         helper.addOnClickListener(R.id.iv_close);
         if (url instanceof Integer) {
             if (Integer.parseInt(url.toString()) == R.mipmap.add_my_photo) {

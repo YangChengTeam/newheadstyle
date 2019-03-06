@@ -18,6 +18,7 @@ import com.blankj.utilcode.util.SizeUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.bumptech.glide.Glide;
 import com.chad.library.adapter.base.BaseQuickAdapter;
+import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.bean.ArticleInfo;
 import com.feiyou.headstyle.bean.BannerInfo;
@@ -46,6 +47,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 /**
  * Created by myflying on 2019/1/3.
@@ -60,10 +62,7 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
     LinearLayout mSearchWrapperLayout;
 
     @BindView(R.id.layout_top_refresh1)
-    LinearLayout refreshLayout1;
-
-    @BindView(R.id.layout_top_refresh1_wrapper)
-    RelativeLayout refreshLayout1Wrapper;
+    RelativeLayout refreshLayout1;
 
     @BindView(R.id.home_head_list)
     RecyclerView mHeadInfoListView;
@@ -106,9 +105,9 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
 
     private View topView;
 
-    private ArrayList<String> articleImages;
+    private View footView;
 
-    ArticleInfo articleInfo;
+    private ImageView mLoadingView;
 
     @Override
     protected View onCreateView() {
@@ -122,35 +121,37 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
 
     public void initTopView() {
         topView = LayoutInflater.from(getActivity()).inflate(R.layout.home_top, null);
+        footView = LayoutInflater.from(getActivity()).inflate(R.layout.list_bottom, null);
+
         mBanner = topView.findViewById(R.id.banner);
         mHeadTypeList = topView.findViewById(R.id.head_type_list);
         mCommunityHeadList = topView.findViewById(R.id.community_head_list);
-        //refreshLayout1 = topView.findViewById(R.id.layout_top_refresh1);
         refreshLayout2 = topView.findViewById(R.id.layout_top_refresh2);
         floatLayout = topView.findViewById(R.id.float_layout);
         mLineView = topView.findViewById(R.id.main_line_view);
         mAdImageView = topView.findViewById(R.id.iv_home_ad);
         mAdLayout = topView.findViewById(R.id.layout_ad);
+        TextView tvRefresh2 = topView.findViewById(R.id.tv_refresh2);
 
         mSearchWrapperLayout = topView.findViewById(R.id.layout_search_wrapper);
         mSearchLayout = topView.findViewById(R.id.layout_search);
 
         mSearchLayout.setOnClickListener(this);
-
+        tvRefresh2.setOnClickListener(this);
         LinearLayout.LayoutParams searchParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, SizeUtils.dp2px(48));
         searchParams.setMargins(0, BarUtils.getStatusBarHeight(), 0, 0);
         mSearchWrapperLayout.setLayoutParams(searchParams);
 
         FrameLayout.LayoutParams refreshParams = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, SizeUtils.dp2px(48) + BarUtils.getStatusBarHeight());
-        refreshLayout1Wrapper.setLayoutParams(refreshParams);
+        refreshParams.setMargins(SizeUtils.dp2px(12), 0, SizeUtils.dp2px(12), 0);
+        refreshLayout1.setLayoutParams(refreshParams);
 
+        //广告模块
         LinearLayout adLayout = topView.findViewById(R.id.layout_ad);
-        adLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
 
-            }
-        });
+        //加载更多动画
+        mLoadingView = footView.findViewById(R.id.iv_loading);
+        Glide.with(getActivity()).load(R.drawable.list_loading).into(mLoadingView);
     }
 
     public void initData() {
@@ -177,30 +178,35 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
         scrollView.setOnScrollChangeListener(new NestedScrollView.OnScrollChangeListener() {
             @Override
             public void onScrollChange(NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
-                int tempY = SizeUtils.px2dp(scrollY);
+                int tempY = SizeUtils.px2dp(scrollY + BarUtils.getStatusBarHeight());
 
                 if (tempY > 510 - 48) {
-                    refreshLayout1Wrapper.setVisibility(View.VISIBLE);
+                    refreshLayout1.setVisibility(View.VISIBLE);
                     refreshLayout2.setVisibility(View.INVISIBLE);
                 } else {
-                    refreshLayout1Wrapper.setVisibility(View.INVISIBLE);
+                    refreshLayout1.setVisibility(View.INVISIBLE);
                     refreshLayout2.setVisibility(View.VISIBLE);
                 }
 
                 //判断是否滑动到了底部
                 if (scrollY + SizeUtils.dp2px(48) >= (v.getChildAt(0).getMeasuredHeight() - v.getMeasuredHeight())) {
-                    headInfoAdapter.loadMoreComplete();
+                    headInfoAdapter.setFooterView(footView);
+
                     currentPage++;
-                    homeDataPresenterImp.getData(currentPage + "", "", "", 0);
+                    homeDataPresenterImp.getData(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", currentPage + "", "", "", 0);
                 }
             }
         });
 
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity(), 3);
+        gridLayoutManager.setSmoothScrollbarEnabled(true);
+        gridLayoutManager.setAutoMeasureEnabled(true);
         headInfoAdapter = new HeadInfoAdapter(getActivity(), null);
-        mHeadInfoListView.setLayoutManager(new GridLayoutManager(getActivity(), 3));
+        mHeadInfoListView.setLayoutManager(gridLayoutManager);
         headInfoAdapter.addHeaderView(topView);
         mHeadInfoListView.setAdapter(headInfoAdapter);
         mHeadInfoListView.setNestedScrollingEnabled(false);
+        mHeadInfoListView.setHasFixedSize(true);
 
         headInfoAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
             @Override
@@ -211,21 +217,14 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
                 Logger.i("jumpPage page--->" + jumpPage + "---jumpPosition--->" + jumpPosition);
 
                 Intent intent = new Intent(getActivity(), HeadShowActivity.class);
+                intent.putExtra("from_type", 1);
                 intent.putExtra("jump_page", jumpPage);
                 intent.putExtra("jump_position", jumpPosition);
                 startActivity(intent);
             }
         });
 
-//        headInfoAdapter.setOnLoadMoreListener(new BaseQuickAdapter.RequestLoadMoreListener() {
-//            @Override
-//            public void onLoadMoreRequested() {
-//                currentPage++;
-//                homeDataPresenterImp.getData(currentPage + "", "", "", 0);
-//            }
-//        }, mHeadInfoListView);
-
-        homeDataPresenterImp.getData("", "", "", 0);
+        homeDataPresenterImp.getData(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", "", "", "", 0);
     }
 
     public void initBanner() {
@@ -237,6 +236,13 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
                 startActivity(intent);
             }
         });
+    }
+
+    @OnClick(R.id.tv_refresh1)
+    void refresh() {
+        isFirstLoad = true;
+        homeDataPresenterImp.getData(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", "", "", "1", 0);
+        scrollView.smoothScrollTo(0, SizeUtils.dp2px(510 - 48));
     }
 
     @Override
@@ -270,34 +276,34 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
                 homeDataRet = ((HomeDataRet) tData).getData();
                 if (homeDataRet != null) {
                     currentPage = homeDataRet.getPage();
-                    if (randomPage == -1) {
+                    if (isFirstLoad) {
                         randomPage = currentPage;
+
+                        //此处的信息，只需要设置一次
+                        if (homeDataRet.getBannerList() != null && homeDataRet.getBannerList().size() > 0) {
+                            bannerInfos = homeDataRet.getBannerList();
+                            List<String> urls = new ArrayList<>();
+                            for (int i = 0; i < bannerInfos.size(); i++) {
+                                urls.add(bannerInfos.get(i).getIco());
+                            }
+                            //设置图片加载器
+                            mBanner.setImageLoader(new GlideImageLoader()).setImages(urls).start();
+                        }
+
+                        if (homeDataRet.getCategoryInfoList() != null && homeDataRet.getCategoryInfoList().size() > 0) {
+                            headTypeAdapter.setNewData(homeDataRet.getCategoryInfoList());
+                        }
+
+                        if (homeDataRet.getAdList() != null && homeDataRet.getAdList().size() > 0) {
+                            Glide.with(getActivity()).load(homeDataRet.getAdList().get(0).getIco()).into(mAdImageView);
+                        } else {
+                            mAdLayout.setVisibility(View.GONE);
+                        }
                     }
 
                     Logger.i("random page--->" + randomPage);
 
-                    if (homeDataRet.getBannerList() != null && homeDataRet.getBannerList().size() > 0) {
-                        bannerInfos = homeDataRet.getBannerList();
-                        List<String> urls = new ArrayList<>();
-                        for (int i = 0; i < bannerInfos.size(); i++) {
-                            urls.add(bannerInfos.get(i).getIco());
-                        }
-                        //设置图片加载器
-                        mBanner.setImageLoader(new GlideImageLoader()).setImages(urls).start();
-                    }
-
-                    if (homeDataRet.getCategoryInfoList() != null && homeDataRet.getCategoryInfoList().size() > 0) {
-                        headTypeAdapter.setNewData(homeDataRet.getCategoryInfoList());
-                    }
-
-                    if (homeDataRet.getAdList() != null && homeDataRet.getAdList().size() > 0) {
-                        Glide.with(getActivity()).load(homeDataRet.getAdList().get(0).getIco()).into(mAdImageView);
-                    } else {
-                        mAdLayout.setVisibility(View.GONE);
-                    }
-
                     if (homeDataRet.getImagesList() != null && homeDataRet.getImagesList().size() > 0) {
-
                         if (isFirstLoad) {
                             headInfoAdapter.setNewData(homeDataRet.getImagesList());
                             isFirstLoad = false;
@@ -305,11 +311,8 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
                             headInfoAdapter.addData(homeDataRet.getImagesList());
                         }
 
-                        if (homeDataRet.getImagesList().size() < pageSize) {
-                            headInfoAdapter.loadMoreEnd();
-                        } else {
-                            headInfoAdapter.loadMoreComplete();
-                        }
+                        //移除底部加载进度
+                        headInfoAdapter.removeAllFooterView();
                     }
                 }
             }
@@ -323,6 +326,9 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
                 Intent intent = new Intent(getActivity(), SearchActivity.class);
                 startActivity(intent);
                 break;
+            case R.id.tv_refresh2:
+                refresh();
+                break;
             default:
                 break;
         }
@@ -333,8 +339,5 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
 
     }
 
-    void refresh() {
-        isFirstLoad = true;
-        homeDataPresenterImp.getData("", "", "1", 0);
-    }
+
 }

@@ -19,6 +19,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.blankj.utilcode.util.SizeUtils;
 import com.blankj.utilcode.util.StringUtils;
 import com.blankj.utilcode.util.ToastUtils;
+import com.bumptech.glide.Glide;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
@@ -36,6 +37,7 @@ import com.qmuiteam.qmui.widget.QMUITopBar;
 import com.zhihu.matisse.Matisse;
 import com.zhihu.matisse.MimeType;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -103,7 +105,9 @@ public class PushNoteActivity extends BaseFragmentActivity implements IBaseView 
 
     private String topicId;
 
-    private StringBuffer sendContent;
+    private String sendContent;
+
+    private String tempFilePath;
 
     @Override
     protected int getContextViewId() {
@@ -151,17 +155,37 @@ public class PushNoteActivity extends BaseFragmentActivity implements IBaseView 
                     }
                 }
 
-                String tempIds = setFriendIds(tempInputContent);
+                if (result.size() == 0) {
+                    ToastUtils.showLong("请选择图片");
+                    return;
+                }
 
+                if (topicSelectIndex == -1) {
+                    ToastUtils.showLong("请选择话题");
+                    return;
+                }
+
+                String tempIds = setFriendIds(tempInputContent);
                 if (progressDialog != null && !progressDialog.isShowing()) {
                     progressDialog.show();
                 }
 
+                //TODO,此方法有问题
+                Logger.i("sendContent--->" + sendContent);
                 addNotePresenterImp.addNote(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", tempInputContent, "1", tempIds, result);
             }
         });
 
+        Bundle bundle = getIntent().getExtras();
+        if (bundle != null && !StringUtils.isEmpty(bundle.getString("file_path"))) {
+            tempFilePath = bundle.getString("file_path");
+        }
+
         List<Object> list = new ArrayList<>();
+        if (!StringUtils.isEmpty(tempFilePath)) {
+            list.add(tempFilePath);
+            maxTotal = maxTotal - 1;
+        }
         list.add(R.mipmap.add_my_photo);
 
         addNoteImageAdapter = new AddNoteImageAdapter(this, list);
@@ -198,9 +222,10 @@ public class PushNoteActivity extends BaseFragmentActivity implements IBaseView 
     }
 
     public void initData() {
+
+
         friendsMap = new HashMap<>();
         ids = new StringBuffer("");
-        sendContent = new StringBuffer("");
 
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("正在发布");
@@ -209,19 +234,29 @@ public class PushNoteActivity extends BaseFragmentActivity implements IBaseView 
     }
 
     public String setFriendIds(String input) {
-        Iterator iterator = friendsMap.entrySet().iterator();
-        while (iterator.hasNext()) {
-            Map.Entry entry = (Map.Entry) iterator.next();
-            Object key = entry.getKey();
-            Object val = entry.getValue();
+        sendContent = input;
+        String tempStr;
+        if (friendsMap.size() > 0) {
+            Iterator iterator = friendsMap.entrySet().iterator();
+            while (iterator.hasNext()) {
+                Map.Entry entry = (Map.Entry) iterator.next();
+                Object key = entry.getKey();
+                Object val = entry.getValue();
 
-            if (input.indexOf(val.toString()) > -1) {
-                ids.append(key).append(",");
+                if (input.indexOf(val.toString()) > -1) {
+                    ids.append(key).append(",");
+
+                    //实际传递到后台的内容值
+                    sendContent = sendContent.replace(val.toString(), "*#" + val + "*#");
+                }
             }
+            tempStr = ids.substring(0, ids.length() - 1);
+        } else {
+            tempStr = "";
         }
 
-        Logger.i("result ids --->" + ids.substring(0, ids.length() - 1));
-        return ids.substring(0, ids.length() - 1);
+        Logger.i("result ids --->" + tempStr);
+        return tempStr;
     }
 
     @OnClick(R.id.layout_topic)

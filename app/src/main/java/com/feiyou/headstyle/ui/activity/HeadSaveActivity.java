@@ -11,11 +11,15 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.blankj.utilcode.util.SizeUtils;
+import com.blankj.utilcode.util.StringUtils;
 import com.blankj.utilcode.util.ToastUtils;
+import com.bumptech.glide.Glide;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.ui.base.BaseFragmentActivity;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 import com.qmuiteam.qmui.widget.QMUITopBar;
+
+import java.io.File;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -37,6 +41,11 @@ public class HeadSaveActivity extends BaseFragmentActivity {
     BottomSheetDialog bottomSheetDialog;
 
     ImageView mCloseImageView;
+
+    @BindView(R.id.iv_result)
+    ImageView mResultImageView;
+
+    private String tempFilePath;
 
     @Override
     protected int getContextViewId() {
@@ -68,10 +77,17 @@ public class HeadSaveActivity extends BaseFragmentActivity {
                 popBackStack();
             }
         });
+
     }
 
     public void initData() {
         ToastUtils.showLong("已保存到图库");
+
+        Bundle bundle = getIntent().getExtras();
+        if (bundle != null && !StringUtils.isEmpty(bundle.getString("file_path"))) {
+            tempFilePath = bundle.getString("file_path");
+            Glide.with(this).load(new File(tempFilePath)).into(mResultImageView);
+        }
 
         bottomSheetDialog = new BottomSheetDialog(this);
         View shareView = LayoutInflater.from(this).inflate(R.layout.share_dialog_view, null);
@@ -89,10 +105,16 @@ public class HeadSaveActivity extends BaseFragmentActivity {
 
         bottomSheetDialog.show();
     }
+    @OnClick(R.id.layout_home)
+    void home() {
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
+    }
 
     @OnClick(R.id.layout_add_note)
     void addNote() {
         Intent intent = new Intent(this, PushNoteActivity.class);
+        intent.putExtra("file_path", tempFilePath);
         startActivity(intent);
     }
 

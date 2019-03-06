@@ -1,6 +1,7 @@
 package com.feiyou.headstyle.api;
 
 import com.feiyou.headstyle.bean.CollectInfoRet;
+import com.feiyou.headstyle.bean.FollowInfoRet;
 import com.feiyou.headstyle.bean.TopicInfoRet;
 
 import okhttp3.RequestBody;
@@ -16,4 +17,8 @@ public interface TopicDataServiceApi {
 
     @POST("v1.show/topicList")
     Observable<TopicInfoRet> getTopicDataList(@Body RequestBody requestBody);
+
+    //关注话题
+    @POST("v1.message/userTopicGuan")
+    Observable<FollowInfoRet> topicFollow(@Body RequestBody requestBody);
 }

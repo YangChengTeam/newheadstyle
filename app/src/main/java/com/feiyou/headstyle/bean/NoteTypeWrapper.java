@@ -9,7 +9,7 @@ import java.util.List;
  */
 public class NoteTypeWrapper {
     @SerializedName("guan_num")
-    private int guanNum;
+    private String guanNum;
 
     @SerializedName("is_guan")
     private int isGuan;
@@ -48,14 +48,6 @@ public class NoteTypeWrapper {
         }
     }
 
-    public int getGuanNum() {
-        return guanNum;
-    }
-
-    public void setGuanNum(int guanNum) {
-        this.guanNum = guanNum;
-    }
-
     public int getIsGuan() {
         return isGuan;
     }
@@ -70,6 +62,14 @@ public class NoteTypeWrapper {
 
     public void setList(List<NoteInfo> list) {
         this.list = list;
+    }
+
+    public String getGuanNum() {
+        return guanNum;
+    }
+
+    public void setGuanNum(String guanNum) {
+        this.guanNum = guanNum;
     }
 
     public String getMessageNum() {

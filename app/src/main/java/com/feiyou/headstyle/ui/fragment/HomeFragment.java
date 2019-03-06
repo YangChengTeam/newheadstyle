@@ -12,6 +12,7 @@ import android.widget.RelativeLayout;
 
 import com.bumptech.glide.Glide;
 import com.chad.library.adapter.base.BaseQuickAdapter;
+import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.bean.BannerInfo;
 import com.feiyou.headstyle.bean.HeadInfo;
@@ -157,13 +158,13 @@ public class HomeFragment extends BaseFragment implements MyScrollView.OnScrollL
         mHeadInfoList.setNestedScrollingEnabled(false);
         myScrollView.setOnScrollListener(this);
 
-        homeDataPresenterImp.getData("", "", "", 0);
+        homeDataPresenterImp.getData(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "","", "", "", 0);
 
         headInfoAdapter.setOnLoadMoreListener(new BaseQuickAdapter.RequestLoadMoreListener() {
             @Override
             public void onLoadMoreRequested() {
                 currentPage++;
-                homeDataPresenterImp.getData(currentPage + "", "", "", 0);
+                homeDataPresenterImp.getData(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "",currentPage + "", "", "", 0);
             }
         }, mHeadInfoList);
 
@@ -280,6 +281,6 @@ public class HomeFragment extends BaseFragment implements MyScrollView.OnScrollL
     @OnClick({R.id.tv_refresh, R.id.iv_refresh})
     void refresh() {
         isFirstLoad = true;
-        homeDataPresenterImp.getData("", "", "1", 0);
+        homeDataPresenterImp.getData(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "","", "", "1", 0);
     }
 }

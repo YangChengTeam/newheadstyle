@@ -105,4 +105,5 @@ dependencies {
     implementation project(':Gpu-Image')
     implementation 'com.github.ome450901:SimpleRatingBar:1.4.2'
     implementation 'cn.yc:YCStatusBarLib:1.4.0'
+    implementation 'lib.kingja.switchbutton:switchbutton:1.1.8'
 }

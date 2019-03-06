@@ -10,4 +10,6 @@ import java.util.List;
 
 public interface FollowModel<T> {
     void addFollow(String owenUserId, String userId,IBaseRequestCallBack<T> iBaseRequestCallBack);
+
+    void followTopic(String userId, String topicId,IBaseRequestCallBack<T> iBaseRequestCallBack);
 }

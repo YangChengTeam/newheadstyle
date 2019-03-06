@@ -43,6 +43,7 @@ import com.feiyou.headstyle.presenter.ReplyCommentPresenterImp;
 import com.feiyou.headstyle.ui.adapter.CommentAdapter;
 import com.feiyou.headstyle.ui.adapter.CommentReplyAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragment;
+import com.feiyou.headstyle.ui.custom.LoginDialog;
 import com.feiyou.headstyle.utils.StatusBarUtil;
 import com.feiyou.headstyle.view.CommentDialog;
 import com.feiyou.headstyle.view.NoteCommentDataView;
@@ -126,6 +127,8 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
     private int currentPage = 1;
 
     private int subCurrentPage = 1;
+
+    LoginDialog loginDialog;
 
     @Override
     protected View onCreateView() {
@@ -220,6 +223,13 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
         commentAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
+                if (!App.getApp().isLogin) {
+                    if (loginDialog != null && !loginDialog.isShowing()) {
+                        loginDialog.show();
+                    }
+                    return;
+                }
+
                 switchType = 1;
                 currentCommentPos = position;
                 showDialog();
@@ -229,9 +239,11 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
         commentAdapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
             @Override
             public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
+
                 switchType = 1;
                 currentCommentPos = position;
                 commentId = commentAdapter.getData().get(currentCommentPos).getCommentId();
+
                 if (view.getId() == R.id.btn_reply_count) {
                     if (commitReplyDialog != null && !commitReplyDialog.isShowing()) {
                         commitReplyDialog.show();
@@ -256,6 +268,13 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
                 }
 
                 if (view.getId() == R.id.layout_zan) {
+                    if (!App.getApp().isLogin) {
+                        if (loginDialog != null && !loginDialog.isShowing()) {
+                            loginDialog.show();
+                        }
+                        return;
+                    }
+
                     addZanPresenterImp.addZan(2, App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", commentAdapter.getData().get(position).getUserId(), "", commentId, "", 1);
                 }
             }
@@ -273,6 +292,13 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
         commentReplyAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
+                if (!App.getApp().isLogin) {
+                    if (loginDialog != null && !loginDialog.isShowing()) {
+                        loginDialog.show();
+                    }
+                    return;
+                }
+
                 switchType = 2;
                 currentReplyPos = position;
                 showDialog();
@@ -282,11 +308,18 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
         commentReplyAdapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
             @Override
             public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
+                if (!App.getApp().isLogin) {
+                    if (loginDialog != null && !loginDialog.isShowing()) {
+                        loginDialog.show();
+                    }
+                    return;
+                }
+
                 switchType = 2;
                 currentReplyPos = position;
-                if (view.getId() == R.id.layout_zan) {
-                    repeatId = commentReplyAdapter.getData().get(position).getRepeatId();
 
+                if (view.getId() == R.id.layout_zan || view.getId() == R.id.btn_reply_count) {
+                    repeatId = commentReplyAdapter.getData().get(position).getRepeatId();
                     addZanPresenterImp.addZan(3, App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", commentReplyAdapter.getData().get(position).getRepeatUserId(), "", "", repeatId, 1);
                 }
             }
@@ -294,6 +327,8 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
 
         progressDialog = new ProgressDialog(getActivity());
         progressDialog.setMessage("回复中");
+
+        loginDialog = new LoginDialog(getActivity(), R.style.login_dialog);
 
         noteSubCommentDataPresenterImp = new NoteSubCommentDataPresenterImp(this, getActivity());
         addZanPresenterImp = new AddZanPresenterImp(this, getActivity());

@@ -1,5 +1,6 @@
 package com.feiyou.headstyle.bean;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -7,7 +8,7 @@ import java.util.List;
  */
 public class CollectWrapper{
     private CollectInfo info;
-    private List<HeadInfo> list;
+    private ArrayList<HeadInfo> list;
 
     public CollectInfo getInfo() {
         return info;
@@ -17,11 +18,11 @@ public class CollectWrapper{
         this.info = info;
     }
 
-    public List<HeadInfo> getList() {
+    public ArrayList<HeadInfo> getList() {
         return list;
     }
 
-    public void setList(List<HeadInfo> list) {
+    public void setList(ArrayList<HeadInfo> list) {
         this.list = list;
     }
 }
