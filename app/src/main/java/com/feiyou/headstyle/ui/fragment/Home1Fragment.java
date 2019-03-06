@@ -33,6 +33,7 @@ import com.feiyou.headstyle.ui.activity.HeadListActivity;
 import com.feiyou.headstyle.ui.activity.HeadShowActivity;
 import com.feiyou.headstyle.ui.activity.MoreTypeActivity;
 import com.feiyou.headstyle.ui.activity.SearchActivity;
+import com.feiyou.headstyle.ui.activity.Test1Activity;
 import com.feiyou.headstyle.ui.adapter.CommunityHeadAdapter;
 import com.feiyou.headstyle.ui.adapter.HeadInfoAdapter;
 import com.feiyou.headstyle.ui.adapter.HeadTypeAdapter;
@@ -216,7 +217,7 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
 
                 Logger.i("jumpPage page--->" + jumpPage + "---jumpPosition--->" + jumpPosition);
 
-                Intent intent = new Intent(getActivity(), HeadShowActivity.class);
+                Intent intent = new Intent(getActivity(), Test1Activity.class);
                 intent.putExtra("from_type", 1);
                 intent.putExtra("jump_page", jumpPage);
                 intent.putExtra("jump_position", jumpPosition);

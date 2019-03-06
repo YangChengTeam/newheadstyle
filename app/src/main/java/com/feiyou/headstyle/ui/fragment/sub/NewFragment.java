@@ -9,8 +9,6 @@ import android.view.View;
 
 import com.blankj.utilcode.util.StringUtils;
 import com.blankj.utilcode.util.ToastUtils;
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.RequestOptions;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
@@ -27,7 +25,6 @@ import com.feiyou.headstyle.ui.adapter.NoteInfoAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragment;
 import com.feiyou.headstyle.ui.custom.LoginDialog;
 import com.feiyou.headstyle.view.NoteTypeView;
-import com.orhanobut.logger.Logger;
 import com.wang.avi.AVLoadingIndicatorView;
 
 import butterknife.BindView;
@@ -127,7 +124,6 @@ public class NewFragment extends BaseFragment implements NoteTypeView {
         });
 
         noteInfoAdapter.setOnLoadMoreListener(new BaseQuickAdapter.RequestLoadMoreListener()
-
         {
             @Override
             public void onLoadMoreRequested() {
