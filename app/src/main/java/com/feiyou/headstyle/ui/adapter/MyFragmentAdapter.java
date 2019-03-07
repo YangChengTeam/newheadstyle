@@ -6,6 +6,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.view.ViewGroup;
 
 import com.feiyou.headstyle.ui.fragment.Home1Fragment;
+import com.feiyou.headstyle.ui.fragment.Home2Fragment;
 import com.feiyou.headstyle.ui.fragment.HomeFragment;
 import com.feiyou.headstyle.ui.fragment.CommunityFragment;
 import com.feiyou.headstyle.ui.fragment.MyFragment;

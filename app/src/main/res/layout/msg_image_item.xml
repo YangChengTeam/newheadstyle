@@ -183,8 +183,8 @@
             android:id="@+id/iv_user_head"
             android:layout_width="48dp"
             android:layout_height="48dp"
+            android:scaleType="centerCrop"
             android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:src="@mipmap/setting_head" />
+            android:layout_centerVertical="true" />
     </RelativeLayout>
 </RelativeLayout>

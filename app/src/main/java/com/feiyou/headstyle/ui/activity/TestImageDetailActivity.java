@@ -19,12 +19,14 @@ import com.blankj.utilcode.util.KeyboardUtils;
 import com.blankj.utilcode.util.SizeUtils;
 import com.blankj.utilcode.util.StringUtils;
 import com.blankj.utilcode.util.ToastUtils;
+import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.bean.ResultInfo;
 import com.feiyou.headstyle.bean.TestDetailInfoRet;
 import com.feiyou.headstyle.bean.TestMsgInfo;
 import com.feiyou.headstyle.bean.TestResultInfoRet;
 import com.feiyou.headstyle.bean.TestResultParams;
+import com.feiyou.headstyle.bean.UserInfo;
 import com.feiyou.headstyle.common.Constants;
 import com.feiyou.headstyle.presenter.TestDetailInfoPresenterImp;
 import com.feiyou.headstyle.presenter.TestResultInfoPresenterImp;
@@ -98,6 +100,10 @@ public class TestImageDetailActivity extends BaseFragmentActivity implements Tes
 
     private int inputStep = 1; //1表示在选择性别，2表示在输入姓名
 
+    private String tid;
+
+    private UserInfo userInfo;
+
     @Override
     protected int getContextViewId() {
         return R.layout.activity_test_image_detail;
@@ -129,6 +135,12 @@ public class TestImageDetailActivity extends BaseFragmentActivity implements Tes
     }
 
     public void initData() {
+        Bundle bundle = getIntent().getExtras();
+        if (bundle != null && !StringUtils.isEmpty(bundle.getString("tid"))) {
+            tid = bundle.getString("tid");
+        }
+        userInfo = App.getApp().getmUserInfo();
+
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("正在提交");
 
@@ -151,7 +163,7 @@ public class TestImageDetailActivity extends BaseFragmentActivity implements Tes
         testDetailInfoPresenterImp = new TestDetailInfoPresenterImp(this, this);
         testResultInfoPresenterImp = new TestResultInfoPresenterImp(this, this);
 
-        testDetailInfoPresenterImp.getTestDetail("164", 2);
+        testDetailInfoPresenterImp.getTestDetail(tid, 2);
     }
 
     @OnClick(R.id.layout_comment)
@@ -162,17 +174,18 @@ public class TestImageDetailActivity extends BaseFragmentActivity implements Tes
             }
 
             TestResultParams params = new TestResultParams();
-            params.setId("122");
-            params.setTestType("1");
-            params.setNickname("我是忍者");
-            params.setHeadimg("http://thirdwx.qlogo.cn/mmopen/vi_32/g8lk9icgk6QfZLib2awxgnibnU4RTeRzobJNWc3ZxziabI0CncNfgUQG1godEgqGI3wfqqqSCr4kAlv9LOKiad2NEFw/132");
-            params.setSex("0");
-            params.setUserId("1021601");
+            params.setId(tid);
+            params.setTestType("2");
+            params.setNickname(userInfo != null ? userInfo.getNickname() : "火星用户");
+            params.setHeadimg(userInfo != null ? userInfo.getUserimg() : "");
+            params.setSex(userInfo != null ? userInfo.getSex() : "0");
+            params.setUserId(userInfo != null ? userInfo.getId() : "0");
 
             testResultInfoPresenterImp.createImage(params);
         } else {
             mCommentLayout.setVisibility(View.GONE);
             TestMsgInfo startInfo = new TestMsgInfo("", "开始测试", TestMsgInfo.TYPE_SENT);
+            startInfo.setImgUrl(userInfo != null ? userInfo.getUserimg():"");
             chatListAdapter.addData(startInfo);
             chatListAdapter.notifyItemInserted(chatListAdapter.getData().size() - 1);
             mChatListView.scrollToPosition(chatListAdapter.getData().size() - 1);
@@ -205,6 +218,7 @@ public class TestImageDetailActivity extends BaseFragmentActivity implements Tes
 
             TestMsgInfo inputName = new TestMsgInfo();
             inputName.setType(TestMsgInfo.TYPE_SENT);
+            inputName.setImgUrl(userInfo != null ? userInfo.getUserimg():"");
             inputName.setContent(mInputUserNameEt.getText().toString());
             chatListAdapter.addData(inputName);
 
@@ -218,12 +232,12 @@ public class TestImageDetailActivity extends BaseFragmentActivity implements Tes
             }
 
             TestResultParams params = new TestResultParams();
-            params.setId("164");
+            params.setId(tid);
             params.setTestType("2");
-            params.setNickname("我是忍者");
-            params.setHeadimg("http://thirdwx.qlogo.cn/mmopen/vi_32/g8lk9icgk6QfZLib2awxgnibnU4RTeRzobJNWc3ZxziabI0CncNfgUQG1godEgqGI3wfqqqSCr4kAlv9LOKiad2NEFw/132");
-            params.setSex("0");
-            params.setUserId("1021601");
+            params.setNickname(userInfo != null ? userInfo.getNickname() : "火星用户");
+            params.setHeadimg(userInfo != null ? userInfo.getUserimg() : "");
+            params.setSex(userInfo != null ? userInfo.getSex() : "0");
+            params.setUserId(userInfo != null ? userInfo.getId() : "0");
             testResultInfoPresenterImp.createImage(params);
 
         }
@@ -234,6 +248,7 @@ public class TestImageDetailActivity extends BaseFragmentActivity implements Tes
         //回复选择的答案
         TestMsgInfo sexInfo = new TestMsgInfo();
         sexInfo.setType(TestMsgInfo.TYPE_SENT);
+        sexInfo.setImgUrl(userInfo != null ? userInfo.getUserimg():"");
         sexInfo.setContent(sexValue);
         chatListAdapter.addData(sexInfo);
 

@@ -55,6 +55,26 @@
             android:layout_marginLeft="12dp"
             android:layout_marginRight="12dp"
             android:minHeight="70dp"></android.support.v7.widget.RecyclerView>
+
+        <LinearLayout
+            android:id="@+id/layout_topic"
+            android:layout_width="100dp"
+            android:layout_height="30dp"
+            android:layout_margin="12dp"
+            android:background="@drawable/add_topic_bg"
+            android:gravity="center">
+
+            <TextView
+                android:id="@+id/tv_topic_txt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawableLeft="@mipmap/not_add_note_topic"
+                android:drawablePadding="4dp"
+                android:gravity="center"
+                android:text="添加话题"
+                android:textColor="@color/add_topic_color"
+                android:textSize="12sp" />
+        </LinearLayout>
     </LinearLayout>
 
     <View
@@ -64,7 +84,7 @@
         android:layout_above="@+id/layout_bottom"
         android:background="@color/line_color"></View>
 
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/layout_bottom"
         android:layout_width="match_parent"
         android:layout_height="48dp"
@@ -73,9 +93,9 @@
 
         <LinearLayout
             android:id="@+id/layout_choose_image"
-            android:layout_width="0dp"
+            android:layout_width="70dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"
+            android:layout_marginLeft="12dp"
             android:gravity="center">
 
             <TextView
@@ -89,28 +109,11 @@
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/layout_topic"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center">
-
-            <TextView
-                android:id="@+id/tv_topic_txt"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:drawableLeft="@mipmap/add_note_topic"
-                android:drawablePadding="4dp"
-                android:gravity="center"
-                android:text="话题"
-                android:textSize="14sp" />
-        </LinearLayout>
-
-        <LinearLayout
             android:id="@+id/layout_friends"
-            android:layout_width="0dp"
+            android:layout_width="70dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"
+            android:layout_marginLeft="24dp"
+            android:layout_toRightOf="@+id/layout_choose_image"
             android:gravity="center">
 
             <TextView
@@ -122,5 +125,5 @@
                 android:text="好友"
                 android:textSize="14sp" />
         </LinearLayout>
-    </LinearLayout>
+    </RelativeLayout>
 </RelativeLayout>

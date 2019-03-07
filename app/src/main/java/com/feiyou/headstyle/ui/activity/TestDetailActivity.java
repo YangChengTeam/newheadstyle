@@ -15,7 +15,9 @@ import android.widget.TextView;
 
 import com.alibaba.fastjson.JSONObject;
 import com.blankj.utilcode.util.SizeUtils;
+import com.blankj.utilcode.util.StringUtils;
 import com.blankj.utilcode.util.ToastUtils;
+import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.bean.QuestionJumpInfo;
 import com.feiyou.headstyle.bean.ResultInfo;
@@ -23,6 +25,7 @@ import com.feiyou.headstyle.bean.TestDetailInfoRet;
 import com.feiyou.headstyle.bean.TestMsgInfo;
 import com.feiyou.headstyle.bean.TestResultInfoRet;
 import com.feiyou.headstyle.bean.TestResultParams;
+import com.feiyou.headstyle.bean.UserInfo;
 import com.feiyou.headstyle.common.Constants;
 import com.feiyou.headstyle.presenter.TestDetailInfoPresenterImp;
 import com.feiyou.headstyle.presenter.TestResultInfoPresenterImp;
@@ -61,8 +64,6 @@ public class TestDetailActivity extends BaseFragmentActivity implements TestDeta
 
     private TestChatListAdapter chatListAdapter;
 
-    private List<TestMsgInfo> msgList = new ArrayList<>();
-
     private TestDetailInfoPresenterImp testDetailInfoPresenterImp;
 
     private TestResultInfoPresenterImp testResultInfoPresenterImp;
@@ -81,6 +82,10 @@ public class TestDetailActivity extends BaseFragmentActivity implements TestDeta
 
     private String selectResultIndex;
 
+    private String tid;
+
+    private UserInfo userInfo;
+
     @Override
     protected int getContextViewId() {
         return R.layout.activity_test_detail;
@@ -91,7 +96,6 @@ public class TestDetailActivity extends BaseFragmentActivity implements TestDeta
         super.onCreate(savedInstanceState);
         initTopBar();
         initData();
-        initMsg();
     }
 
     private void initTopBar() {
@@ -113,6 +117,13 @@ public class TestDetailActivity extends BaseFragmentActivity implements TestDeta
     }
 
     public void initData() {
+
+        Bundle bundle = getIntent().getExtras();
+        if (bundle != null && !StringUtils.isEmpty(bundle.getString("tid"))) {
+            tid = bundle.getString("tid");
+        }
+        userInfo = App.getApp().getmUserInfo();
+
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("正在提交");
 
@@ -124,7 +135,7 @@ public class TestDetailActivity extends BaseFragmentActivity implements TestDeta
         testDetailInfoPresenterImp = new TestDetailInfoPresenterImp(this, this);
         testResultInfoPresenterImp = new TestResultInfoPresenterImp(this, this);
 
-        testDetailInfoPresenterImp.getTestDetail("122", 1);
+        testDetailInfoPresenterImp.getTestDetail(tid, 1);
     }
 
     @OnClick(R.id.layout_comment)
@@ -135,13 +146,13 @@ public class TestDetailActivity extends BaseFragmentActivity implements TestDeta
             }
 
             TestResultParams params = new TestResultParams();
-            params.setId("122");
+            params.setId(tid);
             params.setTestType("1");
-            params.setNickname("我是忍者");
-            params.setHeadimg("http://thirdwx.qlogo.cn/mmopen/vi_32/g8lk9icgk6QfZLib2awxgnibnU4RTeRzobJNWc3ZxziabI0CncNfgUQG1godEgqGI3wfqqqSCr4kAlv9LOKiad2NEFw/132");
+            params.setNickname(userInfo != null ? userInfo.getNickname() : "火星用户");
+            params.setHeadimg(userInfo != null ? userInfo.getUserimg() : "");
             params.setResultId(selectResultIndex);
-            params.setSex("0");
-            params.setUserId("1021601");
+            params.setSex(userInfo != null ? userInfo.getSex() : "0");
+            params.setUserId(userInfo != null ? userInfo.getId() : "0");
 
             testResultInfoPresenterImp.createImage(params);
         } else {
@@ -162,17 +173,6 @@ public class TestDetailActivity extends BaseFragmentActivity implements TestDeta
 
         testMsgInfo.setContent(question.get(currentSubjectIndex));
         chatListAdapter.addData(testMsgInfo);
-    }
-
-    private void initMsg() {
-        TestMsgInfo msg1 = new TestMsgInfo("", "Hello guy!", TestMsgInfo.TYPE_RECEIVED);
-        msgList.add(msg1);
-        TestMsgInfo msg2 = new TestMsgInfo("", "Hi!", TestMsgInfo.TYPE_SENT);
-        msgList.add(msg2);
-        TestMsgInfo msg3 = new TestMsgInfo("", "What's up?", TestMsgInfo.TYPE_SENT);
-        msgList.add(msg3);
-        TestMsgInfo msg4 = new TestMsgInfo("", "Fine.", TestMsgInfo.TYPE_RECEIVED);
-        msgList.add(msg4);
     }
 
     @Override
@@ -254,9 +254,9 @@ public class TestDetailActivity extends BaseFragmentActivity implements TestDeta
             }
             if (tData instanceof TestResultInfoRet) {
                 if (((TestResultInfoRet) tData).getData() != null) {
-                    Intent intent = new Intent(this,TestResultActivity.class);
-                    intent.putExtra("image_url",((TestResultInfoRet) tData).getData().getImage());
-                    intent.putExtra("nocode_image_url",((TestResultInfoRet) tData).getData().getImageNocode());
+                    Intent intent = new Intent(this, TestResultActivity.class);
+                    intent.putExtra("image_url", ((TestResultInfoRet) tData).getData().getImage());
+                    intent.putExtra("nocode_image_url", ((TestResultInfoRet) tData).getData().getImageNocode());
                     startActivity(intent);
                 }
             }

@@ -71,4 +71,15 @@
     <color name="forecast5_color">#6acb65</color>
 
     <color name="forecast6_color">#28acff</color>
+
+    <color name="set_qq_bg_color">#4383ff</color>
+
+    <color name="set_weixin_bg_color">#36cc64</color>
+
+    <color name="set_app_head_color">#ffa200</color>
+
+    <color name="is_follow_topic_bg_color">#5c5c5c</color>
+
+    <color name="add_topic_color">#707070</color>
+
 </resources>

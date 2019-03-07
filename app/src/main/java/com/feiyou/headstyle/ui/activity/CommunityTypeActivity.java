@@ -96,6 +96,9 @@ public class CommunityTypeActivity extends BaseFragmentActivity implements NoteT
     @BindView(R.id.layout_is_follow)
     FrameLayout mFollowLayout;
 
+    @BindView(R.id.tv_follow_txt)
+    TextView mFollowTv;
+
     int toolBarPositionY = 0;
 
     List<String> mTitleDataList;
@@ -229,18 +232,26 @@ public class CommunityTypeActivity extends BaseFragmentActivity implements NoteT
                 }
 
                 if (noteTypeWrapper.getIsGuan() == 0) {
-                    mFollowLayout.setVisibility(View.VISIBLE);
+                    mFollowLayout.setBackgroundResource(R.mipmap.not_follow_topic);
+                    mFollowTv.setTextColor(ContextCompat.getColor(this, R.color.white));
                 } else {
-                    mFollowLayout.setVisibility(View.GONE);
+                    mFollowLayout.setBackgroundResource(R.mipmap.is_follow_icon);
+                    mFollowTv.setTextColor(ContextCompat.getColor(this, R.color.is_follow_topic_bg_color));
+                    mFollowTv.setText("已关注");
                 }
             }
 
             if (tData instanceof FollowInfoRet) {
                 if (((FollowInfoRet) tData).getData() != null) {
                     if (((FollowInfoRet) tData).getData().getIsGuan() == 0) {
-                        mFollowLayout.setVisibility(View.VISIBLE);
+                        ToastUtils.showLong("已取消");
+                        mFollowLayout.setBackgroundResource(R.mipmap.not_follow_topic);
+                        mFollowTv.setTextColor(ContextCompat.getColor(this, R.color.white));
                     } else {
-                        mFollowLayout.setVisibility(View.GONE);
+                        ToastUtils.showLong("已关注");
+                        mFollowLayout.setBackgroundResource(R.mipmap.is_follow_icon);
+                        mFollowTv.setTextColor(ContextCompat.getColor(this, R.color.is_follow_topic_bg_color));
+                        mFollowTv.setText("已关注");
                     }
                 } else {
                     ToastUtils.showLong(StringUtils.isEmpty(tData.getMsg()) ? "操作错误" : tData.getMsg());
@@ -248,7 +259,6 @@ public class CommunityTypeActivity extends BaseFragmentActivity implements NoteT
             }
         } else {
 
-            mFollowLayout.setVisibility(View.VISIBLE);
             if (tData instanceof FollowInfoRet) {
                 ToastUtils.showLong(StringUtils.isEmpty(tData.getMsg()) ? "操作错误" : tData.getMsg());
             } else {

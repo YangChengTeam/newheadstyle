@@ -8,9 +8,12 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
+import android.support.design.widget.BottomSheetDialog;
 import android.support.v4.content.ContextCompat;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -146,7 +149,13 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
 
     private String currentImageUrl;
 
-    String filePath;
+    private String filePath;
+
+    BottomSheetDialog bottomSheetDialog;
+
+    ImageView mCloseImageView;
+
+    private int loginType = 1;
 
     @Override
     protected int getContextViewId() {
@@ -157,6 +166,7 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         initTopBar();
+        initDialog();
         initData();
     }
 
@@ -185,6 +195,58 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
             public void onClick(View view) {
                 Intent intent = new Intent(HeadShowActivity.this, HeadSaveActivity.class);
                 startActivity(intent);
+            }
+        });
+    }
+
+    public void initDialog() {
+        loginType = App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getLoginType() : 1;
+
+        bottomSheetDialog = new BottomSheetDialog(this);
+        View setView = LayoutInflater.from(this).inflate(R.layout.set_head_dialog, null);
+        setView.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, SizeUtils.dp2px(210)));
+        mCloseImageView = setView.findViewById(R.id.iv_close_setting);
+
+        LinearLayout mSettingTypeLayout = setView.findViewById(R.id.layout_setting_type);
+        LinearLayout mSettingAppLayout = setView.findViewById(R.id.layout_set_app_head);
+
+        TextView mSettingTv = setView.findViewById(R.id.tv_setting_type_name);
+
+        if (loginType == 2) {
+            mSettingTypeLayout.setBackgroundResource(R.drawable.setting_weixin_bg);
+            mSettingTv.setText("设为微信头像");
+        } else {
+            mSettingTypeLayout.setBackgroundResource(R.drawable.setting_qq_bg);
+            mSettingTv.setText("设为QQ头像");
+        }
+
+        bottomSheetDialog.setContentView(setView);
+        mCloseImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (bottomSheetDialog != null && bottomSheetDialog.isShowing()) {
+                    bottomSheetDialog.dismiss();
+                }
+            }
+        });
+
+        mSettingTypeLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (loginType == 2) {
+                    downImage();
+                    if (bottomSheetDialog != null && bottomSheetDialog.isShowing()) {
+                        bottomSheetDialog.dismiss();
+                    }
+                } else {
+
+                }
+            }
+        });
+        mSettingAppLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
             }
         });
     }
@@ -256,7 +318,6 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
                 }
             }
         });
-
     }
 
     void square() {
@@ -313,6 +374,13 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
 
     }
 
+    @OnClick(R.id.layout_setting_head)
+    void setting() {
+        if (bottomSheetDialog != null && !bottomSheetDialog.isShowing()) {
+            bottomSheetDialog.show();
+        }
+    }
+
     // 其次把文件插入到系统图库
     public boolean saveImageToGallery() {
         boolean flag = true;
@@ -324,7 +392,7 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
                 MediaScannerConnection.scanFile(HeadShowActivity.this, new String[]{filePath}, null, null);
                 // 最后通知图库更新
                 sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.parse("file://" + filePath)));
-                ToastUtils.showLong("已保存到图库");
+                ToastUtils.showLong(loginType == 2 ? "已保存，请在微信中修改" : "已保存到图库");
 
             } else {
                 flag = false;

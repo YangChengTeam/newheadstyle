@@ -261,6 +261,8 @@ public class RecommendFragment extends BaseFragment implements NoteDataView {
 
         } else {
             if (tData instanceof FollowInfoRet) {
+                ToastUtils.showLong(StringUtils.isEmpty(tData.getMsg()) ? "操作错误" : tData.getMsg());
+            }else{
                 Logger.i("error--->" + tData.getMsg());
             }
         }

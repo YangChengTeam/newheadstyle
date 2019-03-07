@@ -11,6 +11,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -27,6 +28,7 @@ import com.bumptech.glide.Glide;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
+import com.feiyou.headstyle.bean.FollowInfoRet;
 import com.feiyou.headstyle.bean.MessageEvent;
 import com.feiyou.headstyle.bean.NoteCommentRet;
 import com.feiyou.headstyle.bean.NoteItem;
@@ -37,6 +39,7 @@ import com.feiyou.headstyle.bean.ResultInfo;
 import com.feiyou.headstyle.bean.ZanResultRet;
 import com.feiyou.headstyle.common.Constants;
 import com.feiyou.headstyle.presenter.AddZanPresenterImp;
+import com.feiyou.headstyle.presenter.FollowInfoPresenterImp;
 import com.feiyou.headstyle.presenter.NoteCommentDataPresenterImp;
 import com.feiyou.headstyle.presenter.NoteSubCommentDataPresenterImp;
 import com.feiyou.headstyle.presenter.ReplyCommentPresenterImp;
@@ -78,13 +81,21 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
 
     private AddZanPresenterImp addZanPresenterImp;
 
+    private FollowInfoPresenterImp followInfoPresenterImp;
+
     BottomSheetDialog commitReplyDialog;
 
     private View replyView;
 
     private ImageView mCloseReplyIv;
 
+    private FrameLayout mReplyFollowLayout;
+
+    private TextView mReplyFollowTv;
+
     private RecyclerView replyListView;
+
+    private LinearLayout mReplyNoDataLayout;
 
     ImageView topUserHeadImageView;
 
@@ -130,6 +141,8 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
 
     LoginDialog loginDialog;
 
+    private String replyTopUserId;
+
     @Override
     protected View onCreateView() {
         View root = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_wonderful, null);
@@ -149,7 +162,10 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
     public void initReplyDialog() {
         commitReplyDialog = new BottomSheetDialog(getActivity());
         replyView = LayoutInflater.from(getActivity()).inflate(R.layout.comment_reply_view, null);
+        mReplyFollowLayout = replyView.findViewById(R.id.reply_is_follow);
+        mReplyFollowTv = replyView.findViewById(R.id.tv_reply_follow);
         replyListView = replyView.findViewById(R.id.rv_reply_list);
+        mReplyNoDataLayout = replyView.findViewById(R.id.reply_layout_no_data);
         mCloseReplyIv = replyView.findViewById(R.id.iv_close);
         zanCountTv = replyView.findViewById(R.id.tv_zan_count);
 
@@ -177,6 +193,21 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
             public void onClick(View view) {
                 switchType = 1;
                 addZanPresenterImp.addZan(2, App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", commentAdapter.getData().get(currentCommentPos).getUserId(), "", commentId, "", 1);
+            }
+        });
+
+        mReplyFollowLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                switchType = 1;
+                if (!App.getApp().isLogin) {
+                    if (loginDialog != null && !loginDialog.isShowing()) {
+                        loginDialog.show();
+                    }
+                    return;
+                }
+
+                followInfoPresenterImp.addFollow(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", StringUtils.isEmpty(replyTopUserId) ? "" : replyTopUserId);
             }
         });
 
@@ -251,6 +282,8 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
 
                     //设置头部信息
                     NoteItem noteItem = commentAdapter.getData().get(position);
+                    replyTopUserId = noteItem.getUserId();
+
                     Glide.with(getActivity()).load(noteItem.getCommentUserimg()).into(topUserHeadImageView);
                     nickNameTv.setText(noteItem.getCommentNickname());
                     addDateTv.setText(TimeUtils.millis2String(noteItem.getAddTime() != null ? noteItem.getAddTime() * 1000 : 0));
@@ -334,6 +367,7 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
         addZanPresenterImp = new AddZanPresenterImp(this, getActivity());
         noteCommentDataPresenterImp = new NoteCommentDataPresenterImp(this, getActivity());
         replyCommentPresenterImp = new ReplyCommentPresenterImp(this, getActivity());
+        followInfoPresenterImp = new FollowInfoPresenterImp(this, getActivity());
         noteCommentDataPresenterImp.getNoteDetailData(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", currentPage, messageId, 1);
     }
 
@@ -394,13 +428,23 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
 
             if (tData instanceof NoteSubCommentRet) {
                 if (((NoteSubCommentRet) tData).getData() != null) {
+                    replyListView.setVisibility(View.VISIBLE);
+                    mReplyNoDataLayout.setVisibility(View.GONE);
                     commentReplyAdapter.setNewData(((NoteSubCommentRet) tData).getData());
+                } else {
+                    replyListView.setVisibility(View.GONE);
+                    mReplyNoDataLayout.setVisibility(View.VISIBLE);
                 }
             }
 
             if (tData instanceof ReplyResultInfoRet) {
                 ToastUtils.showLong("回复成功");
+                replyListView.setVisibility(View.VISIBLE);
+                mReplyNoDataLayout.setVisibility(View.GONE);
                 if (switchType == 1) {
+                    mNoDataLayout.setVisibility(View.GONE);
+                    mWonderfulListView.setVisibility(View.VISIBLE);
+
                     Integer tempNum = commentAdapter.getData().get(currentCommentPos).getListNum() + 1;
                     commentAdapter.getData().get(currentCommentPos).setListNum(tempNum);
                     commentAdapter.notifyDataSetChanged();
@@ -410,6 +454,8 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
                     commentReplyAdapter.notifyDataSetChanged();
                 }
                 if (switchType == 2) {
+                    replyListView.setVisibility(View.VISIBLE);
+                    mReplyNoDataLayout.setVisibility(View.GONE);
                     commentReplyAdapter.addData(0, ((ReplyResultInfoRet) tData).getData());
                     commentReplyAdapter.notifyDataSetChanged();
                 }
@@ -449,13 +495,30 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
                     commentReplyAdapter.notifyDataSetChanged();
                 }
             }
+
+            if (tData instanceof FollowInfoRet) {
+                int tempResult = ((FollowInfoRet) tData).getData().getIsGuan();
+
+                ToastUtils.showLong(tempResult == 0 ? "已取消" : "已关注");
+                mReplyFollowLayout.setBackgroundResource(tempResult == 0 ? R.drawable.into_bg : R.drawable.is_follow_bg);
+                mReplyFollowTv.setTextColor(ContextCompat.getColor(getActivity(), tempResult == 0 ? R.color.tab_select_color : R.color.black2));
+                mReplyFollowTv.setText(tempResult == 0 ? "+关注" : "已关注");
+            }
+
         } else {
             if (tData instanceof NoteCommentRet) {
                 mNoDataLayout.setVisibility(View.VISIBLE);
-            } else {
-                mNoDataLayout.setVisibility(View.GONE);
+            }
+
+            if (tData instanceof NoteSubCommentRet) {
+                replyListView.setVisibility(View.GONE);
+                mReplyNoDataLayout.setVisibility(View.VISIBLE);
+            }
+
+            if (tData instanceof FollowInfoRet) {
                 ToastUtils.showLong(StringUtils.isEmpty(tData.getMsg()) ? "操作失败" : tData.getMsg());
             }
+            Logger.i(StringUtils.isEmpty(tData.getMsg()) ? "操作失败" : tData.getMsg());
         }
     }
 

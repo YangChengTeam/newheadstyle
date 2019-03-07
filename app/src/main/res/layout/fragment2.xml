@@ -1,51 +1,99 @@
-<?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/white">
+    android:layout_height="match_parent">
 
-    <android.support.v4.widget.NestedScrollView
-        android:id="@+id/scroll_view"
+    <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fillViewport="true">
+        android:background="@color/white"
+        android:layout_height="488dp">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:layout_height="488dp"
+            android:layout_marginLeft="12dp"
+            android:layout_marginRight="12dp"
+            android:orientation="vertical"
+            app:layout_scrollFlags="scroll">
 
-            <View
+            <LinearLayout
+                android:id="@+id/layout_search_wrapper"
                 android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/transparent"
-                android:focusable="true"
-                android:focusableInTouchMode="true"></View>
+                android:layout_height="48dp"
+                android:gravity="center">
+
+                <LinearLayout
+                    android:id="@+id/layout_search"
+                    android:layout_width="match_parent"
+                    android:layout_height="35dp"
+                    android:background="@drawable/search_bg"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="17dp"
+                        android:layout_height="17dp"
+                        android:src="@mipmap/search_icon" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="8dp"
+                        android:text="@string/search_txt"
+                        android:textColor="@color/gray999"
+                        android:textSize="@dimen/sp_12" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <com.youth.banner.Banner
+                android:id="@+id/banner"
+                android:layout_width="match_parent"
+                android:layout_height="130dp"
+                app:delay_time="4000"
+                app:indicator_drawable_selected="@mipmap/indicator_select"
+                app:indicator_drawable_unselected="@mipmap/indicator_normal"
+                app:indicator_height="6dp"
+                app:indicator_width="10dp" />
 
             <android.support.v7.widget.RecyclerView
-                android:id="@+id/home_head_list"
+                android:id="@+id/head_type_list"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginLeft="12dp"
-                android:layout_marginRight="12dp"></android.support.v7.widget.RecyclerView>
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:nestedScrollingEnabled="false"></android.support.v7.widget.RecyclerView>
+
+            <LinearLayout
+                android:id="@+id/layout_ad"
+                android:layout_width="match_parent"
+                android:layout_height="83dp"
+                android:gravity="center">
+
+                <ImageView
+                    android:id="@+id/iv_home_ad"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
         </LinearLayout>
 
-    </android.support.v4.widget.NestedScrollView>
+    </android.support.design.widget.AppBarLayout>
 
-    <RelativeLayout
-        android:id="@+id/layout_top_refresh1"
+    <!--悬停的部分-->
+    <LinearLayout
+        android:id="@+id/layout_top_refresh2"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:background="@color/white"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:visibility="invisible">
+        android:gravity="center"
+        android:orientation="vertical"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <RelativeLayout
             android:id="@+id/float_layout"
             android:layout_width="match_parent"
             android:layout_height="48dp"
-            android:layout_alignParentBottom="true"
+            android:layout_marginLeft="12dp"
+            android:layout_marginRight="12dp"
             android:background="@color/white">
 
             <TextView
@@ -53,29 +101,37 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
                 android:layout_centerVertical="true"
-                android:padding="6dp"
                 android:layout_toRightOf="@+id/iv_new"
                 android:drawableLeft="@mipmap/iv_new"
                 android:drawablePadding="6dp"
                 android:gravity="center"
+                android:padding="6dp"
                 android:text="@string/new_head_txt"
                 android:textColor="@color/rec_color"
                 android:textFontWeight="800"
                 android:textSize="16sp" />
 
             <TextView
-                android:id="@+id/tv_refresh1"
+                android:id="@+id/tv_refresh2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
-                android:padding="6dp"
                 android:layout_toLeftOf="@+id/iv_refresh"
                 android:drawableRight="@mipmap/refresh_head"
                 android:drawablePadding="6dp"
+                android:padding="6dp"
                 android:text="@string/refresh_head_txt"
                 android:textColor="@color/into_community_color"
                 android:textSize="16sp" />
         </RelativeLayout>
-    </RelativeLayout>
-</FrameLayout>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/home_head_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="12dp"
+            android:layout_marginRight="12dp"></android.support.v7.widget.RecyclerView>
+    </LinearLayout>
+
+</android.support.design.widget.CoordinatorLayout>

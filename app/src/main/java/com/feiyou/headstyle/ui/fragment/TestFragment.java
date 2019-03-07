@@ -12,17 +12,20 @@ import com.alibaba.fastjson.JSON;
 import com.blankj.utilcode.util.BarUtils;
 import com.blankj.utilcode.util.SizeUtils;
 import com.chad.library.adapter.base.BaseQuickAdapter;
+import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.bean.TestInfoRet;
 import com.feiyou.headstyle.common.Constants;
 import com.feiyou.headstyle.common.GlideImageLoader;
 import com.feiyou.headstyle.presenter.TestInfoPresenterImp;
 import com.feiyou.headstyle.ui.activity.StarListActivity;
+import com.feiyou.headstyle.ui.activity.TestActivity;
 import com.feiyou.headstyle.ui.activity.TestCategoryActivity;
 import com.feiyou.headstyle.ui.activity.TestDetailActivity;
 import com.feiyou.headstyle.ui.activity.TestImageDetailActivity;
 import com.feiyou.headstyle.ui.adapter.TestInfoAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragment;
+import com.feiyou.headstyle.ui.custom.LoginDialog;
 import com.feiyou.headstyle.ui.custom.NormalDecoration;
 import com.feiyou.headstyle.view.TestInfoView;
 import com.orhanobut.logger.Logger;
@@ -58,6 +61,8 @@ public class TestFragment extends BaseFragment implements TestInfoView, View.OnC
 
     private TestInfoPresenterImp testInfoPresenterImp;
 
+    LoginDialog loginDialog;
+
     @Override
     protected View onCreateView() {
         View root = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_test, null);
@@ -67,6 +72,8 @@ public class TestFragment extends BaseFragment implements TestInfoView, View.OnC
     }
 
     public void initViews() {
+        loginDialog = new LoginDialog(getActivity(), R.style.login_dialog);
+
         topView = LayoutInflater.from(getActivity()).inflate(R.layout.test_top, null);
         mSearchWrapperLayout = topView.findViewById(R.id.layout_search_wrapper);
         mBanner = topView.findViewById(R.id.test_banner);
@@ -102,14 +109,29 @@ public class TestFragment extends BaseFragment implements TestInfoView, View.OnC
         });
 
         testInfoAdapter.setHeaderView(topView);
-
         testInfoPresenterImp.getHotAndRecommendList(1);
 
         testInfoAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
-                Intent intent = new Intent(getActivity(), TestImageDetailActivity.class);
-                startActivity(intent);
+
+                if (!App.getApp().isLogin) {
+                    if (loginDialog != null && !loginDialog.isShowing()) {
+                        loginDialog.show();
+                    }
+                    return;
+                }
+
+                if (testInfoAdapter.getData().get(position).getTestType() == 1) {
+                    Intent intent = new Intent(getActivity(), TestDetailActivity.class);
+                    intent.putExtra("tid", testInfoAdapter.getData().get(position).getId());
+                    startActivity(intent);
+                } else {
+                    Intent intent = new Intent(getActivity(), TestImageDetailActivity.class);
+                    intent.putExtra("tid", testInfoAdapter.getData().get(position).getId());
+                    startActivity(intent);
+                }
+
             }
         });
     }

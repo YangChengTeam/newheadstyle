@@ -3,7 +3,9 @@ package com.feiyou.headstyle.ui.activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
@@ -108,6 +110,10 @@ public class PushNoteActivity extends BaseFragmentActivity implements IBaseView 
     private String sendContent;
 
     private String tempFilePath;
+
+    private Drawable notAddTopicDw;
+
+    private Drawable isAddTopicDw;
 
     @Override
     protected int getContextViewId() {
@@ -222,7 +228,8 @@ public class PushNoteActivity extends BaseFragmentActivity implements IBaseView 
     }
 
     public void initData() {
-
+        notAddTopicDw = ContextCompat.getDrawable(this, R.mipmap.not_add_note_topic);
+        isAddTopicDw = ContextCompat.getDrawable(this, R.mipmap.is_add_topic_icon);
 
         friendsMap = new HashMap<>();
         ids = new StringBuffer("");
@@ -257,6 +264,18 @@ public class PushNoteActivity extends BaseFragmentActivity implements IBaseView 
 
         Logger.i("result ids --->" + tempStr);
         return tempStr;
+    }
+
+    @OnClick(R.id.layout_choose_image)
+    void chooseImage() {
+        Matisse.from(PushNoteActivity.this)
+                .choose(MimeType.ofImage())
+                .countable(true)
+                .maxSelectable(maxTotal)
+                .restrictOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED)
+                .thumbnailScale(0.85f)
+                .imageEngine(new Glide4Engine())
+                .forResult(REQUEST_CODE_CHOOSE);
     }
 
     @OnClick(R.id.layout_topic)
@@ -325,11 +344,17 @@ public class PushNoteActivity extends BaseFragmentActivity implements IBaseView 
         //选择了话题时返回
         if (resultCode == RESULT_TOPIC_CODE) {
             if (requestCode == REQUEST_FRIENDS) {
+                mTopicTv.setCompoundDrawablesWithIntrinsicBounds(isAddTopicDw, null, null, null);
+                mTopicTv.setTextColor(ContextCompat.getColor(this, R.color.tab_select_color));
+
                 topicSelectIndex = data.getIntExtra("topic_select_index", -1);
                 topicId = data.getStringExtra("topic_id");
 
                 Logger.i("topic info--->" + topicId + "---" + data.getStringExtra("topic_name"));
                 mTopicTv.setText(data.getStringExtra("topic_name"));
+            } else {
+                mTopicTv.setCompoundDrawablesWithIntrinsicBounds(notAddTopicDw, null, null, null);
+                mTopicTv.setTextColor(ContextCompat.getColor(this, R.color.add_topic_color));
             }
         }
     }

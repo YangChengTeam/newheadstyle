@@ -29,13 +29,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="50dp"
-                android:src="@mipmap/empty_icon" />
+                android:src="@mipmap/no_comment_icon" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:text="暂无数据"
+                android:text="还没有评论，你的机会来了"
                 android:textColor="@color/search_number_def"
                 android:textSize="16sp" />
         </LinearLayout>

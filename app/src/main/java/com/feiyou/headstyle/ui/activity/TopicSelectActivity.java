@@ -106,11 +106,13 @@ public class TopicSelectActivity extends BaseFragmentActivity {
         if (bundle != null && bundle.getInt("topic_select_index") > -1) {
             defTopicIndex = bundle.getInt("topic_select_index");
         }
-
-        //重置选中状态
-        List<TopicInfo> topicInfoList = App.topicInfoList;
-        for (TopicInfo item : topicInfoList) {
-            item.setSelected(false);
+        List<TopicInfo> topicInfoList = null;
+        if (App.topicInfoList != null && App.topicInfoList.size() > 0) {
+            //重置选中状态
+            topicInfoList = App.topicInfoList;
+            for (TopicInfo item : topicInfoList) {
+                item.setSelected(false);
+            }
         }
 
         topicSelectListAdapter = new TopicSelectListAdapter(this, topicInfoList);

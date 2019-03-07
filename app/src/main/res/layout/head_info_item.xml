@@ -10,6 +10,6 @@
         android:id="@+id/iv_head_info"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:scaleType="centerInside" />
+        android:scaleType="centerCrop" />
 
 </LinearLayout>

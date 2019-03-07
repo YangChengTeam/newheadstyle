@@ -45,6 +45,7 @@ import com.feiyou.headstyle.presenter.FollowInfoPresenterImp;
 import com.feiyou.headstyle.presenter.NoteInfoDetailDataPresenterImp;
 import com.feiyou.headstyle.presenter.ReplyCommentPresenterImp;
 import com.feiyou.headstyle.ui.adapter.CommunityHeadAdapter;
+import com.feiyou.headstyle.ui.adapter.CommunityItemAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragmentActivity;
 import com.feiyou.headstyle.ui.custom.GlideRoundTransform;
 import com.feiyou.headstyle.ui.custom.LoginDialog;
@@ -125,7 +126,7 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
 
     private FollowInfoPresenterImp followInfoPresenterImp;
 
-    private CommunityHeadAdapter communityHeadAdapter;
+    private CommunityItemAdapter communityItemAdapter;
 
     CommentDialog commentDialog;
 
@@ -170,11 +171,11 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
         QMUIStatusBarHelper.setStatusBarLightMode(this);
         mTopContentLayout.setLayoutParams(new CollapsingToolbarLayout.LayoutParams(CollapsingToolbarLayout.LayoutParams.MATCH_PARENT, CollapsingToolbarLayout.LayoutParams.WRAP_CONTENT));
 
-        communityHeadAdapter = new CommunityHeadAdapter(this, null, 3, false);
+        communityItemAdapter = new CommunityItemAdapter(this, null);
         mNoteImageListView.setLayoutManager(new GridLayoutManager(this, 3));
-        mNoteImageListView.setAdapter(communityHeadAdapter);
+        mNoteImageListView.setAdapter(communityItemAdapter);
 
-        communityHeadAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
+        communityItemAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
                 if (imageUrls != null && imageUrls.size() > 0) {
@@ -288,7 +289,7 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
 
                 mNickNameTextView.setText(currentNoteInfo.getNickname());
                 mTopicNameTextView.setText(currentNoteInfo.getName());
-                mAddDateTextView.setText(TimeUtils.millis2String(currentNoteInfo.getAddTime() * 1000));
+                mAddDateTextView.setText(TimeUtils.millis2String(currentNoteInfo.getAddTime() != null ? currentNoteInfo.getAddTime() * 1000 : 0));
                 mNoteContentTextView.setText(currentNoteInfo.getContent());
 
                 mMessageCountTextView.setText(commentNum > 0 ? commentNum + "" : "");
@@ -316,8 +317,7 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
                 }
                 int temp = imageUrls.size() % 3 == 0 ? imageUrls.size() / 3 : imageUrls.size() / 3 + 1;
                 mNoteImageListView.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, SizeUtils.dp2px(112 * temp)));
-                communityHeadAdapter.setNewData(imageUrls);
-
+                communityItemAdapter.setNewData(headInfos);
 
                 int tempResult = currentNoteInfo.getIsGuan();
 

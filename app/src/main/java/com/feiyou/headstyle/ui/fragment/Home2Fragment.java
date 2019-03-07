@@ -49,46 +49,38 @@ import butterknife.OnClick;
 /**
  * Created by myflying on 2019/1/3.
  */
-public class Home1Fragment extends BaseFragment implements HomeDataView, View.OnClickListener {
+public class Home2Fragment extends BaseFragment implements HomeDataView, View.OnClickListener {
 
-    @BindView(R.id.scroll_view)
-    NestedScrollView scrollView;
-
+    @BindView(R.id.layout_search)
     LinearLayout mSearchLayout;
 
+    @BindView(R.id.layout_search_wrapper)
     LinearLayout mSearchWrapperLayout;
 
-    @BindView(R.id.layout_top_refresh1)
-    RelativeLayout refreshLayout1;
+    @BindView(R.id.layout_top_refresh2)
+    LinearLayout refreshLayout2;
+
+    @BindView(R.id.tv_refresh2)
+    TextView mRefreshTv;
 
     @BindView(R.id.home_head_list)
     RecyclerView mHeadInfoListView;
 
+    @BindView(R.id.banner)
     Banner mBanner;
 
+    @BindView(R.id.head_type_list)
     RecyclerView mHeadTypeList;
 
-    LinearLayout mRecommendLayout;
-
-    RecyclerView mCommunityHeadList;
-
-    LinearLayout refreshLayout2;
-
-    RelativeLayout floatLayout;
-
-    View mLineView;
-
-    ImageView mAdImageView;
-
+    @BindView(R.id.layout_ad)
     LinearLayout mAdLayout;
+
+    @BindView(R.id.iv_home_ad)
+    ImageView mAdImageView;
 
     HeadTypeAdapter headTypeAdapter;
 
     HeadInfoAdapter headInfoAdapter;
-
-    private int searchLayoutTop;
-
-    private HomeDataPresenterImp homeDataPresenterImp;
 
     private int randomPage = -1;
 
@@ -100,15 +92,11 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
 
     private List<BannerInfo> bannerInfos;
 
-    private View topView;
-
-    private View footView;
-
-    private ImageView mLoadingView;
+    private HomeDataPresenterImp homeDataPresenterImp;
 
     @Override
     protected View onCreateView() {
-        View root = LayoutInflater.from(getActivity()).inflate(R.layout.fragment1, null);
+        View root = LayoutInflater.from(getActivity()).inflate(R.layout.fragment2, null);
         ButterKnife.bind(this, root);
         initTopView();
         initBanner();
@@ -117,38 +105,13 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
     }
 
     public void initTopView() {
-        topView = LayoutInflater.from(getActivity()).inflate(R.layout.home_top, null);
-        footView = LayoutInflater.from(getActivity()).inflate(R.layout.list_bottom, null);
-
-        mBanner = topView.findViewById(R.id.banner);
-        mHeadTypeList = topView.findViewById(R.id.head_type_list);
-        mCommunityHeadList = topView.findViewById(R.id.community_head_list);
-        refreshLayout2 = topView.findViewById(R.id.layout_top_refresh2);
-        floatLayout = topView.findViewById(R.id.float_layout);
-        mLineView = topView.findViewById(R.id.main_line_view);
-        mAdImageView = topView.findViewById(R.id.iv_home_ad);
-        mAdLayout = topView.findViewById(R.id.layout_ad);
-        TextView tvRefresh2 = topView.findViewById(R.id.tv_refresh2);
-
-        mSearchWrapperLayout = topView.findViewById(R.id.layout_search_wrapper);
-        mSearchLayout = topView.findViewById(R.id.layout_search);
-
-        mSearchLayout.setOnClickListener(this);
-        tvRefresh2.setOnClickListener(this);
+        //设置搜索栏距离
         LinearLayout.LayoutParams searchParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, SizeUtils.dp2px(48));
         searchParams.setMargins(0, BarUtils.getStatusBarHeight(), 0, 0);
         mSearchWrapperLayout.setLayoutParams(searchParams);
 
-        FrameLayout.LayoutParams refreshParams = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, SizeUtils.dp2px(48) + BarUtils.getStatusBarHeight());
-        refreshParams.setMargins(SizeUtils.dp2px(12), 0, SizeUtils.dp2px(12), 0);
-        refreshLayout1.setLayoutParams(refreshParams);
-
-        //广告模块
-        LinearLayout adLayout = topView.findViewById(R.id.layout_ad);
-
-        //加载更多动画
-        mLoadingView = footView.findViewById(R.id.iv_loading);
-        Glide.with(getActivity()).load(R.drawable.list_loading).into(mLoadingView);
+        mSearchLayout.setOnClickListener(this);
+        mRefreshTv.setOnClickListener(this);
     }
 
     public void initData() {
@@ -172,38 +135,11 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
             }
         });
 
-        scrollView.setOnScrollChangeListener(new NestedScrollView.OnScrollChangeListener() {
-            @Override
-            public void onScrollChange(NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
-                int tempY = SizeUtils.px2dp(scrollY + BarUtils.getStatusBarHeight());
-
-                if (tempY > 510 - 48) {
-                    refreshLayout1.setVisibility(View.VISIBLE);
-                    refreshLayout2.setVisibility(View.INVISIBLE);
-                } else {
-                    refreshLayout1.setVisibility(View.INVISIBLE);
-                    refreshLayout2.setVisibility(View.VISIBLE);
-                }
-
-                //判断是否滑动到了底部
-                if (scrollY + SizeUtils.dp2px(48) >= (v.getChildAt(0).getMeasuredHeight() - v.getMeasuredHeight())) {
-                    headInfoAdapter.setFooterView(footView);
-
-                    currentPage++;
-                    homeDataPresenterImp.getData(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", currentPage + "", "", "", 0);
-                }
-            }
-        });
-
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity(), 3);
-        gridLayoutManager.setSmoothScrollbarEnabled(true);
-        gridLayoutManager.setAutoMeasureEnabled(true);
         headInfoAdapter = new HeadInfoAdapter(getActivity(), null);
-        mHeadInfoListView.setLayoutManager(gridLayoutManager);
-        headInfoAdapter.addHeaderView(topView);
+        mHeadInfoListView.setLayoutManager(new GridLayoutManager(getActivity(), 3));
         mHeadInfoListView.setAdapter(headInfoAdapter);
         mHeadInfoListView.setNestedScrollingEnabled(false);
-        mHeadInfoListView.setHasFixedSize(true);
+        //mHeadInfoListView.setHasFixedSize(true);
 
         headInfoAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
             @Override
@@ -211,7 +147,7 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
                 int jumpPage = randomPage + position / pageSize;
                 int jumpPosition = position % pageSize;
 
-                Logger.i("jumpPage page--->" + jumpPage + "---jumpPosition--->" + jumpPosition);
+                Logger.i("jump page--->" + jumpPage + "---jump position--->" + jumpPosition);
 
                 Intent intent = new Intent(getActivity(), HeadShowActivity.class);
                 intent.putExtra("from_type", 1);
@@ -220,6 +156,14 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
                 startActivity(intent);
             }
         });
+
+        headInfoAdapter.setOnLoadMoreListener(new BaseQuickAdapter.RequestLoadMoreListener() {
+            @Override
+            public void onLoadMoreRequested() {
+                currentPage++;
+                homeDataPresenterImp.getData(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", currentPage + "", "", "", 0);
+            }
+        }, mHeadInfoListView);
 
         homeDataPresenterImp.getData(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", "", "", "", 0);
     }
@@ -235,11 +179,10 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
         });
     }
 
-    @OnClick(R.id.tv_refresh1)
+    @OnClick(R.id.tv_refresh2)
     void refresh() {
         isFirstLoad = true;
         homeDataPresenterImp.getData(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", "", "", "1", 0);
-        scrollView.smoothScrollTo(0, SizeUtils.dp2px(510 - 48));
     }
 
     @Override
@@ -335,6 +278,4 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
     public void loadDataError(Throwable throwable) {
 
     }
-
-
 }
