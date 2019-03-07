@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import com.blankj.utilcode.util.BarUtils;
 import com.blankj.utilcode.util.SizeUtils;
+import com.blankj.utilcode.util.ToastUtils;
 import com.bumptech.glide.Glide;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.feiyou.headstyle.App;
@@ -50,9 +51,6 @@ import butterknife.OnClick;
  * Created by myflying on 2019/1/3.
  */
 public class Home1Fragment extends BaseFragment implements HomeDataView, View.OnClickListener {
-
-    @BindView(R.id.scroll_view)
-    NestedScrollView scrollView;
 
     LinearLayout mSearchLayout;
 
@@ -172,42 +170,63 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
             }
         });
 
-        scrollView.setOnScrollChangeListener(new NestedScrollView.OnScrollChangeListener() {
-            @Override
-            public void onScrollChange(NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
-                int tempY = SizeUtils.px2dp(scrollY + BarUtils.getStatusBarHeight());
-
-                if (tempY > 510 - 48) {
-                    refreshLayout1.setVisibility(View.VISIBLE);
-                    refreshLayout2.setVisibility(View.INVISIBLE);
-                } else {
-                    refreshLayout1.setVisibility(View.INVISIBLE);
-                    refreshLayout2.setVisibility(View.VISIBLE);
-                }
-
-                //判断是否滑动到了底部
-                if (scrollY + SizeUtils.dp2px(48) >= (v.getChildAt(0).getMeasuredHeight() - v.getMeasuredHeight())) {
-                    headInfoAdapter.setFooterView(footView);
-
-                    currentPage++;
-                    homeDataPresenterImp.getData(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", currentPage + "", "", "", 0);
-                }
-            }
-        });
-
         GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity(), 3);
-        gridLayoutManager.setSmoothScrollbarEnabled(true);
-        gridLayoutManager.setAutoMeasureEnabled(true);
         headInfoAdapter = new HeadInfoAdapter(getActivity(), null);
         mHeadInfoListView.setLayoutManager(gridLayoutManager);
         headInfoAdapter.addHeaderView(topView);
         mHeadInfoListView.setAdapter(headInfoAdapter);
-        mHeadInfoListView.setNestedScrollingEnabled(false);
-        mHeadInfoListView.setHasFixedSize(true);
+
+
+        mHeadInfoListView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                //在此做处理
+                if (null != gridLayoutManager) {
+                    //当前条目索引
+                    int position = gridLayoutManager.findFirstVisibleItemPosition();
+
+//
+//                    int position = gridLayoutManager.findFirstVisibleItemPosition();
+//                    //根据当前条目索引做判断处理。例如：如果在索引是0，
+//                    //隐藏显示某个布局，索引大于0显示出来
+//                    if (position > 0) {
+//                        //做显示布局操作
+//                        //view.setVisibility(View.VISIBLE);
+//                        refreshLayout1.setVisibility(View.VISIBLE);
+//                        refreshLayout2.setVisibility(View.INVISIBLE);
+//                    } else {
+//                        //做隐藏布局操作
+//                        //view.setVisibility(View.GONE);
+//                        refreshLayout1.setVisibility(View.INVISIBLE);
+//                        refreshLayout2.setVisibility(View.VISIBLE);
+//                    }
+
+
+                    //根据索引来获取对应的itemView
+                    View firstVisiableChildView = gridLayoutManager.findViewByPosition(position);
+                    //获取当前显示条目的高度
+                    int itemHeight = firstVisiableChildView.getHeight();
+                    //获取当前Recyclerview 偏移量
+                    int flag = position * itemHeight - firstVisiableChildView.getTop() + SizeUtils.dp2px(48) + BarUtils.getActionBarHeight();
+                    if (flag >= itemHeight) {
+                        //做显示布局操作
+                        refreshLayout1.setVisibility(View.VISIBLE);
+                        refreshLayout2.setVisibility(View.INVISIBLE);
+                    } else {
+                        //做隐藏布局操作
+                        refreshLayout1.setVisibility(View.INVISIBLE);
+                        refreshLayout2.setVisibility(View.VISIBLE);
+                    }
+                }
+            }
+        });
+
 
         headInfoAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
+
                 int jumpPage = randomPage + position / pageSize;
                 int jumpPosition = position % pageSize;
 
@@ -220,6 +239,14 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
                 startActivity(intent);
             }
         });
+
+        headInfoAdapter.setOnLoadMoreListener(new BaseQuickAdapter.RequestLoadMoreListener() {
+            @Override
+            public void onLoadMoreRequested() {
+                currentPage++;
+                homeDataPresenterImp.getData(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", currentPage + "", "", "", 0);
+            }
+        }, mHeadInfoListView);
 
         homeDataPresenterImp.getData(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", "", "", "", 0);
     }
@@ -239,7 +266,8 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
     void refresh() {
         isFirstLoad = true;
         homeDataPresenterImp.getData(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", "", "", "1", 0);
-        scrollView.smoothScrollTo(0, SizeUtils.dp2px(510 - 48));
+        //scrollView.smoothScrollTo(0, SizeUtils.dp2px(510 - 48));
+        mHeadInfoListView.scrollToPosition(0);
     }
 
     @Override
@@ -308,8 +336,11 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
                             headInfoAdapter.addData(homeDataRet.getImagesList());
                         }
 
-                        //移除底部加载进度
-                        headInfoAdapter.removeAllFooterView();
+                        if (homeDataRet.getImagesList().size() == pageSize) {
+                            headInfoAdapter.loadMoreComplete();
+                        } else {
+                            headInfoAdapter.loadMoreEnd();
+                        }
                     }
                 }
             }
