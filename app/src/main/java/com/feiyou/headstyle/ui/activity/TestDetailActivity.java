@@ -151,7 +151,7 @@ public class TestDetailActivity extends BaseFragmentActivity implements TestDeta
             params.setNickname(userInfo != null ? userInfo.getNickname() : "火星用户");
             params.setHeadimg(userInfo != null ? userInfo.getUserimg() : "");
             params.setResultId(selectResultIndex);
-            params.setSex(userInfo != null ? userInfo.getSex() : "0");
+            params.setSex(userInfo != null ? userInfo.getSex() : 1);
             params.setUserId(userInfo != null ? userInfo.getId() : "0");
 
             testResultInfoPresenterImp.createImage(params);

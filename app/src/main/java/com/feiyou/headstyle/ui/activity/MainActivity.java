@@ -45,7 +45,7 @@ import permissions.dispatcher.RuntimePermissions;
 
 
 @RuntimePermissions
-public class MainActivity extends BaseFragmentActivity implements View.OnClickListener, ViewPager.OnPageChangeListener, UserInfoView {
+public class MainActivity extends BaseFragmentActivity implements View.OnClickListener, ViewPager.OnPageChangeListener {
 
     @BindView(R.id.viewpager)
     ViewPager viewPager;
@@ -89,8 +89,6 @@ public class MainActivity extends BaseFragmentActivity implements View.OnClickLi
     private MyFragmentAdapter adapter;
 
     private UserInfo userInfo;
-
-    private UserInfoPresenterImp userInfoPresenterImp;
 
     public interface IOnFocusListener {
         void onWindowFocusChanged(boolean hasFocus);
@@ -149,8 +147,6 @@ public class MainActivity extends BaseFragmentActivity implements View.OnClickLi
         mMyLayout.setOnClickListener(this);
         viewPager.addOnPageChangeListener(this);
         setCheckedItem(0);
-
-        userInfoPresenterImp = new UserInfoPresenterImp(this, this);
     }
 
     @Override
@@ -164,7 +160,6 @@ public class MainActivity extends BaseFragmentActivity implements View.OnClickLi
             App.getApp().setmUserInfo(userInfo);
             App.getApp().setLogin(true);
         }
-
     }
 
     public void wordType() {
@@ -219,6 +214,7 @@ public class MainActivity extends BaseFragmentActivity implements View.OnClickLi
     }
 
     public void setCheckedItem(int current) {
+
         Button[] tabImages = {mHomeImageView, mCommunityImageView, mTestImageView, mMyImageView};
         TextView[] tabTexts = {mHomeTextView, mCommunityTextView, mTestTextView, mMyTextView};
 
@@ -233,29 +229,6 @@ public class MainActivity extends BaseFragmentActivity implements View.OnClickLi
         }
 
     }
-
-    @Override
-    public void showProgress() {
-
-    }
-
-    @Override
-    public void dismissProgress() {
-
-    }
-
-    @Override
-    public void loadDataSuccess(UserInfoRet tData) {
-        if (tData.getCode() == Constants.SUCCESS) {
-
-        }
-    }
-
-    @Override
-    public void loadDataError(Throwable throwable) {
-
-    }
-
 
     @Override
     public void onPageScrolled(int i, float v, int i1) {

@@ -11,7 +11,7 @@ public class TestResultParams {
     private String resultId;
     private String nickname;
     private String headimg;
-    private String sex;
+    private int sex;
     private String userId;
 
     public String getId() {
@@ -54,11 +54,11 @@ public class TestResultParams {
         this.headimg = headimg;
     }
 
-    public String getSex() {
+    public int getSex() {
         return sex;
     }
 
-    public void setSex(String sex) {
+    public void setSex(int sex) {
         this.sex = sex;
     }
 

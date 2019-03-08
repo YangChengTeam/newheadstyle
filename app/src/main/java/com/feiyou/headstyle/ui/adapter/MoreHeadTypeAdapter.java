@@ -19,8 +19,6 @@ public class MoreHeadTypeAdapter extends BaseQuickAdapter<HeadType, BaseViewHold
 
     private Context mContext;
 
-    String baseUrl = "http://192.168.80.97:8888/words/";
-
     public MoreHeadTypeAdapter(Context context, List<HeadType> datas) {
         super(R.layout.more_head_type_item, datas);
         this.mContext = context;

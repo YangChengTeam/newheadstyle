@@ -178,14 +178,14 @@ public class TestImageDetailActivity extends BaseFragmentActivity implements Tes
             params.setTestType("2");
             params.setNickname(userInfo != null ? userInfo.getNickname() : "火星用户");
             params.setHeadimg(userInfo != null ? userInfo.getUserimg() : "");
-            params.setSex(userInfo != null ? userInfo.getSex() : "0");
+            params.setSex(userInfo != null ? userInfo.getSex() : 1);
             params.setUserId(userInfo != null ? userInfo.getId() : "0");
 
             testResultInfoPresenterImp.createImage(params);
         } else {
             mCommentLayout.setVisibility(View.GONE);
             TestMsgInfo startInfo = new TestMsgInfo("", "开始测试", TestMsgInfo.TYPE_SENT);
-            startInfo.setImgUrl(userInfo != null ? userInfo.getUserimg():"");
+            startInfo.setImgUrl(userInfo != null ? userInfo.getUserimg() : "");
             chatListAdapter.addData(startInfo);
             chatListAdapter.notifyItemInserted(chatListAdapter.getData().size() - 1);
             mChatListView.scrollToPosition(chatListAdapter.getData().size() - 1);
@@ -208,6 +208,10 @@ public class TestImageDetailActivity extends BaseFragmentActivity implements Tes
     @OnClick(R.id.layout_config)
     void config() {
         if (inputStep == 1) {
+            if (StringUtils.isEmpty(selectSexValue)) {
+                ToastUtils.showLong("请选择性别");
+                return;
+            }
             checkSex(selectSexValue);
             inputStep = 2;
         } else {
@@ -218,7 +222,7 @@ public class TestImageDetailActivity extends BaseFragmentActivity implements Tes
 
             TestMsgInfo inputName = new TestMsgInfo();
             inputName.setType(TestMsgInfo.TYPE_SENT);
-            inputName.setImgUrl(userInfo != null ? userInfo.getUserimg():"");
+            inputName.setImgUrl(userInfo != null ? userInfo.getUserimg() : "");
             inputName.setContent(mInputUserNameEt.getText().toString());
             chatListAdapter.addData(inputName);
 
@@ -236,7 +240,7 @@ public class TestImageDetailActivity extends BaseFragmentActivity implements Tes
             params.setTestType("2");
             params.setNickname(userInfo != null ? userInfo.getNickname() : "火星用户");
             params.setHeadimg(userInfo != null ? userInfo.getUserimg() : "");
-            params.setSex(userInfo != null ? userInfo.getSex() : "0");
+            params.setSex(userInfo != null ? userInfo.getSex() : 1);
             params.setUserId(userInfo != null ? userInfo.getId() : "0");
             testResultInfoPresenterImp.createImage(params);
 
@@ -248,7 +252,7 @@ public class TestImageDetailActivity extends BaseFragmentActivity implements Tes
         //回复选择的答案
         TestMsgInfo sexInfo = new TestMsgInfo();
         sexInfo.setType(TestMsgInfo.TYPE_SENT);
-        sexInfo.setImgUrl(userInfo != null ? userInfo.getUserimg():"");
+        sexInfo.setImgUrl(userInfo != null ? userInfo.getUserimg() : "");
         sexInfo.setContent(sexValue);
         chatListAdapter.addData(sexInfo);
 

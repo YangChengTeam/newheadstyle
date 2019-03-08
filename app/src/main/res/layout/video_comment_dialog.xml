@@ -42,8 +42,8 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginBottom="50dp"
-        android:layout_below="@+id/top_line">
+        android:layout_below="@+id/top_line"
+        android:layout_marginBottom="50dp">
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/video_comment_list"
@@ -72,13 +72,13 @@
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@mipmap/empty_icon" />
+                android:src="@mipmap/no_comment_icon" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:text="暂无评论"
+                android:text="还没有评论，你的机会来了"
                 android:textColor="@color/search_number_def"
                 android:textSize="16sp" />
         </LinearLayout>

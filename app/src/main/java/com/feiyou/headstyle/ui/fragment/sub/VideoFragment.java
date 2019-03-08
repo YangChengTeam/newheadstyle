@@ -97,12 +97,12 @@ public class VideoFragment extends BaseFragment implements VideoInfoView {
             }
         });
 
-        videoInfoPresenterImp.getDataList(1);
+        videoInfoPresenterImp.getDataList(currentPage);
         videoListAdapter.setOnLoadMoreListener(new BaseQuickAdapter.RequestLoadMoreListener() {
             @Override
             public void onLoadMoreRequested() {
                 currentPage++;
-                videoInfoPresenterImp.getDataList(1);
+                videoInfoPresenterImp.getDataList(currentPage);
             }
         }, mVideoListView);
     }

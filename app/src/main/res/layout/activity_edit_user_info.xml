@@ -30,6 +30,7 @@
             android:gravity="center">
 
             <ImageView
+                android:id="@+id/iv_user_head"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
                 android:src="@mipmap/head_def" />
@@ -59,14 +60,16 @@
                     android:text="昵称" />
 
                 <EditText
-                    android:layout_width="wrap_content"
+                    android:id="@+id/et_user_nick_name"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
                     android:layout_marginLeft="20dp"
                     android:layout_toRightOf="@+id/tv_nick_name_txt"
                     android:background="@null"
                     android:hint="填写你要修改的昵称"
-                    android:minWidth="150dp"
+                    android:maxLength="50"
+                    android:minWidth="200dp"
                     android:textColor="@color/black1"
                     android:textSize="14sp" />
             </RelativeLayout>
@@ -132,6 +135,7 @@
                     android:text="生日" />
 
                 <TextView
+                    android:id="@+id/tv_birthday"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
@@ -194,19 +198,19 @@
                     android:id="@+id/photo_list"
                     android:layout_width="200dp"
                     android:layout_height="60dp"
-                    android:layout_margin="6dp"
-                    android:focusable="false"
-                    android:clickable="false"
                     android:layout_centerVertical="true"
-                    android:layout_toLeftOf="@+id/tv_total_count"></android.support.v7.widget.RecyclerView>
+                    android:layout_margin="6dp"
+                    android:layout_toLeftOf="@+id/tv_total_count"
+                    android:clickable="false"
+                    android:focusable="false"></android.support.v7.widget.RecyclerView>
 
                 <TextView
                     android:id="@+id/tv_total_count"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
-                    android:layout_marginRight="4dp"
                     android:layout_marginLeft="12dp"
+                    android:layout_marginRight="4dp"
                     android:layout_toLeftOf="@+id/iv_right"
                     android:gravity="right"
                     android:text="0张"
@@ -242,6 +246,7 @@
                 android:textSize="16sp" />
 
             <EditText
+                android:id="@+id/et_intro"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="12dp"
@@ -249,6 +254,7 @@
                 android:gravity="left|top"
                 android:hint="你还没有个性签名"
                 android:lines="3"
+                android:maxLength="200"
                 android:minHeight="100dp"
                 android:padding="6dp" />
         </LinearLayout>

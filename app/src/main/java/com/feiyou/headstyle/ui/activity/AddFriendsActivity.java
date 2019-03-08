@@ -31,6 +31,7 @@ import com.feiyou.headstyle.ui.adapter.AddFriendsListAdapter;
 import com.feiyou.headstyle.ui.adapter.BlackListAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragmentActivity;
 import com.feiyou.headstyle.ui.custom.NormalDecoration;
+import com.feiyou.headstyle.utils.MyToastUtils;
 import com.feiyou.headstyle.view.UserInfoListView;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 import com.qmuiteam.qmui.widget.QMUITopBar;
@@ -219,7 +220,14 @@ public class AddFriendsActivity extends BaseFragmentActivity implements UserInfo
             }
             if (tData instanceof FollowInfoRet) {
                 int tempResult = ((FollowInfoRet) tData).getData().getIsGuan();
-                ToastUtils.showLong(tempResult == 0 ? "已取消" : "已关注");
+                //ToastUtils.showLong(tempResult == 0 ? "已取消" : "已关注");
+
+                if (tempResult == 0) {
+                    MyToastUtils.showToast(this, 1, "已取消");
+                } else {
+                    MyToastUtils.showToast(this, 0, "关注成功");
+                }
+
                 addFriendsListAdapter.getData().get(currentPosition).setFollow(tempResult == 0 ? false : true);
                 addFriendsListAdapter.notifyDataSetChanged();
             }

@@ -246,28 +246,6 @@ public class HeadEditActivity extends BaseFragmentActivity implements StickerDat
         mGPUImageView.setLayoutParams(bgParams);
         mGPUImageView.getGPUImage().setScaleType(GPUImage.ScaleType.CENTER_INSIDE);
 
-//        Glide.with(this).asBitmap().load("")
-//                .listener(new RequestListener<Bitmap>() {
-//                              @Override
-//                              public boolean onLoadFailed(@Nullable GlideException e, Object o, Target<Bitmap> target, boolean b) {
-//                                  currentBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.app_logo);
-//                                  mGPUImageView.setImage(currentBitmap);
-//                                  return false;
-//                              }
-//
-//                              @Override
-//                              public boolean onResourceReady(Bitmap bitmap, Object o, Target<Bitmap> target, DataSource dataSource, boolean b) {
-//                                  if (bitmap != null) {
-//                                      currentBitmap = bitmap;
-//                                  } else {
-//                                      currentBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.app_logo);
-//                                  }
-//                                  mGPUImageView.setImage(currentBitmap);
-//                                  return false;
-//                              }
-//                          }
-//                ).submit();
-
         tabLayout.addTab(tabLayout.newTab().setCustomView(getTabView(0)));
         tabLayout.addTab(tabLayout.newTab().setCustomView(getTabView(1)));
 
@@ -320,7 +298,6 @@ public class HeadEditActivity extends BaseFragmentActivity implements StickerDat
                 e.printStackTrace();
             }
         }
-
 
         //贴纸类型参数
         stickerTypeAdapter = new StickerTypeAdapter(this, null);

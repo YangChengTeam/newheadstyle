@@ -12,7 +12,7 @@ public class UserInfo {
     private String id;
     private String nickname;
     private String openid;
-    private String sex;
+    private int sex;
     private String userimg;
 
     private String addr;
@@ -67,11 +67,12 @@ public class UserInfo {
         this.openid = openid;
     }
 
-    public String getSex() {
+
+    public int getSex() {
         return sex;
     }
 
-    public void setSex(String sex) {
+    public void setSex(int sex) {
         this.sex = sex;
     }
 

@@ -49,6 +49,8 @@ public class TestCategoryActivity extends BaseFragmentActivity implements TestIn
 
     private TestInfoAdapter testInfoAdapter;
 
+    private String cid;
+
     @Override
     protected int getContextViewId() {
         return R.layout.activity_test_category;
@@ -80,12 +82,17 @@ public class TestCategoryActivity extends BaseFragmentActivity implements TestIn
     }
 
     public void initData() {
+        Bundle bundle = getIntent().getExtras();
+        if (bundle != null && bundle.getString("cid") != null) {
+            cid = bundle.getString("cid");
+        }
+
         testInfoPresenterImp = new TestInfoPresenterImp(this, this);
         testInfoAdapter = new TestInfoAdapter(this, null);
         mTypeListView.setLayoutManager(new LinearLayoutManager(this));
         mTypeListView.setAdapter(testInfoAdapter);
         avi.show();
-        testInfoPresenterImp.getDataListByCid("1");
+        testInfoPresenterImp.getDataListByCid(cid);
     }
 
     @Override

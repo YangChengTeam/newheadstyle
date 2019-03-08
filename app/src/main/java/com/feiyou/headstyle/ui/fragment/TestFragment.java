@@ -7,6 +7,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.alibaba.fastjson.JSON;
 import com.blankj.utilcode.util.BarUtils;
@@ -18,6 +19,7 @@ import com.feiyou.headstyle.bean.TestInfoRet;
 import com.feiyou.headstyle.common.Constants;
 import com.feiyou.headstyle.common.GlideImageLoader;
 import com.feiyou.headstyle.presenter.TestInfoPresenterImp;
+import com.feiyou.headstyle.ui.activity.MoreTestActivity;
 import com.feiyou.headstyle.ui.activity.StarListActivity;
 import com.feiyou.headstyle.ui.activity.TestActivity;
 import com.feiyou.headstyle.ui.activity.TestCategoryActivity;
@@ -51,7 +53,15 @@ public class TestFragment extends BaseFragment implements TestInfoView, View.OnC
 
     LinearLayout mFunTestLayout;
 
+    LinearLayout mIQTestLayout;
+
+    LinearLayout mXinliTestLayout;
+
+    LinearLayout mTDTestLayout;
+
     LinearLayout mStarLayout;
+
+    TextView mMoreTv;
 
     private View topView;
 
@@ -78,10 +88,18 @@ public class TestFragment extends BaseFragment implements TestInfoView, View.OnC
         mSearchWrapperLayout = topView.findViewById(R.id.layout_search_wrapper);
         mBanner = topView.findViewById(R.id.test_banner);
         mFunTestLayout = topView.findViewById(R.id.layout_funs);
+        mIQTestLayout = topView.findViewById(R.id.layout_iq);
+        mXinliTestLayout = topView.findViewById(R.id.layout_xinli);
+        mTDTestLayout = topView.findViewById(R.id.layout_tuodan);
         mStarLayout = topView.findViewById(R.id.layout_star);
+        mMoreTv = topView.findViewById(R.id.tv_more);
 
         mFunTestLayout.setOnClickListener(this);
+        mIQTestLayout.setOnClickListener(this);
+        mXinliTestLayout.setOnClickListener(this);
+        mTDTestLayout.setOnClickListener(this);
         mStarLayout.setOnClickListener(this);
+        mMoreTv.setOnClickListener(this);
 
         testInfoPresenterImp = new TestInfoPresenterImp(this, getActivity());
         testInfoAdapter = new TestInfoAdapter(getActivity(), null);
@@ -148,8 +166,9 @@ public class TestFragment extends BaseFragment implements TestInfoView, View.OnC
         mBanner.stopAutoPlay();
     }
 
-    public void funTest() {
+    public void testCategory(String cid) {
         Intent intent = new Intent(getActivity(), TestCategoryActivity.class);
+        intent.putExtra("cid", cid);
         startActivity(intent);
     }
 
@@ -168,6 +187,7 @@ public class TestFragment extends BaseFragment implements TestInfoView, View.OnC
         Logger.i("test list data --->" + JSON.toJSONString(tData));
         if (tData != null && tData.getCode() == Constants.SUCCESS) {
             testInfoAdapter.setNewData(tData.getData());
+            App.testInfoList = tData.getData();
         }
     }
 
@@ -180,7 +200,20 @@ public class TestFragment extends BaseFragment implements TestInfoView, View.OnC
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.layout_funs:
-                funTest();
+                testCategory("1");
+                break;
+            case R.id.layout_iq:
+                testCategory("1");
+                break;
+            case R.id.layout_xinli:
+                testCategory("1");
+                break;
+            case R.id.layout_tuodan:
+                testCategory("1");
+                break;
+            case R.id.tv_more:
+                Intent intentMore = new Intent(getActivity(), MoreTestActivity.class);
+                startActivity(intentMore);
                 break;
             case R.id.layout_star:
                 Intent intent = new Intent(getActivity(), StarListActivity.class);

@@ -7,15 +7,22 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.alibaba.fastjson.JSONObject;
+import com.blankj.utilcode.util.SPUtils;
 import com.blankj.utilcode.util.SizeUtils;
 import com.blankj.utilcode.util.ToastUtils;
+import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.bean.HeadType;
+import com.feiyou.headstyle.bean.UserInfo;
+import com.feiyou.headstyle.common.Constants;
 import com.feiyou.headstyle.ui.adapter.MoreHeadTypeAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragmentActivity;
+import com.feiyou.headstyle.ui.custom.ConfigDialog;
 import com.feiyou.headstyle.ui.custom.LoginDialog;
 import com.feiyou.headstyle.ui.custom.VersionUpdateDialog;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
@@ -30,7 +37,7 @@ import butterknife.OnClick;
 /**
  * Created by myflying on 2018/11/23.
  */
-public class SettingActivity extends BaseFragmentActivity {
+public class SettingActivity extends BaseFragmentActivity implements ConfigDialog.ConfigListener {
 
     @BindView(R.id.topbar)
     QMUITopBar mTopBar;
@@ -40,9 +47,22 @@ public class SettingActivity extends BaseFragmentActivity {
     @BindView(R.id.layout_my_info)
     RelativeLayout mMyInfoLayout;
 
+    @BindView(R.id.layout_login_out)
+    LinearLayout mLoginOutLayout;
+
+    @BindView(R.id.tv_user_id)
+    TextView mUserIdTv;
+
+    @BindView(R.id.tv_address)
+    TextView mUserAddressTv;
+
     VersionUpdateDialog updateDialog;
 
     private VersionUpdateDialog.UpdateListener listener;
+
+    UserInfo userInfo;
+
+    ConfigDialog configDialog;
 
     @Override
     protected int getContextViewId() {
@@ -59,7 +79,6 @@ public class SettingActivity extends BaseFragmentActivity {
 
     private void initTopBar() {
         QMUIStatusBarHelper.setStatusBarLightMode(this);
-        mTopBar.setTitle(getResources().getString(R.string.app_name));
         View topSearchView = getLayoutInflater().inflate(R.layout.common_top_back, null);
         topSearchView.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, SizeUtils.dp2px(48)));
         TextView titleTv = topSearchView.findViewById(R.id.tv_title);
@@ -76,7 +95,14 @@ public class SettingActivity extends BaseFragmentActivity {
     }
 
     public void initData() {
+        configDialog = new ConfigDialog(this, R.style.login_dialog, 1, "确认退出吗?", "请你确认是否退出当前账号，退出后无法获取更多消息哦!");
+        configDialog.setConfigListener(this);
 
+        userInfo = App.getApp().getmUserInfo();
+        if (userInfo != null) {
+            mUserIdTv.setText(userInfo.getId() + "");
+            mUserAddressTv.setText(userInfo.getAddr());
+        }
     }
 
     public void initDialog() {
@@ -114,8 +140,31 @@ public class SettingActivity extends BaseFragmentActivity {
         startActivity(intent);
     }
 
+    @OnClick(R.id.layout_login_out)
+    void loginOut() {
+        if (configDialog != null && !configDialog.isShowing()) {
+            configDialog.show();
+        }
+    }
+
     @Override
     public void onBackPressed() {
         popBackStack();
+    }
+
+    @Override
+    public void config() {
+        App.getApp().setmUserInfo(null);
+        App.getApp().setLogin(false);
+        //移除存储的对象
+        SPUtils.getInstance().remove(Constants.USER_INFO);
+        finish();
+    }
+
+    @Override
+    public void cancel() {
+        if (configDialog != null && configDialog.isShowing()) {
+            configDialog.dismiss();
+        }
     }
 }

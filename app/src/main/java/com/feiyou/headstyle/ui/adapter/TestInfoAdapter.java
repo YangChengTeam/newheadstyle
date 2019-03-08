@@ -34,7 +34,7 @@ public class TestInfoAdapter extends BaseQuickAdapter<TestInfo, BaseViewHolder> 
                 .setText(R.id.tv_test_count, item.getTestCount() + "");
         RequestOptions options = new RequestOptions();
         options.transform(new GlideRoundTransform(mContext, 6));
-        options.placeholder(R.mipmap.empty_icon).error(R.mipmap.empty_icon);
+        options.placeholder(R.mipmap.image_def).error(R.mipmap.image_def);
         Glide.with(mContext).load(item.getTestThumb()).apply(options).into((ImageView) helper.itemView.findViewById(R.id.iv_test_thumb));
     }
 }

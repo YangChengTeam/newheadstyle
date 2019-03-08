@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.feiyou.headstyle.base.BasePresenterImp;
 import com.feiyou.headstyle.bean.LoginRequest;
+import com.feiyou.headstyle.bean.UserInfo;
 import com.feiyou.headstyle.bean.UserInfoRet;
 import com.feiyou.headstyle.bean.WordInfoRet;
 import com.feiyou.headstyle.model.UserInfoModelImp;
@@ -36,5 +37,10 @@ public class UserInfoPresenterImp extends BasePresenterImp<UserInfoView, UserInf
     @Override
     public void getUserSig(String userName) {
         userInfoModelImp.getUserSig(userName, this);
+    }
+
+    @Override
+    public void updateUserInfo(UserInfo updateInfo) {
+        userInfoModelImp.updateUserInfo(updateInfo, this);
     }
 }

@@ -1,7 +1,9 @@
 package com.feiyou.headstyle.ui.fragment;
 
 import android.content.Intent;
-import android.support.v4.widget.NestedScrollView;
+import android.graphics.Color;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -14,7 +16,6 @@ import android.widget.TextView;
 
 import com.blankj.utilcode.util.BarUtils;
 import com.blankj.utilcode.util.SizeUtils;
-import com.blankj.utilcode.util.ToastUtils;
 import com.bumptech.glide.Glide;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.feiyou.headstyle.App;
@@ -31,7 +32,6 @@ import com.feiyou.headstyle.ui.activity.HeadListActivity;
 import com.feiyou.headstyle.ui.activity.HeadShowActivity;
 import com.feiyou.headstyle.ui.activity.MoreTypeActivity;
 import com.feiyou.headstyle.ui.activity.SearchActivity;
-import com.feiyou.headstyle.ui.activity.Test1Activity;
 import com.feiyou.headstyle.ui.adapter.HeadInfoAdapter;
 import com.feiyou.headstyle.ui.adapter.HeadTypeAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragment;
@@ -50,11 +50,14 @@ import butterknife.OnClick;
 /**
  * Created by myflying on 2019/1/3.
  */
-public class Home1Fragment extends BaseFragment implements HomeDataView, View.OnClickListener {
+public class Home1Fragment extends BaseFragment implements HomeDataView, View.OnClickListener, SwipeRefreshLayout.OnRefreshListener {
 
     LinearLayout mSearchLayout;
 
     LinearLayout mSearchWrapperLayout;
+
+    @BindView(R.id.swipe_refresh)
+    SwipeRefreshLayout mRefreshLayout;
 
     @BindView(R.id.layout_top_refresh1)
     RelativeLayout refreshLayout1;
@@ -104,6 +107,10 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
 
     private ImageView mLoadingView;
 
+    private int marginTopHeight;
+
+    GridLayoutManager gridLayoutManager;
+
     @Override
     protected View onCreateView() {
         View root = LayoutInflater.from(getActivity()).inflate(R.layout.fragment1, null);
@@ -115,6 +122,20 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
     }
 
     public void initTopView() {
+        mRefreshLayout.setOnRefreshListener(this);
+        //设置进度View样式的大小，只有两个值DEFAULT和LARGE
+        //设置进度View下拉的起始点和结束点，scale 是指设置是否需要放大或者缩小动画
+        mRefreshLayout.setProgressViewOffset(true, -0, 200);
+        //设置进度View下拉的结束点，scale 是指设置是否需要放大或者缩小动画
+        mRefreshLayout.setProgressViewEndTarget(true, 180);
+        //设置进度View的组合颜色，在手指上下滑时使用第一个颜色，在刷新中，会一个个颜色进行切换
+        mRefreshLayout.setColorSchemeColors(ContextCompat.getColor(getActivity(),R.color.colorPrimary), Color.RED, Color.YELLOW, Color.BLUE);
+
+        //设置触发刷新的距离
+        mRefreshLayout.setDistanceToTriggerSync(200);
+        //如果child是自己自定义的view，可以通过这个回调，告诉mSwipeRefreshLayoutchild是否可以滑动
+        mRefreshLayout.setOnChildScrollUpCallback(null);
+
         topView = LayoutInflater.from(getActivity()).inflate(R.layout.home_top, null);
         footView = LayoutInflater.from(getActivity()).inflate(R.layout.list_bottom, null);
 
@@ -138,7 +159,7 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
         mSearchWrapperLayout.setLayoutParams(searchParams);
 
         FrameLayout.LayoutParams refreshParams = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, SizeUtils.dp2px(48) + BarUtils.getStatusBarHeight());
-        refreshParams.setMargins(SizeUtils.dp2px(12), 0, SizeUtils.dp2px(12), 0);
+        refreshParams.setMargins(0, 0, 0, 0);
         refreshLayout1.setLayoutParams(refreshParams);
 
         //广告模块
@@ -170,7 +191,7 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
             }
         });
 
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity(), 3);
+        gridLayoutManager = new GridLayoutManager(getActivity(), 3);
         headInfoAdapter = new HeadInfoAdapter(getActivity(), null);
         mHeadInfoListView.setLayoutManager(gridLayoutManager);
         headInfoAdapter.addHeaderView(topView);
@@ -210,6 +231,7 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
                     //获取当前Recyclerview 偏移量
                     int flag = position * itemHeight - firstVisiableChildView.getTop() + SizeUtils.dp2px(48) + BarUtils.getActionBarHeight();
                     if (flag >= itemHeight) {
+                        marginTopHeight = flag;
                         //做显示布局操作
                         refreshLayout1.setVisibility(View.VISIBLE);
                         refreshLayout2.setVisibility(View.INVISIBLE);
@@ -267,7 +289,7 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
         isFirstLoad = true;
         homeDataPresenterImp.getData(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", "", "", "1", 0);
         //scrollView.smoothScrollTo(0, SizeUtils.dp2px(510 - 48));
-        mHeadInfoListView.scrollToPosition(0);
+        mHeadInfoListView.scrollTo(0, SizeUtils.dp2px(200));
     }
 
     @Override
@@ -289,11 +311,12 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
 
     @Override
     public void dismissProgress() {
-
+        mRefreshLayout.setRefreshing(false);
     }
 
     @Override
     public void loadDataSuccess(ResultInfo tData) {
+        mRefreshLayout.setRefreshing(false);
         if (tData != null && tData.getCode() == Constants.SUCCESS) {
 
             HomeDataWrapper homeDataRet = null;
@@ -364,8 +387,12 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
 
     @Override
     public void loadDataError(Throwable throwable) {
-
+        mRefreshLayout.setRefreshing(false);
     }
 
 
+    @Override
+    public void onRefresh() {
+        refresh();
+    }
 }

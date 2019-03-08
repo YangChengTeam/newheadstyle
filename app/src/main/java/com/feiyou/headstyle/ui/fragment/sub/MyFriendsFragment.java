@@ -23,6 +23,7 @@ import com.feiyou.headstyle.ui.adapter.AddFriendsListAdapter;
 import com.feiyou.headstyle.ui.adapter.MyFriendsListAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragment;
 import com.feiyou.headstyle.ui.custom.NormalDecoration;
+import com.feiyou.headstyle.utils.MyToastUtils;
 import com.feiyou.headstyle.view.UserInfoListView;
 import com.orhanobut.logger.Logger;
 import com.wang.avi.AVLoadingIndicatorView;
@@ -143,7 +144,14 @@ public class MyFriendsFragment extends BaseFragment implements UserInfoListView 
             }
             if (tData instanceof FollowInfoRet) {
                 int tempResult = ((FollowInfoRet) tData).getData().getIsGuan();
-                ToastUtils.showLong(tempResult == 0 ? "已取消" : "已关注");
+                //ToastUtils.showLong(tempResult == 0 ? "已取消" : "已关注");
+
+                if (tempResult == 0) {
+                    MyToastUtils.showToast(getActivity(), 1, "已取消");
+                } else {
+                    MyToastUtils.showToast(getActivity(), 0, "关注成功");
+                }
+
                 if(myFriendsListAdapter.getData().size() > 0){
                     myFriendsListAdapter.getData().remove(0);
                 }

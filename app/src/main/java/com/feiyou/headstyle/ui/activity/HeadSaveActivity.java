@@ -105,6 +105,12 @@ public class HeadSaveActivity extends BaseFragmentActivity {
 
         bottomSheetDialog.show();
     }
+
+    @OnClick(R.id.layout_setting)
+    void settingHead() {
+
+    }
+
     @OnClick(R.id.layout_home)
     void home() {
         Intent intent = new Intent(this, MainActivity.class);

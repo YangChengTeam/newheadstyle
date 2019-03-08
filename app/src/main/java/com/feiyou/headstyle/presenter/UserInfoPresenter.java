@@ -1,6 +1,7 @@
 package com.feiyou.headstyle.presenter;
 
 import com.feiyou.headstyle.bean.LoginRequest;
+import com.feiyou.headstyle.bean.UserInfo;
 
 /**
  * Created by iflying on 2018/1/9.
@@ -9,4 +10,5 @@ import com.feiyou.headstyle.bean.LoginRequest;
 public interface UserInfoPresenter {
     void login(LoginRequest loginRequest);
     void getUserSig(String userName);
+    void updateUserInfo(UserInfo updateInfo);
 }

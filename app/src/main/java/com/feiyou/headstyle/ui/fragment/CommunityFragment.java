@@ -25,6 +25,7 @@ import com.feiyou.headstyle.presenter.TopicDataPresenterImp;
 import com.feiyou.headstyle.ui.activity.AddFriendsActivity;
 import com.feiyou.headstyle.ui.adapter.SubFragmentAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragment;
+import com.feiyou.headstyle.ui.custom.LoginDialog;
 import com.feiyou.headstyle.ui.fragment.sub.FollowFragment;
 import com.feiyou.headstyle.ui.fragment.sub.RecommendFragment;
 import com.feiyou.headstyle.ui.fragment.sub.VideoFragment;
@@ -69,6 +70,8 @@ public class CommunityFragment extends BaseFragment implements ViewPager.OnPageC
 
     private TopicDataPresenterImp topicDataPresenterImp;
 
+    LoginDialog loginDialog;
+
     /**
      * onCreateView
      */
@@ -86,6 +89,8 @@ public class CommunityFragment extends BaseFragment implements ViewPager.OnPageC
      * 初始化组件
      */
     public void initView() {
+        loginDialog = new LoginDialog(getActivity(), R.style.login_dialog);
+
         //实例化布局对象
         layoutInflater = LayoutInflater.from(getActivity());
 
@@ -199,6 +204,13 @@ public class CommunityFragment extends BaseFragment implements ViewPager.OnPageC
 
     @OnClick(R.id.iv_add_friends)
     void addFriends() {
+        if (!App.getApp().isLogin) {
+            if (loginDialog != null && !loginDialog.isShowing()) {
+                loginDialog.show();
+            }
+            return;
+        }
+
         Intent intent = new Intent(getActivity(), AddFriendsActivity.class);
         startActivity(intent);
     }

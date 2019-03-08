@@ -392,8 +392,7 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
                 MediaScannerConnection.scanFile(HeadShowActivity.this, new String[]{filePath}, null, null);
                 // 最后通知图库更新
                 sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.parse("file://" + filePath)));
-                ToastUtils.showLong(loginType == 2 ? "已保存，请在微信中修改" : "已保存到图库");
-
+                ToastUtils.showLong(loginType == 2 && bottomSheetDialog.isShowing() ? "已保存，请在微信中修改" : "已保存到图库");
             } else {
                 flag = false;
             }

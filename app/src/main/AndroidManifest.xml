@@ -84,6 +84,7 @@
         <activity android:name=".ui.activity.MyFollowActivity" />
         <activity android:name=".ui.activity.TopicSelectActivity" />
         <activity android:name=".ui.activity.Test1Activity" />
+        <activity android:name=".ui.activity.MoreTestActivity" />
         <activity
             android:name=".ui.activity.CommunityTypeActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"

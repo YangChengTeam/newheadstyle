@@ -183,6 +183,11 @@ public class CommunityTypeActivity extends BaseFragmentActivity implements NoteT
         }
     }
 
+    @OnClick(R.id.toolbar_iv_image)
+    void back() {
+        popBackStack();
+    }
+
     @OnClick(R.id.layout_is_follow)
     void followTopic() {
 

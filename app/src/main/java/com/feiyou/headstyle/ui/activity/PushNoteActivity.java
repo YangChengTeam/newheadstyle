@@ -33,6 +33,7 @@ import com.feiyou.headstyle.ui.adapter.AddNoteImageAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragmentActivity;
 import com.feiyou.headstyle.ui.custom.Glide4Engine;
 import com.feiyou.headstyle.ui.custom.MsgEditText;
+import com.feiyou.headstyle.utils.MyToastUtils;
 import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 import com.qmuiteam.qmui.widget.QMUITopBar;
@@ -384,8 +385,10 @@ public class PushNoteActivity extends BaseFragmentActivity implements IBaseView 
         Logger.i(JSON.toJSONString(tData));
         if (tData instanceof ResultInfo) {
             if (((ResultInfo) tData).getCode() == Constants.SUCCESS) {
-                ToastUtils.showLong("发布成功");
+                MyToastUtils.showToast(this, 0, "发帖成功");
                 finish();
+            } else {
+                MyToastUtils.showToast(this, 1, "发帖失败");
             }
         }
     }

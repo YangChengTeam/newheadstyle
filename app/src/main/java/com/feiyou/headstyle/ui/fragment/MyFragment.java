@@ -118,6 +118,8 @@ public class MyFragment extends BaseFragment implements UserInfoView {
             Logger.i(SPUtils.getInstance().getString(Constants.USER_INFO));
             userInfo = JSON.parseObject(SPUtils.getInstance().getString(Constants.USER_INFO), new TypeReference<UserInfo>() {
             });
+        } else {
+            userInfo = null;
         }
 
         if (userInfo != null) {
@@ -130,6 +132,15 @@ public class MyFragment extends BaseFragment implements UserInfoView {
             mFollowTv.setText(userInfo.getGuanNum() + "");
             mFansCountTv.setText(userInfo.getFenNum() + "");
             mKeepCountTv.setText(userInfo.getCollectNum() + "");
+        } else {
+            mUserHeadImageView.setImageResource(R.mipmap.head_def);
+
+            mUserNickNameTv.setText("未登录");
+            mUserIdTv.setText("登录可以换头像哦");
+
+            mFollowTv.setText("0");
+            mFansCountTv.setText("0");
+            mKeepCountTv.setText("0");
         }
 
         if (loginDialog != null && loginDialog.isShowing()) {
@@ -179,30 +190,45 @@ public class MyFragment extends BaseFragment implements UserInfoView {
 
     @OnClick(R.id.layout_my_guan)
     public void guanzhu() {
-        Intent intent = new Intent(getActivity(), MyFollowActivity.class);
-        intent.putExtra("type", 0);
-        startActivity(intent);
+        startActivity(1);
     }
 
     @OnClick(R.id.layout_my_fen)
     public void fensi() {
-        Intent intent = new Intent(getActivity(), MyFollowActivity.class);
-        intent.putExtra("type", 1);
-        startActivity(intent);
+        startActivity(2);
     }
 
     @OnClick(R.id.tv_setting)
     public void setting() {
-        Intent intent = new Intent(getActivity(), SettingActivity.class);
-        startActivity(intent);
+        startActivity(3);
     }
 
     @OnClick(R.id.iv_user_head)
     public void click() {
+        startActivity(4);
+    }
+
+    void startActivity(int type) {
         if (userInfo == null && loginDialog != null && !loginDialog.isShowing()) {
             loginDialog.show();
         } else {
-            Intent intent = new Intent(getActivity(), UserInfoActivity.class);
+            Intent intent = null;
+            switch (type) {
+                case 1:
+                    intent = new Intent(getActivity(), MyFollowActivity.class);
+                    intent.putExtra("type", 0);
+                    break;
+                case 2:
+                    intent = new Intent(getActivity(), MyFollowActivity.class);
+                    intent.putExtra("type", 1);
+                    break;
+                case 3:
+                    intent = new Intent(getActivity(), SettingActivity.class);
+                    break;
+                case 4:
+                    intent = new Intent(getActivity(), UserInfoActivity.class);
+                    break;
+            }
             startActivity(intent);
         }
     }

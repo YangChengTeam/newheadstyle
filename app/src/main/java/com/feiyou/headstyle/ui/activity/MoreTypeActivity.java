@@ -1,5 +1,6 @@
 package com.feiyou.headstyle.ui.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -7,8 +8,10 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.blankj.utilcode.util.SizeUtils;
+import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.bean.MoreTypeInfoRet;
 import com.feiyou.headstyle.common.Constants;
@@ -70,6 +73,8 @@ public class MoreTypeActivity extends BaseFragmentActivity implements MoreTypeDa
         View topSearchView = getLayoutInflater().inflate(R.layout.common_top_back, null);
         topSearchView.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, SizeUtils.dp2px(48)));
         mTopBar.setCenterView(topSearchView);
+        TextView titleTv = topSearchView.findViewById(R.id.tv_title);
+        titleTv.setText("更多头像");
 
         mBackImageView = topSearchView.findViewById(R.id.iv_back);
         mBackImageView.setOnClickListener(new View.OnClickListener() {
@@ -89,6 +94,15 @@ public class MoreTypeActivity extends BaseFragmentActivity implements MoreTypeDa
         mTypeListView.setAdapter(moreTypeAdapter);
         avi.show();
         moreTypeDataPresenterImp.getMoreTypeList();
+        moreTypeAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
+                Intent intent = new Intent(MoreTypeActivity.this, HeadListActivity.class);
+                intent.putExtra("tag_name", moreTypeAdapter.getData().get(position).getTagsname());
+                intent.putExtra("tag_id", moreTypeAdapter.getData().get(position).getId());
+                startActivity(intent);
+            }
+        });
     }
 
     @Override

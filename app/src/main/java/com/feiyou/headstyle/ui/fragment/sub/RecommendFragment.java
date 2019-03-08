@@ -1,6 +1,7 @@
 package com.feiyou.headstyle.ui.fragment.sub;
 
 import android.content.Intent;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -35,6 +36,7 @@ import com.feiyou.headstyle.presenter.FollowInfoPresenterImp;
 import com.feiyou.headstyle.presenter.NoteDataPresenterImp;
 import com.feiyou.headstyle.ui.activity.CommunityArticleActivity;
 import com.feiyou.headstyle.ui.activity.CommunityTypeActivity;
+import com.feiyou.headstyle.ui.activity.PushNoteActivity;
 import com.feiyou.headstyle.ui.adapter.NoteInfoAdapter;
 import com.feiyou.headstyle.ui.adapter.TopicAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragment;
@@ -42,6 +44,7 @@ import com.feiyou.headstyle.ui.custom.GlideRoundTransform;
 import com.feiyou.headstyle.ui.custom.LoginDialog;
 import com.feiyou.headstyle.view.NoteDataView;
 import com.orhanobut.logger.Logger;
+import com.wang.avi.AVLoadingIndicatorView;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -61,6 +64,15 @@ public class RecommendFragment extends BaseFragment implements NoteDataView {
 
     @BindView(R.id.recommend_list)
     RecyclerView mRecommendListView;
+
+    @BindView(R.id.layout_no_data)
+    LinearLayout noDataLayout;
+
+    @BindView(R.id.avi)
+    AVLoadingIndicatorView avi;
+
+    @BindView(R.id.fab)
+    FloatingActionButton mFabButton;
 
     View topView;
 
@@ -196,6 +208,18 @@ public class RecommendFragment extends BaseFragment implements NoteDataView {
         }
     }
 
+    @OnClick(R.id.fab)
+    void fabButton() {
+        if (!App.getApp().isLogin) {
+            if (loginDialog != null && !loginDialog.isShowing()) {
+                loginDialog.show();
+            }
+            return;
+        }
+
+        Intent intent = new Intent(getActivity(), PushNoteActivity.class);
+        startActivity(intent);
+    }
 
     @Override
     public void onStart() {
@@ -221,19 +245,28 @@ public class RecommendFragment extends BaseFragment implements NoteDataView {
 
     @Override
     public void loadDataSuccess(ResultInfo tData) {
+        avi.hide();
         if (tData != null && tData.getCode() == Constants.SUCCESS) {
             if (tData instanceof NoteInfoRet) {
-                if (currentPage == 1) {
-                    noteInfoAdapter.setNewData(((NoteInfoRet) tData).getData());
+                if (((NoteInfoRet) tData).getData() != null && ((NoteInfoRet) tData).getData().size() > 0) {
+                    mRecommendListView.setVisibility(View.VISIBLE);
+                    noDataLayout.setVisibility(View.GONE);
+                    if (currentPage == 1) {
+                        noteInfoAdapter.setNewData(((NoteInfoRet) tData).getData());
+                    } else {
+                        noteInfoAdapter.addData(((NoteInfoRet) tData).getData());
+                    }
+
+                    if (((NoteInfoRet) tData).getData().size() == pageSize) {
+                        noteInfoAdapter.loadMoreComplete();
+                    } else {
+                        noteInfoAdapter.loadMoreEnd();
+                    }
                 } else {
-                    noteInfoAdapter.addData(((NoteInfoRet) tData).getData());
+                    mRecommendListView.setVisibility(View.GONE);
+                    noDataLayout.setVisibility(View.VISIBLE);
                 }
 
-                if (((NoteInfoRet) tData).getData().size() == pageSize) {
-                    noteInfoAdapter.loadMoreComplete();
-                } else {
-                    noteInfoAdapter.loadMoreEnd();
-                }
             }
 
             if (tData instanceof FollowInfoRet) {
@@ -260,9 +293,14 @@ public class RecommendFragment extends BaseFragment implements NoteDataView {
             }
 
         } else {
+            if (tData instanceof NoteInfoRet) {
+                mRecommendListView.setVisibility(View.GONE);
+                noDataLayout.setVisibility(View.VISIBLE);
+            }
+
             if (tData instanceof FollowInfoRet) {
                 ToastUtils.showLong(StringUtils.isEmpty(tData.getMsg()) ? "操作错误" : tData.getMsg());
-            }else{
+            } else {
                 Logger.i("error--->" + tData.getMsg());
             }
         }
@@ -271,6 +309,6 @@ public class RecommendFragment extends BaseFragment implements NoteDataView {
 
     @Override
     public void loadDataError(Throwable throwable) {
-
+        avi.hide();
     }
 }
