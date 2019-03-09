@@ -63,8 +63,8 @@ public class StarListActivity extends BaseFragmentActivity {
 
     private void initTopBar() {
         QMUIStatusBarHelper.setStatusBarLightMode(this);
-        RelativeLayout.LayoutParams params =  new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, SizeUtils.dp2px(48));
-        params.setMargins(0,StatusBarUtil.getStatusBarHeight(this),0,0);
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, SizeUtils.dp2px(48));
+        params.setMargins(0, StatusBarUtil.getStatusBarHeight(this), 0, 0);
 
         mTopLayout.setLayoutParams(params);
 
@@ -94,7 +94,8 @@ public class StarListActivity extends BaseFragmentActivity {
         starListAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
-                Intent intent = new Intent(StarListActivity.this,StarDetailActivity.class);
+                Intent intent = new Intent(StarListActivity.this, StarDetailActivity.class);
+                intent.putExtra("star_index", position);
                 startActivity(intent);
             }
         });

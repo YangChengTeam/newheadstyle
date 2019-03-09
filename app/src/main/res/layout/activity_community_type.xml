@@ -65,7 +65,7 @@
                             android:layout_height="wrap_content"
                             android:text="处Q友"
                             android:textColor="@color/white"
-                            android:textSize="18sp"
+                            android:textSize="18dp"
                             android:textStyle="bold" />
 
                         <LinearLayout
@@ -80,7 +80,7 @@
                                 android:layout_height="wrap_content"
                                 android:text="关注218w"
                                 android:textColor="@color/white"
-                                android:textSize="13sp" />
+                                android:textSize="13dp" />
 
                             <TextView
                                 android:id="@+id/tv_note_count"
@@ -89,7 +89,7 @@
                                 android:layout_marginLeft="12dp"
                                 android:text="帖子9.8w"
                                 android:textColor="@color/white"
-                                android:textSize="13sp" />
+                                android:textSize="13dp" />
                         </LinearLayout>
                     </LinearLayout>
 
@@ -108,7 +108,7 @@
                             android:layout_gravity="center"
                             android:text="@string/follow_user_txt"
                             android:textColor="@color/white"
-                            android:textSize="13sp" />
+                            android:textSize="13dp" />
                     </FrameLayout>
                 </RelativeLayout>
 
@@ -121,7 +121,7 @@
                 <LinearLayout
                     android:id="@+id/top_note_layout"
                     android:layout_width="match_parent"
-                    android:layout_height="99dp"
+                    android:layout_height="56dp"
                     android:layout_alignParentBottom="true"
                     android:layout_gravity="bottom"
                     android:background="@color/white"
@@ -142,7 +142,7 @@
                             android:gravity="center"
                             android:text="置顶"
                             android:textColor="@color/tab_select_color"
-                            android:textSize="15sp" />
+                            android:textSize="15dp" />
 
                         <TextView
                             android:id="@+id/tv_top1_note_name"
@@ -155,44 +155,8 @@
                             android:maxLines="1"
                             android:text="Q友吧招募新的管理员，福利待遇丰厚，请踊跃报名"
                             android:textColor="@color/black1"
-                            android:textSize="15sp" />
+                            android:textSize="15dp" />
                     </LinearLayout>
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="0.5dp"
-                        android:background="@color/line_color"></View>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="45dp"
-                        android:layout_marginLeft="12dp"
-                        android:layout_marginRight="12dp"
-                        android:orientation="horizontal">
-
-                        <TextView
-                            android:layout_width="40dp"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:gravity="center"
-                            android:text="置顶"
-                            android:textColor="@color/tab_select_color"
-                            android:textSize="15sp" />
-
-                        <TextView
-                            android:id="@+id/tv_top2_note_name"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:layout_marginLeft="12dp"
-                            android:layout_weight="1"
-                            android:ellipsize="end"
-                            android:maxLines="1"
-                            android:text="Q友吧招募新的管理员，福利待遇丰厚，请踊跃报名"
-                            android:textColor="@color/black1"
-                            android:textSize="15sp" />
-                    </LinearLayout>
-
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="8dp"
@@ -230,7 +194,7 @@
                         android:layout_centerInParent="true"
                         android:text="头像标题"
                         android:textColor="@color/white"
-                        android:textSize="18sp" />
+                        android:textSize="18dp" />
 
                     <ImageView
                         android:id="@+id/iv_top_share"

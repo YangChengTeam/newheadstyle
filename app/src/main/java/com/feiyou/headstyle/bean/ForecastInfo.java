@@ -8,10 +8,13 @@ import java.util.List;
  * Created by myflying on 2019/2/25.
  */
 public class ForecastInfo {
+
     private List<ForecastSubInfo> list;
 
     @SerializedName("hui")
     private NumInfo numberInfo;
+
+    private String uniqid;
 
     public List<ForecastSubInfo> getList() {
         return list;
@@ -27,6 +30,14 @@ public class ForecastInfo {
 
     public void setNumberInfo(NumInfo numberInfo) {
         this.numberInfo = numberInfo;
+    }
+
+    public String getUniqid() {
+        return uniqid;
+    }
+
+    public void setUniqid(String uniqid) {
+        this.uniqid = uniqid;
     }
 
     public class ForecastSubInfo {

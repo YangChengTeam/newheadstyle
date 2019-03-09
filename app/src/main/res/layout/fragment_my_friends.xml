@@ -46,7 +46,7 @@
                 android:layout_marginTop="10dp"
                 android:text="你还没有关注哦"
                 android:textColor="@color/search_number_def"
-                android:textSize="16sp" />
+                android:textSize="16dp" />
 
             <TextView
                 android:id="@+id/tv_follow_user"
@@ -55,7 +55,7 @@
                 android:padding="10dp"
                 android:text="关注好友→"
                 android:textColor="@color/colorPrimary"
-                android:textSize="16sp" />
+                android:textSize="16dp" />
         </LinearLayout>
     </FrameLayout>
 </LinearLayout>

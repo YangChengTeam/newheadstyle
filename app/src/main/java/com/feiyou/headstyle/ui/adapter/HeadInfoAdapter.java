@@ -24,6 +24,8 @@ public class HeadInfoAdapter extends BaseQuickAdapter<HeadInfo, BaseViewHolder> 
 
     private Context mContext;
 
+    RequestOptions options = null;
+
     public HeadInfoAdapter(Context context, List<HeadInfo> datas) {
         super(R.layout.head_info_item, datas);
         this.mContext = context;
@@ -36,11 +38,12 @@ public class HeadInfoAdapter extends BaseQuickAdapter<HeadInfo, BaseViewHolder> 
         LinearLayout.LayoutParams itemParams = new LinearLayout.LayoutParams(tempWidth, tempWidth);
         itemLayout.setLayoutParams(itemParams);
 
-        RequestOptions options = new RequestOptions();
-        options.transform(new GlideRoundTransform(mContext, 5));
-        options.placeholder(R.mipmap.image_def).error(R.mipmap.image_def);
-        options.override(tempWidth - 8, tempWidth - 8);
-        //options.centerCrop();
+        if (options == null) {
+            options = new RequestOptions();
+            options.transform(new GlideRoundTransform(mContext, 5));
+            options.placeholder(R.mipmap.image_def).error(R.mipmap.image_def);
+            options.override(tempWidth - 8, tempWidth - 8);
+        }
 
         Glide.with(mContext).load(item.getImgurl()).apply(options).into((ImageView) helper.itemView.findViewById(R.id.iv_head_info));
     }

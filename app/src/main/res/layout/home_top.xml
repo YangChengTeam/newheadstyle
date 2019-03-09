@@ -91,7 +91,7 @@
                 android:text="@string/new_head_txt"
                 android:textColor="@color/rec_color"
                 android:textFontWeight="800"
-                android:textSize="16sp" />
+                android:textSize="16dp" />
 
             <TextView
                 android:id="@+id/tv_refresh2"
@@ -105,7 +105,7 @@
                 android:drawablePadding="6dp"
                 android:text="@string/refresh_head_txt"
                 android:textColor="@color/into_community_color"
-                android:textSize="16sp" />
+                android:textSize="16dp" />
         </RelativeLayout>
     </LinearLayout>
 

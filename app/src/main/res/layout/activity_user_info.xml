@@ -69,7 +69,7 @@
                                 android:gravity="center"
                                 android:text="关注"
                                 android:textColor="@color/gray999"
-                                android:textSize="16sp" />
+                                android:textSize="16dp" />
 
                             <TextView
                                 android:id="@+id/tv_follow_count"
@@ -80,7 +80,7 @@
                                 android:layout_toRightOf="@+id/tv_follow_txt"
                                 android:text="250"
                                 android:textColor="@color/black1"
-                                android:textSize="18sp" />
+                                android:textSize="18dp" />
 
                             <TextView
                                 android:id="@+id/tv_fsns_txt"
@@ -92,7 +92,7 @@
                                 android:gravity="center"
                                 android:text="粉丝"
                                 android:textColor="@color/gray999"
-                                android:textSize="16sp" />
+                                android:textSize="16dp" />
 
                             <TextView
                                 android:id="@+id/tv_fans_count"
@@ -102,7 +102,7 @@
                                 android:layout_centerVertical="true"
                                 android:text="168"
                                 android:textColor="@color/black1"
-                                android:textSize="18sp" />
+                                android:textSize="18dp" />
                         </RelativeLayout>
 
                         <LinearLayout
@@ -123,7 +123,7 @@
                                 android:maxLines="1"
                                 android:text="你是一个小笨猪"
                                 android:textColor="@color/black"
-                                android:textSize="16sp" />
+                                android:textSize="16dp" />
                         </LinearLayout>
 
                         <LinearLayout
@@ -139,7 +139,7 @@
                                 android:layout_height="wrap_content"
                                 android:text="头像ID："
                                 android:textColor="@color/gray999"
-                                android:textSize="14sp" />
+                                android:textSize="14dp" />
 
                             <TextView
                                 android:id="@+id/tv_user_id"
@@ -147,7 +147,7 @@
                                 android:layout_height="wrap_content"
                                 android:text="2342342234"
                                 android:textColor="@color/black1"
-                                android:textSize="14sp" />
+                                android:textSize="14dp" />
                         </LinearLayout>
 
                         <LinearLayout
@@ -163,14 +163,14 @@
                                 android:layout_height="wrap_content"
                                 android:text="资料："
                                 android:textColor="@color/gray999"
-                                android:textSize="14sp" />
+                                android:textSize="14dp" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="18岁"
                                 android:textColor="@color/black1"
-                                android:textSize="14sp" />
+                                android:textSize="14dp" />
 
                             <ImageView
                                 android:layout_width="wrap_content"
@@ -184,7 +184,7 @@
                                 android:layout_marginLeft="10dp"
                                 android:text="双鱼座"
                                 android:textColor="@color/black1"
-                                android:textSize="14sp" />
+                                android:textSize="14dp" />
                         </LinearLayout>
 
                         <LinearLayout
@@ -200,7 +200,7 @@
                                 android:layout_height="wrap_content"
                                 android:text="签名："
                                 android:textColor="@color/gray999"
-                                android:textSize="14sp" />
+                                android:textSize="14dp" />
 
                             <TextView
                                 android:id="@+id/tv_user_sign"
@@ -211,7 +211,7 @@
                                 android:maxLines="1"
                                 android:text="没有什么是一顿饭不能解决的，如果有，那就二顿"
                                 android:textColor="@color/black1"
-                                android:textSize="14sp" />
+                                android:textSize="14dp" />
                         </LinearLayout>
 
                         <RelativeLayout
@@ -231,7 +231,7 @@
                                 android:layout_centerVertical="true"
                                 android:text="照片墙："
                                 android:textColor="@color/gray999"
-                                android:textSize="14sp" />
+                                android:textSize="14dp" />
 
                             <android.support.v7.widget.RecyclerView
                                 android:id="@+id/photo_list"

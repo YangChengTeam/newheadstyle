@@ -30,7 +30,7 @@
             android:minHeight="25dp"
             android:text="你是一个猪"
             android:textColor="@color/gray999"
-            android:textSize="13sp" />
+            android:textSize="13dp" />
 
         <TextView
             android:id="@+id/tv_reply_content"
@@ -43,7 +43,7 @@
             android:minHeight="30dp"
             android:text="你是一个大傻逼 @张三"
             android:textColor="@color/black1"
-            android:textSize="14sp" />
+            android:textSize="14dp" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -73,7 +73,7 @@
                 android:minHeight="36dp"
                 android:text="大傻蛋发布的帖子标题"
                 android:textColor="@color/black"
-                android:textSize="14sp" />
+                android:textSize="14dp" />
         </LinearLayout>
 
         <RelativeLayout
@@ -89,7 +89,7 @@
                 android:layout_centerVertical="true"
                 android:text="2019-03-05 12:12"
                 android:textColor="@color/gray_aaa"
-                android:textSize="13sp" />
+                android:textSize="13dp" />
 
             <ImageView
                 android:id="@+id/iv_reply_icon"

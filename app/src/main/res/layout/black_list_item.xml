@@ -35,7 +35,7 @@
                 android:layout_marginBottom="8dp"
                 android:text="你是一个小笨猪"
                 android:textColor="@color/black"
-                android:textSize="18sp" />
+                android:textSize="18dp" />
 
             <TextView
                 android:id="@+id/tv_black_date"
@@ -44,7 +44,7 @@
                 android:layout_marginBottom="8dp"
                 android:text="拉黑时间：2019-01-29"
                 android:textColor="@color/gray999"
-                android:textSize="14sp" />
+                android:textSize="14dp" />
         </LinearLayout>
 
         <LinearLayout
@@ -60,7 +60,7 @@
                 android:layout_height="wrap_content"
                 android:text="移除"
                 android:textColor="@color/search_number_color2"
-                android:textSize="16sp" />
+                android:textSize="16dp" />
         </LinearLayout>
 
         <View

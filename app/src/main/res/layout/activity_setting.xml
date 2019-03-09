@@ -85,7 +85,7 @@
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
                     android:textColor="@color/gray999"
-                    android:textSize="14sp" />
+                    android:textSize="14dp" />
             </RelativeLayout>
         </LinearLayout>
 
@@ -177,7 +177,7 @@
                     android:layout_toLeftOf="@+id/iv_phone_right"
                     android:text="去绑定"
                     android:textColor="@color/gray999"
-                    android:textSize="14sp" />
+                    android:textSize="14dp" />
 
                 <ImageView
                     android:id="@+id/iv_phone_right"
@@ -251,7 +251,7 @@
                     android:layout_toLeftOf="@+id/iv_address_right"
                     android:text="未知地区"
                     android:textColor="@color/gray999"
-                    android:textSize="14sp" />
+                    android:textSize="14dp" />
 
                 <ImageView
                     android:id="@+id/iv_address_right"
@@ -292,7 +292,7 @@
                     android:layout_toLeftOf="@+id/iv_clear_right"
                     android:text="254KB"
                     android:textColor="@color/gray999"
-                    android:textSize="14sp" />
+                    android:textSize="14dp" />
 
                 <ImageView
                     android:id="@+id/iv_clear_right"
@@ -351,6 +351,6 @@
             android:gravity="center"
             android:text="退出登录"
             android:textColor="@color/tab_select_color"
-            android:textSize="16sp" />
+            android:textSize="16dp" />
     </LinearLayout>
 </RelativeLayout>

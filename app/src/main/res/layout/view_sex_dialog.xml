@@ -15,7 +15,7 @@
             android:layout_height="wrap_content"
             android:text="修改性别"
             android:textColor="@color/update_sex_title_color"
-            android:textSize="14sp" />
+            android:textSize="14dp" />
     </LinearLayout>
 
     <View
@@ -34,7 +34,7 @@
             android:layout_height="wrap_content"
             android:text="男"
             android:textColor="@color/black1"
-            android:textSize="16sp" />
+            android:textSize="16dp" />
     </LinearLayout>
 
     <View
@@ -53,7 +53,7 @@
             android:layout_height="wrap_content"
             android:text="女"
             android:textColor="@color/black1"
-            android:textSize="16sp" />
+            android:textSize="16dp" />
     </LinearLayout>
 
     <View
@@ -72,6 +72,6 @@
             android:layout_height="wrap_content"
             android:text="取消"
             android:textColor="@color/update_sex_title_color"
-            android:textSize="14sp" />
+            android:textSize="14dp" />
     </LinearLayout>
 </LinearLayout>

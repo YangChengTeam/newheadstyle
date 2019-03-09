@@ -53,7 +53,7 @@
                     android:minHeight="30dp"
                     android:padding="6dp"
                     android:textColor="@color/black"
-                    android:textSize="14sp" />
+                    android:textSize="14dp" />
             </RelativeLayout>
         </LinearLayout>
 
@@ -167,7 +167,7 @@
                 android:minHeight="30dp"
                 android:padding="6dp"
                 android:textColor="@color/black"
-                android:textSize="14sp" />
+                android:textSize="14dp" />
 
             <ImageView
                 android:id="@+id/iv_chat_horn_right"

@@ -36,16 +36,16 @@
                 android:layout_marginBottom="8dp"
                 android:text="头像类型"
                 android:textColor="@color/black"
-                android:textSize="18sp" />
+                android:textSize="18dp" />
 
             <TextView
-                android:id="@+id/iv_type_desp"
+                android:id="@+id/iv_type_dedp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
                 android:text="好看的头像类型介绍"
                 android:textColor="@color/gray999"
-                android:textSize="14sp" />
+                android:textSize="14dp" />
         </LinearLayout>
 
         <LinearLayout
@@ -64,7 +64,7 @@
                 android:layout_marginRight="-3dp"
                 android:layout_marginLeft="3dp"
                 android:textColor="@color/tab_select_color"
-                android:textSize="14sp" />
+                android:textSize="14dp" />
 
             <ImageView
                 android:layout_width="16dp"

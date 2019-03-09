@@ -40,7 +40,7 @@
                     android:gravity="left|center"
                     android:text="你是一个小笨猪"
                     android:textColor="@color/black"
-                    android:textSize="16sp" />
+                    android:textSize="16dp" />
 
                 <ImageView
                     android:id="@+id/iv_sex"
@@ -56,7 +56,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="left|center"
                 android:textColor="@color/gray999"
-                android:textSize="12sp" />
+                android:textSize="12dp" />
 
             <TextView
                 android:id="@+id/tv_user_sign"
@@ -68,7 +68,7 @@
                 android:lines="1"
                 android:maxWidth="200dp"
                 android:textColor="@color/gray999"
-                android:textSize="12sp" />
+                android:textSize="12dp" />
         </LinearLayout>
 
         <LinearLayout
@@ -87,7 +87,7 @@
                 android:layout_height="wrap_content"
                 android:text="取消关注"
                 android:textColor="@color/is_follow_color"
-                android:textSize="14sp" />
+                android:textSize="14dp" />
         </LinearLayout>
     </RelativeLayout>
 

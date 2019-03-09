@@ -19,5 +19,5 @@
         android:text="处Q友"
         android:layout_marginTop="4dp"
         android:textColor="@color/black3"
-        android:textSize="14sp" />
+        android:textSize="14dp" />
 </LinearLayout>

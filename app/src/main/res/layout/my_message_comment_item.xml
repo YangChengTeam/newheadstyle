@@ -30,7 +30,7 @@
             android:minHeight="25dp"
             android:text="你是一个猪"
             android:textColor="@color/gray999"
-            android:textSize="13sp" />
+            android:textSize="13dp" />
 
         <TextView
             android:id="@+id/tv_reply_content"
@@ -43,7 +43,7 @@
             android:minHeight="30dp"
             android:text="无聊的网友瞎几把回复的内容"
             android:textColor="@color/black1"
-            android:textSize="14sp" />
+            android:textSize="14dp" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -64,7 +64,7 @@
                 android:padding="6dp"
                 android:text="火星网友发布的内容火星网友发布的内容火星网友发布的内容"
                 android:textColor="@color/tab_normal_color"
-                android:textSize="14sp" />
+                android:textSize="14dp" />
         </LinearLayout>
 
         <RelativeLayout
@@ -80,7 +80,7 @@
                 android:layout_centerVertical="true"
                 android:text="2019-03-05 12:12"
                 android:textColor="@color/gray_aaa"
-                android:textSize="13sp" />
+                android:textSize="13dp" />
 
             <ImageView
                 android:id="@+id/iv_reply_icon"

@@ -90,9 +90,6 @@ public class CommunityTypeActivity extends BaseFragmentActivity implements NoteT
     @BindView(R.id.tv_top1_note_name)
     TextView mTop1NoteNameTv;
 
-    @BindView(R.id.tv_top2_note_name)
-    TextView mTop2NoteNameTv;
-
     @BindView(R.id.layout_is_follow)
     FrameLayout mFollowLayout;
 
@@ -114,6 +111,8 @@ public class CommunityTypeActivity extends BaseFragmentActivity implements NoteT
     FollowInfoPresenterImp followInfoPresenterImp;
 
     LoginDialog loginDialog;
+
+    private String noteId;
 
     @Override
     protected int getContextViewId() {
@@ -183,6 +182,13 @@ public class CommunityTypeActivity extends BaseFragmentActivity implements NoteT
         }
     }
 
+    @OnClick(R.id.tv_top1_note_name)
+    void topNote() {
+        Intent intent = new Intent(this, CommunityArticleActivity.class);
+        intent.putExtra("msg_id", noteId);
+        startActivity(intent);
+    }
+
     @OnClick(R.id.toolbar_iv_image)
     void back() {
         popBackStack();
@@ -229,10 +235,8 @@ public class CommunityTypeActivity extends BaseFragmentActivity implements NoteT
 
                 if (noteTypeWrapper != null && noteTypeWrapper.getNoticeList() != null) {
                     if (noteTypeWrapper.getNoticeList().size() > 0) {
+                        noteId = noteTypeWrapper.getNoticeList().get(0).getId();
                         mTop1NoteNameTv.setText(noteTypeWrapper.getNoticeList().get(0).getTitle());
-                    }
-                    if (noteTypeWrapper.getNoticeList().size() > 1) {
-                        mTop2NoteNameTv.setText(noteTypeWrapper.getNoticeList().get(1).getTitle());
                     }
                 }
 

@@ -17,5 +17,5 @@
         android:padding="@dimen/dp_4"
         android:gravity="center"
         android:textColor="@color/black1"
-        android:textSize="14sp" />
+        android:textSize="14dp" />
 </LinearLayout>

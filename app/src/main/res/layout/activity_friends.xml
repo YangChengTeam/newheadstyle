@@ -44,7 +44,7 @@
             android:hint="搜索好友"
             android:imeOptions="actionSearch"
             android:inputType="text"
-            android:textSize="13sp" />
+            android:textSize="13dp" />
     </LinearLayout>
 
     <com.yanzhenjie.recyclerview.swipe.widget.StickyNestedScrollView

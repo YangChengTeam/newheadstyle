@@ -29,7 +29,7 @@
             android:layout_centerInParent="true"
             android:text="评论"
             android:textColor="@color/black1"
-            android:textSize="18sp" />
+            android:textSize="18dp" />
     </RelativeLayout>
 
     <View
@@ -80,7 +80,7 @@
                 android:layout_marginTop="10dp"
                 android:text="还没有评论，你的机会来了"
                 android:textColor="@color/search_number_def"
-                android:textSize="16sp" />
+                android:textSize="16dp" />
         </LinearLayout>
     </FrameLayout>
 
@@ -125,7 +125,7 @@
                     android:layout_marginLeft="6dp"
                     android:text="@string/share_txt"
                     android:textColor="@color/black3"
-                    android:textSize="12sp" />
+                    android:textSize="12dp" />
             </LinearLayout>
 
             <LinearLayout
@@ -148,7 +148,7 @@
                     android:layout_marginLeft="6dp"
                     android:text="回复"
                     android:textColor="@color/black3"
-                    android:textSize="12sp" />
+                    android:textSize="12dp" />
             </LinearLayout>
 
             <LinearLayout
@@ -166,7 +166,7 @@
                     android:layout_marginLeft="6dp"
                     android:text="点赞"
                     android:textColor="@color/black3"
-                    android:textSize="12sp" />
+                    android:textSize="12dp" />
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>

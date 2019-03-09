@@ -16,5 +16,5 @@
         android:layout_toLeftOf="@+id/iv_refresh"
         android:text="关注--->"
         android:textColor="@color/into_community_color"
-        android:textSize="13sp" />
+        android:textSize="13dp" />
 </RelativeLayout>

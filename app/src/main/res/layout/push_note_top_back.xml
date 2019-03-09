@@ -12,7 +12,7 @@
         android:layout_centerVertical="true"
         android:padding="12dp"
         android:text="取消"
-        android:textSize="14sp"
+        android:textSize="14dp"
         android:textColor="@color/black" />
 
     <Button

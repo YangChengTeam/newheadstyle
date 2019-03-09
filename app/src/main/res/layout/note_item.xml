@@ -49,7 +49,7 @@
                     android:layout_height="wrap_content"
                     android:text="用户昵称"
                     android:textColor="@color/into_community_color"
-                    android:textSize="14sp" />
+                    android:textSize="14dp" />
 
                 <LinearLayout
                     android:layout_width="wrap_content"
@@ -64,7 +64,7 @@
                         android:layout_height="wrap_content"
                         android:text="处Q友"
                         android:textColor="@color/community_type_color"
-                        android:textSize="11sp" />
+                        android:textSize="11dp" />
 
                     <TextView
                         android:id="@+id/tv_note_date"
@@ -73,7 +73,7 @@
                         android:layout_marginLeft="6dp"
                         android:text="10分钟前"
                         android:textColor="@color/gray_aaa"
-                        android:textSize="9sp" />
+                        android:textSize="9dp" />
                 </LinearLayout>
             </LinearLayout>
 
@@ -93,7 +93,7 @@
                     android:layout_gravity="center"
                     android:text="@string/follow_user_txt"
                     android:textColor="@color/tab_select_color"
-                    android:textSize="14sp" />
+                    android:textSize="14dp" />
             </FrameLayout>
 
             <LinearLayout
@@ -125,7 +125,7 @@
                 android:layout_height="wrap_content"
                 android:text="帖子的内容介绍文字等等"
                 android:textColor="@color/black"
-                android:textSize="14sp" />
+                android:textSize="14dp" />
         </LinearLayout>
 
         <android.support.v7.widget.RecyclerView
@@ -160,7 +160,7 @@
                     android:layout_marginLeft="6dp"
                     android:text="@string/share_txt"
                     android:textColor="@color/black3"
-                    android:textSize="12sp" />
+                    android:textSize="12dp" />
             </LinearLayout>
 
             <LinearLayout
@@ -182,7 +182,7 @@
                     android:layout_marginLeft="6dp"
                     android:text="563"
                     android:textColor="@color/black3"
-                    android:textSize="12sp" />
+                    android:textSize="12dp" />
             </LinearLayout>
 
             <LinearLayout
@@ -202,7 +202,7 @@
                     android:drawablePadding="4dp"
                     android:text="0"
                     android:textColor="@color/zan_txt_color"
-                    android:textSize="12sp" />
+                    android:textSize="12dp" />
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>

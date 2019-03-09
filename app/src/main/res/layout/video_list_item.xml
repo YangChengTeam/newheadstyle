@@ -48,7 +48,7 @@
                 android:maxLines="1"
                 android:text="火星用户"
                 android:textColor="@color/into_community_color"
-                android:textSize="12sp" />
+                android:textSize="12dp" />
 
             <ImageView
                 android:layout_width="12dp"
@@ -67,7 +67,7 @@
                 android:layout_marginRight="6dp"
                 android:text="452"
                 android:textColor="@color/black3"
-                android:textSize="11sp" />
+                android:textSize="11dp" />
 
         </RelativeLayout>
     </LinearLayout>

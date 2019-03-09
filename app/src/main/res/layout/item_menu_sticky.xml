@@ -27,6 +27,6 @@
         android:padding="@dimen/dp_10"
         android:text="A"
         android:textColor="@color/gray_aaa"
-        android:textSize="14sp" />
+        android:textSize="14dp" />
 
 </FrameLayout>

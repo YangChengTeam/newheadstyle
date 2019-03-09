@@ -14,5 +14,5 @@
         android:maxLines="2"
         android:minHeight="36dp"
         android:textColor="@color/white"
-        android:textSize="12sp" />
+        android:textSize="12dp" />
 </LinearLayout>

@@ -32,7 +32,7 @@
             app:strokeRadius="20dp"
             app:strokeWidth="1dp"
             app:switchTabs="@array/switch_tabs"
-            app:textSize="14sp" />
+            app:textSize="14dp" />
     </LinearLayout>
 
     <LinearLayout
@@ -79,7 +79,7 @@
                     android:drawablePadding="4dp"
                     android:text="分享"
                     android:textColor="@color/tab_normal_color"
-                    android:textSize="10sp" />
+                    android:textSize="10dp" />
             </LinearLayout>
 
             <LinearLayout
@@ -96,7 +96,7 @@
                     android:drawablePadding="4dp"
                     android:text="修改"
                     android:textColor="@color/tab_normal_color"
-                    android:textSize="10sp" />
+                    android:textSize="10dp" />
             </LinearLayout>
 
             <FrameLayout
@@ -112,7 +112,7 @@
                     android:layout_marginTop="10dp"
                     android:text="设为头像"
                     android:textColor="@color/tab_normal_color"
-                    android:textSize="10sp" />
+                    android:textSize="10dp" />
             </FrameLayout>
 
             <LinearLayout
@@ -130,7 +130,7 @@
                     android:drawablePadding="4dp"
                     android:text="收藏"
                     android:textColor="@color/tab_normal_color"
-                    android:textSize="10sp" />
+                    android:textSize="10dp" />
             </LinearLayout>
 
             <LinearLayout
@@ -147,7 +147,7 @@
                     android:drawablePadding="4dp"
                     android:text="下载"
                     android:textColor="@color/tab_normal_color"
-                    android:textSize="10sp" />
+                    android:textSize="10dp" />
             </LinearLayout>
         </LinearLayout>
 

@@ -45,7 +45,7 @@
                 android:layout_height="wrap_content"
                 android:text="开始测试"
                 android:textColor="@color/white"
-                android:textSize="16sp" />
+                android:textSize="16dp" />
         </LinearLayout>
     </FrameLayout>
 

@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         android:text="推荐"
         android:textColor="@color/gray999"
-        android:textSize="16sp"></TextView>
+        android:textSize="16dp"></TextView>
 
     <View
         android:id="@+id/tab_line"

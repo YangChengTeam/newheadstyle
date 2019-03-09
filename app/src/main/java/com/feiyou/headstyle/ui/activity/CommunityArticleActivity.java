@@ -13,6 +13,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -290,7 +291,7 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
                 mNickNameTextView.setText(currentNoteInfo.getNickname());
                 mTopicNameTextView.setText(currentNoteInfo.getName());
                 mAddDateTextView.setText(TimeUtils.millis2String(currentNoteInfo.getAddTime() != null ? currentNoteInfo.getAddTime() * 1000 : 0));
-                mNoteContentTextView.setText(currentNoteInfo.getContent());
+                mNoteContentTextView.setText(Html.fromHtml(currentNoteInfo.getContent()));
 
                 mMessageCountTextView.setText(commentNum > 0 ? commentNum + "" : "");
                 mZanCountTextView.setText(currentNoteInfo.getZanNum() + "");
@@ -360,8 +361,11 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
             mFollowLayout.setBackgroundResource(tempResult == 0 ? R.drawable.into_bg : R.drawable.is_follow_bg);
             mFollowTv.setTextColor(ContextCompat.getColor(this, tempResult == 0 ? R.color.tab_select_color : R.color.black2));
             mFollowTv.setText(tempResult == 0 ? "+关注" : "已关注");
-
-            ToastUtils.showLong(StringUtils.isEmpty(tData.getMsg()) ? "操作失败" : tData.getMsg());
+            if (tData instanceof NoteInfoDetailRet) {
+                Logger.i(StringUtils.isEmpty(tData.getMsg()) ? "操作失败" : tData.getMsg());
+            } else {
+                ToastUtils.showLong(StringUtils.isEmpty(tData.getMsg()) ? "操作失败" : tData.getMsg());
+            }
         }
     }
 

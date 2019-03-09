@@ -19,7 +19,7 @@
         android:lines="1"
         android:maxWidth="200dp"
         android:textColor="@color/black"
-        android:textSize="14sp" />
+        android:textSize="14dp" />
 
     <TextView
         android:id="@+id/tv_word_type_cn_name"
@@ -29,5 +29,5 @@
         android:lines="1"
         android:maxWidth="200dp"
         android:textColor="@color/black2"
-        android:textSize="13sp" />
+        android:textSize="13dp" />
 </LinearLayout>

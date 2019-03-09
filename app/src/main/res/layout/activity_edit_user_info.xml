@@ -71,7 +71,7 @@
                     android:maxLength="50"
                     android:minWidth="200dp"
                     android:textColor="@color/black1"
-                    android:textSize="14sp" />
+                    android:textSize="14dp" />
             </RelativeLayout>
 
             <View
@@ -170,7 +170,7 @@
                 android:layout_marginLeft="12dp"
                 android:text="照片墙"
                 android:textColor="@color/black1"
-                android:textSize="16sp" />
+                android:textSize="16dp" />
 
             <LinearLayout
                 android:id="@+id/layout_no_photo"
@@ -185,7 +185,7 @@
                     android:layout_height="wrap_content"
                     android:text="请点击上传照片"
                     android:textColor="@color/hint_txt_color"
-                    android:textSize="16sp" />
+                    android:textSize="16dp" />
             </LinearLayout>
 
             <RelativeLayout
@@ -215,7 +215,7 @@
                     android:gravity="right"
                     android:text="0张"
                     android:textColor="@color/black3"
-                    android:textSize="16sp" />
+                    android:textSize="16dp" />
 
                 <ImageView
                     android:id="@+id/iv_right"
@@ -243,7 +243,7 @@
                 android:layout_marginTop="12dp"
                 android:text="个性签名"
                 android:textColor="@color/black1"
-                android:textSize="16sp" />
+                android:textSize="16dp" />
 
             <EditText
                 android:id="@+id/et_intro"

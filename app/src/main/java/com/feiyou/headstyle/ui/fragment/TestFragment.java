@@ -216,6 +216,12 @@ public class TestFragment extends BaseFragment implements TestInfoView, View.OnC
                 startActivity(intentMore);
                 break;
             case R.id.layout_star:
+                if (!App.getApp().isLogin) {
+                    if (loginDialog != null && !loginDialog.isShowing()) {
+                        loginDialog.show();
+                    }
+                    return;
+                }
                 Intent intent = new Intent(getActivity(), StarListActivity.class);
                 startActivity(intent);
                 break;

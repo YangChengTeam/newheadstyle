@@ -35,7 +35,7 @@ public class StarListAdapter extends BaseQuickAdapter<StarInfo, BaseViewHolder> 
 
         int tempWidth = (ScreenUtils.getScreenWidth() - SizeUtils.dp2px(56)) / 4;
         LinearLayout itemLayout = helper.itemView.findViewById(R.id.layout_star_item);
-        LinearLayout.LayoutParams itemParams = new LinearLayout.LayoutParams(tempWidth, SizeUtils.dp2px(108));
+        LinearLayout.LayoutParams itemParams = new LinearLayout.LayoutParams(tempWidth, SizeUtils.dp2px(122));
         int temp = SizeUtils.dp2px(4);
         itemLayout.setGravity(Gravity.CENTER);
         itemParams.setMargins(temp, temp, temp, temp);

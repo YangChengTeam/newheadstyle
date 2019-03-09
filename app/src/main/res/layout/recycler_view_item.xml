@@ -14,5 +14,5 @@
         android:background="@color/colorPrimary"
         android:gravity="center"
         android:textColor="#fff"
-        android:textSize="40sp"/>
+        android:textSize="40dp"/>
 </RelativeLayout>
