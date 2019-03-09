@@ -234,10 +234,10 @@ public class StarDetailActivity extends BaseFragmentActivity implements Forecast
     }
 
     void downImage(String imgUrl) {
-        if (StringUtils.isEmpty(imgUrl)) {
-            ToastUtils.showLong("下载失败，请稍后重试");
-            return;
-        }
+//        if (StringUtils.isEmpty(imgUrl)) {
+//            ToastUtils.showLong("下载失败，请稍后重试");
+//            return;
+//        }
         Glide.with(this).asBitmap().load(imgUrl).into(new SimpleTarget<Bitmap>() {
             @Override
             public void onResourceReady(Bitmap resource, Transition<? super Bitmap> transition) {
