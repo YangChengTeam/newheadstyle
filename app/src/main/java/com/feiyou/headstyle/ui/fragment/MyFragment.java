@@ -26,6 +26,7 @@ import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.bean.LoginRequest;
 import com.feiyou.headstyle.bean.MessageEvent;
+import com.feiyou.headstyle.bean.ResultInfo;
 import com.feiyou.headstyle.bean.UserInfo;
 import com.feiyou.headstyle.bean.UserInfoRet;
 import com.feiyou.headstyle.common.Constants;
@@ -256,23 +257,24 @@ public class MyFragment extends BaseFragment implements UserInfoView {
     }
 
     @Override
-    public void loadDataSuccess(UserInfoRet tData) {
+    public void loadDataSuccess(ResultInfo tData) {
         Logger.i("my fragment user info --->" + JSONObject.toJSONString(tData));
 
         if (tData != null && tData.getCode() == Constants.SUCCESS) {
-            userInfo = tData.getData();
+            if (tData instanceof UserInfoRet) {
+                userInfo = ((UserInfoRet) tData).getData();
 
-            App.getApp().setmUserInfo(userInfo);
-            App.getApp().setLogin(true);
-            SPUtils.getInstance().put(Constants.USER_INFO, JSONObject.toJSONString(tData.getData()));
+                App.getApp().setmUserInfo(userInfo);
+                App.getApp().setLogin(true);
+                SPUtils.getInstance().put(Constants.USER_INFO, JSONObject.toJSONString(((UserInfoRet) tData).getData()));
 
-            mUserNickNameTv.setText(userInfo.getNickname());
-            mUserIdTv.setText("ID：" + userInfo.getId());
+                mUserNickNameTv.setText(userInfo.getNickname());
+                mUserIdTv.setText("ID：" + userInfo.getId());
 
-            mFollowTv.setText(userInfo.getGuanNum() + "");
-            mFansCountTv.setText(userInfo.getFenNum() + "");
-            mKeepCountTv.setText(userInfo.getCollectNum() + "");
-
+                mFollowTv.setText(userInfo.getGuanNum() + "");
+                mFansCountTv.setText(userInfo.getFenNum() + "");
+                mKeepCountTv.setText(userInfo.getCollectNum() + "");
+            }
         } else {
             ToastUtils.showLong(StringUtils.isEmpty(tData.getMsg()) ? "登录失败" : tData.getMsg());
         }

@@ -1,18 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/layout_type_item"
     android:layout_width="match_parent"
-    android:layout_height="31dp"
-    android:background="@color/gray_eee"
-    android:gravity="center"
-    android:orientation="vertical">
+    android:layout_height="36dp"
+    android:background="@color/gray_eee">
+
+    <View
+        android:id="@+id/left_type_line"
+        android:layout_width="2dp"
+        android:layout_height="36dp"
+        android:layout_alignParentLeft="true"
+        android:background="@color/sticker_item_bg_color"></View>
 
     <TextView
         android:id="@+id/tv_type_name"
         android:layout_width="wrap_content"
         android:layout_height="30dp"
+        android:layout_centerInParent="true"
         android:gravity="center"
         android:textColor="@color/black4"
-        android:textSize="13dp" />
+        android:textSize="12dp" />
 
-</LinearLayout>
+</RelativeLayout>

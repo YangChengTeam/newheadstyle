@@ -1,22 +1,20 @@
 package com.feiyou.headstyle.bean;
 
-import java.util.List;
-
 /**
  * Created by myflying on 2018/11/20.
  */
-public class StarPosterRet extends ResultInfo {
-    private ResultImageWrapper data;
+public class UpdateHeadRet extends ResultInfo {
+    private UpdateHeadWrapper data;
 
-    public ResultImageWrapper getData() {
+    public UpdateHeadWrapper getData() {
         return data;
     }
 
-    public void setData(ResultImageWrapper data) {
+    public void setData(UpdateHeadWrapper data) {
         this.data = data;
     }
 
-    public class ResultImageWrapper{
+    public class UpdateHeadWrapper {
         private String image;
 
         public String getImage() {

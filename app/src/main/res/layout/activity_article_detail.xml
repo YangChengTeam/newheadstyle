@@ -110,26 +110,22 @@
                     </RelativeLayout>
 
                     <LinearLayout
+                        android:id="@+id/layout_web_view"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:gravity="left|center"
-                        android:minHeight="40dp">
+                        android:layout_margin="12dp"
+                        android:gravity="center"
+                        android:minHeight="48dp"
+                        android:orientation="vertical">
 
-                        <TextView
-                            android:id="@+id/tv_note_content"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:padding="12dp"
-                            android:textColor="@color/black"
-                            android:textSize="14dp" />
                     </LinearLayout>
 
                     <android.support.v7.widget.RecyclerView
                         android:id="@+id/note_img_list"
-                        android:paddingLeft="12dp"
-                        android:paddingRight="12dp"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"></android.support.v7.widget.RecyclerView>
+                        android:layout_height="wrap_content"
+                        android:paddingLeft="12dp"
+                        android:paddingRight="12dp"></android.support.v7.widget.RecyclerView>
 
                 </LinearLayout>
 

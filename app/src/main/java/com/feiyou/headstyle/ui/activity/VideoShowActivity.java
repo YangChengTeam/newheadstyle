@@ -42,6 +42,7 @@ import com.dingmouren.layoutmanagergroup.viewpager.OnViewPagerListener;
 import com.dingmouren.layoutmanagergroup.viewpager.ViewPagerLayoutManager;
 import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
+import com.feiyou.headstyle.bean.FollowInfoRet;
 import com.feiyou.headstyle.bean.MessageEvent;
 import com.feiyou.headstyle.bean.NoteItem;
 import com.feiyou.headstyle.bean.NoteSubComment;
@@ -55,6 +56,7 @@ import com.feiyou.headstyle.bean.VideoInfoRet;
 import com.feiyou.headstyle.bean.ZanResultRet;
 import com.feiyou.headstyle.common.Constants;
 import com.feiyou.headstyle.presenter.AddZanPresenterImp;
+import com.feiyou.headstyle.presenter.FollowInfoPresenterImp;
 import com.feiyou.headstyle.presenter.NoteSubCommentDataPresenterImp;
 import com.feiyou.headstyle.presenter.ReplyCommentPresenterImp;
 import com.feiyou.headstyle.presenter.VideoCommentPresenterImp;
@@ -161,6 +163,8 @@ public class VideoShowActivity extends BaseFragmentActivity implements VideoInfo
 
     private AddZanPresenterImp addZanPresenterImp;
 
+    private FollowInfoPresenterImp followInfoPresenterImp;
+
     LoginDialog loginDialog;
 
     private int videoPage = 1;
@@ -170,6 +174,8 @@ public class VideoShowActivity extends BaseFragmentActivity implements VideoInfo
     private int subCommentPage = 1;
 
     private UserInfo userInfo;
+
+    private int selectVideoIndex;
 
     @Override
     protected int getContextViewId() {
@@ -213,6 +219,7 @@ public class VideoShowActivity extends BaseFragmentActivity implements VideoInfo
         replyCommentPresenterImp = new ReplyCommentPresenterImp(this, this);
         noteSubCommentDataPresenterImp = new NoteSubCommentDataPresenterImp(this, this);
         addZanPresenterImp = new AddZanPresenterImp(this, this);
+        followInfoPresenterImp = new FollowInfoPresenterImp(this, this);
 
         videoInfoPresenterImp.getDataList(videoPage);
         mVideoAdapter.setOnLoadMoreListener(new BaseQuickAdapter.RequestLoadMoreListener() {
@@ -226,7 +233,15 @@ public class VideoShowActivity extends BaseFragmentActivity implements VideoInfo
         mVideoAdapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
             @Override
             public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
-                if (view.getId() == R.id.tv_comment_num) {
+                if (!App.getApp().isLogin) {
+                    if (loginDialog != null && !loginDialog.isShowing()) {
+                        loginDialog.show();
+                    }
+                    return;
+                }
+
+                selectVideoIndex = position;
+                if (view.getId() == R.id.tv_comment_num || view.getId() == R.id.et_video_item) {
                     currentVideoId = mVideoAdapter.getData().get(position).getId();
                     videoCommentPresenterImp.getCommentList(commentPage, currentVideoId, userInfo != null ? userInfo.getId() : "");
                     if (popupWindow != null && !popupWindow.isShowing()) {
@@ -234,6 +249,10 @@ public class VideoShowActivity extends BaseFragmentActivity implements VideoInfo
                         // 设置popupWindow的显示位置，此处是在手机屏幕底部且水平居中的位置
                         popupWindow.showAtLocation(mVideoShowLayout, Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL, 0, 0);
                     }
+                }
+
+                if (view.getId() == R.id.btn_is_follow) {
+                    followInfoPresenterImp.addFollow(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", "");
                 }
             }
         });
@@ -301,7 +320,7 @@ public class VideoShowActivity extends BaseFragmentActivity implements VideoInfo
                     }
                     zanCountTv.setCompoundDrawablePadding(SizeUtils.dp2px(4));
 
-                    noteSubCommentDataPresenterImp.getNoteSubCommentData(subCommentPage,userInfo != null ? userInfo.getId() : "", commentId, 2);
+                    noteSubCommentDataPresenterImp.getNoteSubCommentData(subCommentPage, userInfo != null ? userInfo.getId() : "", commentId, 2);
                 }
 
                 if (view.getId() == R.id.layout_zan) {
@@ -464,10 +483,12 @@ public class VideoShowActivity extends BaseFragmentActivity implements VideoInfo
 
     private void releaseVideo(int index) {
         View itemView = mVideoListView.getChildAt(index);
-        final VideoView videoView = itemView.findViewById(R.id.video_view);
-        final ImageView imgThumb = itemView.findViewById(R.id.img_thumb);
-        videoView.stopPlayback();
-        imgThumb.animate().alpha(1).start();
+        if (itemView != null) {
+            VideoView videoView = itemView.findViewById(R.id.video_view);
+            ImageView imgThumb = itemView.findViewById(R.id.img_thumb);
+            videoView.stopPlayback();
+            imgThumb.animate().alpha(1).start();
+        }
     }
 
     @Override
@@ -565,6 +586,13 @@ public class VideoShowActivity extends BaseFragmentActivity implements VideoInfo
                     commentReplyAdapter.getData().get(currentReplyPos).setIsZan(((ZanResultRet) tData).getData().getIsZan());
                     commentReplyAdapter.notifyDataSetChanged();
                 }
+            }
+
+            if (tData instanceof FollowInfoRet) {
+                int tempResult = ((FollowInfoRet) tData).getData().getIsGuan();
+
+                ToastUtils.showLong(tempResult == 0 ? "已取消" : "已关注");
+                mVideoAdapter.getData().get(selectVideoIndex).setFollow(tempResult == 0 ? false : true);
             }
 
         }

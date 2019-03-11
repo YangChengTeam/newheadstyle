@@ -33,8 +33,10 @@ public class StickerTypeAdapter extends BaseQuickAdapter<StickerTypeInfo, BaseVi
         helper.setText(R.id.tv_type_name, item.getTypeName());
         if (item.isSelected()) {
             helper.setBackgroundColor(R.id.layout_type_item, ContextCompat.getColor(mContext, R.color.white));
+            helper.setBackgroundColor(R.id.left_type_line, ContextCompat.getColor(mContext, R.color.tab_select_color));
         } else {
-            helper.setBackgroundColor(R.id.layout_type_item, ContextCompat.getColor(mContext, R.color.gray_eee));
+            helper.setBackgroundColor(R.id.layout_type_item, ContextCompat.getColor(mContext, R.color.sticker_item_bg_color));
+            helper.setBackgroundColor(R.id.left_type_line, ContextCompat.getColor(mContext, R.color.sticker_item_bg_color));
         }
     }
 }

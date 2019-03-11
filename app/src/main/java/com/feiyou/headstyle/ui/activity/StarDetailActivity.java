@@ -3,10 +3,12 @@ package com.feiyou.headstyle.ui.activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -224,7 +226,7 @@ public class StarDetailActivity extends BaseFragmentActivity implements Forecast
                 }
             }
             if (tData instanceof StarPosterRet) {
-                downImage(((StarPosterRet) tData).getImage());
+                downImage(((StarPosterRet) tData).getData().getImage());
             }
         } else {
             if (tData instanceof StarPosterRet) {
@@ -249,6 +251,13 @@ public class StarDetailActivity extends BaseFragmentActivity implements Forecast
                     saveImageToGallery();
                 }
             }
+
+            @Override
+            public void onLoadFailed(@Nullable Drawable errorDrawable) {
+                super.onLoadFailed(errorDrawable);
+                ToastUtils.showLong("生成失败");
+            }
+
         });
 
     }

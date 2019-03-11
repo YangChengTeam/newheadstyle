@@ -36,6 +36,12 @@ public class VideoInfo {
 
     private String topic;
 
+    private int width;
+
+    private int height;
+
+    private boolean isFollow;
+
     public String getId() {
         return id;
     }
@@ -130,5 +136,29 @@ public class VideoInfo {
 
     public void setTopic(String topic) {
         this.topic = topic;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public void setWidth(int width) {
+        this.width = width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
+    }
+
+    public boolean isFollow() {
+        return isFollow;
+    }
+
+    public void setFollow(boolean follow) {
+        isFollow = follow;
     }
 }

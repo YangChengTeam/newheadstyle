@@ -16,6 +16,8 @@ import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -50,6 +52,7 @@ import com.feiyou.headstyle.ui.adapter.CommunityItemAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragmentActivity;
 import com.feiyou.headstyle.ui.custom.GlideRoundTransform;
 import com.feiyou.headstyle.ui.custom.LoginDialog;
+import com.feiyou.headstyle.ui.custom.MyWebView;
 import com.feiyou.headstyle.ui.fragment.sub.WonderfulFragment;
 import com.feiyou.headstyle.view.CommentDialog;
 import com.feiyou.headstyle.view.NoteInfoDetailDataView;
@@ -96,9 +99,6 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
     @BindView(R.id.tv_add_date)
     TextView mAddDateTextView;
 
-    @BindView(R.id.tv_note_content)
-    TextView mNoteContentTextView;
-
     @BindView(R.id.note_img_list)
     RecyclerView mNoteImageListView;
 
@@ -116,6 +116,9 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
 
     @BindView(R.id.tv_follow_txt)
     TextView mFollowTv;
+
+    @BindView(R.id.layout_web_view)
+    LinearLayout mWebViewLayout;
 
     List<String> mTitleDataList;
 
@@ -146,6 +149,8 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
     private boolean isFollow;
 
     LoginDialog loginDialog;
+
+    MyWebView mWebView;
 
     @Override
     protected int getContextViewId() {
@@ -291,7 +296,13 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
                 mNickNameTextView.setText(currentNoteInfo.getNickname());
                 mTopicNameTextView.setText(currentNoteInfo.getName());
                 mAddDateTextView.setText(TimeUtils.millis2String(currentNoteInfo.getAddTime() != null ? currentNoteInfo.getAddTime() * 1000 : 0));
-                mNoteContentTextView.setText(Html.fromHtml(currentNoteInfo.getContent()));
+
+                //设置帖子内容
+                //mNoteContentTextView.setText(Html.fromHtml(currentNoteInfo.getContent()));
+                mWebView = new MyWebView(CommunityArticleActivity.this);
+                mWebView.setScrollbarFadingEnabled(true);
+                mWebView.loadData(Html.fromHtml(currentNoteInfo.getContent()).toString(), "text/html; charset=UTF-8", null);
+                mWebViewLayout.addView(mWebView);
 
                 mMessageCountTextView.setText(commentNum > 0 ? commentNum + "" : "");
                 mZanCountTextView.setText(currentNoteInfo.getZanNum() + "");

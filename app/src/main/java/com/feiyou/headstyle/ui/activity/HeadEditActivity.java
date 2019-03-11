@@ -10,9 +10,11 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.design.widget.TabLayout;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,8 +23,10 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.blankj.utilcode.util.BarUtils;
 import com.blankj.utilcode.util.ImageUtils;
 import com.blankj.utilcode.util.PathUtils;
+import com.blankj.utilcode.util.RomUtils;
 import com.blankj.utilcode.util.ScreenUtils;
 import com.blankj.utilcode.util.SizeUtils;
 import com.blankj.utilcode.util.StringUtils;
@@ -50,6 +54,7 @@ import com.feiyou.headstyle.utils.EffectUtil;
 import com.feiyou.headstyle.utils.FilterEffect;
 import com.feiyou.headstyle.utils.GPUImageFilterTools;
 import com.feiyou.headstyle.utils.MyImageViewDrawableOverlay;
+
 import com.feiyou.headstyle.view.StickerDataView;
 import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
@@ -62,6 +67,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
+import butterknife.OnClick;
 import jp.co.cyberagent.android.gpuimage.GPUImage;
 import jp.co.cyberagent.android.gpuimage.GPUImageFilter;
 import jp.co.cyberagent.android.gpuimage.GPUImageView;
@@ -106,6 +112,12 @@ public class HeadEditActivity extends BaseFragmentActivity implements StickerDat
     @BindView(R.id.filter_list_view)
     RecyclerView filterListView;
 
+    @BindView(R.id.layout_bottom)
+    LinearLayout mBottomLayout;
+
+    @BindView(R.id.iv_done_img)
+    ImageView mDoneImageView;
+
     private MyImageViewDrawableOverlay mImageView;
 
     //当前选择底部按钮
@@ -144,6 +156,10 @@ public class HeadEditActivity extends BaseFragmentActivity implements StickerDat
     private int lastTypeIndex = -1;
 
     private List<List<StickerInfo>> allStickerList;
+
+    int lastTab = 0;
+
+    private int tempHeight;
 
     @Override
     protected int getContextViewId() {
@@ -207,13 +223,24 @@ public class HeadEditActivity extends BaseFragmentActivity implements StickerDat
 
         //画布高度
         int canvasHeight = (int) (ScreenUtils.getScreenWidth() * 0.8);
-        //int canvasHeight = ScreenUtils.getHeight(this) - SizeUtils.dp2px(this, 174) - NavgationBarUtils.getNavigationBarHeight(this);
+        tempHeight = ScreenUtils.getScreenHeight() - SizeUtils.dp2px(48 * 2 + 32) - canvasHeight - BarUtils.getStatusBarHeight();
+
+        if (RomUtils.isHuawei()) {
+            tempHeight = tempHeight - BarUtils.getNavBarHeight();
+        }
+
+        //计算剩余的高度
+        RelativeLayout.LayoutParams bottomParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, tempHeight);
+        bottomParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+        mBottomLayout.setLayoutParams(bottomParams);
+
         //添加贴纸水印的画布
         View overlay = LayoutInflater.from(HeadEditActivity.this).inflate(
                 R.layout.view_drawable_overlay, null);
-        mImageView = (MyImageViewDrawableOverlay) overlay.findViewById(R.id.drawable_overlay);
+        mImageView = overlay.findViewById(R.id.drawable_overlay);
         ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(canvasHeight, canvasHeight);
         mImageView.setLayoutParams(params);
+
         overlay.setLayoutParams(params);
         drawArea.addView(overlay);
 
@@ -225,6 +252,11 @@ public class HeadEditActivity extends BaseFragmentActivity implements StickerDat
         tabLayout.addTab(tabLayout.newTab().setCustomView(getTabView(0)));
         tabLayout.addTab(tabLayout.newTab().setCustomView(getTabView(1)));
 
+        View firstView = tabLayout.getTabAt(lastTab).getCustomView().findViewById(R.id.tab_line_view);
+        //lastView.setBackgroundColor(ContextCompat.getColor(HeadEditActivity.this,R.color.tab_select_color));
+        firstView.setVisibility(View.VISIBLE);
+        firstView.setBackgroundResource(R.drawable.common_red_bg);
+
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
@@ -232,12 +264,37 @@ public class HeadEditActivity extends BaseFragmentActivity implements StickerDat
                     mStickerLayout.setVisibility(View.VISIBLE);
                     mFilterLayout.setVisibility(View.GONE);
                     stickerListView.setAdapter(stickerAdapter);
+
+                    //计算剩余的高度
+                    RelativeLayout.LayoutParams bottomParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, tempHeight);
+                    bottomParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+                    mBottomLayout.setLayoutParams(bottomParams);
                 }
                 if (tab.getPosition() == 1) {
                     mStickerLayout.setVisibility(View.GONE);
                     mFilterLayout.setVisibility(View.VISIBLE);
                     initFilterToolBar();
+
+                    //计算剩余的高度
+                    RelativeLayout.LayoutParams bottomParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, SizeUtils.dp2px(108));
+                    bottomParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+                    mBottomLayout.setLayoutParams(bottomParams);
                 }
+
+                if (tab.getPosition() == lastTab) {
+                    return;
+                }
+
+                View lineView = tab.getCustomView().findViewById(R.id.tab_line_view);
+                lineView.setBackgroundResource(R.drawable.common_red_bg);
+                lineView.setVisibility(View.VISIBLE);
+
+
+                View lastView = tabLayout.getTabAt(lastTab).getCustomView().findViewById(R.id.tab_line_view);
+                lastView.setBackgroundColor(ContextCompat.getColor(HeadEditActivity.this, R.color.transparent));
+                lastView.setVisibility(View.INVISIBLE);
+
+                lastTab = tab.getPosition();
             }
 
             @Override
@@ -410,8 +467,28 @@ public class HeadEditActivity extends BaseFragmentActivity implements StickerDat
 
     }
 
+    //TODO
+    @OnClick(R.id.iv_done_img)
+    void doneImageView() {
+        Logger.e("w" + mImageView.getWidth() + "--h--->" + mImageView.getHeight());
+        //加滤镜
+        final Bitmap newBitmap = Bitmap.createBitmap(mImageView.getWidth(), mImageView.getHeight(),
+                Bitmap.Config.ARGB_8888);
+        Canvas cv = new Canvas(newBitmap);
+        RectF dst = new RectF(0, 0, mImageView.getWidth(), mImageView.getHeight());
+        try {
+            cv.drawBitmap(mGPUImageView.capture(), null, dst, null);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            cv.drawBitmap(currentBitmap, null, dst, null);
+        }
+        //加贴纸水印
+        EffectUtil.removeHightView(cv, mImageView);
+    }
+
     //保存图片
     private void savePicture() {
+
         Logger.e("w" + mImageView.getWidth() + "--h--->" + mImageView.getHeight());
         //加滤镜
         final Bitmap newBitmap = Bitmap.createBitmap(mImageView.getWidth(), mImageView.getHeight(),
@@ -482,7 +559,7 @@ public class HeadEditActivity extends BaseFragmentActivity implements StickerDat
                 //ToastUtils.showLong("保存成功!");
 
                 Intent intent = new Intent(this, HeadSaveActivity.class);
-                intent.putExtra("file_path",filePath);
+                intent.putExtra("file_path", filePath);
                 startActivity(intent);
             } else {
                 flag = false;

@@ -21,7 +21,7 @@ import it.sephiroth.android.library.imagezoom.ImageViewTouch;
  */
 public class EffectUtil {
 
-    public static List<Addon> addonList                 = new ArrayList<Addon>();
+    public static List<Addon> addonList = new ArrayList<Addon>();
     private static List<MyHighlightView> hightlistViews = new CopyOnWriteArrayList<MyHighlightView>();
 
     static {
@@ -120,7 +120,7 @@ public class EffectUtil {
         Matrix matrix = new Matrix(mImageMatrix);
         matrix.invert(matrix);
 
-        float[] pts = new float[] { x, y, x + cropWidth, y + cropHeight };
+        float[] pts = new float[]{x, y, x + cropWidth, y + cropHeight};
         MatrixUtils.mapPoints(matrix, pts);
 
         RectF cropRect = new RectF(pts[0], pts[1], pts[2], pts[3]);
@@ -139,6 +139,13 @@ public class EffectUtil {
     public static void applyOnSave(Canvas mCanvas, ImageViewTouch processImage) {
         for (MyHighlightView view : hightlistViews) {
             applyOnSave(mCanvas, processImage, view);
+        }
+    }
+
+    //添加水印
+    public static void removeHightView(Canvas mCanvas, ImageViewTouch processImage) {
+        for (MyHighlightView view : hightlistViews) {
+            //((MyImageViewDrawableOverlay) processImage).removeHightlightView(view);
         }
     }
 

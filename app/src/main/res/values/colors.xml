@@ -82,4 +82,6 @@
 
     <color name="add_topic_color">#707070</color>
 
+    <color name="sticker_item_bg_color">#f2f2f2</color>
+
 </resources>

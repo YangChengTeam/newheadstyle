@@ -3,6 +3,7 @@ package com.feiyou.headstyle.api;
 import com.feiyou.headstyle.bean.CollectInfoRet;
 import com.feiyou.headstyle.bean.PhotoWallRet;
 import com.feiyou.headstyle.bean.ResultInfo;
+import com.feiyou.headstyle.bean.UpdateHeadRet;
 import com.feiyou.headstyle.bean.UserInfoListRet;
 import com.feiyou.headstyle.bean.UserInfoRet;
 
@@ -41,4 +42,7 @@ public interface UserInfoServiceApi {
 
     @POST("v1.userinfo/updSetUpInfo")
     Observable<UserInfoRet> updateUserInfo(@Body RequestBody requestBody);
+
+    @POST("v1.userinfo/userImgupload")
+    Observable<UpdateHeadRet> updateHead(@Body MultipartBody multipartBody);
 }

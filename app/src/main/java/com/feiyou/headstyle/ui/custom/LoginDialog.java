@@ -19,6 +19,7 @@ import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.bean.LoginRequest;
 import com.feiyou.headstyle.bean.MessageEvent;
+import com.feiyou.headstyle.bean.ResultInfo;
 import com.feiyou.headstyle.bean.UserInfo;
 import com.feiyou.headstyle.bean.UserInfoRet;
 import com.feiyou.headstyle.common.Constants;
@@ -123,16 +124,18 @@ public class LoginDialog extends Dialog implements View.OnClickListener, UserInf
     }
 
     @Override
-    public void loadDataSuccess(UserInfoRet tData) {
+    public void loadDataSuccess(ResultInfo tData) {
         Logger.i("login dialog user info --->" + JSONObject.toJSONString(tData));
 
         if (tData != null && tData.getCode() == Constants.SUCCESS) {
-            UserInfo userInfo = tData.getData();
-            ToastUtils.showLong("登录成功");
-            App.getApp().setmUserInfo(userInfo);
-            App.getApp().setLogin(true);
-            SPUtils.getInstance().put(Constants.USER_INFO, JSONObject.toJSONString(tData.getData()));
-            EventBus.getDefault().post(new MessageEvent("login_success"));
+            if (tData instanceof UserInfoRet) {
+                UserInfo userInfo = ((UserInfoRet) tData).getData();
+                ToastUtils.showLong("登录成功");
+                App.getApp().setmUserInfo(userInfo);
+                App.getApp().setLogin(true);
+                SPUtils.getInstance().put(Constants.USER_INFO, JSONObject.toJSONString(((UserInfoRet) tData).getData()));
+                EventBus.getDefault().post(new MessageEvent("login_success"));
+            }
         } else {
             ToastUtils.showLong(StringUtils.isEmpty(tData.getMsg()) ? "登录失败" : tData.getMsg());
         }

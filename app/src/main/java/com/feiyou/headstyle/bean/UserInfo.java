@@ -43,6 +43,9 @@ public class UserInfo {
     @SerializedName("type")
     private int loginType;
 
+    @SerializedName("update_sex_num")
+    private int updateSexNum;
+
     public String getId() {
         return id;
     }
@@ -194,5 +197,13 @@ public class UserInfo {
 
     public void setLoginType(int loginType) {
         this.loginType = loginType;
+    }
+
+    public int getUpdateSexNum() {
+        return updateSexNum;
+    }
+
+    public void setUpdateSexNum(int updateSexNum) {
+        this.updateSexNum = updateSexNum;
     }
 }

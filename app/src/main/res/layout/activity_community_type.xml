@@ -153,10 +153,10 @@
                             android:layout_weight="1"
                             android:ellipsize="end"
                             android:maxLines="1"
-                            android:text="Q友吧招募新的管理员，福利待遇丰厚，请踊跃报名"
                             android:textColor="@color/black1"
                             android:textSize="15dp" />
                     </LinearLayout>
+
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="8dp"
