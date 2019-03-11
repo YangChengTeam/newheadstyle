@@ -30,6 +30,7 @@ import com.feiyou.headstyle.common.Constants;
 import com.feiyou.headstyle.presenter.UserInfoPresenterImp;
 import com.feiyou.headstyle.ui.adapter.MyFragmentAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragmentActivity;
+import com.feiyou.headstyle.ui.custom.CustomViewPager;
 import com.feiyou.headstyle.view.UserInfoView;
 import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
@@ -48,7 +49,7 @@ import permissions.dispatcher.RuntimePermissions;
 public class MainActivity extends BaseFragmentActivity implements View.OnClickListener, ViewPager.OnPageChangeListener {
 
     @BindView(R.id.viewpager)
-    ViewPager viewPager;
+    CustomViewPager viewPager;
 
     @BindView(R.id.layout_home)
     LinearLayout mHomeLayout;
@@ -89,6 +90,8 @@ public class MainActivity extends BaseFragmentActivity implements View.OnClickLi
     private MyFragmentAdapter adapter;
 
     private UserInfo userInfo;
+
+    private int lastIndex = -1;
 
     public interface IOnFocusListener {
         void onWindowFocusChanged(boolean hasFocus);
@@ -214,35 +217,50 @@ public class MainActivity extends BaseFragmentActivity implements View.OnClickLi
     }
 
     public void setCheckedItem(int current) {
-
         Button[] tabImages = {mHomeImageView, mCommunityImageView, mTestImageView, mMyImageView};
+
         TextView[] tabTexts = {mHomeTextView, mCommunityTextView, mTestTextView, mMyTextView};
 
-        for (int i = 0; i < 4; i++) {
-            if (current == i) {
-                tabImages[i].setSelected(true);
-                tabTexts[i].setTextColor(ContextCompat.getColor(this, R.color.tab_select_color));
-            } else {
-                tabImages[i].setSelected(false);
-                tabTexts[i].setTextColor(ContextCompat.getColor(this, R.color.tab_normal_color));
-            }
+        if (lastIndex == current) {
+            return;
         }
+
+        tabImages[current].setSelected(true);
+        tabTexts[current].setTextColor(ContextCompat.getColor(this, R.color.tab_select_color));
+
+        if (lastIndex > -1) {
+            tabImages[lastIndex].setSelected(false);
+            tabTexts[lastIndex].setTextColor(ContextCompat.getColor(this, R.color.tab_normal_color));
+        }
+
+        lastIndex = current;
+
+//        for (int i = 0; i < 4; i++) {
+//            if (current == i) {
+//                tabImages[i].setSelected(true);
+//                tabTexts[i].setTextColor(ContextCompat.getColor(this, R.color.tab_select_color));
+//            } else {
+//                tabImages[i].setSelected(false);
+//                tabTexts[i].setTextColor(ContextCompat.getColor(this, R.color.tab_normal_color));
+//            }
+//        }
 
     }
 
     @Override
     public void onPageScrolled(int i, float v, int i1) {
-
+        Logger.i("view pager onPageScrolled--->" + i);
     }
 
     @Override
     public void onPageSelected(int i) {
-
+        Logger.i("view pager onPageSelected--->" + i);
     }
 
     @Override
     public void onPageScrollStateChanged(int state) {
         if (state == 2) {
+            Logger.i("view pager onPageScrollStateChanged--->" + viewPager.getCurrentItem());
             switch (viewPager.getCurrentItem()) {
                 case 0:
                     setCheckedItem(0);
