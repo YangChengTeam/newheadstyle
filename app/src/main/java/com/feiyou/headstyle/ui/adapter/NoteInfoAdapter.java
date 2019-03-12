@@ -6,6 +6,7 @@ import android.graphics.drawable.Drawable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -53,9 +54,12 @@ public class NoteInfoAdapter extends BaseQuickAdapter<NoteInfo, BaseViewHolder> 
         helper.setText(R.id.tv_nick_name, item.getNickname())
                 .setText(R.id.tv_topic_name, item.getName())
                 .setText(R.id.tv_note_date, tempDateStr)
-                .setText(R.id.tv_note_content, item.getContent())
                 .setText(R.id.tv_message_count, item.getCommentNum() + "")
                 .setText(R.id.tv_zan_count, item.getZanNum() + "");
+
+
+        TextView contentTv = helper.getView(R.id.tv_note_content);
+        contentTv.setText(Html.fromHtml(item.getContent()));
 
         TextView isZanTv = helper.itemView.findViewById(R.id.tv_zan_count);
         Drawable isZan = ContextCompat.getDrawable(mContext, R.mipmap.is_zan);

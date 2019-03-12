@@ -2,6 +2,7 @@ package com.feiyou.headstyle.ui.custom;
 
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.v7.widget.AppCompatEditText;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -9,6 +10,7 @@ import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.TextPaint;
 import android.text.TextUtils;
+import android.text.style.ForegroundColorSpan;
 import android.text.style.MetricAffectingSpan;
 import android.text.style.URLSpan;
 import android.util.AttributeSet;
@@ -85,8 +87,9 @@ public class MsgEditText extends AppCompatEditText {
         MyTextSpan what = new MyTextSpan(unSpanText.returnText, userId);
         int start = unSpanText.start;
         int end = unSpanText.end;
-        sps.setSpan(what, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        //sps.setSpan(new URLSpan("https://github.com/CaMnter"), start, end, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+        //sps.setSpan(what, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        ForegroundColorSpan foregroundColorSpan=new ForegroundColorSpan(Color.parseColor("#4383ff"));
+        sps.setSpan(foregroundColorSpan,start,end,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
     }
 
 

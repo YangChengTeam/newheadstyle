@@ -179,7 +179,7 @@ public class PushNoteActivity extends BaseFragmentActivity implements IBaseView 
 
                 //TODO,此方法有问题
                 Logger.i("sendContent--->" + sendContent);
-                addNotePresenterImp.addNote(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", tempInputContent, "1", tempIds, result);
+                addNotePresenterImp.addNote(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", StringUtils.isEmpty(sendContent) ? tempInputContent : sendContent, "1", tempIds, result);
             }
         });
 
@@ -255,7 +255,7 @@ public class PushNoteActivity extends BaseFragmentActivity implements IBaseView 
                     ids.append(key).append(",");
 
                     //实际传递到后台的内容值
-                    sendContent = sendContent.replace(val.toString(), "*#" + val + "*#");
+                    sendContent = sendContent.replace(val.toString(), "<span style='color:#4383ff;'>" + val + "</span>");
                 }
             }
             tempStr = ids.substring(0, ids.length() - 1);
@@ -263,7 +263,7 @@ public class PushNoteActivity extends BaseFragmentActivity implements IBaseView 
             tempStr = "";
         }
 
-        Logger.i("result ids --->" + tempStr);
+        Logger.i("result ids --->" + tempStr + "--->content--->" + sendContent);
         return tempStr;
     }
 
@@ -336,8 +336,8 @@ public class PushNoteActivity extends BaseFragmentActivity implements IBaseView 
                 ArrayList<String> ids = data.getStringArrayListExtra("friend_ids");
                 ArrayList<String> names = data.getStringArrayListExtra("friend_names");
                 for (int i = 0; i < names.size(); i++) {
-                    friendsMap.put(ids.get(i), names.get(i));
-                    mInputNoteEditText.addAtSpan(MASK_STR, names.get(i), 100000,ContextCompat.getColor(this,R.color.set_qq_bg_color));
+                    friendsMap.put(ids.get(i), MASK_STR + names.get(i));
+                    mInputNoteEditText.addAtSpan(MASK_STR, names.get(i), 100000, ContextCompat.getColor(this, R.color.set_qq_bg_color));
                 }
             }
         }
