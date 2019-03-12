@@ -177,6 +177,14 @@ public class VideoShowActivity extends BaseFragmentActivity implements VideoInfo
 
     private int selectVideoIndex;
 
+    private String replyTopUserId;
+
+    FrameLayout replyFollowLayout;
+
+    TextView mReplyFollowTv;
+
+    LinearLayout replyZanLayout;
+
     @Override
     protected int getContextViewId() {
         return R.layout.activity_video_show;
@@ -252,7 +260,7 @@ public class VideoShowActivity extends BaseFragmentActivity implements VideoInfo
                 }
 
                 if (view.getId() == R.id.btn_is_follow) {
-                    followInfoPresenterImp.addFollow(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", "");
+                    followInfoPresenterImp.addFollow(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", mVideoAdapter.getData().get(position).getUserId());
                 }
             }
         });
@@ -308,6 +316,9 @@ public class VideoShowActivity extends BaseFragmentActivity implements VideoInfo
                     }
                     //设置头部信息
                     NoteItem noteItem = commentAdapter.getData().get(position);
+
+                    replyTopUserId = noteItem.getUserId();
+
                     Glide.with(VideoShowActivity.this).load(noteItem.getCommentUserimg()).into(topUserHeadImageView);
                     nickNameTv.setText(noteItem.getCommentNickname());
                     addDateTv.setText(TimeUtils.millis2String(noteItem.getAddTime() != null ? noteItem.getAddTime() * 1000 : 0));
@@ -345,10 +356,12 @@ public class VideoShowActivity extends BaseFragmentActivity implements VideoInfo
 
         LinearLayout contentLayout = replyView.findViewById(R.id.layout_content);
         LinearLayout bottomLayout = replyView.findViewById(R.id.layout_reply_bottom);
-        LinearLayout zanLayout = replyView.findViewById(R.id.layout_comment_zan);
+        replyFollowLayout = replyView.findViewById(R.id.reply_is_follow);
+
+        replyZanLayout = replyView.findViewById(R.id.layout_comment_zan);
+        zanCountTv = replyView.findViewById(R.id.tv_zan_count);
 
         LinearLayout addMessageLayout = replyView.findViewById(R.id.layout_add_message);
-
         addMessageLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -357,12 +370,35 @@ public class VideoShowActivity extends BaseFragmentActivity implements VideoInfo
             }
         });
 
+        replyZanLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                switchType = 1;
+                addZanPresenterImp.addZan(2, App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", commentAdapter.getData().get(currentCommentPos).getUserId(), "", commentId, "", 2);
+            }
+        });
+
+        replyFollowLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                switchType = 1;
+
+                if (!App.getApp().isLogin) {
+                    if (loginDialog != null && !loginDialog.isShowing()) {
+                        loginDialog.show();
+                    }
+                    return;
+                }
+
+                followInfoPresenterImp.addFollow(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", StringUtils.isEmpty(replyTopUserId) ? "" : replyTopUserId);
+            }
+        });
+
         //顶部个人的回复信息
         topUserHeadImageView = replyView.findViewById(R.id.iv_user_head);
         nickNameTv = replyView.findViewById(R.id.tv_user_nick_name);
         addDateTv = replyView.findViewById(R.id.tv_add_date);
         commentContentTv = replyView.findViewById(R.id.tv_content);
-        zanCountTv = replyView.findViewById(R.id.tv_zan_count);
 
         RelativeLayout.LayoutParams contentParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
         int contentMarginHeight = BarUtils.getNavBarHeight() + SizeUtils.dp2px(62);
@@ -370,8 +406,9 @@ public class VideoShowActivity extends BaseFragmentActivity implements VideoInfo
         contentLayout.setLayoutParams(contentParams);
 
         RelativeLayout.LayoutParams bottomParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, SizeUtils.dp2px(49));
-        int tempHeight = ScreenUtils.getScreenHeight() - BarUtils.getNavBarHeight() - BarUtils.getStatusBarHeight() - SizeUtils.dp2px(49);
-        bottomParams.setMargins(0, tempHeight, 0, BarUtils.getNavBarHeight());
+        //int tempHeight = ScreenUtils.getScreenHeight() - BarUtils.getNavBarHeight() - BarUtils.getStatusBarHeight() - SizeUtils.dp2px(49);
+        bottomParams.setMargins(0, 0, 0, BarUtils.getNavBarHeight() - BarUtils.getStatusBarHeight());
+        bottomParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
         bottomLayout.setLayoutParams(bottomParams);
 
         replyView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ScreenUtils.getScreenHeight()));
@@ -563,6 +600,27 @@ public class VideoShowActivity extends BaseFragmentActivity implements VideoInfo
             }
 
             if (tData instanceof ZanResultRet) {
+
+                if (switchType == 1) {
+                    int tempNum = commentAdapter.getData().get(currentCommentPos).getZanNum();
+
+                    if (((ZanResultRet) tData).getData().getIsZan() == 0) {
+                        tempNum = tempNum - 1;
+                        zanCountTv.setCompoundDrawablesWithIntrinsicBounds(notZan, null, null, null);
+                        zanCountTv.setCompoundDrawablePadding(SizeUtils.dp2px(4));
+                    } else {
+                        tempNum = tempNum + 1;
+                        zanCountTv.setCompoundDrawablesWithIntrinsicBounds(isZan, null, null, null);
+                        zanCountTv.setCompoundDrawablePadding(SizeUtils.dp2px(4));
+                    }
+
+                    commentAdapter.getData().get(currentCommentPos).setZanNum(tempNum);
+                    commentAdapter.getData().get(currentCommentPos).setIsZan(((ZanResultRet) tData).getData().getIsZan());
+                    commentAdapter.notifyDataSetChanged();
+
+                    zanCountTv.setText(tempNum + "");
+                }
+
                 if (switchType == 2) {
                     int tempNum = commentAdapter.getData().get(currentCommentPos).getZanNum();
                     if (((ZanResultRet) tData).getData().getIsZan() == 0) {
@@ -589,12 +647,21 @@ public class VideoShowActivity extends BaseFragmentActivity implements VideoInfo
             }
 
             if (tData instanceof FollowInfoRet) {
-                int tempResult = ((FollowInfoRet) tData).getData().getIsGuan();
-
-                ToastUtils.showLong(tempResult == 0 ? "已取消" : "已关注");
-                mVideoAdapter.getData().get(selectVideoIndex).setFollow(tempResult == 0 ? false : true);
+                if (tData.getCode() == Constants.SUCCESS) {
+                    int tempResult = ((FollowInfoRet) tData).getData().getIsGuan();
+                    if (commitReplyDialog != null && commitReplyDialog.isShowing()) {
+                        replyFollowLayout.setBackgroundResource(tempResult == 0 ? R.drawable.into_bg : R.drawable.is_follow_bg);
+                        mReplyFollowTv.setTextColor(ContextCompat.getColor(this, tempResult == 0 ? R.color.tab_select_color : R.color.black2));
+                        mReplyFollowTv.setText(tempResult == 0 ? "+关注" : "已关注");
+                    } else {
+                        ToastUtils.showLong(tempResult == 0 ? "已取消" : "已关注");
+                        mVideoAdapter.getData().get(selectVideoIndex).setIsGuan(tempResult);
+                        mVideoAdapter.notifyDataSetChanged();
+                    }
+                } else {
+                    ToastUtils.showLong(StringUtils.isEmpty(tData.getMsg()) ? "回复失败" : tData.getMsg());
+                }
             }
-
         }
     }
 

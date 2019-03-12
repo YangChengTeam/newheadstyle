@@ -5,9 +5,12 @@ import android.content.Context;
 import android.support.v7.widget.AppCompatEditText;
 import android.text.Spannable;
 import android.text.SpannableString;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
 import android.text.TextPaint;
 import android.text.TextUtils;
 import android.text.style.MetricAffectingSpan;
+import android.text.style.URLSpan;
 import android.util.AttributeSet;
 
 /**
@@ -40,7 +43,7 @@ public class MsgEditText extends AppCompatEditText {
      * @param showText 显示到界面的内容
      * @param userId   附加属性，比如用户id,邮件id之类的，如果不需要可以去除掉
      */
-    public void addAtSpan(String maskText, String showText, long userId) {
+    public void addAtSpan(String maskText, String showText, long userId,int color) {
         builder = new StringBuilder();
         if (!TextUtils.isEmpty(maskText)) {
             //已经添加了@
@@ -49,7 +52,9 @@ public class MsgEditText extends AppCompatEditText {
             builder.append(showText).append(" ");
         }
         getText().insert(getSelectionStart(), builder.toString());
-        SpannableString sps = new SpannableString(getText());
+
+        //setTextColor(color);
+        SpannableStringBuilder sps = new SpannableStringBuilder(getText());
 
         int start = getSelectionEnd() - builder.toString().length() - (TextUtils.isEmpty(maskText) ? 1 : 0);
         int end = getSelectionEnd();
@@ -81,6 +86,7 @@ public class MsgEditText extends AppCompatEditText {
         int start = unSpanText.start;
         int end = unSpanText.end;
         sps.setSpan(what, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        //sps.setSpan(new URLSpan("https://github.com/CaMnter"), start, end, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
     }
 
 
@@ -120,7 +126,6 @@ public class MsgEditText extends AppCompatEditText {
 
         @Override
         public void updateMeasureState(TextPaint p) {
-
         }
 
         @Override

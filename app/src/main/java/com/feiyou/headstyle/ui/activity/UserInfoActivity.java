@@ -28,15 +28,18 @@ import com.feiyou.headstyle.bean.CollectInfoRet;
 import com.feiyou.headstyle.bean.NoteInfoRet;
 import com.feiyou.headstyle.bean.ResultInfo;
 import com.feiyou.headstyle.bean.UserInfo;
+import com.feiyou.headstyle.bean.UserInfoRet;
 import com.feiyou.headstyle.common.Constants;
 import com.feiyou.headstyle.presenter.CollectDataPresenterImp;
 import com.feiyou.headstyle.presenter.NoteDataPresenterImp;
+import com.feiyou.headstyle.presenter.UserInfoPresenterImp;
 import com.feiyou.headstyle.ui.adapter.CommonImageAdapter;
 import com.feiyou.headstyle.ui.adapter.HeadInfoAdapter;
 import com.feiyou.headstyle.ui.adapter.NoteInfoAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragmentActivity;
 import com.feiyou.headstyle.view.CollectDataView;
 import com.feiyou.headstyle.view.NoteDataView;
+import com.feiyou.headstyle.view.UserInfoView;
 import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 import com.qmuiteam.qmui.widget.QMUICollapsingTopBarLayout;
@@ -50,7 +53,7 @@ import butterknife.BindView;
 /**
  * Created by myflying on 2018/11/23.
  */
-public class UserInfoActivity extends BaseFragmentActivity implements NoteDataView {
+public class UserInfoActivity extends BaseFragmentActivity implements NoteDataView, UserInfoView {
 
     @BindView(R.id.collapsing_topbar_layout)
     QMUICollapsingTopBarLayout mCollapsingTopBarLayout;
@@ -63,6 +66,27 @@ public class UserInfoActivity extends BaseFragmentActivity implements NoteDataVi
 
     @BindView(R.id.photo_list)
     RecyclerView mPhotoListView;
+
+    @BindView(R.id.tv_follow_count)
+    TextView mFollowCountTv;
+
+    @BindView(R.id.tv_fans_count)
+    TextView mFansCountTv;
+
+    @BindView(R.id.tv_user_nick_name)
+    TextView mNickNameTv;
+
+    @BindView(R.id.tv_user_id)
+    TextView mUserIdTv;
+
+    @BindView(R.id.tv_user_age)
+    TextView mUserAgeTv;
+
+    @BindView(R.id.iv_user_sex)
+    ImageView mUserSexIv;
+
+    @BindView(R.id.tv_user_star)
+    TextView mUserStarTv;
 
     ImageView mBackImageView;
 
@@ -81,6 +105,10 @@ public class UserInfoActivity extends BaseFragmentActivity implements NoteDataVi
     private UserInfo userInfo;
 
     private List<Object> photoList;
+
+    private UserInfoPresenterImp userInfoPresenterImp;
+
+    private String userId;
 
     @Override
     protected int getContextViewId() {
@@ -110,6 +138,15 @@ public class UserInfoActivity extends BaseFragmentActivity implements NoteDataVi
     }
 
     public void initData() {
+        userInfoPresenterImp = new UserInfoPresenterImp(this, this);
+        noteDataPresenterImp = new NoteDataPresenterImp(this, this);
+
+        Bundle bundle = getIntent().getExtras();
+        if (bundle != null && !StringUtils.isEmpty(bundle.getString("user_id"))) {
+            userId = bundle.getString("user_id");
+            userInfoPresenterImp.getUserInfo(userId);
+        }
+
         bottomSheetDialog = new BottomSheetDialog(this);
         View deleteDialogView = LayoutInflater.from(this).inflate(R.layout.note_delete_dialog, null);
         bottomSheetDialog.setContentView(deleteDialogView);
@@ -125,7 +162,6 @@ public class UserInfoActivity extends BaseFragmentActivity implements NoteDataVi
             }
         });
 
-        noteDataPresenterImp = new NoteDataPresenterImp(this, this);
         noteInfoAdapter = new NoteInfoAdapter(this, null, 2);
         mNoteListView.setLayoutManager(new LinearLayoutManager(this));
         mNoteListView.setAdapter(noteInfoAdapter);
@@ -197,6 +233,7 @@ public class UserInfoActivity extends BaseFragmentActivity implements NoteDataVi
 
     @Override
     public void loadDataSuccess(ResultInfo tData) {
+        Logger.i("other user info--->" + JSON.toJSONString(tData));
         if (tData != null && tData.getCode() == Constants.SUCCESS) {
 
             if (tData instanceof NoteInfoRet) {
@@ -211,6 +248,18 @@ public class UserInfoActivity extends BaseFragmentActivity implements NoteDataVi
                 } else {
                     noteInfoAdapter.loadMoreEnd();
                 }
+            }
+
+            if (tData instanceof UserInfoRet) {
+                UserInfo otherUser = ((UserInfoRet) tData).getData();
+
+                mFollowCountTv.setText(otherUser.getGuanNum() + "");
+                mFansCountTv.setText(otherUser.getFenNum() + "");
+                mNickNameTv.setText(otherUser.getNickname() + "");
+                mUserIdTv.setText(otherUser.getId() + "");
+                mUserAgeTv.setText(otherUser.getAge() + "");
+                Glide.with(this).load(otherUser.getSex() == 1 ? R.mipmap.sex_boy : R.mipmap.sex_girl).into(mUserSexIv);
+                mUserStarTv.setText(otherUser.getStar());
             }
         } else {
             ToastUtils.showLong(StringUtils.isEmpty(tData.getMsg()) ? "操作错误" : tData.getMsg());

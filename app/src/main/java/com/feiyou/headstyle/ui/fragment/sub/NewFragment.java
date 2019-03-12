@@ -21,6 +21,7 @@ import com.feiyou.headstyle.presenter.AddZanPresenterImp;
 import com.feiyou.headstyle.presenter.FollowInfoPresenterImp;
 import com.feiyou.headstyle.presenter.NoteTypePresenterImp;
 import com.feiyou.headstyle.ui.activity.CommunityArticleActivity;
+import com.feiyou.headstyle.ui.activity.UserInfoActivity;
 import com.feiyou.headstyle.ui.adapter.NoteInfoAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragment;
 import com.feiyou.headstyle.ui.custom.LoginDialog;
@@ -120,11 +121,15 @@ public class NewFragment extends BaseFragment implements NoteTypeView {
                     String messageId = noteInfoAdapter.getData().get(position).getId();
                     addZanPresenterImp.addZan(1, App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", noteInfoAdapter.getData().get(position).getUserId(), messageId, "", "", 1);
                 }
+                if (view.getId() == R.id.iv_user_head) {
+                    Intent intent = new Intent(getActivity(), UserInfoActivity.class);
+                    intent.putExtra("user_id", noteInfoAdapter.getData().get(position).getUserId());
+                    startActivity(intent);
+                }
             }
         });
 
-        noteInfoAdapter.setOnLoadMoreListener(new BaseQuickAdapter.RequestLoadMoreListener()
-        {
+        noteInfoAdapter.setOnLoadMoreListener(new BaseQuickAdapter.RequestLoadMoreListener() {
             @Override
             public void onLoadMoreRequested() {
                 currentPage++;

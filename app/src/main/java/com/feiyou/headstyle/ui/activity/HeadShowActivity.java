@@ -25,6 +25,7 @@ import com.blankj.utilcode.util.ImageUtils;
 import com.blankj.utilcode.util.PathUtils;
 import com.blankj.utilcode.util.SPUtils;
 import com.blankj.utilcode.util.SizeUtils;
+import com.blankj.utilcode.util.SpanUtils;
 import com.blankj.utilcode.util.StringUtils;
 import com.blankj.utilcode.util.TimeUtils;
 import com.blankj.utilcode.util.ToastUtils;
@@ -115,8 +116,6 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
 
     HeadShowItemAdapter adapter;
 
-    private int showShape = 1; //展示的形状.1,正方形,2圆形
-
     private HomeDataPresenterImp homeDataPresenterImp;
 
     private HeadListDataPresenterImp headListDataPresenterImp;
@@ -156,6 +155,8 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
     ImageView mCloseImageView;
 
     private int loginType = 1;
+
+    private int showShape = 1; //展示的形状.1,正方形,2圆形
 
     @Override
     protected int getContextViewId() {
@@ -252,9 +253,11 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
     }
 
     public void initData() {
+        showShape = SPUtils.getInstance().getInt(Constants.SHOW_SHAPE, 1);
+
+        switchMultiButton.setSelectedTab(showShape == 1 ? 0 : 1);
 
         Bundle bundle = getIntent().getExtras();
-
         if (bundle != null && bundle.getInt("jump_page") > 0) {
             currentPage = bundle.getInt("jump_page");
         }
@@ -322,24 +325,33 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
 
     void square() {
         showShape = 1;
+        SPUtils.getInstance().put(Constants.SHOW_SHAPE, 1);
         if (adapter != null) {
             adapter.setShowShape(showShape);
         }
+        adapter.notifyDataSetChanged();
     }
 
     void circle() {
         showShape = 2;
+        SPUtils.getInstance().put(Constants.SHOW_SHAPE, 2);
         if (adapter != null) {
             adapter.setShowShape(showShape);
         }
+        adapter.notifyDataSetChanged();
     }
 
     @OnClick(R.id.layout_edit)
     public void editImage() {
         isEdit = !isEdit;
-        Intent intent = new Intent(HeadShowActivity.this, HeadEditActivity.class);
-        intent.putExtra("image_url", adapter.getHeads().get(0).getImgurl());
-        startActivity(intent);
+
+        if (adapter.getHeads() != null && adapter.getHeads().size() > 0) {
+            Intent intent = new Intent(HeadShowActivity.this, HeadEditActivity.class);
+            intent.putExtra("image_url", adapter.getHeads().get(0).getImgurl());
+            startActivity(intent);
+        } else {
+            ToastUtils.showLong("图片加载错误，请重试");
+        }
     }
 
     @OnClick(R.id.layout_keep)

@@ -301,12 +301,11 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
                 //mNoteContentTextView.setText(Html.fromHtml(currentNoteInfo.getContent()));
                 mWebView = new MyWebView(CommunityArticleActivity.this);
                 mWebView.setScrollbarFadingEnabled(true);
-                mWebView.loadData(Html.fromHtml(currentNoteInfo.getContent()).toString(), "text/html; charset=UTF-8", null);
+                mWebView.loadData(currentNoteInfo.getContent(), "text/html; charset=UTF-8", null);
                 mWebViewLayout.addView(mWebView);
 
                 mMessageCountTextView.setText(commentNum > 0 ? commentNum + "" : "");
                 mZanCountTextView.setText(currentNoteInfo.getZanNum() + "");
-
 
                 if (currentNoteInfo.getIsZan() == 0) {
                     mZanCountTextView.setCompoundDrawablesWithIntrinsicBounds(notZan, null, null, null);
@@ -318,21 +317,26 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
                 //设置帖子图片
                 List<HeadInfo> headInfos = new ArrayList<>();
                 String[] tempImg = currentNoteInfo.getImageArr();
-
                 imageUrls = new ArrayList<>();
 
                 for (int i = 0; i < tempImg.length; i++) {
-                    HeadInfo headInfo = new HeadInfo();
-                    headInfo.setImgurl(tempImg[i]);
-                    headInfos.add(headInfo);
-                    imageUrls.add(tempImg[i]);
+                    if (StringUtils.isEmpty(tempImg[i])) {
+                        HeadInfo headInfo = new HeadInfo();
+                        headInfo.setImgurl(tempImg[i]);
+                        headInfos.add(headInfo);
+                        imageUrls.add(tempImg[i]);
+                    }
                 }
-                int temp = imageUrls.size() % 3 == 0 ? imageUrls.size() / 3 : imageUrls.size() / 3 + 1;
-                mNoteImageListView.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, SizeUtils.dp2px(112 * temp)));
-                communityItemAdapter.setNewData(headInfos);
+                if (headInfos.size() > 0) {
+                    mNoteImageListView.setVisibility(View.VISIBLE);
+                    int temp = imageUrls.size() % 3 == 0 ? imageUrls.size() / 3 : imageUrls.size() / 3 + 1;
+                    mNoteImageListView.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, SizeUtils.dp2px(112 * temp)));
+                    communityItemAdapter.setNewData(headInfos);
+                } else {
+                    mNoteImageListView.setVisibility(View.GONE);
+                }
 
                 int tempResult = currentNoteInfo.getIsGuan();
-
                 mFollowLayout.setBackgroundResource(tempResult == 0 ? R.drawable.into_bg : R.drawable.is_follow_bg);
                 mFollowTv.setTextColor(ContextCompat.getColor(this, tempResult == 0 ? R.color.tab_select_color : R.color.black2));
                 mFollowTv.setText(tempResult == 0 ? "+关注" : "已关注");

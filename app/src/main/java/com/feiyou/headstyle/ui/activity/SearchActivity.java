@@ -38,6 +38,7 @@ import com.feiyou.headstyle.ui.adapter.HeadInfoAdapter;
 import com.feiyou.headstyle.ui.adapter.SearchHistoryAdapter;
 import com.feiyou.headstyle.ui.adapter.SearchHotWordAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragmentActivity;
+import com.feiyou.headstyle.ui.custom.ConfigDialog;
 import com.feiyou.headstyle.view.HotWordDataView;
 import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
@@ -49,7 +50,7 @@ import butterknife.BindView;
 import butterknife.OnClick;
 
 
-public class SearchActivity extends BaseFragmentActivity implements HotWordDataView {
+public class SearchActivity extends BaseFragmentActivity implements HotWordDataView, ConfigDialog.ConfigListener {
 
     @BindView(R.id.layout_top)
     LinearLayout mTopLayout;
@@ -97,6 +98,8 @@ public class SearchActivity extends BaseFragmentActivity implements HotWordDataV
 
     private List<String> historySearchList;
 
+    ConfigDialog configDialog;
+
     @Override
     protected int getContextViewId() {
         return R.layout.activity_search;
@@ -114,6 +117,8 @@ public class SearchActivity extends BaseFragmentActivity implements HotWordDataV
     }
 
     public void initData() {
+        configDialog = new ConfigDialog(this, R.style.login_dialog, 1, "确认清除吗?", "请你确认是否清除搜索记录？");
+        configDialog.setConfigListener(this);
 
         initProgress("搜索中");
 
@@ -215,7 +220,7 @@ public class SearchActivity extends BaseFragmentActivity implements HotWordDataV
     }
 
     @OnClick(R.id.tv_cancel)
-    public void cancel() {
+    public void cancelSearch() {
         finish();
 //        if (StringUtils.isEmpty(mHotWordEditText.getText())) {
 //            finish();
@@ -229,8 +234,11 @@ public class SearchActivity extends BaseFragmentActivity implements HotWordDataV
 
     @OnClick(R.id.layout_clear)
     public void clearHistory() {
-        SPUtils.getInstance().put(Constants.SEARCH_HISTORY, "");
-        searchHistoryAdapter.setNewData(null);
+        if (searchHistoryAdapter != null || searchHistoryAdapter.getData().size() > 0) {
+            if (configDialog != null && !configDialog.isShowing()) {
+                configDialog.show();
+            }
+        }
     }
 
     @Override
@@ -290,5 +298,18 @@ public class SearchActivity extends BaseFragmentActivity implements HotWordDataV
     @Override
     public void loadDataError(Throwable throwable) {
 
+    }
+
+    @Override
+    public void config() {
+        SPUtils.getInstance().put(Constants.SEARCH_HISTORY, "");
+        searchHistoryAdapter.setNewData(null);
+    }
+
+    @Override
+    public void cancel() {
+        if (configDialog != null && configDialog.isShowing()) {
+            configDialog.dismiss();
+        }
     }
 }

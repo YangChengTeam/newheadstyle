@@ -1,5 +1,6 @@
 package com.feiyou.headstyle.ui.adapter;
 
+import android.app.Activity;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +15,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.bean.HeadInfo;
 import com.feiyou.headstyle.ui.custom.GlideRoundTransform;
+import com.orhanobut.logger.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,8 +29,6 @@ public class HeadShowItemAdapter extends BaseAdapter {
     private List<HeadInfo> heads;
 
     private int ivWidth;
-
-    private int ivHeight;
 
     private int showShape = 1; //展示的形状.1,正方形,2圆形
 
@@ -109,11 +109,12 @@ public class HeadShowItemAdapter extends BaseAdapter {
             holder = (ViewHolder) convertView.getTag();
         }
 
-        RequestOptions options = new RequestOptions();
-        options.transform(new GlideRoundTransform(mContext, SizeUtils.dp2px(117)));
         if (showShape == 1) {
-            Glide.with(mContext).load(heads.get(position).getImgurl()).into(holder.mHeadShowImageView);
+            RequestOptions options = new RequestOptions().skipMemoryCache(true);
+            Glide.with(mContext).load(heads.get(position).getImgurl()).apply(options).into(holder.mHeadShowImageView);
         } else {
+            RequestOptions options = new RequestOptions().skipMemoryCache(true);
+            options.transform(new GlideRoundTransform(mContext, SizeUtils.dp2px(117)));
             Glide.with(mContext).load(heads.get(position).getImgurl()).apply(options).into(holder.mHeadShowImageView);
         }
 

@@ -166,6 +166,7 @@
                                 android:textSize="14dp" />
 
                             <TextView
+                                android:id="@+id/tv_user_age"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="18岁"
@@ -173,12 +174,14 @@
                                 android:textSize="14dp" />
 
                             <ImageView
+                                android:id="@+id/iv_user_sex"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginLeft="10dp"
                                 android:src="@mipmap/sex_girl" />
 
                             <TextView
+                                android:id="@+id/tv_user_star"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginLeft="10dp"

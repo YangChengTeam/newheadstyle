@@ -189,7 +189,7 @@ public class CommunityTypeActivity extends BaseFragmentActivity implements NoteT
         startActivity(intent);
     }
 
-    @OnClick(R.id.toolbar_iv_image)
+    @OnClick(R.id.iv_back)
     void back() {
         popBackStack();
     }

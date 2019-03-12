@@ -43,4 +43,9 @@ public class UserInfoPresenterImp extends BasePresenterImp<UserInfoView, UserInf
     public void updateUserInfo(UserInfo updateInfo) {
         userInfoModelImp.updateUserInfo(updateInfo, this);
     }
+
+    @Override
+    public void getUserInfo(String userId) {
+        userInfoModelImp.getUserInfo(userId, this);
+    }
 }

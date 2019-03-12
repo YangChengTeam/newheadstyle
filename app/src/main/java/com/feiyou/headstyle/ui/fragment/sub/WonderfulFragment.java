@@ -8,6 +8,7 @@ import android.support.design.widget.BottomSheetDialog;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -217,8 +218,9 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
         contentLayout.setLayoutParams(contentParams);
 
         RelativeLayout.LayoutParams bottomParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, SizeUtils.dp2px(49));
-        int tempHeight = ScreenUtils.getScreenHeight() - BarUtils.getNavBarHeight() - BarUtils.getStatusBarHeight() - SizeUtils.dp2px(49);
-        bottomParams.setMargins(0, tempHeight, 0, BarUtils.getNavBarHeight());
+        //int tempHeight = ScreenUtils.getScreenHeight() - BarUtils.getNavBarHeight() - BarUtils.getStatusBarHeight() - SizeUtils.dp2px(49);
+        bottomParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+        bottomParams.setMargins(0, 0, 0, BarUtils.getNavBarHeight() - BarUtils.getStatusBarHeight());
         bottomLayout.setLayoutParams(bottomParams);
 
         replyView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ScreenUtils.getScreenHeight()));
@@ -516,6 +518,10 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
             }
 
             if (tData instanceof FollowInfoRet) {
+                ToastUtils.showLong(StringUtils.isEmpty(tData.getMsg()) ? "操作失败" : tData.getMsg());
+            }
+
+            if (tData instanceof ReplyResultInfoRet) {
                 ToastUtils.showLong(StringUtils.isEmpty(tData.getMsg()) ? "操作失败" : tData.getMsg());
             }
             Logger.i(StringUtils.isEmpty(tData.getMsg()) ? "操作失败" : tData.getMsg());

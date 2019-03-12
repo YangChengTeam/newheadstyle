@@ -33,7 +33,7 @@ public class FollowFragment extends BaseFragment {
 
     @Override
     protected View onCreateView() {
-        View root = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_my_friends, null);
+        View root = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_follow, null);
         ButterKnife.bind(this, root);
         return root;
     }

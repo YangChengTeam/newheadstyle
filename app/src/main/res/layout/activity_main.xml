@@ -8,12 +8,12 @@
     android:orientation="vertical"
     tools:context="com.feiyou.headstyle.ui.activity.MainActivity">
 
-    <com.feiyou.headstyle.ui.custom.CustomViewPager
+    <android.support.v4.view.ViewPager
         android:id="@+id/viewpager"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:background="@color/white"></com.feiyou.headstyle.ui.custom.CustomViewPager>
+        android:background="@color/white"></android.support.v4.view.ViewPager>
 
     <View
         android:layout_width="match_parent"

@@ -7,6 +7,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.blankj.utilcode.util.StringUtils;
 import com.blankj.utilcode.util.ToastUtils;
@@ -44,6 +45,12 @@ public class MyFriendsFragment extends BaseFragment implements UserInfoListView 
 
     @BindView(R.id.layout_no_data)
     LinearLayout mNoDataLayout;
+
+    @BindView(R.id.tv_no_data_title)
+    TextView mNoDataTitleTv;
+
+    @BindView(R.id.tv_no_data)
+    TextView mNoDataToTv;
 
     MyFriendsListAdapter myFriendsListAdapter;
 
@@ -152,7 +159,7 @@ public class MyFriendsFragment extends BaseFragment implements UserInfoListView 
                     MyToastUtils.showToast(getActivity(), 0, "关注成功");
                 }
 
-                if(myFriendsListAdapter.getData().size() > 0){
+                if (myFriendsListAdapter.getData().size() > 0) {
                     myFriendsListAdapter.getData().remove(0);
                 }
                 myFriendsListAdapter.notifyDataSetChanged();
@@ -161,6 +168,8 @@ public class MyFriendsFragment extends BaseFragment implements UserInfoListView 
             if (tData instanceof UserInfoListRet) {
                 mFriendsListView.setVisibility(View.GONE);
                 mNoDataLayout.setVisibility(View.VISIBLE);
+                //mNoDataTitleTv.setText(type == 1 ? "还没有关注的好友？不如去多认识几个朋友！" : "还没收到过关注？不如发个帖求波关注！");
+                //mNoDataToTv.setText(type == 1 ? "去关注" : "去发帖");
             }
             ToastUtils.showLong(StringUtils.isEmpty(tData.getMsg()) ? "操作失败" : tData.getMsg());
         }

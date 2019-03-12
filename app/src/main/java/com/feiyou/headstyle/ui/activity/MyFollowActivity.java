@@ -8,25 +8,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TabHost;
 import android.widget.TabWidget;
 import android.widget.TextView;
 
-import com.blankj.utilcode.util.BarUtils;
-import com.blankj.utilcode.util.SizeUtils;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.ui.adapter.FollowFragmentAdapter;
-import com.feiyou.headstyle.ui.adapter.SubFragmentAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragmentActivity;
-import com.feiyou.headstyle.ui.fragment.sub.FollowFragment;
 import com.feiyou.headstyle.ui.fragment.sub.MyFriendsFragment;
-import com.feiyou.headstyle.ui.fragment.sub.RecommendFragment;
-import com.feiyou.headstyle.ui.fragment.sub.VideoFragment;
 import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
-import com.qmuiteam.qmui.widget.QMUITopBar;
 
 import butterknife.BindView;
 import butterknife.OnClick;

@@ -40,7 +40,11 @@ public class VideoInfo {
 
     private int height;
 
-    private boolean isFollow;
+    @SerializedName("is_guan")
+    private int isGuan;
+
+    @SerializedName("user_id")
+    private String userId;
 
     public String getId() {
         return id;
@@ -154,11 +158,19 @@ public class VideoInfo {
         this.height = height;
     }
 
-    public boolean isFollow() {
-        return isFollow;
+    public int getIsGuan() {
+        return isGuan;
     }
 
-    public void setFollow(boolean follow) {
-        isFollow = follow;
+    public void setIsGuan(int isGuan) {
+        this.isGuan = isGuan;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 }

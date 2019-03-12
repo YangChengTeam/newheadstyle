@@ -25,14 +25,14 @@ public class CommunityItemAdapter extends BaseQuickAdapter<HeadInfo, BaseViewHol
     private Context mContext;
 
     public CommunityItemAdapter(Context context, List<HeadInfo> datas) {
-        super(R.layout.head_info_item, datas);
+        super(R.layout.community_top_item, datas);
         this.mContext = context;
     }
 
     @Override
     protected void convert(final BaseViewHolder helper, final HeadInfo item) {
         int tempWidth = (ScreenUtils.getScreenWidth() - SizeUtils.dp2px(24)) / 3;
-        LinearLayout itemLayout = helper.itemView.findViewById(R.id.head_item_layout);
+        LinearLayout itemLayout = helper.itemView.findViewById(R.id.top_item_layout);
         LinearLayout.LayoutParams itemParams = new LinearLayout.LayoutParams(tempWidth, tempWidth);
         itemLayout.setLayoutParams(itemParams);
 
@@ -41,6 +41,6 @@ public class CommunityItemAdapter extends BaseQuickAdapter<HeadInfo, BaseViewHol
         options.override(tempWidth - 8, tempWidth - 8);
         //options.centerCrop();
 
-        Glide.with(mContext).load(item.getImgurl()).apply(options).into((ImageView) helper.itemView.findViewById(R.id.iv_head_info));
+        Glide.with(mContext).load(item.getImgurl()).apply(options).into((ImageView) helper.itemView.findViewById(R.id.iv_top_img));
     }
 }

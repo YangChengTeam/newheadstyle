@@ -46,6 +46,10 @@ public class UserInfo {
     @SerializedName("update_sex_num")
     private int updateSexNum;
 
+    private int age;
+
+    private String star;
+
     public String getId() {
         return id;
     }
@@ -205,5 +209,21 @@ public class UserInfo {
 
     public void setUpdateSexNum(int updateSexNum) {
         this.updateSexNum = updateSexNum;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    public String getStar() {
+        return star;
+    }
+
+    public void setStar(String star) {
+        this.star = star;
     }
 }

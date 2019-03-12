@@ -337,7 +337,7 @@ public class PushNoteActivity extends BaseFragmentActivity implements IBaseView 
                 ArrayList<String> names = data.getStringArrayListExtra("friend_names");
                 for (int i = 0; i < names.size(); i++) {
                     friendsMap.put(ids.get(i), names.get(i));
-                    mInputNoteEditText.addAtSpan(MASK_STR, names.get(i), 100000);
+                    mInputNoteEditText.addAtSpan(MASK_STR, names.get(i), 100000,ContextCompat.getColor(this,R.color.set_qq_bg_color));
                 }
             }
         }

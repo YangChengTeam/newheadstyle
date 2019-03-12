@@ -80,7 +80,7 @@ public class NoteInfoAdapter extends BaseQuickAdapter<NoteInfo, BaseViewHolder> 
         helper.setTextColor(R.id.tv_follow_txt, ContextCompat.getColor(mContext, item.getIsGuan() == 0 ? R.color.tab_select_color : R.color.is_follow_color));
         helper.setText(R.id.tv_follow_txt, item.getIsGuan() == 0 ? "+关注" : "已关注");
 
-        helper.addOnClickListener(R.id.layout_item_zan);
+        helper.addOnClickListener(R.id.layout_item_zan).addOnClickListener(R.id.iv_user_head);
 
         RequestOptions options = new RequestOptions();
         options.override(SizeUtils.dp2px(42), SizeUtils.dp2px(42));

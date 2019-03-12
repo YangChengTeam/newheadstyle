@@ -49,7 +49,7 @@ import permissions.dispatcher.RuntimePermissions;
 public class MainActivity extends BaseFragmentActivity implements View.OnClickListener, ViewPager.OnPageChangeListener {
 
     @BindView(R.id.viewpager)
-    CustomViewPager viewPager;
+    ViewPager viewPager;
 
     @BindView(R.id.layout_home)
     LinearLayout mHomeLayout;
@@ -191,6 +191,7 @@ public class MainActivity extends BaseFragmentActivity implements View.OnClickLi
 
     @Override
     public void onClick(View v) {
+        Logger.i("view pager click --->" + v.getId());
         switch (v.getId()) {
             case R.id.layout_home:
                 viewPager.setCurrentItem(0);

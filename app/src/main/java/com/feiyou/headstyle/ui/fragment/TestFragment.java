@@ -6,6 +6,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -106,6 +107,9 @@ public class TestFragment extends BaseFragment implements TestInfoView, View.OnC
         mHotTestListView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mHotTestListView.setAdapter(testInfoAdapter);
         mHotTestListView.addItemDecoration(new NormalDecoration(ContextCompat.getColor(getActivity(), R.color.line_color), 1));
+
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        params.setMargins(0, 0, 0, BarUtils.getNavBarHeight());
 
         LinearLayout.LayoutParams searchParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, SizeUtils.dp2px(48));
         searchParams.setMargins(0, BarUtils.getStatusBarHeight(), 0, 0);

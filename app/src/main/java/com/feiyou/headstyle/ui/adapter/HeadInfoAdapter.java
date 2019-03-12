@@ -23,28 +23,24 @@ import java.util.List;
 public class HeadInfoAdapter extends BaseQuickAdapter<HeadInfo, BaseViewHolder> {
 
     private Context mContext;
-
-    RequestOptions options = null;
+    private int tempWidth;
 
     public HeadInfoAdapter(Context context, List<HeadInfo> datas) {
         super(R.layout.head_info_item, datas);
         this.mContext = context;
+        tempWidth = (ScreenUtils.getScreenWidth() - SizeUtils.dp2px(24)) / 3;
     }
 
     @Override
     protected void convert(final BaseViewHolder helper, final HeadInfo item) {
-        int tempWidth = (ScreenUtils.getScreenWidth() - SizeUtils.dp2px(24)) / 3;
         LinearLayout itemLayout = helper.itemView.findViewById(R.id.head_item_layout);
         LinearLayout.LayoutParams itemParams = new LinearLayout.LayoutParams(tempWidth, tempWidth);
         itemLayout.setLayoutParams(itemParams);
 
-        if (options == null) {
-            options = new RequestOptions();
-            options.transform(new GlideRoundTransform(mContext, 5));
-            options.placeholder(R.mipmap.image_def).error(R.mipmap.image_def);
-            options.override(tempWidth - 8, tempWidth - 8);
-        }
-
-        Glide.with(mContext).load(item.getImgurl()).apply(options).into((ImageView) helper.itemView.findViewById(R.id.iv_head_info));
+        RequestOptions options = new RequestOptions().skipMemoryCache(true);
+        options.override(tempWidth - 8, tempWidth - 8);
+        options.transform(new GlideRoundTransform(mContext, 5));
+        options.placeholder(R.mipmap.image_def).error(R.mipmap.image_def);
+        Glide.with(mContext).load(item.getImgurl()).apply(options).into((ImageView) helper.getView(R.id.iv_head_info));
     }
 }

@@ -11,6 +11,6 @@ import com.feiyou.headstyle.bean.UserInfo;
 public interface UserInfoModel<T> {
     void login(LoginRequest loginRequest, IBaseRequestCallBack<T> iBaseRequestCallBack);
     void getUserSig(String userName, IBaseRequestCallBack<T> iBaseRequestCallBack);
-
     void updateUserInfo(UserInfo updateInfo, IBaseRequestCallBack<T> iBaseRequestCallBack);
+    void getUserInfo(String userId, IBaseRequestCallBack<T> iBaseRequestCallBack);
 }
