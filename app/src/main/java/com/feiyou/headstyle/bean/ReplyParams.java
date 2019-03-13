@@ -16,6 +16,8 @@ public class ReplyParams {
     private String repeatId;
     private String repeatCommentUserId;
 
+    private String atUserIds;
+
     public int getType() {
         return type;
     }
@@ -86,5 +88,13 @@ public class ReplyParams {
 
     public void setModelType(int modelType) {
         this.modelType = modelType;
+    }
+
+    public String getAtUserIds() {
+        return atUserIds;
+    }
+
+    public void setAtUserIds(String atUserIds) {
+        this.atUserIds = atUserIds;
     }
 }

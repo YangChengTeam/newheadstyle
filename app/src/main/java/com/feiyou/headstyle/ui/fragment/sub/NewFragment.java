@@ -1,11 +1,15 @@
 package com.feiyou.headstyle.ui.fragment.sub;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.LinearLayout;
 
 import com.blankj.utilcode.util.StringUtils;
 import com.blankj.utilcode.util.ToastUtils;
@@ -20,27 +24,36 @@ import com.feiyou.headstyle.common.Constants;
 import com.feiyou.headstyle.presenter.AddZanPresenterImp;
 import com.feiyou.headstyle.presenter.FollowInfoPresenterImp;
 import com.feiyou.headstyle.presenter.NoteTypePresenterImp;
+import com.feiyou.headstyle.ui.activity.AddFriendsActivity;
 import com.feiyou.headstyle.ui.activity.CommunityArticleActivity;
 import com.feiyou.headstyle.ui.activity.UserInfoActivity;
 import com.feiyou.headstyle.ui.adapter.NoteInfoAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragment;
 import com.feiyou.headstyle.ui.custom.LoginDialog;
 import com.feiyou.headstyle.view.NoteTypeView;
+import com.orhanobut.logger.Logger;
 import com.wang.avi.AVLoadingIndicatorView;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 /**
  * Created by myflying on 2018/12/24.
  */
-public class NewFragment extends BaseFragment implements NoteTypeView {
+public class NewFragment extends BaseFragment implements NoteTypeView, SwipeRefreshLayout.OnRefreshListener {
+
+    @BindView(R.id.swipe_refresh)
+    SwipeRefreshLayout mRefreshLayout;
 
     @BindView(R.id.news_list)
     RecyclerView mNewsListView;
 
     @BindView(R.id.avi)
     AVLoadingIndicatorView avi;
+
+    @BindView(R.id.layout_no_data)
+    LinearLayout mNoDataLayout;
 
     NoteInfoAdapter noteInfoAdapter;
 
@@ -50,7 +63,7 @@ public class NewFragment extends BaseFragment implements NoteTypeView {
 
     private int currentPage = 1;
 
-    private int pageSize = 30;
+    private int pageSize = 10;
 
     private int queryType = 1;
 
@@ -80,6 +93,21 @@ public class NewFragment extends BaseFragment implements NoteTypeView {
     }
 
     public void initData() {
+        mRefreshLayout.setOnRefreshListener(this);
+        //设置进度View样式的大小，只有两个值DEFAULT和LARGE
+        //设置进度View下拉的起始点和结束点，scale 是指设置是否需要放大或者缩小动画
+        mRefreshLayout.setProgressViewOffset(true, -0, 200);
+        //设置进度View下拉的结束点，scale 是指设置是否需要放大或者缩小动画
+        mRefreshLayout.setProgressViewEndTarget(true, 180);
+        //设置进度View的组合颜色，在手指上下滑时使用第一个颜色，在刷新中，会一个个颜色进行切换
+        mRefreshLayout.setColorSchemeColors(ContextCompat.getColor(getActivity(), R.color.colorPrimary), Color.RED, Color.YELLOW, Color.BLUE);
+
+        //设置触发刷新的距离
+        mRefreshLayout.setDistanceToTriggerSync(200);
+        //如果child是自己自定义的view，可以通过这个回调，告诉mSwipeRefreshLayoutchild是否可以滑动
+        mRefreshLayout.setOnChildScrollUpCallback(null);
+
+
         Bundle bundle = getActivity().getIntent().getExtras();
         if (bundle != null && !StringUtils.isEmpty(bundle.getString("topic_id"))) {
             topicId = bundle.getString("topic_id");
@@ -147,6 +175,18 @@ public class NewFragment extends BaseFragment implements NoteTypeView {
         noteTypePresenterImp.getNoteTypeData(topicId, currentPage, queryType, App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "");
     }
 
+    void followUser() {
+        if (!App.getApp().isLogin) {
+            if (loginDialog != null && !loginDialog.isShowing()) {
+                loginDialog.show();
+            }
+            return;
+        }
+
+        Intent intent = new Intent(getActivity(), AddFriendsActivity.class);
+        startActivity(intent);
+    }
+
     @Override
     public void showProgress() {
 
@@ -155,11 +195,16 @@ public class NewFragment extends BaseFragment implements NoteTypeView {
     @Override
     public void dismissProgress() {
         avi.hide();
+        mRefreshLayout.setRefreshing(false);
     }
 
     @Override
     public void loadDataSuccess(ResultInfo tData) {
+        avi.hide();
+        mRefreshLayout.setRefreshing(false);
         if (tData != null && tData.getCode() == Constants.SUCCESS) {
+            mNewsListView.setVisibility(View.VISIBLE);
+            mNoDataLayout.setVisibility(View.GONE);
             if (tData instanceof NoteTypeRet) {
                 if (((NoteTypeRet) tData).getData() != null && ((NoteTypeRet) tData).getData().getList() != null) {
                     if (currentPage == 1) {
@@ -200,12 +245,26 @@ public class NewFragment extends BaseFragment implements NoteTypeView {
             }
 
         } else {
-            ToastUtils.showLong(StringUtils.isEmpty(tData.getMsg()) ? "操作错误" : tData.getMsg());
+            mNewsListView.setVisibility(View.GONE);
+            mNoDataLayout.setVisibility(View.VISIBLE);
+            if (tData instanceof FollowInfoRet || tData instanceof ZanResultRet) {
+                ToastUtils.showLong(StringUtils.isEmpty(tData.getMsg()) ? "操作错误" : tData.getMsg());
+            } else {
+                Logger.i(StringUtils.isEmpty(tData.getMsg()) ? "数据错误" : tData.getMsg());
+            }
         }
     }
 
     @Override
     public void loadDataError(Throwable throwable) {
+        avi.hide();
+        mRefreshLayout.setRefreshing(false);
+    }
 
+    @Override
+    public void onRefresh() {
+        mRefreshLayout.setRefreshing(true);
+        currentPage = 1;
+        noteTypePresenterImp.getNoteTypeData(topicId, currentPage, queryType, App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "");
     }
 }

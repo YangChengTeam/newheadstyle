@@ -37,6 +37,7 @@ import com.blankj.utilcode.util.StringUtils;
 import com.blankj.utilcode.util.TimeUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.dingmouren.layoutmanagergroup.viewpager.OnViewPagerListener;
 import com.dingmouren.layoutmanagergroup.viewpager.ViewPagerLayoutManager;
@@ -65,6 +66,7 @@ import com.feiyou.headstyle.ui.adapter.CommentAdapter;
 import com.feiyou.headstyle.ui.adapter.CommentReplyAdapter;
 import com.feiyou.headstyle.ui.adapter.VideoItemAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragmentActivity;
+import com.feiyou.headstyle.ui.custom.GlideRoundTransform;
 import com.feiyou.headstyle.ui.custom.LoginDialog;
 import com.feiyou.headstyle.view.CommentDialog;
 import com.feiyou.headstyle.view.VideoInfoView;
@@ -319,7 +321,11 @@ public class VideoShowActivity extends BaseFragmentActivity implements VideoInfo
 
                     replyTopUserId = noteItem.getUserId();
 
-                    Glide.with(VideoShowActivity.this).load(noteItem.getCommentUserimg()).into(topUserHeadImageView);
+                    RequestOptions options = new RequestOptions();
+                    options.transform(new GlideRoundTransform(VideoShowActivity.this, 21));
+                    options.error(R.mipmap.head_def);
+                    options.placeholder(R.mipmap.head_def);
+                    Glide.with(VideoShowActivity.this).load(noteItem.getCommentUserimg()).apply(options).into(topUserHeadImageView);
                     nickNameTv.setText(noteItem.getCommentNickname());
                     addDateTv.setText(TimeUtils.millis2String(noteItem.getAddTime() != null ? noteItem.getAddTime() * 1000 : 0));
                     commentContentTv.setText(noteItem.getCommentContent());
@@ -681,7 +687,7 @@ public class VideoShowActivity extends BaseFragmentActivity implements VideoInfo
     }
 
     @Override
-    public void sendContent(String content, int type) {
+    public void sendContent(String userIds,String content, int type) {
         //关闭软键盘
         KeyboardUtils.hideSoftInput(commentView);
 

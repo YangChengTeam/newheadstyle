@@ -1,6 +1,7 @@
 package com.feiyou.headstyle.ui.fragment.sub;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.design.widget.BottomSheetBehavior;
@@ -8,6 +9,7 @@ import android.support.design.widget.BottomSheetDialog;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +20,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.blankj.utilcode.util.BarUtils;
 import com.blankj.utilcode.util.ScreenUtils;
@@ -26,6 +29,7 @@ import com.blankj.utilcode.util.StringUtils;
 import com.blankj.utilcode.util.TimeUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
@@ -47,6 +51,7 @@ import com.feiyou.headstyle.presenter.ReplyCommentPresenterImp;
 import com.feiyou.headstyle.ui.adapter.CommentAdapter;
 import com.feiyou.headstyle.ui.adapter.CommentReplyAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragment;
+import com.feiyou.headstyle.ui.custom.GlideRoundTransform;
 import com.feiyou.headstyle.ui.custom.LoginDialog;
 import com.feiyou.headstyle.utils.StatusBarUtil;
 import com.feiyou.headstyle.view.CommentDialog;
@@ -57,6 +62,9 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -65,6 +73,12 @@ import butterknife.OnClick;
  * Created by myflying on 2018/11/26.
  */
 public class WonderfulFragment extends BaseFragment implements NoteCommentDataView, CommentDialog.SendBackListener {
+
+    public static final int REQUEST_CODE_CHOOSE = 23;
+
+    public static final int REQUEST_FRIENDS = 0;
+
+    public static final int RESULT_FRIEND_CODE = 2;
 
     @BindView(R.id.wonderful_list)
     RecyclerView mWonderfulListView;
@@ -144,10 +158,15 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
 
     private String replyTopUserId;
 
+    public final static String MASK_STR = "@";
+
+    public final static String SPLIT_STR = "*#";
+
     @Override
     protected View onCreateView() {
         View root = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_wonderful, null);
         ButterKnife.bind(this, root);
+        EventBus.getDefault().register(this);
         initData();
         return root;
     }
@@ -286,10 +305,15 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
                     NoteItem noteItem = commentAdapter.getData().get(position);
                     replyTopUserId = noteItem.getUserId();
 
-                    Glide.with(getActivity()).load(noteItem.getCommentUserimg()).into(topUserHeadImageView);
+                    RequestOptions options = new RequestOptions();
+                    options.transform(new GlideRoundTransform(getActivity(), 21));
+                    options.error(R.mipmap.head_def);
+                    options.placeholder(R.mipmap.head_def);
+
+                    Glide.with(getActivity()).load(noteItem.getCommentUserimg()).apply(options).into(topUserHeadImageView);
                     nickNameTv.setText(noteItem.getCommentNickname());
                     addDateTv.setText(TimeUtils.millis2String(noteItem.getAddTime() != null ? noteItem.getAddTime() * 1000 : 0));
-                    commentContentTv.setText(noteItem.getCommentContent());
+                    commentContentTv.setText(Html.fromHtml(noteItem.getCommentContent()));
                     noteSubCommentDataPresenterImp.getNoteSubCommentData(subCurrentPage, App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", commentId, 1);
 
                     zanCountTv.setText(noteItem.getZanNum() + "");
@@ -381,21 +405,18 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void Event(MessageEvent messageEvent) {
-        noteCommentDataPresenterImp.getNoteDetailData(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", currentPage, messageId, 1);
-    }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        EventBus.getDefault().register(this);
+        if (messageEvent.getMessage().equals("friend_ids")) {
+            if (messageEvent.getMessage().equals("friend_ids")) {
+                List<String> friendIds = JSON.parseArray(messageEvent.getFriendIds(), String.class);
+                List<String> names = JSON.parseArray(messageEvent.getFriendNames(), String.class);
+                Logger.i("user names result--->" + messageEvent.getFriendNames());
+                commentDialog.setAtUserNames(friendIds, names);
+            }
+        } else {
+            noteCommentDataPresenterImp.getNoteDetailData(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", currentPage, messageId, 1);
+        }
     }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        EventBus.getDefault().unregister(this);
-    }
-
 
     @Override
     public void showProgress() {
@@ -536,7 +557,7 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
     }
 
     @Override
-    public void sendContent(String content, int type) {
+    public void sendContent(String userIds, String content, int type) {
         Logger.i("content--->" + content + "---type--->" + type);
 
         if (progressDialog != null && !progressDialog.isShowing()) {
@@ -554,6 +575,7 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
             replyParams.setRepeatUserId(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "");
             replyParams.setCommentId(commentId);
             replyParams.setRepeatCommentUserId(repeatCommentUserId);
+            replyParams.setAtUserIds(userIds);
 
             replyCommentPresenterImp.addReplyInfo(replyParams);
 
@@ -576,7 +598,7 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
             replyParams.setRepeatUserId(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "");
             replyParams.setRepeatId(repeatId);
             replyParams.setRepeatCommentUserId(repeatCommentUserId);
-
+            replyParams.setAtUserIds(userIds);
             replyCommentPresenterImp.addReplyInfo(replyParams);
 
             if (content != null) {
@@ -587,5 +609,11 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
             }
 
         }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault().unregister(this);
     }
 }

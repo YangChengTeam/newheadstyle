@@ -3,11 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/my_info_bg_color"
     android:fitsSystemWindows="false">
 
     <com.qmuiteam.qmui.widget.QMUIAppBarLayout
         android:layout_width="match_parent"
         android:layout_height="375dp"
+        android:background="@color/my_info_bg_color"
         android:fitsSystemWindows="true">
 
         <com.qmuiteam.qmui.widget.QMUICollapsingTopBarLayout
@@ -55,6 +57,7 @@
                         android:orientation="vertical">
 
                         <RelativeLayout
+                            android:id="@+id/layout_guan_fen"
                             android:layout_width="match_parent"
                             android:layout_height="40dp"
                             android:layout_marginLeft="30dp"
@@ -123,7 +126,8 @@
                                 android:maxLines="1"
                                 android:text="你是一个小笨猪"
                                 android:textColor="@color/black"
-                                android:textSize="16dp" />
+                                android:textSize="18dp"
+                                android:textStyle="bold" />
                         </LinearLayout>
 
                         <LinearLayout
@@ -175,9 +179,9 @@
 
                             <ImageView
                                 android:id="@+id/iv_user_sex"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginLeft="10dp"
+                                android:layout_width="14dp"
+                                android:layout_height="14dp"
+                                android:layout_marginLeft="6dp"
                                 android:src="@mipmap/sex_girl" />
 
                             <TextView
@@ -211,8 +215,8 @@
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
                                 android:ellipsize="end"
-                                android:maxLines="1"
-                                android:text="没有什么是一顿饭不能解决的，如果有，那就二顿"
+                                android:maxLines="2"
+                                android:text=""
                                 android:textColor="@color/black1"
                                 android:textSize="14dp" />
                         </LinearLayout>
@@ -258,6 +262,7 @@
                     </LinearLayout>
 
                     <ImageView
+                        android:id="@+id/iv_user_head"
                         android:layout_width="60dp"
                         android:layout_height="60dp"
                         android:layout_gravity="top|center"
@@ -278,9 +283,11 @@
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/note_list"
-        android:layout_width="333dp"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="top|center"
-        android:scrollbars="none"
+        android:layout_marginLeft="12dp"
+        android:layout_marginRight="12dp"
+        android:background="@color/my_info_bg_color"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 </android.support.design.widget.CoordinatorLayout>

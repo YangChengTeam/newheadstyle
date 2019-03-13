@@ -1,8 +1,6 @@
 package com.feiyou.headstyle.bean;
 
-public class MessageEvent {
-
-    private String message;
+public class FriendInfosEvent {
 
     private String friendIds;
 
@@ -22,17 +20,5 @@ public class MessageEvent {
 
     public void setFriendNames(String friendNames) {
         this.friendNames = friendNames;
-    }
-
-    public MessageEvent(String message) {
-        this.message = message;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
     }
 }

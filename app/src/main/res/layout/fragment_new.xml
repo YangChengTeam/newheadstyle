@@ -7,48 +7,54 @@
     android:gravity="center"
     android:orientation="vertical">
 
-    <FrameLayout
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_refresh"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/news_list"
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="top|center"></android.support.v7.widget.RecyclerView>
+            android:layout_height="match_parent">
 
-        <com.wang.avi.AVLoadingIndicatorView
-            android:id="@+id/avi"
-            style="@style/AVLoadingIndicatorView.Large"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="top|center"
-            android:layout_marginTop="56dp"
-            app:indicatorColor="@color/search_number_color3"
-            app:indicatorName="BallBeatIndicator" />
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/news_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="top|center"></android.support.v7.widget.RecyclerView>
 
-        <LinearLayout
-            android:id="@+id/layout_no_data"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginTop="56dp"
-            android:background="@color/white"
-            android:gravity="top|center"
-            android:orientation="vertical"
-            android:visibility="gone">
-
-            <ImageView
+            <com.wang.avi.AVLoadingIndicatorView
+                android:id="@+id/avi"
+                style="@style/AVLoadingIndicatorView.Large"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@mipmap/empty_icon" />
+                android:layout_gravity="top|center"
+                android:layout_marginTop="56dp"
+                app:indicatorColor="@color/search_number_color3"
+                app:indicatorName="BallBeatIndicator" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:text="暂无数据"
-                android:textColor="@color/search_number_def"
-                android:textSize="16dp" />
-        </LinearLayout>
-    </FrameLayout>
+            <LinearLayout
+                android:id="@+id/layout_no_data"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="56dp"
+                android:background="@color/white"
+                android:gravity="top|center"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@mipmap/empty_icon" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="暂无数据"
+                    android:textColor="@color/search_number_def"
+                    android:textSize="16dp" />
+            </LinearLayout>
+        </FrameLayout>
+    </android.support.v4.widget.SwipeRefreshLayout>
 </LinearLayout>

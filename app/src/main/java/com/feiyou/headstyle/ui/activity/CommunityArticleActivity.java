@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.FragmentManager;
@@ -23,6 +24,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.blankj.utilcode.util.SizeUtils;
 import com.blankj.utilcode.util.StringUtils;
@@ -60,6 +63,8 @@ import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 
 import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -160,6 +165,7 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        EventBus.getDefault().register(this);
         initViews();
     }
 
@@ -177,7 +183,7 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
         QMUIStatusBarHelper.setStatusBarLightMode(this);
         mTopContentLayout.setLayoutParams(new CollapsingToolbarLayout.LayoutParams(CollapsingToolbarLayout.LayoutParams.MATCH_PARENT, CollapsingToolbarLayout.LayoutParams.WRAP_CONTENT));
 
-        communityItemAdapter = new CommunityItemAdapter(this, null);
+        communityItemAdapter = new CommunityItemAdapter(this, null, 1);
         mNoteImageListView.setLayoutManager(new GridLayoutManager(this, 3));
         mNoteImageListView.setAdapter(communityItemAdapter);
 
@@ -247,6 +253,18 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
         }
 
         addZanPresenterImp.addZan(1, App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", currentNoteInfo.getUserId(), messageId, "", "", 1);
+    }
+
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void Event(MessageEvent messageEvent) {
+        Logger.i("event bus activity --->" + messageEvent.getMessage());
+        if (messageEvent.getMessage().equals("friend_ids")) {
+            List<String> friendIds = JSON.parseArray(messageEvent.getFriendIds(), String.class);
+            List<String> names = JSON.parseArray(messageEvent.getFriendNames(), String.class);
+            Logger.i("user names result--->" + messageEvent.getFriendNames());
+            commentDialog.setAtUserNames(friendIds, names);
+        }
     }
 
     @OnClick(R.id.iv_back)
@@ -392,7 +410,7 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
     }
 
     @Override
-    public void sendContent(String content, int type) {
+    public void sendContent(String userIds,String content, int type) {
 
         if (progressDialog != null && !progressDialog.isShowing()) {
             progressDialog.show();
@@ -413,5 +431,11 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
                 commentDialog.dismiss();
             }
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault().unregister(this);
     }
 }

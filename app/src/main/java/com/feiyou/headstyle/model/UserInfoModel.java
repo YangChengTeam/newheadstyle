@@ -13,4 +13,5 @@ public interface UserInfoModel<T> {
     void getUserSig(String userName, IBaseRequestCallBack<T> iBaseRequestCallBack);
     void updateUserInfo(UserInfo updateInfo, IBaseRequestCallBack<T> iBaseRequestCallBack);
     void getUserInfo(String userId, IBaseRequestCallBack<T> iBaseRequestCallBack);
+    void updateOneInfo(UserInfo updateInfo, IBaseRequestCallBack<T> iBaseRequestCallBack);
 }

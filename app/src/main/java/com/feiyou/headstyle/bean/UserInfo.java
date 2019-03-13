@@ -3,6 +3,8 @@ package com.feiyou.headstyle.bean;
 import com.feiyou.headstyle.R;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.List;
+
 import butterknife.BindView;
 
 /**
@@ -49,6 +51,9 @@ public class UserInfo {
     private int age;
 
     private String star;
+
+    @SerializedName("message_list")
+    private List<NoteInfo> noteList;
 
     public String getId() {
         return id;
@@ -225,5 +230,13 @@ public class UserInfo {
 
     public void setStar(String star) {
         this.star = star;
+    }
+
+    public List<NoteInfo> getNoteList() {
+        return noteList;
+    }
+
+    public void setNoteList(List<NoteInfo> noteList) {
+        this.noteList = noteList;
     }
 }

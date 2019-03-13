@@ -6,26 +6,36 @@ import android.app.DialogFragment;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.content.ContextCompat;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.blankj.utilcode.util.StringUtils;
 import com.feiyou.headstyle.R;
+import com.feiyou.headstyle.ui.activity.FriendListActivity;
+import com.feiyou.headstyle.ui.custom.MsgEditText;
 import com.orhanobut.logger.Logger;
+
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by admin on 2017/11/28.
  */
 
-public class CommentDialog extends DialogFragment implements MyEditText.BackListener {
+public class CommentDialog extends DialogFragment implements MsgEditText.BackListener {
 
     private Context mContext;
 
@@ -33,13 +43,25 @@ public class CommentDialog extends DialogFragment implements MyEditText.BackList
 
     Handler handler;
 
-    private MyEditText mInputEditText;
+    private MsgEditText mInputEditText;
 
     private TextView mSendTextView;
+
+    private ImageView mAddFriendsIv;
 
     ProgressDialog progressDialog;
 
     private int cType;
+
+    public final static String MASK_STR = "@";
+
+    private Map<String, String> friendsMap;
+
+    private List<String> friendIds;
+
+    private StringBuffer ids;
+
+    private String sendContent;
 
     public CommentDialog() {
     }
@@ -51,7 +73,7 @@ public class CommentDialog extends DialogFragment implements MyEditText.BackList
     }
 
     public interface SendBackListener {
-        void sendContent(String content, int type);
+        void sendContent(String ids, String content, int type);
     }
 
     private SendBackListener sendBackListener;
@@ -61,6 +83,9 @@ public class CommentDialog extends DialogFragment implements MyEditText.BackList
     }
 
     public Dialog onCreateDialog(Bundle savedInstanceState) {
+        friendsMap = new HashMap<>();
+        ids = new StringBuffer("");
+
         // 使用不带Theme的构造器, 获得的dialog边框距离屏幕仍有几毫米的缝隙。
         dialog = new Dialog(getActivity(), R.style.BottomDialog);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE); // 设置Content前设定
@@ -90,8 +115,8 @@ public class CommentDialog extends DialogFragment implements MyEditText.BackList
                 return false;
             }
         });
-
-        mInputEditText = (MyEditText) contentView.findViewById(R.id.et_comment);
+        mAddFriendsIv = (ImageView) contentView.findViewById(R.id.iv_add_friends);
+        mInputEditText = (MsgEditText) contentView.findViewById(R.id.et_comment);
         mSendTextView = (TextView) contentView.findViewById(R.id.tv_send_commit);
         mSendTextView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -105,8 +130,18 @@ public class CommentDialog extends DialogFragment implements MyEditText.BackList
                     if (progressDialog != null && !progressDialog.isShowing()) {
                         progressDialog.show();
                     }
-                    sendBackListener.sendContent(mInputEditText.getText().toString(), cType);
+
+                    String tempIds = setFriendIds(mInputEditText.getText().toString());
+                    sendBackListener.sendContent(tempIds, StringUtils.isEmpty(sendContent) ? mInputEditText.getText().toString() : sendContent, cType);
                 }
+            }
+        });
+
+        mAddFriendsIv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(mContext, FriendListActivity.class);
+                startActivityForResult(intent, 0);
             }
         });
 
@@ -117,6 +152,32 @@ public class CommentDialog extends DialogFragment implements MyEditText.BackList
         mInputEditText.setBackListener(this);
 
         return dialog;
+    }
+
+    public String setFriendIds(String input) {
+        sendContent = input;
+        String tempStr;
+        if (friendsMap != null && friendsMap.size() > 0) {
+            Iterator iterator = friendsMap.entrySet().iterator();
+            while (iterator.hasNext()) {
+                Map.Entry entry = (Map.Entry) iterator.next();
+                Object key = entry.getKey();
+                Object val = entry.getValue();
+
+                if (input.indexOf(val.toString()) > -1) {
+                    ids.append(key).append(",");
+
+                    //实际传递到后台的内容值
+                    sendContent = sendContent.replace(val.toString(), "<span style='color:#4383ff;'>" + val + "</span>");
+                }
+            }
+            tempStr = ids.substring(0, ids.length() - 1);
+        } else {
+            tempStr = "";
+        }
+
+        Logger.i("commentdialog userids --->" + tempStr + "--->content--->" + sendContent);
+        return tempStr;
     }
 
     @Override
@@ -144,6 +205,14 @@ public class CommentDialog extends DialogFragment implements MyEditText.BackList
     public void hideProgressDialog() {
         if (progressDialog != null && progressDialog.isShowing()) {
             progressDialog.dismiss();
+        }
+    }
+
+    public void setAtUserNames(List<String> friendIds, List<String> userNameList) {
+        this.friendIds = friendIds;
+        for (int i = 0; i < userNameList.size(); i++) {
+            friendsMap.put(friendIds.get(i), MASK_STR + userNameList.get(i));
+            mInputEditText.addAtSpan(MASK_STR, userNameList.get(i), 100000, ContextCompat.getColor(mContext, R.color.set_qq_bg_color));
         }
     }
 

@@ -24,14 +24,17 @@ public class CommunityItemAdapter extends BaseQuickAdapter<HeadInfo, BaseViewHol
 
     private Context mContext;
 
-    public CommunityItemAdapter(Context context, List<HeadInfo> datas) {
+    private int showType;
+
+    public CommunityItemAdapter(Context context, List<HeadInfo> datas, int showType) {
         super(R.layout.community_top_item, datas);
         this.mContext = context;
+        this.showType = showType;
     }
 
     @Override
     protected void convert(final BaseViewHolder helper, final HeadInfo item) {
-        int tempWidth = (ScreenUtils.getScreenWidth() - SizeUtils.dp2px(24)) / 3;
+        int tempWidth = (ScreenUtils.getScreenWidth() - SizeUtils.dp2px(showType == 1 ? 24 : 48)) / 3;
         LinearLayout itemLayout = helper.itemView.findViewById(R.id.top_item_layout);
         LinearLayout.LayoutParams itemParams = new LinearLayout.LayoutParams(tempWidth, tempWidth);
         itemLayout.setLayoutParams(itemParams);

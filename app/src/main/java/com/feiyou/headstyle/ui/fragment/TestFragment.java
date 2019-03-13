@@ -109,7 +109,8 @@ public class TestFragment extends BaseFragment implements TestInfoView, View.OnC
         mHotTestListView.addItemDecoration(new NormalDecoration(ContextCompat.getColor(getActivity(), R.color.line_color), 1));
 
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        params.setMargins(0, 0, 0, BarUtils.getNavBarHeight());
+        params.setMargins(0, 0, 0, SizeUtils.dp2px(48));
+        mHotTestListView.setLayoutParams(params);
 
         LinearLayout.LayoutParams searchParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, SizeUtils.dp2px(48));
         searchParams.setMargins(0, BarUtils.getStatusBarHeight(), 0, 0);

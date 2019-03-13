@@ -102,7 +102,7 @@ public class NoteInfoAdapter extends BaseQuickAdapter<NoteInfo, BaseViewHolder> 
             imageUrls.add(tempImg[i]);
         }
 
-        CommunityItemAdapter communityItemAdapter = new CommunityItemAdapter(mContext, headInfos);
+        CommunityItemAdapter communityItemAdapter = new CommunityItemAdapter(mContext, headInfos, showType);
         RecyclerView noteImageListView = helper.itemView.findViewById(R.id.note_img_list);
         noteImageListView.setLayoutManager(new GridLayoutManager(mContext, 3));
         noteImageListView.setAdapter(communityItemAdapter);

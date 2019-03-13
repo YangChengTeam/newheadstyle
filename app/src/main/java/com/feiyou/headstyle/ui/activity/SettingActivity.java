@@ -14,6 +14,7 @@ import android.widget.TextView;
 import com.alibaba.fastjson.JSONObject;
 import com.blankj.utilcode.util.SPUtils;
 import com.blankj.utilcode.util.SizeUtils;
+import com.blankj.utilcode.util.StringUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
@@ -56,6 +57,9 @@ public class SettingActivity extends BaseFragmentActivity implements ConfigDialo
     @BindView(R.id.tv_address)
     TextView mUserAddressTv;
 
+    @BindView(R.id.tv_user_phone)
+    TextView mUserPhoneTv;
+
     VersionUpdateDialog updateDialog;
 
     private VersionUpdateDialog.UpdateListener listener;
@@ -97,11 +101,19 @@ public class SettingActivity extends BaseFragmentActivity implements ConfigDialo
     public void initData() {
         configDialog = new ConfigDialog(this, R.style.login_dialog, 1, "确认退出吗?", "请你确认是否退出当前账号，退出后无法获取更多消息哦!");
         configDialog.setConfigListener(this);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
 
         userInfo = App.getApp().getmUserInfo();
         if (userInfo != null) {
             mUserIdTv.setText(userInfo.getId() + "");
             mUserAddressTv.setText(userInfo.getAddr());
+            if (!StringUtils.isEmpty(userInfo.getPhone())) {
+                mUserPhoneTv.setText(userInfo.getPhone() + "");
+            }
         }
     }
 

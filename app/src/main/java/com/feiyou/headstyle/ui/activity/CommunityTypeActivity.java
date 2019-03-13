@@ -106,7 +106,7 @@ public class CommunityTypeActivity extends BaseFragmentActivity implements NoteT
 
     private int currentPage = 1;
 
-    private int pageSize = 30;
+    private int pageSize = 10;
 
     FollowInfoPresenterImp followInfoPresenterImp;
 

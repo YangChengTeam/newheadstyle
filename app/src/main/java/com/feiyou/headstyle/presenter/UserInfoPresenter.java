@@ -12,4 +12,5 @@ public interface UserInfoPresenter {
     void getUserSig(String userName);
     void updateUserInfo(UserInfo updateInfo);
     void getUserInfo(String userId);
+    void updateOneInfo(UserInfo updateInfo);
 }

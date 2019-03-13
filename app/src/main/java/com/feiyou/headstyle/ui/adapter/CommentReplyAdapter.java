@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.support.v4.content.ContextCompat;
+import android.text.Html;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
@@ -21,6 +22,7 @@ import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.bean.NoteSubComment;
+import com.feiyou.headstyle.ui.custom.GlideRoundTransform;
 import com.feiyou.headstyle.view.MyClickText;
 import com.orhanobut.logger.Logger;
 
@@ -42,6 +44,7 @@ public class CommentReplyAdapter extends BaseQuickAdapter<NoteSubComment, BaseVi
     protected void convert(final BaseViewHolder helper, NoteSubComment item) {
         Logger.i("image url --->" + item.getRepeatUserimg());
         RequestOptions options = new RequestOptions();
+        options.transform(new GlideRoundTransform(mContext, 22));
         options.error(R.mipmap.head_def);
         options.placeholder(R.mipmap.empty_icon);
         Glide.with(mContext).load(item.getRepeatUserimg()).apply(options).into((ImageView) helper.itemView.findViewById(R.id.iv_user_head));
@@ -49,7 +52,7 @@ public class CommentReplyAdapter extends BaseQuickAdapter<NoteSubComment, BaseVi
         helper.setText(R.id.tv_nick_name, item.getRepeatNickname())
                 .setText(R.id.tv_comment_date, TimeUtils.millis2String(item.getAddTime() != null ? item.getAddTime() * 1000 : 0))
                 .setText(R.id.btn_reply_count, "回复")
-                .setText(R.id.tv_comment_content, item.getRepeatContent())
+                .setText(R.id.tv_comment_content, Html.fromHtml(item.getRepeatContent()))
                 .setText(R.id.tv_is_zan, item.getZanNum() + "");
 
         TextView isZanTv = helper.itemView.findViewById(R.id.tv_is_zan);

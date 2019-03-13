@@ -2,6 +2,8 @@ package com.feiyou.headstyle.ui.fragment;
 
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -31,6 +34,7 @@ import com.feiyou.headstyle.bean.UserInfo;
 import com.feiyou.headstyle.bean.UserInfoRet;
 import com.feiyou.headstyle.common.Constants;
 import com.feiyou.headstyle.presenter.UserInfoPresenterImp;
+import com.feiyou.headstyle.ui.activity.MainActivity;
 import com.feiyou.headstyle.ui.activity.MyFollowActivity;
 import com.feiyou.headstyle.ui.activity.MyMessageActivity;
 import com.feiyou.headstyle.ui.activity.MyNoteActivity;
@@ -99,6 +103,23 @@ public class MyFragment extends BaseFragment implements UserInfoView {
     }
 
     public void initViews() {
+
+        mUserIdTv.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                if (!App.getApp().isLogin) {
+                    if (loginDialog != null && !loginDialog.isShowing()) {
+                        loginDialog.show();
+                    }
+                } else {
+                    ClipboardManager cmb = (ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
+                    cmb.setText(userInfo.getId()); //将内容放入粘贴管理器,在别的地方长按选择"粘贴"即可
+                    ToastUtils.showLong("已复制");
+                }
+                return false;
+            }
+        });
+
         FrameLayout.LayoutParams searchParams = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, SizeUtils.dp2px(36));
         searchParams.setMargins(0, BarUtils.getStatusBarHeight(), 0, 0);
         mMyInfoTopLayout.setLayoutParams(searchParams);
@@ -133,6 +154,13 @@ public class MyFragment extends BaseFragment implements UserInfoView {
             mFollowTv.setText(userInfo.getGuanNum() + "");
             mFansCountTv.setText(userInfo.getFenNum() + "");
             mKeepCountTv.setText(userInfo.getCollectNum() + "");
+
+            //如果用户已经登录，重新获取最新的用户信息
+            LoginRequest loginRequest = new LoginRequest();
+            loginRequest.setOpenid(userInfo.getOpenid());//openid全部大写
+            loginRequest.setType(userInfo.getLoginType());
+            userInfoPresenterImp.login(loginRequest);
+
         } else {
             mUserHeadImageView.setImageResource(R.mipmap.head_def);
 
@@ -228,6 +256,7 @@ public class MyFragment extends BaseFragment implements UserInfoView {
                     break;
                 case 4:
                     intent = new Intent(getActivity(), UserInfoActivity.class);
+                    intent.putExtra("is_my_info", true);
                     break;
             }
             startActivity(intent);
@@ -269,7 +298,7 @@ public class MyFragment extends BaseFragment implements UserInfoView {
                 SPUtils.getInstance().put(Constants.USER_INFO, JSONObject.toJSONString(((UserInfoRet) tData).getData()));
 
                 mUserNickNameTv.setText(userInfo.getNickname());
-                mUserIdTv.setText("ID：" + userInfo.getId());
+                mUserIdTv.setText("头像ID：" + userInfo.getId());
 
                 mFollowTv.setText(userInfo.getGuanNum() + "");
                 mFansCountTv.setText(userInfo.getFenNum() + "");

@@ -12,6 +12,8 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.blankj.utilcode.util.SizeUtils;
 import com.blankj.utilcode.util.StringUtils;
@@ -20,9 +22,11 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
+import com.feiyou.headstyle.bean.FriendInfosEvent;
 import com.feiyou.headstyle.bean.FriendsGroup;
 import com.feiyou.headstyle.bean.FriendsGroupRet;
 import com.feiyou.headstyle.bean.FriendsInfo;
+import com.feiyou.headstyle.bean.MessageEvent;
 import com.feiyou.headstyle.common.Constants;
 import com.feiyou.headstyle.presenter.FriendsDataPresenterImp;
 import com.feiyou.headstyle.ui.base.BaseFragmentActivity;
@@ -34,6 +38,10 @@ import com.qmuiteam.qmui.widget.QMUITopBar;
 import com.yanzhenjie.recyclerview.swipe.SwipeItemClickListener;
 import com.yanzhenjie.recyclerview.swipe.SwipeMenuRecyclerView;
 import com.yanzhenjie.recyclerview.swipe.widget.DefaultItemDecoration;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -116,6 +124,11 @@ public class FriendListActivity extends BaseFragmentActivity implements FriendsD
                 intent.putStringArrayListExtra("friend_names", friendNames);
                 setResult(PushNoteActivity.RESULT_FRIEND_CODE, intent);
 
+                MessageEvent friendInfosEvent = new MessageEvent("friend_ids");
+                Logger.i("choose friends--->" + JSON.toJSONString(friendIds));
+                friendInfosEvent.setFriendIds(JSON.toJSONString(friendIds));
+                friendInfosEvent.setFriendNames(JSON.toJSONString(friendNames));
+                EventBus.getDefault().post(friendInfosEvent);
                 finish();
             }
         });

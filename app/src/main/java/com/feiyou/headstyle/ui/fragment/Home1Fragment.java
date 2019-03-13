@@ -8,6 +8,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -37,6 +38,7 @@ import com.feiyou.headstyle.ui.adapter.HeadTypeAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragment;
 import com.feiyou.headstyle.view.HomeDataView;
 import com.orhanobut.logger.Logger;
+import com.wang.avi.AVLoadingIndicatorView;
 import com.youth.banner.Banner;
 import com.youth.banner.listener.OnBannerListener;
 
@@ -64,6 +66,12 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
 
     @BindView(R.id.home_head_list)
     RecyclerView mHeadInfoListView;
+
+    @BindView(R.id.avi)
+    AVLoadingIndicatorView avi;
+
+    @BindView(R.id.layout_no_data)
+    LinearLayout mNoDataLayout;
 
     Banner mBanner;
 
@@ -129,7 +137,7 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
         //设置进度View下拉的结束点，scale 是指设置是否需要放大或者缩小动画
         mRefreshLayout.setProgressViewEndTarget(true, 180);
         //设置进度View的组合颜色，在手指上下滑时使用第一个颜色，在刷新中，会一个个颜色进行切换
-        mRefreshLayout.setColorSchemeColors(ContextCompat.getColor(getActivity(),R.color.colorPrimary), Color.RED, Color.YELLOW, Color.BLUE);
+        mRefreshLayout.setColorSchemeColors(ContextCompat.getColor(getActivity(), R.color.colorPrimary), Color.RED, Color.YELLOW, Color.BLUE);
 
         //设置触发刷新的距离
         mRefreshLayout.setDistanceToTriggerSync(200);
@@ -197,6 +205,9 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
         headInfoAdapter.addHeaderView(topView);
         mHeadInfoListView.setAdapter(headInfoAdapter);
 
+        FrameLayout.LayoutParams listParams = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
+        listParams.setMargins(0, 0, 0, SizeUtils.dp2px(48));
+        mRefreshLayout.setLayoutParams(listParams);
 
         mHeadInfoListView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -244,6 +255,17 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
             }
         });
 
+        mHeadInfoListView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                int topRowVerticalPosition = (recyclerView == null || recyclerView.getChildCount() == 0) ? 0 : recyclerView.getChildAt(0).getTop();
+                mRefreshLayout.setEnabled(topRowVerticalPosition >= 0);
+            }
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+            }
+        });
 
         headInfoAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
             @Override
@@ -286,6 +308,7 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
 
     @OnClick(R.id.tv_refresh1)
     void refresh() {
+        mRefreshLayout.setRefreshing(true);
         isFirstLoad = true;
         homeDataPresenterImp.getData(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", "", "", "1", 0);
         //scrollView.smoothScrollTo(0, SizeUtils.dp2px(510 - 48));
@@ -311,22 +334,26 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
 
     @Override
     public void dismissProgress() {
+        avi.hide();
         mRefreshLayout.setRefreshing(false);
     }
 
     @Override
     public void loadDataSuccess(ResultInfo tData) {
+        avi.hide();
         mRefreshLayout.setRefreshing(false);
         if (tData != null && tData.getCode() == Constants.SUCCESS) {
+            mNoDataLayout.setVisibility(View.GONE);
+            mHeadInfoListView.setVisibility(View.VISIBLE);
 
             HomeDataWrapper homeDataRet = null;
             if (tData instanceof HomeDataRet) {
                 homeDataRet = ((HomeDataRet) tData).getData();
                 if (homeDataRet != null) {
                     currentPage = homeDataRet.getPage();
+
                     if (isFirstLoad) {
                         randomPage = currentPage;
-
                         //此处的信息，只需要设置一次
                         if (homeDataRet.getBannerList() != null && homeDataRet.getBannerList().size() > 0) {
                             bannerInfos = homeDataRet.getBannerList();
@@ -365,8 +392,14 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
                             headInfoAdapter.loadMoreEnd();
                         }
                     }
+                } else {
+                    mNoDataLayout.setVisibility(View.VISIBLE);
+                    mHeadInfoListView.setVisibility(View.GONE);
                 }
             }
+        } else {
+            mNoDataLayout.setVisibility(View.VISIBLE);
+            mHeadInfoListView.setVisibility(View.GONE);
         }
     }
 
@@ -387,6 +420,7 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
 
     @Override
     public void loadDataError(Throwable throwable) {
+        avi.hide();
         mRefreshLayout.setRefreshing(false);
     }
 

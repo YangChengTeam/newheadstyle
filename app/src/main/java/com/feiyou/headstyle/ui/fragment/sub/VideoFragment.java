@@ -1,8 +1,11 @@
 package com.feiyou.headstyle.ui.fragment.sub;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
@@ -12,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.VideoView;
 
@@ -32,6 +36,7 @@ import com.feiyou.headstyle.ui.adapter.VideoListAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragment;
 import com.feiyou.headstyle.view.VideoInfoView;
 import com.orhanobut.logger.Logger;
+import com.wang.avi.AVLoadingIndicatorView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,10 +48,19 @@ import butterknife.OnClick;
 /**
  * Created by myflying on 2018/11/26.
  */
-public class VideoFragment extends BaseFragment implements VideoInfoView {
+public class VideoFragment extends BaseFragment implements VideoInfoView, SwipeRefreshLayout.OnRefreshListener {
+
+    @BindView(R.id.swipe_refresh)
+    SwipeRefreshLayout mRefreshLayout;
 
     @BindView(R.id.video_list)
     RecyclerView mVideoListView;
+
+    @BindView(R.id.layout_no_data)
+    LinearLayout noDataLayout;
+
+    @BindView(R.id.avi)
+    AVLoadingIndicatorView avi;
 
     VideoListAdapter videoListAdapter;
 
@@ -74,11 +88,37 @@ public class VideoFragment extends BaseFragment implements VideoInfoView {
 
     public void initViews() {
 
+        mRefreshLayout.setOnRefreshListener(this);
+        //设置进度View样式的大小，只有两个值DEFAULT和LARGE
+        //设置进度View下拉的起始点和结束点，scale 是指设置是否需要放大或者缩小动画
+        mRefreshLayout.setProgressViewOffset(true, -0, 200);
+        //设置进度View下拉的结束点，scale 是指设置是否需要放大或者缩小动画
+        mRefreshLayout.setProgressViewEndTarget(true, 180);
+        //设置进度View的组合颜色，在手指上下滑时使用第一个颜色，在刷新中，会一个个颜色进行切换
+        mRefreshLayout.setColorSchemeColors(ContextCompat.getColor(getActivity(), R.color.colorPrimary), Color.RED, Color.YELLOW, Color.BLUE);
+
+        //设置触发刷新的距离
+        mRefreshLayout.setDistanceToTriggerSync(200);
+        //如果child是自己自定义的view，可以通过这个回调，告诉mSwipeRefreshLayoutchild是否可以滑动
+        mRefreshLayout.setOnChildScrollUpCallback(null);
+
         videoInfoPresenterImp = new VideoInfoPresenterImp(this, getActivity());
 
         videoListAdapter = new VideoListAdapter(getActivity(), null);
         mVideoListView.setLayoutManager(new GridLayoutManager(getActivity(), 2));
         mVideoListView.setAdapter(videoListAdapter);
+
+        mVideoListView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                int topRowVerticalPosition = (recyclerView == null || recyclerView.getChildCount() == 0) ? 0 : recyclerView.getChildAt(0).getTop();
+                mRefreshLayout.setEnabled(topRowVerticalPosition >= 0);
+            }
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+            }
+        });
 
         videoListAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
             @Override
@@ -114,13 +154,18 @@ public class VideoFragment extends BaseFragment implements VideoInfoView {
 
     @Override
     public void dismissProgress() {
-
+        avi.hide();
+        mRefreshLayout.setRefreshing(false);
     }
 
     @Override
     public void loadDataSuccess(ResultInfo tData) {
+        avi.hide();
+        mRefreshLayout.setRefreshing(false);
         Logger.i(JSONObject.toJSONString(tData));
         if (tData != null && tData.getCode() == Constants.SUCCESS) {
+            mVideoListView.setVisibility(View.VISIBLE);
+            noDataLayout.setVisibility(View.GONE);
             if (tData instanceof VideoInfoRet) {
                 if (currentPage == 0) {
                     randomPage = ((VideoInfoRet) tData).getData().getPage();
@@ -141,11 +186,22 @@ public class VideoFragment extends BaseFragment implements VideoInfoView {
                     videoListAdapter.loadMoreEnd();
                 }
             }
+        } else {
+            mVideoListView.setVisibility(View.GONE);
+            noDataLayout.setVisibility(View.VISIBLE);
         }
     }
 
     @Override
     public void loadDataError(Throwable throwable) {
+        avi.hide();
+        mRefreshLayout.setRefreshing(false);
+    }
 
+    @Override
+    public void onRefresh() {
+        mRefreshLayout.setRefreshing(true);
+        currentPage = 0;
+        videoInfoPresenterImp.getDataList(currentPage);
     }
 }

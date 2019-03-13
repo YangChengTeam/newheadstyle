@@ -3,6 +3,7 @@ package com.feiyou.headstyle.ui.adapter;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.support.v4.content.ContextCompat;
+import android.text.Html;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -52,7 +53,7 @@ public class CommentAdapter extends BaseQuickAdapter<NoteItem, BaseViewHolder> {
 
             helper.setText(R.id.tv_nick_name, item.getCommentNickname())
                     .setText(R.id.tv_comment_date, TimeUtils.millis2String(item.getAddTime() != null ? item.getAddTime() * 1000 : 0))
-                    .setText(R.id.tv_comment_content, item.getCommentContent())
+                    .setText(R.id.tv_comment_content, Html.fromHtml(item.getCommentContent()))
                     .setText(R.id.tv_is_zan, item.getZanNum() + "");
 
             TextView isZanTv = helper.itemView.findViewById(R.id.tv_is_zan);

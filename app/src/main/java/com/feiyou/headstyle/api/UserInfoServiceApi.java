@@ -48,4 +48,7 @@ public interface UserInfoServiceApi {
 
     @POST("v1.userinfo/userInfo")
     Observable<UserInfoRet> getUserInfo(@Body RequestBody requestBody);
+
+    @POST("v1.userinfo/updSetUpSingleInfo")
+    Observable<UserInfoRet> updateOneInfo(@Body RequestBody requestBody);
 }

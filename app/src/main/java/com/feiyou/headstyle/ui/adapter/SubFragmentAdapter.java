@@ -14,7 +14,7 @@ import com.feiyou.headstyle.ui.fragment.sub.VideoFragment;
 
 public class SubFragmentAdapter extends FragmentPagerAdapter {
 
-    private final Fragment[] FRAGMENTS = new Fragment[]{new FollowFragment(), new RecommendFragment(), new VideoFragment()};
+    private final Fragment[] FRAGMENTS = new Fragment[]{RecommendFragment.newInstance(1), RecommendFragment.newInstance(2), new VideoFragment()};
 
     public SubFragmentAdapter(FragmentManager fragmentManager) {
         super(fragmentManager);

@@ -14,6 +14,9 @@ import android.text.style.ForegroundColorSpan;
 import android.text.style.MetricAffectingSpan;
 import android.text.style.URLSpan;
 import android.util.AttributeSet;
+import android.view.KeyEvent;
+
+import com.feiyou.headstyle.view.MyEditText;
 
 /**
  * 模仿微信的@功能 整块删除 可编辑
@@ -35,6 +38,27 @@ public class MsgEditText extends AppCompatEditText {
     public MsgEditText(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
 
+    }
+
+    public interface BackListener {
+        void back();
+    }
+
+    private MsgEditText.BackListener listener;
+
+    public void setBackListener(MsgEditText.BackListener listener) {
+        this.listener = listener;
+    }
+
+    @Override
+
+    public boolean onKeyPreIme(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_UP) {
+            if (listener != null) {
+                listener.back();
+            }
+        }
+        return false;
     }
 
     private StringBuilder builder;

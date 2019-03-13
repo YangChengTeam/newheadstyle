@@ -30,7 +30,8 @@ public class HeadTypeAdapter extends BaseQuickAdapter<CategoryInfo, BaseViewHold
 
     @Override
     protected void convert(final BaseViewHolder helper, final CategoryInfo item) {
-        helper.setText(R.id.iv_type_name,item.getTagsname());
-        Glide.with(mContext).load(item.getTagsimg()).into((ImageView) helper.itemView.findViewById(R.id.iv_type_img));
+        helper.setText(R.id.iv_type_name, item.getTagsname());
+        RequestOptions options = new RequestOptions().skipMemoryCache(true);
+        Glide.with(mContext).load(item.getTagsimg()).apply(options).into((ImageView) helper.getView(R.id.iv_type_img));
     }
 }

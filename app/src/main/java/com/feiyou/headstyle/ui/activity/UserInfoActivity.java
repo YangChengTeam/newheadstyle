@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -22,7 +23,9 @@ import com.blankj.utilcode.util.SizeUtils;
 import com.blankj.utilcode.util.StringUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.chad.library.adapter.base.BaseQuickAdapter;
+import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.bean.CollectInfoRet;
 import com.feiyou.headstyle.bean.NoteInfoRet;
@@ -37,6 +40,7 @@ import com.feiyou.headstyle.ui.adapter.CommonImageAdapter;
 import com.feiyou.headstyle.ui.adapter.HeadInfoAdapter;
 import com.feiyou.headstyle.ui.adapter.NoteInfoAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragmentActivity;
+import com.feiyou.headstyle.ui.custom.GlideRoundTransform;
 import com.feiyou.headstyle.view.CollectDataView;
 import com.feiyou.headstyle.view.NoteDataView;
 import com.feiyou.headstyle.view.UserInfoView;
@@ -53,13 +57,19 @@ import butterknife.BindView;
 /**
  * Created by myflying on 2018/11/23.
  */
-public class UserInfoActivity extends BaseFragmentActivity implements NoteDataView, UserInfoView {
+public class UserInfoActivity extends BaseFragmentActivity implements UserInfoView, View.OnClickListener {
 
     @BindView(R.id.collapsing_topbar_layout)
     QMUICollapsingTopBarLayout mCollapsingTopBarLayout;
 
     @BindView(R.id.topbar)
     QMUITopBar mTopBar;
+
+    @BindView(R.id.iv_user_head)
+    ImageView mUserHeadIv;
+
+    @BindView(R.id.layout_guan_fen)
+    RelativeLayout mGuanFenLayout;
 
     @BindView(R.id.note_list)
     RecyclerView mNoteListView;
@@ -88,11 +98,15 @@ public class UserInfoActivity extends BaseFragmentActivity implements NoteDataVi
     @BindView(R.id.tv_user_star)
     TextView mUserStarTv;
 
+    @BindView(R.id.tv_user_sign)
+    TextView mUserSignTv;
+
+    @BindView(R.id.layout_photos)
+    RelativeLayout mPhotoLayout;
+
     ImageView mBackImageView;
 
     NoteInfoAdapter noteInfoAdapter;
-
-    private NoteDataPresenterImp noteDataPresenterImp;
 
     private int currentPage = 1;
 
@@ -110,6 +124,16 @@ public class UserInfoActivity extends BaseFragmentActivity implements NoteDataVi
 
     private String userId;
 
+    private boolean isMyInfo;
+
+    BottomSheetDialog updateBgDialog;
+
+    LinearLayout mTopItemLayout;
+
+    TextView mTopItemTv;
+
+    LinearLayout mUpdateCancelLayout;
+
     @Override
     protected int getContextViewId() {
         return R.layout.activity_user_info;
@@ -126,30 +150,92 @@ public class UserInfoActivity extends BaseFragmentActivity implements NoteDataVi
         QMUIStatusBarHelper.setStatusBarLightMode(this);
         View topView = getLayoutInflater().inflate(R.layout.common_user_info, null);
         topView.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, SizeUtils.dp2px(48)));
-
         mTopBar.setCenterView(topView);
         mBackImageView = topView.findViewById(R.id.iv_back);
+        ImageView rightIv = topView.findViewById(R.id.iv_right);
+        TextView titleTv = topView.findViewById(R.id.tv_title);
+        titleTv.setText(isMyInfo ? "我的主页" : "个人主页");
         mBackImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 popBackStack();
             }
         });
+
+        rightIv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (updateBgDialog != null && !updateBgDialog.isShowing()) {
+                    updateBgDialog.show();
+                }
+            }
+        });
     }
 
     public void initData() {
-        userInfoPresenterImp = new UserInfoPresenterImp(this, this);
-        noteDataPresenterImp = new NoteDataPresenterImp(this, this);
-
         Bundle bundle = getIntent().getExtras();
-        if (bundle != null && !StringUtils.isEmpty(bundle.getString("user_id"))) {
-            userId = bundle.getString("user_id");
-            userInfoPresenterImp.getUserInfo(userId);
+        if (bundle != null) {
+            isMyInfo = bundle.getBoolean("is_my_info", false);
         }
+
+        if (isMyInfo) {
+            userInfo = App.getApp().getmUserInfo();
+            userId = userInfo.getId();
+
+            RequestOptions options = new RequestOptions();
+            options.transform(new GlideRoundTransform(this, 30));
+            Glide.with(this).load(userInfo.getUserimg()).apply(options).into(mUserHeadIv);
+
+            mFollowCountTv.setText(userInfo.getGuanNum() + "");
+            mFansCountTv.setText(userInfo.getFenNum() + "");
+            mNickNameTv.setText(userInfo.getNickname() + "");
+            mUserIdTv.setText(userInfo.getId() + "");
+            mUserAgeTv.setText(userInfo.getAge() + "岁");
+            mUserSignTv.setText(userInfo.getSig());
+            mUserSexIv.setVisibility(userInfo.getSex() > 0 ? View.VISIBLE : View.GONE);
+            Glide.with(this).load(userInfo.getSex() == 1 ? R.mipmap.sex_boy : R.mipmap.sex_girl).into(mUserSexIv);
+            mUserStarTv.setText(userInfo.getStar());
+
+            //设置照片墙
+            if (userInfo.getImageWall() != null && userInfo.getImageWall().length > 0) {
+                mPhotoLayout.setVisibility(View.VISIBLE);
+                String[] tempPhotos = userInfo.getImageWall();
+                photoList = new ArrayList<>();
+                for (int i = 0; i < tempPhotos.length; i++) {
+                    photoList.add(tempPhotos[i]);
+                }
+                if (photoList.size() > 4) {
+                    photoList = photoList.subList(0, 4);
+                }
+
+                commonImageAdapter.setNewData(photoList);
+            } else {
+                mPhotoLayout.setVisibility(View.GONE);
+            }
+        } else {
+            if (bundle != null && !StringUtils.isEmpty(bundle.getString("user_id"))) {
+                userId = bundle.getString("user_id");
+            }
+        }
+
+        userInfoPresenterImp = new UserInfoPresenterImp(this, this);
+
+        mGuanFenLayout.setVisibility(isMyInfo ? View.GONE : View.VISIBLE);
 
         bottomSheetDialog = new BottomSheetDialog(this);
         View deleteDialogView = LayoutInflater.from(this).inflate(R.layout.note_delete_dialog, null);
         bottomSheetDialog.setContentView(deleteDialogView);
+
+        //顶部操作栏弹出窗口
+        updateBgDialog = new BottomSheetDialog(this);
+        View updateBgView = LayoutInflater.from(this).inflate(R.layout.update_info_bg_view, null);
+        mTopItemLayout = updateBgView.findViewById(R.id.layout_top_item);
+        mUpdateCancelLayout = updateBgView.findViewById(R.id.layout_update_cancel);
+        mTopItemTv = updateBgView.findViewById(R.id.tv_top_item);
+
+        mTopItemLayout.setOnClickListener(this);
+        mUpdateCancelLayout.setOnClickListener(this);
+        updateBgDialog.setContentView(updateBgView);
 
         commonImageAdapter = new CommonImageAdapter(this, null, 32);
         mPhotoListView.setLayoutManager(new GridLayoutManager(this, 4));
@@ -178,7 +264,7 @@ public class UserInfoActivity extends BaseFragmentActivity implements NoteDataVi
             @Override
             public void onLoadMoreRequested() {
                 currentPage++;
-                noteDataPresenterImp.getNoteData(currentPage, 2, "");
+                userInfoPresenterImp.getUserInfo(userId);
             }
         }, mNoteListView);
 
@@ -192,33 +278,7 @@ public class UserInfoActivity extends BaseFragmentActivity implements NoteDataVi
                 }
             }
         });
-
-        noteDataPresenterImp.getNoteData(currentPage, 2, "");
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        if (!StringUtils.isEmpty(SPUtils.getInstance().getString(Constants.USER_INFO))) {
-            Logger.i(SPUtils.getInstance().getString(Constants.USER_INFO));
-            userInfo = JSON.parseObject(SPUtils.getInstance().getString(Constants.USER_INFO), new TypeReference<UserInfo>() {
-            });
-        }
-
-        if (userInfo != null && userInfo.getImageWall() != null && userInfo.getImageWall().length > 0) {
-
-            String[] tempPhotos = userInfo.getImageWall();
-            photoList = new ArrayList<>();
-            for (int i = 0; i < tempPhotos.length; i++) {
-                photoList.add(tempPhotos[i]);
-            }
-            if (photoList.size() > 4) {
-                photoList = photoList.subList(0, 4);
-            }
-
-            commonImageAdapter.setNewData(photoList);
-        }
+        userInfoPresenterImp.getUserInfo(userId);
     }
 
     @Override
@@ -234,33 +294,45 @@ public class UserInfoActivity extends BaseFragmentActivity implements NoteDataVi
     @Override
     public void loadDataSuccess(ResultInfo tData) {
         Logger.i("other user info--->" + JSON.toJSONString(tData));
+
         if (tData != null && tData.getCode() == Constants.SUCCESS) {
-
-            if (tData instanceof NoteInfoRet) {
-                if (currentPage == 1) {
-                    noteInfoAdapter.setNewData(((NoteInfoRet) tData).getData());
-                } else {
-                    noteInfoAdapter.addData(((NoteInfoRet) tData).getData());
-                }
-
-                if (((NoteInfoRet) tData).getData().size() == pageSize) {
-                    noteInfoAdapter.loadMoreComplete();
-                } else {
-                    noteInfoAdapter.loadMoreEnd();
-                }
-            }
-
             if (tData instanceof UserInfoRet) {
-                UserInfo otherUser = ((UserInfoRet) tData).getData();
+                userInfo = ((UserInfoRet) tData).getData();
+                RequestOptions options = new RequestOptions();
+                options.transform(new GlideRoundTransform(this, 30));
+                Glide.with(this).load(userInfo.getUserimg()).apply(options).into(mUserHeadIv);
 
-                mFollowCountTv.setText(otherUser.getGuanNum() + "");
-                mFansCountTv.setText(otherUser.getFenNum() + "");
-                mNickNameTv.setText(otherUser.getNickname() + "");
-                mUserIdTv.setText(otherUser.getId() + "");
-                mUserAgeTv.setText(otherUser.getAge() + "");
-                Glide.with(this).load(otherUser.getSex() == 1 ? R.mipmap.sex_boy : R.mipmap.sex_girl).into(mUserSexIv);
-                mUserStarTv.setText(otherUser.getStar());
+                mFollowCountTv.setText(userInfo.getGuanNum() + "");
+                mFansCountTv.setText(userInfo.getFenNum() + "");
+                mNickNameTv.setText(userInfo.getNickname() + "");
+                mUserIdTv.setText(userInfo.getId() + "");
+                mUserAgeTv.setText(userInfo.getAge() + "岁");
+                mUserSignTv.setText(userInfo.getSig());
+                mUserSexIv.setVisibility(userInfo.getSex() > 0 ? View.VISIBLE : View.GONE);
+                Glide.with(this).load(userInfo.getSex() == 1 ? R.mipmap.sex_boy : R.mipmap.sex_girl).into(mUserSexIv);
+                mUserStarTv.setText(userInfo.getStar());
+
+                if (userInfo.getImageWall() != null && userInfo.getImageWall().length > 0) {
+                    mPhotoLayout.setVisibility(View.VISIBLE);
+                } else {
+                    mPhotoLayout.setVisibility(View.GONE);
+                }
+
+                if (userInfo.getNoteList() != null && userInfo.getNoteList().size() > 0) {
+                    if (currentPage == 1) {
+                        noteInfoAdapter.setNewData(userInfo.getNoteList());
+                    } else {
+                        noteInfoAdapter.addData(userInfo.getNoteList());
+                    }
+
+                    if (userInfo.getNoteList().size() == pageSize) {
+                        noteInfoAdapter.loadMoreComplete();
+                    } else {
+                        noteInfoAdapter.loadMoreEnd();
+                    }
+                }
             }
+
         } else {
             ToastUtils.showLong(StringUtils.isEmpty(tData.getMsg()) ? "操作错误" : tData.getMsg());
         }
@@ -275,5 +347,24 @@ public class UserInfoActivity extends BaseFragmentActivity implements NoteDataVi
     public void onBackPressed() {
         super.onBackPressed();
         popBackStack();
+    }
+
+    @Override
+    public void onClick(View view) {
+
+        if (updateBgDialog != null && updateBgDialog.isShowing()) {
+            updateBgDialog.dismiss();
+        }
+
+        switch (view.getId()) {
+            case R.id.layout_top_item:
+
+                break;
+            case R.id.layout_update_cancel:
+
+                break;
+            default:
+                break;
+        }
     }
 }

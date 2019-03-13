@@ -18,12 +18,22 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.alibaba.fastjson.JSONObject;
 import com.blankj.utilcode.util.RegexUtils;
+import com.blankj.utilcode.util.SPUtils;
 import com.blankj.utilcode.util.SizeUtils;
 import com.blankj.utilcode.util.StringUtils;
 import com.blankj.utilcode.util.ToastUtils;
+import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
+import com.feiyou.headstyle.bean.ResultInfo;
+import com.feiyou.headstyle.bean.UserInfo;
+import com.feiyou.headstyle.bean.UserInfoRet;
+import com.feiyou.headstyle.common.Constants;
+import com.feiyou.headstyle.presenter.UserInfoPresenterImp;
 import com.feiyou.headstyle.ui.base.BaseFragmentActivity;
+import com.feiyou.headstyle.utils.MyToastUtils;
+import com.feiyou.headstyle.view.UserInfoView;
 import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 import com.qmuiteam.qmui.widget.QMUITopBar;
@@ -36,7 +46,7 @@ import cn.smssdk.SMSSDK;
 /**
  * Created by myflying on 2018/11/23.
  */
-public class BindPhoneActivity extends BaseFragmentActivity {
+public class BindPhoneActivity extends BaseFragmentActivity implements UserInfoView {
 
     public static String COUNTRY_CODE = "86";
 
@@ -68,6 +78,10 @@ public class BindPhoneActivity extends BaseFragmentActivity {
     private ProgressDialog progressDialog = null;
 
     private int pageType = 1;//1:新用户注册，2:忘记密码
+
+    UserInfoPresenterImp userInfoPresenterImp;
+
+    private UserInfo userInfo;
 
     @SuppressLint("HandlerLeak")
     private Handler handler = new Handler() {
@@ -124,12 +138,10 @@ public class BindPhoneActivity extends BaseFragmentActivity {
                         } else if (event == SMSSDK.EVENT_SUBMIT_VERIFICATION_CODE) {
                             if (result == SMSSDK.RESULT_COMPLETE) {
                                 //register();
-                                ToastUtils.showLong("绑定成功");
-                                if (progressDialog != null && progressDialog.isShowing()) {
-                                    progressDialog.dismiss();
-                                }
-                                finish();
+                                //ToastUtils.showLong("绑定成功");
                                 Logger.i("validate code success--->");
+                                userInfo.setPhone(mMobileEditText.getText().toString());
+                                userInfoPresenterImp.updateOneInfo(userInfo);
                                 // TODO 处理验证码验证通过的结果
                             } else {
 
@@ -173,6 +185,9 @@ public class BindPhoneActivity extends BaseFragmentActivity {
     }
 
     public void initData() {
+        userInfo = App.getApp().getmUserInfo();
+        userInfoPresenterImp = new UserInfoPresenterImp(this,this);
+
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("正在登录");
 
@@ -256,5 +271,45 @@ public class BindPhoneActivity extends BaseFragmentActivity {
     @Override
     public void onBackPressed() {
         popBackStack();
+    }
+
+    @Override
+    public void showProgress() {
+
+    }
+
+    @Override
+    public void dismissProgress() {
+        if (progressDialog != null && progressDialog.isShowing()) {
+            progressDialog.dismiss();
+        }
+    }
+
+    @Override
+    public void loadDataSuccess(ResultInfo tData) {
+        if (progressDialog != null && progressDialog.isShowing()) {
+            progressDialog.dismiss();
+        }
+        if (tData != null && tData.getCode() == Constants.SUCCESS) {
+            if (tData instanceof UserInfoRet) {
+                MyToastUtils.showToast(this, 0, "绑定成功");
+                //设置手机号
+                userInfo.setPhone(mMobileEditText.getText().toString());
+                App.getApp().setmUserInfo(userInfo);
+                App.getApp().setLogin(true);
+                SPUtils.getInstance().put(Constants.USER_INFO, JSONObject.toJSONString(userInfo));
+                finish();
+            }
+        } else {
+            MyToastUtils.showToast(this, 1, "绑定失败");
+            Logger.i(tData.getMsg() != null ? tData.getMsg() : "操作错误");
+        }
+    }
+
+    @Override
+    public void loadDataError(Throwable throwable) {
+        if (progressDialog != null && progressDialog.isShowing()) {
+            progressDialog.dismiss();
+        }
     }
 }
