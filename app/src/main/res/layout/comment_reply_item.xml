@@ -12,8 +12,8 @@
 
         <ImageView
             android:id="@+id/iv_user_head"
-            android:layout_width="44dp"
-            android:layout_height="44dp"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
             android:layout_centerVertical="true"
             android:layout_marginLeft="12dp"
             android:src="@mipmap/head_def" />
@@ -85,8 +85,8 @@
             android:maxLines="2"
             android:padding="6dp"
             android:text="无聊的网友瞎几把回复的内容"
-            android:textColor="@color/black1"
-            android:textSize="16dp" />
+            android:textColor="@color/black2"
+            android:textSize="14dp" />
 
         <LinearLayout
             android:id="@+id/layout_old_content"

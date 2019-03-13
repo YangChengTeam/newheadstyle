@@ -13,6 +13,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -28,6 +29,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.VideoView;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.blankj.utilcode.util.BarUtils;
 import com.blankj.utilcode.util.KeyboardUtils;
@@ -74,6 +76,10 @@ import com.orhanobut.logger.Logger;
 import com.wang.avi.AVLoadingIndicatorView;
 
 import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -195,6 +201,7 @@ public class VideoShowActivity extends BaseFragmentActivity implements VideoInfo
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        EventBus.getDefault().register(this);
         initView();
         initCommentPop();
         initReplyView();
@@ -328,7 +335,7 @@ public class VideoShowActivity extends BaseFragmentActivity implements VideoInfo
                     Glide.with(VideoShowActivity.this).load(noteItem.getCommentUserimg()).apply(options).into(topUserHeadImageView);
                     nickNameTv.setText(noteItem.getCommentNickname());
                     addDateTv.setText(TimeUtils.millis2String(noteItem.getAddTime() != null ? noteItem.getAddTime() * 1000 : 0));
-                    commentContentTv.setText(noteItem.getCommentContent());
+                    commentContentTv.setText(Html.fromHtml(noteItem.getCommentContent()));
                     zanCountTv.setText(noteItem.getZanNum() + "");
                     if (noteItem.getIsZan() == 0) {
                         zanCountTv.setCompoundDrawablesWithIntrinsicBounds(notZan, null, null, null);
@@ -454,6 +461,11 @@ public class VideoShowActivity extends BaseFragmentActivity implements VideoInfo
                     repeatId = commentReplyAdapter.getData().get(position).getRepeatId();
                     addZanPresenterImp.addZan(3, userInfo != null ? userInfo.getId() : "", "", "", "", repeatId, 2);
                 }
+
+                if (view.getId() == R.id.btn_reply_count) {
+                    switchType = 3;
+                    showInputDialog();
+                }
             }
         });
 
@@ -531,6 +543,18 @@ public class VideoShowActivity extends BaseFragmentActivity implements VideoInfo
             ImageView imgThumb = itemView.findViewById(R.id.img_thumb);
             videoView.stopPlayback();
             imgThumb.animate().alpha(1).start();
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void Event(MessageEvent messageEvent) {
+        if (messageEvent.getMessage().equals("friend_ids")) {
+            if (messageEvent.getMessage().equals("friend_ids")) {
+                List<String> friendIds = JSON.parseArray(messageEvent.getFriendIds(), String.class);
+                List<String> names = JSON.parseArray(messageEvent.getFriendNames(), String.class);
+                Logger.i("user names result--->" + messageEvent.getFriendNames());
+                inputDialog.setAtUserNames(friendIds, names);
+            }
         }
     }
 
@@ -687,7 +711,7 @@ public class VideoShowActivity extends BaseFragmentActivity implements VideoInfo
     }
 
     @Override
-    public void sendContent(String userIds,String content, int type) {
+    public void sendContent(String userIds, String content, int type) {
         //关闭软键盘
         KeyboardUtils.hideSoftInput(commentView);
 
@@ -698,6 +722,7 @@ public class VideoShowActivity extends BaseFragmentActivity implements VideoInfo
             replyParams.setContent(content);
             replyParams.setRepeatUserId(userInfo != null ? userInfo.getId() : "");
             replyParams.setMessageId(currentVideoId);
+            replyParams.setAtUserIds(userIds);
         }
         if (switchType == 2) {
             commentId = commentAdapter.getData().get(currentCommentPos).getCommentId();
@@ -709,6 +734,7 @@ public class VideoShowActivity extends BaseFragmentActivity implements VideoInfo
             replyParams.setRepeatUserId(userInfo != null ? userInfo.getId() : "");
             replyParams.setCommentId(commentId);
             replyParams.setRepeatCommentUserId(repeatCommentUserId);
+            replyParams.setAtUserIds(userIds);
         }
 
         if (switchType == 3) {
@@ -721,6 +747,7 @@ public class VideoShowActivity extends BaseFragmentActivity implements VideoInfo
             replyParams.setRepeatUserId(userInfo != null ? userInfo.getId() : "");
             replyParams.setRepeatId(repeatId);
             replyParams.setRepeatCommentUserId(repeatCommentUserId);
+            replyParams.setAtUserIds(userIds);
         }
 
         replyCommentPresenterImp.addReplyInfo(replyParams);
@@ -731,6 +758,11 @@ public class VideoShowActivity extends BaseFragmentActivity implements VideoInfo
                 inputDialog.dismiss();
             }
         }
+    }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault().unregister(this);
     }
 }

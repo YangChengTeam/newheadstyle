@@ -165,6 +165,18 @@ public class NewFragment extends BaseFragment implements NoteTypeView, SwipeRefr
             }
         }, mNewsListView);
 
+        mNewsListView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                int topRowVerticalPosition = (recyclerView == null || recyclerView.getChildCount() == 0) ? 0 : recyclerView.getChildAt(0).getTop();
+                mRefreshLayout.setEnabled(topRowVerticalPosition >= 0);
+            }
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+            }
+        });
+
         loginDialog = new LoginDialog(getActivity(), R.style.login_dialog);
         avi.show();
 

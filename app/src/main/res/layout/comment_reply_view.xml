@@ -119,7 +119,7 @@
                 android:lineSpacingMultiplier="1.3"
                 android:text="你这是一个傻子啊你这是一个傻子啊你这是一个傻子啊你这是一个傻子啊你这是一个傻子啊"
                 android:textColor="@color/black"
-                android:textSize="14dp" />
+                android:textSize="16dp" />
         </LinearLayout>
 
         <View
