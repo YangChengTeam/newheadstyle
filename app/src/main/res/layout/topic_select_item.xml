@@ -17,7 +17,7 @@
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_marginLeft="14dp"
-            android:scaleType="centerCrop"
+
             android:src="@mipmap/xinli_test" />
 
         <RelativeLayout

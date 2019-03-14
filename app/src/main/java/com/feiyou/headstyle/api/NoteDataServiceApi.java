@@ -70,4 +70,7 @@ public interface NoteDataServiceApi {
     //关注用户
     @POST("v1.message/userFriendsGuan")
     Observable<FollowInfoRet> userFollow(@Body RequestBody requestBody);
+
+    @POST("v1.userinfo/delMyMessage")
+    Observable<ResultInfo> deleteNote(@Body RequestBody requestBody);
 }

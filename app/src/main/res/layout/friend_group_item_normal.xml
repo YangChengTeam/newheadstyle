@@ -19,7 +19,7 @@
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
             android:layout_margin="12dp"
-            android:scaleType="centerCrop"
+
             android:visibility="gone"
             android:src="@mipmap/head_def" />
 

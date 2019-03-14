@@ -1,5 +1,6 @@
 package com.feiyou.headstyle.ui.activity;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -26,10 +27,12 @@ import com.feiyou.headstyle.bean.NoteInfoRet;
 import com.feiyou.headstyle.bean.ResultInfo;
 import com.feiyou.headstyle.bean.UserInfo;
 import com.feiyou.headstyle.common.Constants;
+import com.feiyou.headstyle.presenter.DeleteNotePresenterImp;
 import com.feiyou.headstyle.presenter.NoteDataPresenterImp;
 import com.feiyou.headstyle.ui.adapter.MoreHeadTypeAdapter;
 import com.feiyou.headstyle.ui.adapter.NoteInfoAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragmentActivity;
+import com.feiyou.headstyle.ui.custom.ConfigDialog;
 import com.feiyou.headstyle.ui.custom.NormalDecoration;
 import com.feiyou.headstyle.view.NoteDataView;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
@@ -45,7 +48,7 @@ import butterknife.OnClick;
 /**
  * Created by myflying on 2018/11/23.
  */
-public class MyNoteActivity extends BaseFragmentActivity implements NoteDataView, SwipeRefreshLayout.OnRefreshListener, View.OnClickListener {
+public class MyNoteActivity extends BaseFragmentActivity implements NoteDataView, SwipeRefreshLayout.OnRefreshListener, View.OnClickListener, ConfigDialog.ConfigListener {
 
     @BindView(R.id.topbar)
     QMUITopBar mTopBar;
@@ -79,6 +82,16 @@ public class MyNoteActivity extends BaseFragmentActivity implements NoteDataView
     LinearLayout mCancelLayout;
 
     private UserInfo userInfo;
+
+    ConfigDialog configDialog;
+
+    private ProgressDialog progressDialog = null;
+
+    DeleteNotePresenterImp deleteNotePresenterImp;
+
+    private int currentItemPos = -1;
+
+    private boolean isMakeDelete;
 
     @Override
     protected int getContextViewId() {
@@ -124,8 +137,13 @@ public class MyNoteActivity extends BaseFragmentActivity implements NoteDataView
         //如果child是自己自定义的view，可以通过这个回调，告诉mSwipeRefreshLayoutchild是否可以滑动
         mRefreshLayout.setOnChildScrollUpCallback(null);
 
+        configDialog = new ConfigDialog(this, R.style.login_dialog, 1, "确认删除吗?", "请你确认是否删除当前帖子?");
+        configDialog.setConfigListener(this);
 
         userInfo = App.getApp().getmUserInfo();
+
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("正在删除");
 
         bottomSheetDialog = new BottomSheetDialog(this);
         View deleteDialogView = LayoutInflater.from(this).inflate(R.layout.note_delete_dialog, null);
@@ -136,7 +154,7 @@ public class MyNoteActivity extends BaseFragmentActivity implements NoteDataView
         mCancelLayout.setOnClickListener(this);
 
         noteDataPresenterImp = new NoteDataPresenterImp(this, this);
-
+        deleteNotePresenterImp = new DeleteNotePresenterImp(this, this);
         noteInfoAdapter = new NoteInfoAdapter(this, null, 2);
         mNoteListView.setLayoutManager(new LinearLayoutManager(this));
         mNoteListView.setAdapter(noteInfoAdapter);
@@ -145,6 +163,7 @@ public class MyNoteActivity extends BaseFragmentActivity implements NoteDataView
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
                 Intent intent = new Intent(MyNoteActivity.this, CommunityArticleActivity.class);
+                intent.putExtra("msg_id", noteInfoAdapter.getData().get(position).getId());
                 startActivity(intent);
             }
         });
@@ -161,13 +180,18 @@ public class MyNoteActivity extends BaseFragmentActivity implements NoteDataView
             @Override
             public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
                 if (view.getId() == R.id.layout_operation) {
+                    currentItemPos = position;
                     if (bottomSheetDialog != null && !bottomSheetDialog.isShowing()) {
                         bottomSheetDialog.show();
                     }
                 }
             }
         });
+    }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
         noteDataPresenterImp.getMyNoteList(currentPage, userInfo != null ? userInfo.getId() : "");
     }
 
@@ -191,6 +215,9 @@ public class MyNoteActivity extends BaseFragmentActivity implements NoteDataView
     public void dismissProgress() {
         avi.hide();
         mRefreshLayout.setRefreshing(false);
+        if (configDialog != null && configDialog.isShowing()) {
+            configDialog.dismiss();
+        }
     }
 
     @Override
@@ -200,6 +227,10 @@ public class MyNoteActivity extends BaseFragmentActivity implements NoteDataView
         if (tData != null && tData.getCode() == Constants.SUCCESS) {
             noDataLayout.setVisibility(View.GONE);
             mNoteListView.setVisibility(View.VISIBLE);
+
+            if (configDialog != null && configDialog.isShowing()) {
+                configDialog.dismiss();
+            }
 
             if (tData instanceof NoteInfoRet) {
                 if (((NoteInfoRet) tData).getData() != null && ((NoteInfoRet) tData).getData().size() > 0) {
@@ -220,6 +251,13 @@ public class MyNoteActivity extends BaseFragmentActivity implements NoteDataView
                 }
             }
 
+            if (isMakeDelete) {
+                ToastUtils.showLong("删除成功");
+                currentPage = 1;
+                isMakeDelete = false;
+                noteDataPresenterImp.getMyNoteList(currentPage, userInfo != null ? userInfo.getId() : "");
+            }
+
         } else {
             noDataLayout.setVisibility(View.VISIBLE);
             mNoteListView.setVisibility(View.GONE);
@@ -233,6 +271,10 @@ public class MyNoteActivity extends BaseFragmentActivity implements NoteDataView
         mRefreshLayout.setRefreshing(false);
         noDataLayout.setVisibility(View.VISIBLE);
         mNoteListView.setVisibility(View.GONE);
+
+        if (configDialog != null && configDialog.isShowing()) {
+            configDialog.dismiss();
+        }
     }
 
     @Override
@@ -254,9 +296,27 @@ public class MyNoteActivity extends BaseFragmentActivity implements NoteDataView
                 if (bottomSheetDialog != null && bottomSheetDialog.isShowing()) {
                     bottomSheetDialog.dismiss();
                 }
+
+                if (configDialog != null && !configDialog.isShowing()) {
+                    configDialog.show();
+                }
+
                 break;
             default:
                 break;
+        }
+    }
+
+    @Override
+    public void config() {
+        isMakeDelete = true;
+        deleteNotePresenterImp.deleteNote(userInfo != null ? userInfo.getId() : "", noteInfoAdapter.getData().get(currentItemPos).getId());
+    }
+
+    @Override
+    public void cancel() {
+        if (configDialog != null && configDialog.isShowing()) {
+            configDialog.dismiss();
         }
     }
 }

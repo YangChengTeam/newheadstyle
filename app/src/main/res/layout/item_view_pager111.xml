@@ -18,7 +18,6 @@
         android:layout_height="match_parent"
         android:clickable="false"
         android:focusable="false"
-        android:scaleType="centerCrop"
         android:visibility="visible" />
 
     <LinearLayout

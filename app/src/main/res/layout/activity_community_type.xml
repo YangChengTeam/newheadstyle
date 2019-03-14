@@ -40,7 +40,7 @@
                     android:layout_alignParentTop="true"
                     android:adjustViewBounds="true"
                     android:contentDescription="@null"
-                    android:scaleType="centerCrop" />
+                     />
 
                 <RelativeLayout
                     android:id="@+id/layout_detail"

@@ -13,6 +13,7 @@ import com.chad.library.adapter.base.BaseViewHolder;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.bean.HeadInfo;
 import com.feiyou.headstyle.ui.custom.GlideRoundTransform;
+import com.feiyou.headstyle.ui.custom.RoundedCornersTransformation;
 
 import java.util.List;
 
@@ -38,9 +39,10 @@ public class HeadInfoAdapter extends BaseQuickAdapter<HeadInfo, BaseViewHolder> 
         itemLayout.setLayoutParams(itemParams);
 
         RequestOptions options = new RequestOptions().skipMemoryCache(true);
-        options.override(tempWidth - 8, tempWidth - 8);
-        options.transform(new GlideRoundTransform(mContext, 5));
         options.placeholder(R.mipmap.image_def).error(R.mipmap.image_def);
+        options.override(tempWidth - 8, tempWidth - 8);
+        //options.transform(new GlideRoundTransform(mContext, 5));
+        options.transform(new RoundedCornersTransformation(SizeUtils.dp2px(5),0));
         Glide.with(mContext).load(item.getImgurl()).apply(options).into((ImageView) helper.getView(R.id.iv_head_info));
     }
 }

@@ -9,6 +9,7 @@ import com.feiyou.headstyle.api.TopicDataServiceApi;
 import com.feiyou.headstyle.base.BaseModel;
 import com.feiyou.headstyle.base.IBaseRequestCallBack;
 import com.feiyou.headstyle.bean.NoteInfoRet;
+import com.feiyou.headstyle.bean.ResultInfo;
 import com.feiyou.headstyle.bean.TopicInfoRet;
 
 import okhttp3.MediaType;
@@ -34,7 +35,6 @@ public class NoteDataModelImp extends BaseModel implements NoteDataModel<NoteInf
         noteDataServiceApi = mRetrofit.create(NoteDataServiceApi.class);
         mCompositeSubscription = new CompositeSubscription();
     }
-
     @Override
     public void getNoteData(int page, int type, String userid, final IBaseRequestCallBack<NoteInfoRet> iBaseRequestCallBack) {
         JSONObject params = new JSONObject();

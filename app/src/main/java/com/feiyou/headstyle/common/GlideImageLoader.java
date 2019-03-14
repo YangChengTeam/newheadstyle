@@ -9,6 +9,7 @@ import com.blankj.utilcode.util.SizeUtils;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.feiyou.headstyle.ui.custom.GlideRoundTransform;
+import com.feiyou.headstyle.ui.custom.RoundedCornersTransformation;
 import com.youth.banner.loader.ImageLoader;
 
 public class GlideImageLoader extends ImageLoader {
@@ -24,7 +25,8 @@ public class GlideImageLoader extends ImageLoader {
         //Glide 加载图片简单用法
 
         RequestOptions options = new RequestOptions().skipMemoryCache(true);
-        options.transform(new GlideRoundTransform(context, 6));
+        //options.transform(new GlideRoundTransform(context, 6));
+        options.transform(new RoundedCornersTransformation(SizeUtils.dp2px(6),0));
         Glide.with(context).load(path).apply(options).into(imageView);
     }
 
