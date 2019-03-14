@@ -246,10 +246,12 @@ public class MyFragment extends BaseFragment implements UserInfoView {
                 case 1:
                     intent = new Intent(getActivity(), MyFollowActivity.class);
                     intent.putExtra("type", 0);
+                    intent.putExtra("is_my_info",true);
                     break;
                 case 2:
                     intent = new Intent(getActivity(), MyFollowActivity.class);
                     intent.putExtra("type", 1);
+                    intent.putExtra("is_my_info",true);
                     break;
                 case 3:
                     intent = new Intent(getActivity(), SettingActivity.class);
@@ -265,12 +267,24 @@ public class MyFragment extends BaseFragment implements UserInfoView {
 
     @OnClick(R.id.layout_my_note)
     public void myNote() {
+        if (!App.getApp().isLogin) {
+            if (loginDialog != null && !loginDialog.isShowing()) {
+                loginDialog.show();
+            }
+            return;
+        }
         Intent intent = new Intent(getActivity(), MyNoteActivity.class);
         startActivity(intent);
     }
 
     @OnClick(R.id.layout_my_message)
     public void myMessage() {
+        if (!App.getApp().isLogin) {
+            if (loginDialog != null && !loginDialog.isShowing()) {
+                loginDialog.show();
+            }
+            return;
+        }
         Intent intent = new Intent(getActivity(), MyMessageActivity.class);
         startActivity(intent);
     }
@@ -298,7 +312,7 @@ public class MyFragment extends BaseFragment implements UserInfoView {
                 SPUtils.getInstance().put(Constants.USER_INFO, JSONObject.toJSONString(((UserInfoRet) tData).getData()));
 
                 mUserNickNameTv.setText(userInfo.getNickname());
-                mUserIdTv.setText("头像ID：" + userInfo.getId());
+                mUserIdTv.setText("头像号：" + userInfo.getId());
 
                 mFollowTv.setText(userInfo.getGuanNum() + "");
                 mFansCountTv.setText(userInfo.getFenNum() + "");

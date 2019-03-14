@@ -16,6 +16,7 @@ import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.bean.FollowInfoRet;
 import com.feiyou.headstyle.bean.ResultInfo;
+import com.feiyou.headstyle.bean.UserInfo;
 import com.feiyou.headstyle.bean.UserInfoListRet;
 import com.feiyou.headstyle.common.Constants;
 import com.feiyou.headstyle.presenter.FollowInfoPresenterImp;
@@ -66,10 +67,18 @@ public class MyFriendsFragment extends BaseFragment implements UserInfoListView 
 
     private int type;
 
-    public static MyFriendsFragment newInstance(int type) {
+    private boolean isMyInfo;
+
+    private UserInfo userInfo;
+
+    private String intoUserId;
+
+    public static MyFriendsFragment newInstance(int type, boolean ismy, String intoUserId) {
         MyFriendsFragment fragment = new MyFriendsFragment();
         Bundle bundle = new Bundle();
         bundle.putInt("friend_type", type);
+        bundle.putBoolean("is_my_info", ismy);
+        bundle.putString("into_user_id", intoUserId);
         fragment.setArguments(bundle);
         return fragment;
     }
@@ -89,7 +98,16 @@ public class MyFriendsFragment extends BaseFragment implements UserInfoListView 
             type = bundle.getInt("friend_type");
         }
 
+        if (bundle != null) {
+            isMyInfo = bundle.getBoolean("is_my_info", false);
+        }
+
+        if (bundle != null && !StringUtils.isEmpty(bundle.getString("into_user_id"))) {
+            intoUserId = bundle.getString("into_user_id");
+        }
+
         Logger.i("friend_type--->" + type);
+        userInfo = App.getApp().getmUserInfo();
 
         myFriendsListAdapter = new MyFriendsListAdapter(getActivity(), null);
         mFriendsListView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -99,7 +117,7 @@ public class MyFriendsFragment extends BaseFragment implements UserInfoListView 
             @Override
             public void onLoadMoreRequested() {
                 currentPage++;
-                userInfoListPresenterImp.getMyGuanFenList(currentPage, App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", type);
+                userInfoListPresenterImp.getMyGuanFenList(currentPage, userInfo != null ? userInfo.getId() : "", isMyInfo ? userInfo.getId() : intoUserId, type);
             }
         }, mFriendsListView);
 
@@ -115,7 +133,7 @@ public class MyFriendsFragment extends BaseFragment implements UserInfoListView 
 
         followInfoPresenterImp = new FollowInfoPresenterImp(this, getActivity());
         userInfoListPresenterImp = new UserInfoListPresenterImp(this, getActivity());
-        userInfoListPresenterImp.getMyGuanFenList(currentPage, App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", type);
+        userInfoListPresenterImp.getMyGuanFenList(currentPage, userInfo != null ? userInfo.getId() : "", isMyInfo ? userInfo.getId() : intoUserId, type);
     }
 
     @Override

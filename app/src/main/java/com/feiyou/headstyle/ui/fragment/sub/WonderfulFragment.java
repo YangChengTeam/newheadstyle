@@ -1,6 +1,8 @@
 package com.feiyou.headstyle.ui.fragment.sub;
 
 import android.app.ProgressDialog;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -48,6 +50,7 @@ import com.feiyou.headstyle.presenter.FollowInfoPresenterImp;
 import com.feiyou.headstyle.presenter.NoteCommentDataPresenterImp;
 import com.feiyou.headstyle.presenter.NoteSubCommentDataPresenterImp;
 import com.feiyou.headstyle.presenter.ReplyCommentPresenterImp;
+import com.feiyou.headstyle.ui.activity.ReportInfoActivity;
 import com.feiyou.headstyle.ui.adapter.CommentAdapter;
 import com.feiyou.headstyle.ui.adapter.CommentReplyAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragment;
@@ -72,7 +75,7 @@ import butterknife.OnClick;
 /**
  * Created by myflying on 2018/11/26.
  */
-public class WonderfulFragment extends BaseFragment implements NoteCommentDataView, CommentDialog.SendBackListener {
+public class WonderfulFragment extends BaseFragment implements NoteCommentDataView, CommentDialog.SendBackListener, View.OnClickListener {
 
     public static final int REQUEST_CODE_CHOOSE = 23;
 
@@ -110,7 +113,7 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
 
     private RecyclerView replyListView;
 
-    private LinearLayout mReplyNoDataLayout;
+    LinearLayout mReplyNoDataLayout;
 
     ImageView topUserHeadImageView;
 
@@ -162,6 +165,16 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
 
     public final static String SPLIT_STR = "*#";
 
+    public BottomSheetDialog reportDialog;
+
+    LinearLayout mReportCopyLayout;
+
+    LinearLayout mReportLayout;
+
+    LinearLayout mReportCancelLayout;
+
+    private int longClickType = 1;//1,回复的举报,2回复的回复举报
+
     @Override
     protected View onCreateView() {
         View root = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_wonderful, null);
@@ -177,6 +190,19 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
         bundle.putString("msg_id", msgId);
         fragment.setArguments(bundle);
         return fragment;
+    }
+
+    //初始化回复举报弹窗
+    public void initReportDialog() {
+        reportDialog = new BottomSheetDialog(getActivity());
+        View reportView = LayoutInflater.from(getActivity()).inflate(R.layout.comment_report_view, null);
+        mReportCopyLayout = reportView.findViewById(R.id.layout_report_copy);
+        mReportLayout = reportView.findViewById(R.id.layout_report);
+        mReportCancelLayout = reportView.findViewById(R.id.layout_report_cancel);
+        mReportCopyLayout.setOnClickListener(this);
+        mReportLayout.setOnClickListener(this);
+        mReportCancelLayout.setOnClickListener(this);
+        reportDialog.setContentView(reportView);
     }
 
     public void initReplyDialog() {
@@ -266,7 +292,9 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
         isZan = ContextCompat.getDrawable(getActivity(), R.mipmap.is_zan);
         notZan = ContextCompat.getDrawable(getActivity(), R.mipmap.note_zan);
 
-        initReplyDialog();
+        initReplyDialog();//回复列表
+
+        initReportDialog();//举报窗口
 
         mWonderfulListView.setLayoutManager(new LinearLayoutManager(getActivity()));
         commentAdapter = new CommentAdapter(getActivity(), null);
@@ -285,6 +313,18 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
                 switchType = 1;
                 currentCommentPos = position;
                 showDialog();
+            }
+        });
+
+        commentAdapter.setOnItemLongClickListener(new BaseQuickAdapter.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(BaseQuickAdapter adapter, View view, int position) {
+                longClickType = 1;
+                currentCommentPos = position;
+                if (reportDialog != null && !reportDialog.isShowing()) {
+                    reportDialog.show();
+                }
+                return false;
             }
         });
 
@@ -615,5 +655,40 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
     public void onDestroy() {
         super.onDestroy();
         EventBus.getDefault().unregister(this);
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.layout_report_copy:
+                if (reportDialog != null && reportDialog.isShowing()) {
+                    reportDialog.dismiss();
+                }
+                if (longClickType == 1) {
+                    String tempContent = commentAdapter.getData().get(currentCommentPos).getCommentContent();
+                    ClipboardManager cmb = (ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
+                    cmb.setText(tempContent); //将内容放入粘贴管理器,在别的地方长按选择"粘贴"即可
+                    ToastUtils.showLong("已复制");
+                }
+                break;
+            case R.id.layout_report:
+                if (reportDialog != null && reportDialog.isShowing()) {
+                    reportDialog.dismiss();
+                }
+                //举报评论
+                Intent intent = new Intent(getActivity(), ReportInfoActivity.class);
+                intent.putExtra("rid", commentAdapter.getData().get(currentCommentPos).getCommentId());
+                intent.putExtra("report_type",3);
+                startActivity(intent);
+
+                break;
+            case R.id.layout_report_cancel:
+                if (reportDialog != null && reportDialog.isShowing()) {
+                    reportDialog.dismiss();
+                }
+                break;
+            default:
+                break;
+        }
     }
 }

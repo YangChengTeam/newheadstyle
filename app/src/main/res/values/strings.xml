@@ -41,4 +41,6 @@
     <string name="permission_camera_never_ask_again">不再询问</string>
     <string name="permission_camera_rationale">开启相机权限才能正常使用</string>
     <string name="permission_camera_denied">禁止了相机权限，开启权限才能正常使用</string>
+
+    <string name="report_title_txt">请选择举报分类，分类越准，处理越快哦!</string>
 </resources>

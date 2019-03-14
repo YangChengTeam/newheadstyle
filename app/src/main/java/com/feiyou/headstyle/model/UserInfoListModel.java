@@ -13,5 +13,5 @@ public interface UserInfoListModel<T> {
 
     void searchFriendsList(int page, String keyWord, IBaseRequestCallBack<T> iBaseRequestCallBack);
 
-    void getMyGuanFenList(int page, String userId, int type, IBaseRequestCallBack<T> iBaseRequestCallBack);
+    void getMyGuanFenList(int page, String userId, String intoUserId,int type, IBaseRequestCallBack<T> iBaseRequestCallBack);
 }

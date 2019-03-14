@@ -6,6 +6,7 @@
     android:orientation="vertical">
 
     <LinearLayout
+        android:id="@+id/layout_delete"
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:gravity="center">
@@ -24,6 +25,7 @@
         android:background="@color/my_info_bg_color"></View>
 
     <LinearLayout
+        android:id="@+id/layout_cancel"
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:gravity="center">

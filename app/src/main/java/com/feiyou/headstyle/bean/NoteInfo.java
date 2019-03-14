@@ -30,10 +30,10 @@ public class NoteInfo {
     private String userimg;
 
     @SerializedName("zan_num")
-    private Integer zanNum;
+    private int zanNum;
 
     @SerializedName("is_zan")
-    private Integer isZan;
+    private int isZan;
 
     @SerializedName("is_guan")
     private int isGuan;
@@ -110,19 +110,19 @@ public class NoteInfo {
         this.userimg = userimg;
     }
 
-    public Integer getZanNum() {
+    public int getZanNum() {
         return zanNum;
     }
 
-    public void setZanNum(Integer zanNum) {
+    public void setZanNum(int zanNum) {
         this.zanNum = zanNum;
     }
 
-    public Integer getIsZan() {
+    public int getIsZan() {
         return isZan;
     }
 
-    public void setIsZan(Integer isZan) {
+    public void setIsZan(int isZan) {
         this.isZan = isZan;
     }
 

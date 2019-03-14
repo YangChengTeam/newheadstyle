@@ -4,12 +4,14 @@ import android.animation.ValueAnimator;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.BottomSheetDialog;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -53,6 +55,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
+import butterknife.OnClick;
 
 /**
  * Created by myflying on 2018/11/23.
@@ -188,7 +191,7 @@ public class UserInfoActivity extends BaseFragmentActivity implements UserInfoVi
 
             mFollowCountTv.setText(userInfo.getGuanNum() + "");
             mFansCountTv.setText(userInfo.getFenNum() + "");
-            mNickNameTv.setText(userInfo.getNickname() + "");
+            mNickNameTv.setText(StringUtils.isEmpty(userInfo.getNickname()) ? "" : userInfo.getNickname());
             mUserIdTv.setText(userInfo.getId() + "");
             mUserAgeTv.setText(userInfo.getAge() + "岁");
             mUserSignTv.setText(userInfo.getSig());
@@ -199,6 +202,8 @@ public class UserInfoActivity extends BaseFragmentActivity implements UserInfoVi
             //设置照片墙
             if (userInfo.getImageWall() != null && userInfo.getImageWall().length > 0) {
                 mPhotoLayout.setVisibility(View.VISIBLE);
+                mPhotoLayout.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, SizeUtils.dp2px(80)));
+                mPhotoListView.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, SizeUtils.dp2px(60)));
                 String[] tempPhotos = userInfo.getImageWall();
                 photoList = new ArrayList<>();
                 for (int i = 0; i < tempPhotos.length; i++) {
@@ -211,6 +216,8 @@ public class UserInfoActivity extends BaseFragmentActivity implements UserInfoVi
                 commonImageAdapter.setNewData(photoList);
             } else {
                 mPhotoLayout.setVisibility(View.GONE);
+                mPhotoLayout.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0));
+                mPhotoListView.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, 0));
             }
         } else {
             if (bundle != null && !StringUtils.isEmpty(bundle.getString("user_id"))) {
@@ -220,7 +227,7 @@ public class UserInfoActivity extends BaseFragmentActivity implements UserInfoVi
 
         userInfoPresenterImp = new UserInfoPresenterImp(this, this);
 
-        mGuanFenLayout.setVisibility(isMyInfo ? View.GONE : View.VISIBLE);
+        mGuanFenLayout.setVisibility(isMyInfo ? View.INVISIBLE : View.VISIBLE);
 
         bottomSheetDialog = new BottomSheetDialog(this);
         View deleteDialogView = LayoutInflater.from(this).inflate(R.layout.note_delete_dialog, null);
@@ -232,6 +239,8 @@ public class UserInfoActivity extends BaseFragmentActivity implements UserInfoVi
         mTopItemLayout = updateBgView.findViewById(R.id.layout_top_item);
         mUpdateCancelLayout = updateBgView.findViewById(R.id.layout_update_cancel);
         mTopItemTv = updateBgView.findViewById(R.id.tv_top_item);
+        mTopItemTv.setText(isMyInfo ? "更换背景图" : "举报");
+        mTopItemTv.setTextColor(ContextCompat.getColor(this, isMyInfo ? R.color.black : R.color.tab_select_color));
 
         mTopItemLayout.setOnClickListener(this);
         mUpdateCancelLayout.setOnClickListener(this);
@@ -281,6 +290,24 @@ public class UserInfoActivity extends BaseFragmentActivity implements UserInfoVi
         userInfoPresenterImp.getUserInfo(userId);
     }
 
+    @OnClick(R.id.tv_follow_count)
+    void followCount() {
+        Intent intent = new Intent(this, MyFollowActivity.class);
+        intent.putExtra("type", 0);
+        intent.putExtra("is_my_info", false);
+        intent.putExtra("into_user_id", userId);
+        startActivity(intent);
+    }
+
+    @OnClick(R.id.tv_fans_count)
+    void fansCount() {
+        Intent intent = new Intent(this, MyFollowActivity.class);
+        intent.putExtra("type", 1);
+        intent.putExtra("is_my_info", false);
+        intent.putExtra("into_user_id", userId);
+        startActivity(intent);
+    }
+
     @Override
     public void showProgress() {
 
@@ -314,8 +341,12 @@ public class UserInfoActivity extends BaseFragmentActivity implements UserInfoVi
 
                 if (userInfo.getImageWall() != null && userInfo.getImageWall().length > 0) {
                     mPhotoLayout.setVisibility(View.VISIBLE);
+                    mPhotoLayout.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, SizeUtils.dp2px(80)));
+                    mPhotoListView.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, SizeUtils.dp2px(60)));
                 } else {
                     mPhotoLayout.setVisibility(View.GONE);
+                    mPhotoLayout.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0));
+                    mPhotoListView.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, 0));
                 }
 
                 if (userInfo.getNoteList() != null && userInfo.getNoteList().size() > 0) {
@@ -358,7 +389,14 @@ public class UserInfoActivity extends BaseFragmentActivity implements UserInfoVi
 
         switch (view.getId()) {
             case R.id.layout_top_item:
-
+                if (isMyInfo) {
+                    ToastUtils.showLong("更换背景图");
+                } else {
+                    Intent intent = new Intent(this, ReportInfoActivity.class);
+                    intent.putExtra("rid", userId);
+                    intent.putExtra("report_type", 1);
+                    startActivity(intent);
+                }
                 break;
             case R.id.layout_update_cancel:
 

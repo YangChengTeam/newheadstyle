@@ -29,6 +29,9 @@ public interface NoteDataServiceApi {
     @POST("v1.message/messageList")
     Observable<NoteInfoRet> getNoteData(@Body RequestBody requestBody);
 
+    @POST("v1.userinfo/userMessageList")
+    Observable<NoteInfoRet> getMyNoteList(@Body RequestBody requestBody);
+
     @POST("v1.message/messageTypeList")
     Observable<NoteTypeRet> getNoteTypeData(@Body RequestBody requestBody);
 

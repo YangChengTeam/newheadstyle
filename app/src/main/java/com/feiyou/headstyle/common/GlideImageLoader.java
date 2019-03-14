@@ -23,9 +23,9 @@ public class GlideImageLoader extends ImageLoader {
          */
         //Glide 加载图片简单用法
 
-//        RequestOptions options = new RequestOptions();
-//        options.transform(new GlideRoundTransform(context, 5));
-        Glide.with(context).load(path).into(imageView);
+        RequestOptions options = new RequestOptions().skipMemoryCache(true);
+        options.transform(new GlideRoundTransform(context, 6));
+        Glide.with(context).load(path).apply(options).into(imageView);
     }
 
 }

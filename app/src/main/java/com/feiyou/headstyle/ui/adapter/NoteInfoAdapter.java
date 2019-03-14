@@ -48,6 +48,7 @@ public class NoteInfoAdapter extends BaseQuickAdapter<NoteInfo, BaseViewHolder> 
     @Override
     protected void convert(final BaseViewHolder helper, final NoteInfo item) {
 
+
         Date currentDate = TimeUtils.millis2Date(item.getAddTime() != null ? item.getAddTime() * 1000 : 0);
         String tempDateStr = MyTimeUtil.isOutMouth(currentDate) ? TimeUtils.millis2String(item.getAddTime() != null ? item.getAddTime() * 1000 : 0) : MyTimeUtil.getTimeFormatText(currentDate);
 
@@ -59,7 +60,7 @@ public class NoteInfoAdapter extends BaseQuickAdapter<NoteInfo, BaseViewHolder> 
 
 
         TextView contentTv = helper.getView(R.id.tv_note_content);
-        contentTv.setText(Html.fromHtml(item.getContent()));
+        contentTv.setText(Html.fromHtml(StringUtils.isEmpty(item.getContent()) ? "" : item.getContent()));
 
         TextView isZanTv = helper.itemView.findViewById(R.id.tv_zan_count);
         Drawable isZan = ContextCompat.getDrawable(mContext, R.mipmap.is_zan);
@@ -116,5 +117,6 @@ public class NoteInfoAdapter extends BaseQuickAdapter<NoteInfo, BaseViewHolder> 
                 mContext.startActivity(intent);
             }
         });
+
     }
 }

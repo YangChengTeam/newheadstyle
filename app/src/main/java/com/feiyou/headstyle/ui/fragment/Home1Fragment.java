@@ -261,6 +261,7 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
                 int topRowVerticalPosition = (recyclerView == null || recyclerView.getChildCount() == 0) ? 0 : recyclerView.getChildAt(0).getTop();
                 mRefreshLayout.setEnabled(topRowVerticalPosition >= 0);
             }
+
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
@@ -312,7 +313,8 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
         isFirstLoad = true;
         homeDataPresenterImp.getData(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", "", "", "1", 0);
         //scrollView.smoothScrollTo(0, SizeUtils.dp2px(510 - 48));
-        mHeadInfoListView.scrollTo(0, SizeUtils.dp2px(200));
+        //mHeadInfoListView.scrollTo(0, 0);
+        gridLayoutManager.scrollToPosition(0);
     }
 
     @Override

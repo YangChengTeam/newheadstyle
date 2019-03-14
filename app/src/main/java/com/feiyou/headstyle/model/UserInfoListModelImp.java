@@ -121,12 +121,13 @@ public class UserInfoListModelImp extends BaseModel implements UserInfoListModel
     }
 
     @Override
-    public void getMyGuanFenList(int page, String userId, int type, IBaseRequestCallBack<UserInfoListRet> iBaseRequestCallBack) {
+    public void getMyGuanFenList(int page, String userId, String intoUserId, int type, IBaseRequestCallBack<UserInfoListRet> iBaseRequestCallBack) {
         JSONObject params = new JSONObject();
         try {
-            //params.put("page", page + "");
             params.put("user_id", userId);
+            params.put("to_user_id", intoUserId);
             params.put("type", type + "");
+            params.put("page", page + "");
         } catch (JSONException e) {
             e.printStackTrace();
         }

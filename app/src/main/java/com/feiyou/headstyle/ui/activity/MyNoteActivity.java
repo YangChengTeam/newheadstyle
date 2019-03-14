@@ -1,14 +1,17 @@
 package com.feiyou.headstyle.ui.activity;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.BottomSheetDialog;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -16,10 +19,12 @@ import com.blankj.utilcode.util.SizeUtils;
 import com.blankj.utilcode.util.StringUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.chad.library.adapter.base.BaseQuickAdapter;
+import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.bean.HeadType;
 import com.feiyou.headstyle.bean.NoteInfoRet;
 import com.feiyou.headstyle.bean.ResultInfo;
+import com.feiyou.headstyle.bean.UserInfo;
 import com.feiyou.headstyle.common.Constants;
 import com.feiyou.headstyle.presenter.NoteDataPresenterImp;
 import com.feiyou.headstyle.ui.adapter.MoreHeadTypeAdapter;
@@ -29,22 +34,33 @@ import com.feiyou.headstyle.ui.custom.NormalDecoration;
 import com.feiyou.headstyle.view.NoteDataView;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 import com.qmuiteam.qmui.widget.QMUITopBar;
+import com.wang.avi.AVLoadingIndicatorView;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
+import butterknife.OnClick;
 
 /**
  * Created by myflying on 2018/11/23.
  */
-public class MyNoteActivity extends BaseFragmentActivity implements NoteDataView {
+public class MyNoteActivity extends BaseFragmentActivity implements NoteDataView, SwipeRefreshLayout.OnRefreshListener, View.OnClickListener {
 
     @BindView(R.id.topbar)
     QMUITopBar mTopBar;
 
+    @BindView(R.id.swipe_refresh)
+    SwipeRefreshLayout mRefreshLayout;
+
     @BindView(R.id.my_note_list)
     RecyclerView mNoteListView;
+
+    @BindView(R.id.avi)
+    AVLoadingIndicatorView avi;
+
+    @BindView(R.id.layout_no_data)
+    LinearLayout noDataLayout;
 
     ImageView mBackImageView;
 
@@ -54,9 +70,15 @@ public class MyNoteActivity extends BaseFragmentActivity implements NoteDataView
 
     private int currentPage = 1;
 
-    private int pageSize = 20;
+    private int pageSize = 30;
 
     BottomSheetDialog bottomSheetDialog;
+
+    LinearLayout mDeleteLayout;
+
+    LinearLayout mCancelLayout;
+
+    private UserInfo userInfo;
 
     @Override
     protected int getContextViewId() {
@@ -88,9 +110,30 @@ public class MyNoteActivity extends BaseFragmentActivity implements NoteDataView
     }
 
     public void initData() {
+        mRefreshLayout.setOnRefreshListener(this);
+        //设置进度View样式的大小，只有两个值DEFAULT和LARGE
+        //设置进度View下拉的起始点和结束点，scale 是指设置是否需要放大或者缩小动画
+        mRefreshLayout.setProgressViewOffset(true, -0, 200);
+        //设置进度View下拉的结束点，scale 是指设置是否需要放大或者缩小动画
+        mRefreshLayout.setProgressViewEndTarget(true, 180);
+        //设置进度View的组合颜色，在手指上下滑时使用第一个颜色，在刷新中，会一个个颜色进行切换
+        mRefreshLayout.setColorSchemeColors(ContextCompat.getColor(this, R.color.colorPrimary), Color.RED, Color.YELLOW, Color.BLUE);
+
+        //设置触发刷新的距离
+        mRefreshLayout.setDistanceToTriggerSync(200);
+        //如果child是自己自定义的view，可以通过这个回调，告诉mSwipeRefreshLayoutchild是否可以滑动
+        mRefreshLayout.setOnChildScrollUpCallback(null);
+
+
+        userInfo = App.getApp().getmUserInfo();
+
         bottomSheetDialog = new BottomSheetDialog(this);
         View deleteDialogView = LayoutInflater.from(this).inflate(R.layout.note_delete_dialog, null);
+        mDeleteLayout = deleteDialogView.findViewById(R.id.layout_delete);
+        mCancelLayout = deleteDialogView.findViewById(R.id.layout_cancel);
         bottomSheetDialog.setContentView(deleteDialogView);
+        mDeleteLayout.setOnClickListener(this);
+        mCancelLayout.setOnClickListener(this);
 
         noteDataPresenterImp = new NoteDataPresenterImp(this, this);
 
@@ -110,7 +153,7 @@ public class MyNoteActivity extends BaseFragmentActivity implements NoteDataView
             @Override
             public void onLoadMoreRequested() {
                 currentPage++;
-                noteDataPresenterImp.getNoteData(currentPage, 2, "");
+                noteDataPresenterImp.getMyNoteList(currentPage, userInfo != null ? userInfo.getId() : "");
             }
         }, mNoteListView);
 
@@ -125,7 +168,13 @@ public class MyNoteActivity extends BaseFragmentActivity implements NoteDataView
             }
         });
 
-        noteDataPresenterImp.getNoteData(currentPage, 2, "");
+        noteDataPresenterImp.getMyNoteList(currentPage, userInfo != null ? userInfo.getId() : "");
+    }
+
+    @OnClick(R.id.tv_send_note)
+    void sendContent() {
+        Intent intent = new Intent(this, PushNoteActivity.class);
+        startActivity(intent);
     }
 
     @Override
@@ -140,34 +189,74 @@ public class MyNoteActivity extends BaseFragmentActivity implements NoteDataView
 
     @Override
     public void dismissProgress() {
-
+        avi.hide();
+        mRefreshLayout.setRefreshing(false);
     }
 
     @Override
     public void loadDataSuccess(ResultInfo tData) {
+        avi.hide();
+        mRefreshLayout.setRefreshing(false);
         if (tData != null && tData.getCode() == Constants.SUCCESS) {
+            noDataLayout.setVisibility(View.GONE);
+            mNoteListView.setVisibility(View.VISIBLE);
 
             if (tData instanceof NoteInfoRet) {
-                if (currentPage == 1) {
-                    noteInfoAdapter.setNewData(((NoteInfoRet) tData).getData());
-                } else {
-                    noteInfoAdapter.addData(((NoteInfoRet) tData).getData());
-                }
+                if (((NoteInfoRet) tData).getData() != null && ((NoteInfoRet) tData).getData().size() > 0) {
+                    if (currentPage == 1) {
+                        noteInfoAdapter.setNewData(((NoteInfoRet) tData).getData());
+                    } else {
+                        noteInfoAdapter.addData(((NoteInfoRet) tData).getData());
+                    }
 
-                if (((NoteInfoRet) tData).getData().size() == pageSize) {
-                    noteInfoAdapter.loadMoreComplete();
+                    if (((NoteInfoRet) tData).getData().size() == pageSize) {
+                        noteInfoAdapter.loadMoreComplete();
+                    } else {
+                        noteInfoAdapter.loadMoreEnd();
+                    }
                 } else {
-                    noteInfoAdapter.loadMoreEnd();
+                    noDataLayout.setVisibility(View.VISIBLE);
+                    mNoteListView.setVisibility(View.GONE);
                 }
             }
 
         } else {
+            noDataLayout.setVisibility(View.VISIBLE);
+            mNoteListView.setVisibility(View.GONE);
             ToastUtils.showLong(StringUtils.isEmpty(tData.getMsg()) ? "操作错误" : tData.getMsg());
         }
     }
 
     @Override
     public void loadDataError(Throwable throwable) {
+        avi.hide();
+        mRefreshLayout.setRefreshing(false);
+        noDataLayout.setVisibility(View.VISIBLE);
+        mNoteListView.setVisibility(View.GONE);
+    }
 
+    @Override
+    public void onRefresh() {
+        mRefreshLayout.setRefreshing(true);
+        currentPage = 1;
+        noteDataPresenterImp.getMyNoteList(currentPage, userInfo != null ? userInfo.getId() : "");
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.layout_cancel:
+                if (bottomSheetDialog != null && bottomSheetDialog.isShowing()) {
+                    bottomSheetDialog.dismiss();
+                }
+                break;
+            case R.id.layout_delete:
+                if (bottomSheetDialog != null && bottomSheetDialog.isShowing()) {
+                    bottomSheetDialog.dismiss();
+                }
+                break;
+            default:
+                break;
+        }
     }
 }

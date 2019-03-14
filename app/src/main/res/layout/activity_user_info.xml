@@ -141,7 +141,7 @@
                             <TextView
                                 android:layout_width="80dp"
                                 android:layout_height="wrap_content"
-                                android:text="头像ID："
+                                android:text="头像号"
                                 android:textColor="@color/gray999"
                                 android:textSize="14dp" />
 
@@ -165,7 +165,7 @@
                             <TextView
                                 android:layout_width="80dp"
                                 android:layout_height="wrap_content"
-                                android:text="资料："
+                                android:text="资料"
                                 android:textColor="@color/gray999"
                                 android:textSize="14dp" />
 
@@ -205,7 +205,7 @@
                             <TextView
                                 android:layout_width="80dp"
                                 android:layout_height="wrap_content"
-                                android:text="签名："
+                                android:text="签名"
                                 android:textColor="@color/gray999"
                                 android:textSize="14dp" />
 
@@ -236,7 +236,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_alignParentLeft="true"
                                 android:layout_centerVertical="true"
-                                android:text="照片墙："
+                                android:text="照片墙"
                                 android:textColor="@color/gray999"
                                 android:textSize="14dp" />
 

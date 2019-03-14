@@ -13,10 +13,11 @@ import com.feiyou.headstyle.ui.fragment.sub.VideoFragment;
 
 public class FollowFragmentAdapter extends FragmentPagerAdapter {
 
-    private final Fragment[] FRAGMENTS = new Fragment[]{MyFriendsFragment.newInstance(1), MyFriendsFragment.newInstance(2)};
+    private Fragment[] FRAGMENTS;
 
-    public FollowFragmentAdapter(FragmentManager fragmentManager) {
+    public FollowFragmentAdapter(FragmentManager fragmentManager, Fragment[] fragments) {
         super(fragmentManager);
+        this.FRAGMENTS = fragments;
     }
 
     /**

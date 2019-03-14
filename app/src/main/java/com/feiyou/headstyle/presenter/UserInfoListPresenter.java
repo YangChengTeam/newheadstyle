@@ -9,5 +9,5 @@ import com.feiyou.headstyle.bean.LoginRequest;
 public interface UserInfoListPresenter {
     void addFriendsList(int page);
     void searchFriendsList(int page,String keyWord);
-    void getMyGuanFenList(int page, String userId, int type);
+    void getMyGuanFenList(int page, String userId,String intoUserId,int type);
 }

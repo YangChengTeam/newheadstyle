@@ -39,7 +39,7 @@ public class UserInfoListPresenterImp extends BasePresenterImp<UserInfoListView,
     }
 
     @Override
-    public void getMyGuanFenList(int page, String userId, int type) {
-        userInfoListModelImp.getMyGuanFenList(page, userId, type, this);
+    public void getMyGuanFenList(int page, String userId, String intoUserId, int type) {
+        userInfoListModelImp.getMyGuanFenList(page, userId, intoUserId, type, this);
     }
 }

@@ -1,6 +1,7 @@
 package com.feiyou.headstyle.ui.activity;
 
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTabHost;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
@@ -17,6 +18,7 @@ import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.ui.adapter.FollowFragmentAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragmentActivity;
 import com.feiyou.headstyle.ui.fragment.sub.MyFriendsFragment;
+import com.feiyou.headstyle.utils.StringUtils;
 import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 
@@ -49,12 +51,18 @@ public class MyFollowActivity extends BaseFragmentActivity implements ViewPager.
 
     private View lastTabView;
 
-    private int type = 0;
-
     @Override
     protected int getContextViewId() {
         return R.layout.activity_my_follow;
     }
+
+    private Fragment[] fragments;
+
+    private int type = 0;
+
+    private boolean isMyInfo;
+
+    private String intoUserId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +78,16 @@ public class MyFollowActivity extends BaseFragmentActivity implements ViewPager.
             type = bundle.getInt("type", 0);
         }
 
+        if(bundle != null){
+            isMyInfo = bundle.getBoolean("is_my_info",false);
+        }
+
+        if(bundle != null && !StringUtils.isEmpty(bundle.getString("into_user_id"))){
+            intoUserId = bundle.getString("into_user_id");
+        }
+
+        fragments = new Fragment[]{MyFriendsFragment.newInstance(1, isMyInfo,intoUserId), MyFriendsFragment.newInstance(2, isMyInfo,intoUserId)};
+
         layoutInflater = LayoutInflater.from(this);
         //初始化TabHost
         mTabHost.setup(this, getSupportFragmentManager(), android.R.id.tabcontent);
@@ -78,12 +96,12 @@ public class MyFollowActivity extends BaseFragmentActivity implements ViewPager.
         //为每一个Tab按钮设置图标、文字和内容
         TabHost.TabSpec followTab = mTabHost.newTabSpec("关注").setIndicator(getTabItemView(0));
         //将Tab按钮添加进Tab选项卡中
-        mTabHost.addTab(followTab, MyFriendsFragment.newInstance(1).getClass(), null);
+        mTabHost.addTab(followTab, fragments[0].getClass(), null);
 
         //为每一个Tab按钮设置图标、文字和内容
         TabHost.TabSpec fenTab = mTabHost.newTabSpec("粉丝").setIndicator(getTabItemView(1));
         //将Tab按钮添加进Tab选项卡中
-        mTabHost.addTab(fenTab, MyFriendsFragment.newInstance(2).getClass(), null);
+        mTabHost.addTab(fenTab, fragments[1].getClass(), null);
 
         setCurrentTab(type);
 
@@ -103,7 +121,7 @@ public class MyFollowActivity extends BaseFragmentActivity implements ViewPager.
 
     private void initTabs() {
         // 这里的添加顺序对 tab 页的先后顺序有影响
-        viewPager.setAdapter(new FollowFragmentAdapter(getSupportFragmentManager()));
+        viewPager.setAdapter(new FollowFragmentAdapter(getSupportFragmentManager(), fragments));
         mTabHost.getTabWidget().setDividerDrawable(null);
         viewPager.setCurrentItem(type);
     }

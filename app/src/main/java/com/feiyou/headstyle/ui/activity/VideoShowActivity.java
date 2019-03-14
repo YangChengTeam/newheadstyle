@@ -728,7 +728,7 @@ public class VideoShowActivity extends BaseFragmentActivity implements VideoInfo
             commentId = commentAdapter.getData().get(currentCommentPos).getCommentId();
             repeatCommentUserId = commentAdapter.getData().get(currentCommentPos).getUserId();
 
-            replyParams.setModelType(1);
+            replyParams.setModelType(2);
             replyParams.setType(2);
             replyParams.setContent(content);
             replyParams.setRepeatUserId(userInfo != null ? userInfo.getId() : "");
@@ -741,7 +741,7 @@ public class VideoShowActivity extends BaseFragmentActivity implements VideoInfo
             repeatId = commentReplyAdapter.getData().get(currentReplyPos).getRepeatId();
             repeatCommentUserId = commentReplyAdapter.getData().get(currentReplyPos).getOldUserId();
 
-            replyParams.setModelType(1);
+            replyParams.setModelType(2);
             replyParams.setType(3);
             replyParams.setContent(content);
             replyParams.setRepeatUserId(userInfo != null ? userInfo.getId() : "");

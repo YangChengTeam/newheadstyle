@@ -7,6 +7,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.BottomSheetDialog;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -15,6 +16,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
@@ -75,10 +77,13 @@ import butterknife.OnClick;
 /**
  * Created by myflying on 2018/11/28.
  */
-public class CommunityArticleActivity extends BaseFragmentActivity implements NoteInfoDetailDataView, CommentDialog.SendBackListener {
+public class CommunityArticleActivity extends BaseFragmentActivity implements NoteInfoDetailDataView, CommentDialog.SendBackListener, View.OnClickListener {
 
     @BindView(R.id.iv_back)
     ImageView mBackImageView;
+
+    @BindView(R.id.iv_share)
+    ImageView mShareImageView;
 
     @BindView(R.id.appBarLayout)
     AppBarLayout appBarLayout;
@@ -157,6 +162,27 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
 
     MyWebView mWebView;
 
+    BottomSheetDialog commonShareDialog;
+
+    //分享弹窗页面
+    View mCommonShareView;
+
+    LinearLayout mWeixinLayout;
+
+    LinearLayout mCircleLayout;
+
+    LinearLayout mQQLayout;
+
+    LinearLayout mQQzoneLayout;
+
+    LinearLayout mCopyLinkLayout;
+
+    LinearLayout mReportLayout;
+
+    LinearLayout mBackHomeLayout;
+
+    ImageView mCloseIv;
+
     @Override
     protected int getContextViewId() {
         return R.layout.activity_article_detail;
@@ -166,7 +192,32 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EventBus.getDefault().register(this);
+        initShareDialog();
         initViews();
+    }
+
+    public void initShareDialog() {
+        mCommonShareView = LayoutInflater.from(this).inflate(R.layout.common_dialog_view, null);
+
+        mCloseIv = mCommonShareView.findViewById(R.id.iv_close_share);
+        mWeixinLayout = mCommonShareView.findViewById(R.id.layout_weixin);
+        mCircleLayout = mCommonShareView.findViewById(R.id.layout_circle);
+        mQQLayout = mCommonShareView.findViewById(R.id.layout_qq);
+        mQQzoneLayout = mCommonShareView.findViewById(R.id.layout_qzone);
+        mCopyLinkLayout = mCommonShareView.findViewById(R.id.layout_copy);
+        mReportLayout = mCommonShareView.findViewById(R.id.layout_report);
+        mBackHomeLayout = mCommonShareView.findViewById(R.id.layout_to_home);
+
+        mCloseIv.setOnClickListener(this);
+        mWeixinLayout.setOnClickListener(this);
+        mCircleLayout.setOnClickListener(this);
+        mQQLayout.setOnClickListener(this);
+        mQQzoneLayout.setOnClickListener(this);
+        mCopyLinkLayout.setOnClickListener(this);
+        mReportLayout.setOnClickListener(this);
+        mBackHomeLayout.setOnClickListener(this);
+        commonShareDialog = new BottomSheetDialog(this);
+        commonShareDialog.setContentView(mCommonShareView);
     }
 
     public void initViews() {
@@ -267,6 +318,13 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
         }
     }
 
+    @OnClick(R.id.iv_share)
+    void commonShare() {
+        if (commonShareDialog != null && !commonShareDialog.isShowing()) {
+            commonShareDialog.show();
+        }
+    }
+
     @OnClick(R.id.iv_back)
     void back() {
         popBackStack();
@@ -338,7 +396,7 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
                 imageUrls = new ArrayList<>();
 
                 for (int i = 0; i < tempImg.length; i++) {
-                    if (StringUtils.isEmpty(tempImg[i])) {
+                    if (!StringUtils.isEmpty(tempImg[i])) {
                         HeadInfo headInfo = new HeadInfo();
                         headInfo.setImgurl(tempImg[i]);
                         headInfos.add(headInfo);
@@ -410,7 +468,7 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
     }
 
     @Override
-    public void sendContent(String userIds,String content, int type) {
+    public void sendContent(String userIds, String content, int type) {
 
         if (progressDialog != null && !progressDialog.isShowing()) {
             progressDialog.show();
@@ -437,5 +495,39 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
     protected void onDestroy() {
         super.onDestroy();
         EventBus.getDefault().unregister(this);
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.iv_close_share:
+                if (commonShareDialog != null && commonShareDialog.isShowing()) {
+                    commonShareDialog.dismiss();
+                }
+                break;
+            case R.id.layout_weixin:
+                break;
+            case R.id.layout_circle:
+                break;
+            case R.id.layout_qq:
+                break;
+            case R.id.layout_qzone:
+                break;
+            case R.id.layout_copy:
+                break;
+            case R.id.layout_report:
+                if (commonShareDialog != null && commonShareDialog.isShowing()) {
+                    commonShareDialog.dismiss();
+                }
+                Intent intent = new Intent(this, ReportInfoActivity.class);
+                intent.putExtra("rid", currentNoteInfo != null ? currentNoteInfo.getId() : "");
+                intent.putExtra("report_type", 2);
+                startActivity(intent);
+                break;
+            case R.id.layout_to_home:
+                break;
+            default:
+                break;
+        }
     }
 }

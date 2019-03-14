@@ -119,7 +119,7 @@ public class RecommendFragment extends BaseFragment implements NoteDataView, Swi
 
     LoginDialog loginDialog;
 
-    private int communityType = 1;
+    private int communityType = 2;
 
     public static RecommendFragment newInstance(int type) {
         RecommendFragment fragment = new RecommendFragment();

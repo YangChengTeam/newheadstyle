@@ -152,6 +152,11 @@ public class Main1Activity extends BaseFragmentActivity implements ViewPager.OnP
         viewPager.setCurrentItem(2);
     }
 
+    @OnClick(R.id.rb_home)
+    public void homeClick() {
+        Logger.i("view pager home --->");
+    }
+
     @Override
     public void onPageScrolled(int i, float v, int i1) {
         Logger.i("view pager onPageScrolled--->" + i);
@@ -164,6 +169,7 @@ public class Main1Activity extends BaseFragmentActivity implements ViewPager.OnP
 
     @Override
     public void onPageScrollStateChanged(int state) {
+        Logger.i("view pager onPageScrollStateChanged--->" + viewPager.getCurrentItem());
         if (state == 2) {
             Logger.i("view pager onPageScrollStateChanged--->" + viewPager.getCurrentItem());
             RadioButton radioButton = (RadioButton) mTabRadioGroup.getChildAt(viewPager.getCurrentItem());
@@ -173,6 +179,7 @@ public class Main1Activity extends BaseFragmentActivity implements ViewPager.OnP
 
     @Override
     public void onCheckedChanged(RadioGroup radioGroup, int checkedId) {
+        Logger.i("check id--->" + checkedId);
         for (int i = 0; i < radioGroup.getChildCount(); i++) {
             if (radioGroup.getChildAt(i).getId() == checkedId) {
                 viewPager.setCurrentItem(i);
