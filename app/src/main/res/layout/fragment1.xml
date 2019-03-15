@@ -78,6 +78,7 @@
                 android:layout_alignParentLeft="true"
                 android:layout_centerVertical="true"
                 android:layout_toRightOf="@+id/iv_new"
+                android:clickable="true"
                 android:drawableLeft="@mipmap/iv_new"
                 android:drawablePadding="6dp"
                 android:gravity="center"

@@ -58,8 +58,7 @@
                 android:id="@+id/iv_note_img"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
-
-                android:src="@mipmap/filter1" />
+                android:src="@mipmap/image_def" />
 
             <TextView
                 android:id="@+id/tv_note_title"

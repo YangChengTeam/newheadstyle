@@ -8,23 +8,18 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TabHost;
 import android.widget.TabWidget;
 import android.widget.TextView;
 
-import com.blankj.utilcode.util.SizeUtils;
 import com.feiyou.headstyle.R;
-import com.feiyou.headstyle.ui.adapter.FollowFragmentAdapter;
 import com.feiyou.headstyle.ui.adapter.MyCommentFragmentAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragmentActivity;
 import com.feiyou.headstyle.ui.fragment.sub.MyAtMessageFragment;
 import com.feiyou.headstyle.ui.fragment.sub.MyCommentFragment;
-import com.feiyou.headstyle.ui.fragment.sub.MyFriendsFragment;
-import com.feiyou.headstyle.ui.fragment.sub.NoticeFragment;
+import com.feiyou.headstyle.ui.fragment.sub.SystemInfoFragment;
 import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
-import com.qmuiteam.qmui.widget.QMUITopBar;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -83,7 +78,7 @@ public class MyMessageActivity extends BaseFragmentActivity implements ViewPager
         //为每一个Tab按钮设置图标、文字和内容
         TabHost.TabSpec systemTab = mTabHost.newTabSpec(mTextviewArray[2]).setIndicator(getTabItemView(2));
         //将Tab按钮添加进Tab选项卡中
-        mTabHost.addTab(systemTab, NoticeFragment.getInstance().getClass(), null);
+        mTabHost.addTab(systemTab, SystemInfoFragment.getInstance().getClass(), null);
 
         setCurrentTab(0);
 

@@ -195,6 +195,7 @@
                         </LinearLayout>
 
                         <LinearLayout
+                            android:id="@+id/layout_sign"
                             android:layout_width="match_parent"
                             android:layout_height="30dp"
                             android:layout_marginLeft="30dp"
@@ -281,13 +282,61 @@
         </com.qmuiteam.qmui.widget.QMUICollapsingTopBarLayout>
     </com.qmuiteam.qmui.widget.QMUIAppBarLayout>
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/note_list"
+
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_gravity="top|center"
-        android:layout_marginLeft="12dp"
-        android:layout_marginRight="12dp"
+        android:layout_margin="12dp"
         android:background="@color/my_info_bg_color"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/note_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="top|center"
+            android:background="@drawable/common_white_bg" />
+
+        <com.wang.avi.AVLoadingIndicatorView
+            android:id="@+id/avi"
+            style="@style/AVLoadingIndicatorView.Large"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            app:indicatorColor="@color/search_number_color3"
+            app:indicatorName="BallBeatIndicator" />
+
+        <LinearLayout
+            android:id="@+id/layout_no_data"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/white"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@mipmap/empty_icon" />
+
+            <TextView
+                android:id="@+id/tv_no_data_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="要想火，先发帖"
+                android:textColor="@color/search_number_def"
+                android:textSize="16dp" />
+
+            <TextView
+                android:id="@+id/tv_send_note"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:text="去发帖 >"
+                android:textColor="@color/colorPrimary"
+                android:textSize="14dp" />
+        </LinearLayout>
+    </FrameLayout>
 </android.support.design.widget.CoordinatorLayout>

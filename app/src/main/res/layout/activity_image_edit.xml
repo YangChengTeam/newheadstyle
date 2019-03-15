@@ -76,6 +76,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
+            android:background="@color/tab_bg_color"
             android:orientation="vertical">
 
             <LinearLayout
@@ -95,7 +96,7 @@
                 <android.support.v7.widget.RecyclerView
                     android:id="@+id/sticker_list_view"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_centerVertical="true"
                     android:layout_weight="1"
                     android:background="@color/sticker_item_bg_color"

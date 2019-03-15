@@ -119,6 +119,8 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
 
     GridLayoutManager gridLayoutManager;
 
+    private String isChange = "";//默认是""
+
     @Override
     protected View onCreateView() {
         View root = LayoutInflater.from(getActivity()).inflate(R.layout.fragment1, null);
@@ -288,6 +290,8 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
         headInfoAdapter.setOnLoadMoreListener(new BaseQuickAdapter.RequestLoadMoreListener() {
             @Override
             public void onLoadMoreRequested() {
+                isFirstLoad = false;
+                isChange = "";
                 currentPage++;
                 homeDataPresenterImp.getData(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", currentPage + "", "", "", 0);
             }
@@ -310,10 +314,9 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
     @OnClick(R.id.tv_refresh1)
     void refresh() {
         mRefreshLayout.setRefreshing(true);
-        isFirstLoad = true;
-        homeDataPresenterImp.getData(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", "", "", "1", 0);
-        //scrollView.smoothScrollTo(0, SizeUtils.dp2px(510 - 48));
-        //mHeadInfoListView.scrollTo(0, 0);
+        isFirstLoad = false;
+        isChange = "1";
+        homeDataPresenterImp.getData(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", "", "", isChange, 0);
         gridLayoutManager.scrollToPosition(0);
     }
 
@@ -354,19 +357,14 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
                 if (homeDataRet != null) {
                     currentPage = homeDataRet.getPage();
 
-                    if (isFirstLoad) {
+                    //刷新或者第一次加载时，需要重新获取随机数
+                    if (isFirstLoad || isChange.equals("1")) {
                         randomPage = currentPage;
-                        //此处的信息，只需要设置一次
-                        if (homeDataRet.getBannerList() != null && homeDataRet.getBannerList().size() > 0) {
-                            bannerInfos = homeDataRet.getBannerList();
-                            List<String> urls = new ArrayList<>();
-                            for (int i = 0; i < bannerInfos.size(); i++) {
-                                urls.add(bannerInfos.get(i).getIco());
-                            }
-                            //设置图片加载器
-                            mBanner.setImageLoader(new GlideImageLoader()).setImages(urls).start();
-                        }
+                        Logger.i("random page--->" + randomPage);
+                    }
 
+                    if (isFirstLoad) {
+                        //此处的信息，只需要设置一次
                         if (homeDataRet.getCategoryInfoList() != null && homeDataRet.getCategoryInfoList().size() > 0) {
                             headTypeAdapter.setNewData(homeDataRet.getCategoryInfoList());
                         }
@@ -378,12 +376,22 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
                         }
                     }
 
-                    Logger.i("random page--->" + randomPage);
+                    if (homeDataRet.getBannerList() != null && homeDataRet.getBannerList().size() > 0) {
+                        bannerInfos = homeDataRet.getBannerList();
+                        List<String> urls = new ArrayList<>();
+                        for (int i = 0; i < bannerInfos.size(); i++) {
+                            urls.add(bannerInfos.get(i).getIco());
+                        }
+                        //设置图片加载器
+                        mBanner.setImageLoader(new GlideImageLoader()).setImages(urls).start();
+                    }
 
                     if (homeDataRet.getImagesList() != null && homeDataRet.getImagesList().size() > 0) {
-                        if (isFirstLoad) {
+                        if (isFirstLoad || isChange.equals("1")) {
                             headInfoAdapter.setNewData(homeDataRet.getImagesList());
                             isFirstLoad = false;
+                            //刷新或者加载完数据后，设置ischange =""
+                            isChange = "";
                         } else {
                             headInfoAdapter.addData(homeDataRet.getImagesList());
                         }

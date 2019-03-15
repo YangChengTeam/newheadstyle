@@ -480,6 +480,7 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
         replyParams.setContent(content);
         replyParams.setRepeatUserId(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "");
         replyParams.setMessageId(messageId);
+        replyParams.setAtUserIds(userIds);
 
         replyCommentPresenterImp.addReplyInfo(replyParams);
 

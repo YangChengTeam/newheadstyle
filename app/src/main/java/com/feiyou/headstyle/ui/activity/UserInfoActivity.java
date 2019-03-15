@@ -77,6 +77,15 @@ public class UserInfoActivity extends BaseFragmentActivity implements UserInfoVi
     @BindView(R.id.note_list)
     RecyclerView mNoteListView;
 
+    @BindView(R.id.layout_no_data)
+    LinearLayout mNoDataLayout;
+
+    @BindView(R.id.tv_no_data_title)
+    TextView mNoDataTitleTv;
+
+    @BindView(R.id.tv_send_note)
+    TextView mSendNoteTv;
+
     @BindView(R.id.photo_list)
     RecyclerView mPhotoListView;
 
@@ -103,6 +112,9 @@ public class UserInfoActivity extends BaseFragmentActivity implements UserInfoVi
 
     @BindView(R.id.tv_user_sign)
     TextView mUserSignTv;
+
+    @BindView(R.id.layout_sign)
+    LinearLayout mSignLayout;
 
     @BindView(R.id.layout_photos)
     RelativeLayout mPhotoLayout;
@@ -198,7 +210,7 @@ public class UserInfoActivity extends BaseFragmentActivity implements UserInfoVi
             mUserSexIv.setVisibility(userInfo.getSex() > 0 ? View.VISIBLE : View.GONE);
             Glide.with(this).load(userInfo.getSex() == 1 ? R.mipmap.sex_boy : R.mipmap.sex_girl).into(mUserSexIv);
             mUserStarTv.setText(userInfo.getStar());
-
+            mSignLayout.setVisibility(StringUtils.isEmpty(userInfo.getSig()) ? View.GONE : View.VISIBLE);
             //设置照片墙
             if (userInfo.getImageWall() != null && userInfo.getImageWall().length > 0) {
                 mPhotoLayout.setVisibility(View.VISIBLE);
@@ -338,6 +350,7 @@ public class UserInfoActivity extends BaseFragmentActivity implements UserInfoVi
                 mUserSexIv.setVisibility(userInfo.getSex() > 0 ? View.VISIBLE : View.GONE);
                 Glide.with(this).load(userInfo.getSex() == 1 ? R.mipmap.sex_boy : R.mipmap.sex_girl).into(mUserSexIv);
                 mUserStarTv.setText(userInfo.getStar());
+                mSignLayout.setVisibility(StringUtils.isEmpty(userInfo.getSig()) ? View.GONE : View.VISIBLE);
 
                 if (userInfo.getImageWall() != null && userInfo.getImageWall().length > 0) {
                     mPhotoLayout.setVisibility(View.VISIBLE);
@@ -350,6 +363,8 @@ public class UserInfoActivity extends BaseFragmentActivity implements UserInfoVi
                 }
 
                 if (userInfo.getNoteList() != null && userInfo.getNoteList().size() > 0) {
+                    mNoDataLayout.setVisibility(View.GONE);
+                    mNoteListView.setVisibility(View.VISIBLE);
                     if (currentPage == 1) {
                         noteInfoAdapter.setNewData(userInfo.getNoteList());
                     } else {
@@ -361,6 +376,11 @@ public class UserInfoActivity extends BaseFragmentActivity implements UserInfoVi
                     } else {
                         noteInfoAdapter.loadMoreEnd();
                     }
+                } else {
+                    mNoDataLayout.setVisibility(View.VISIBLE);
+                    mNoteListView.setVisibility(View.GONE);
+                    mNoDataTitleTv.setText(isMyInfo ? "要想火，先发帖" : "这个人很神秘，什么都没有留下");
+                    mSendNoteTv.setVisibility(isMyInfo ? View.VISIBLE : View.GONE);
                 }
             }
 

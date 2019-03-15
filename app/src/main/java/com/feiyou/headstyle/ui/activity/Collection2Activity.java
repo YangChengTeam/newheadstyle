@@ -27,6 +27,7 @@ import com.blankj.utilcode.util.StringUtils;
 import com.blankj.utilcode.util.TimeUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.chad.library.adapter.base.BaseQuickAdapter;
@@ -39,6 +40,8 @@ import com.feiyou.headstyle.presenter.CollectDataPresenterImp;
 import com.feiyou.headstyle.ui.adapter.HeadInfoAdapter;
 import com.feiyou.headstyle.ui.adapter.QDRecyclerViewAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragmentActivity;
+import com.feiyou.headstyle.ui.custom.GlideRoundedCornersTransform;
+import com.feiyou.headstyle.ui.custom.RoundedCornersTransformation;
 import com.feiyou.headstyle.view.CollectDataView;
 import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
@@ -170,6 +173,9 @@ public class Collection2Activity extends BaseFragmentActivity implements Collect
                 }
 
                 if (((CollectInfoRet) tData).getData().getInfo() != null) {
+
+                    RequestOptions options = new RequestOptions().skipMemoryCache(true);
+                    options.transform(new RoundedCornersTransformation(SizeUtils.dp2px(6),0));
 
                     Glide.with(this).load(((CollectInfoRet) tData).getData().getInfo().getImage1()).into(mCollectImageView);
                     titleName = ((CollectInfoRet) tData).getData().getInfo().getName();

@@ -2,6 +2,7 @@ package com.feiyou.headstyle.ui.adapter;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.text.Html;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
@@ -51,7 +52,7 @@ public class MyCommentAdapter extends BaseQuickAdapter<MyCommentInfo, BaseViewHo
             SpannableString replySpan = new SpannableString(replyStr + item.getRepeatContent());
             replySpan.setSpan(new MyClickText(mContext), 0, replyStr.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             //当然这里也可以通过setSpan来设置哪些位置的文本哪些颜色
-            replyTv.setText(replySpan);
+            replyTv.setText(Html.fromHtml(replySpan.toString()));
             replyTv.setMovementMethod(LinkMovementMethod.getInstance());//不设置 没有点击事件
             replyTv.setHighlightColor(Color.TRANSPARENT); //设置点击后的颜色为透明
         }
@@ -63,7 +64,7 @@ public class MyCommentAdapter extends BaseQuickAdapter<MyCommentInfo, BaseViewHo
             SpannableString tempStr = new SpannableString(preStr + item.getContent());
             tempStr.setSpan(new MyClickText(mContext), 0, preStr.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             //当然这里也可以通过setSpan来设置哪些位置的文本哪些颜色
-            olgTv.setText(tempStr);
+            olgTv.setText(Html.fromHtml(tempStr.toString()));
             olgTv.setMovementMethod(LinkMovementMethod.getInstance());//不设置 没有点击事件
             olgTv.setHighlightColor(Color.TRANSPARENT); //设置点击后的颜色为透明
         }

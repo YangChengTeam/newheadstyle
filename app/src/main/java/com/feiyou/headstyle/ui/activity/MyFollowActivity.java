@@ -78,15 +78,15 @@ public class MyFollowActivity extends BaseFragmentActivity implements ViewPager.
             type = bundle.getInt("type", 0);
         }
 
-        if(bundle != null){
-            isMyInfo = bundle.getBoolean("is_my_info",false);
+        if (bundle != null) {
+            isMyInfo = bundle.getBoolean("is_my_info", false);
         }
 
-        if(bundle != null && !StringUtils.isEmpty(bundle.getString("into_user_id"))){
+        if (bundle != null && !StringUtils.isEmpty(bundle.getString("into_user_id"))) {
             intoUserId = bundle.getString("into_user_id");
         }
 
-        fragments = new Fragment[]{MyFriendsFragment.newInstance(1, isMyInfo,intoUserId), MyFriendsFragment.newInstance(2, isMyInfo,intoUserId)};
+        fragments = new Fragment[]{MyFriendsFragment.newInstance(1, isMyInfo, intoUserId), MyFriendsFragment.newInstance(2, isMyInfo, intoUserId)};
 
         layoutInflater = LayoutInflater.from(this);
         //初始化TabHost
@@ -155,6 +155,18 @@ public class MyFollowActivity extends BaseFragmentActivity implements ViewPager.
         widget.setDescendantFocusability(ViewGroup.FOCUS_BLOCK_DESCENDANTS);
         mTabHost.setCurrentTab(position);
         widget.setDescendantFocusability(oldFocusability);
+    }
+
+    public int getTabIndex() {
+        return mTabHost.getCurrentTab() == 0 ? 1 : 2;
+    }
+
+    public boolean isMyInfo() {
+        return isMyInfo;
+    }
+
+    public String getIntoUserId() {
+        return intoUserId;
     }
 
     @Override

@@ -11,7 +11,7 @@
         android:layout_width="150dp"
         android:layout_height="100dp"
         android:layout_gravity="center"
-        android:background="@drawable/common_white_bg"
+        android:background="@drawable/toast_bg"
         android:gravity="center"
         android:orientation="vertical">
 

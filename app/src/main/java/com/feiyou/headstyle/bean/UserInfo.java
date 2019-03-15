@@ -45,15 +45,15 @@ public class UserInfo {
     @SerializedName("type")
     private int loginType;
 
-    @SerializedName("update_sex_num")
-    private int updateSexNum;
-
     private int age;
 
     private String star;
 
     @SerializedName("message_list")
     private List<NoteInfo> noteList;
+
+    @SerializedName("sex_can_change")
+    private int sexCanChange;
 
     public String getId() {
         return id;
@@ -208,14 +208,6 @@ public class UserInfo {
         this.loginType = loginType;
     }
 
-    public int getUpdateSexNum() {
-        return updateSexNum;
-    }
-
-    public void setUpdateSexNum(int updateSexNum) {
-        this.updateSexNum = updateSexNum;
-    }
-
     public int getAge() {
         return age;
     }
@@ -238,5 +230,13 @@ public class UserInfo {
 
     public void setNoteList(List<NoteInfo> noteList) {
         this.noteList = noteList;
+    }
+
+    public int getSexCanChange() {
+        return sexCanChange;
+    }
+
+    public void setSexCanChange(int sexCanChange) {
+        this.sexCanChange = sexCanChange;
     }
 }

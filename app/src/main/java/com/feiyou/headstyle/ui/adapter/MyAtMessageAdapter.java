@@ -2,6 +2,7 @@ package com.feiyou.headstyle.ui.adapter;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.text.Html;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
@@ -37,36 +38,16 @@ public class MyAtMessageAdapter extends BaseQuickAdapter<MyAtMessage, BaseViewHo
 
     @Override
     protected void convert(final BaseViewHolder helper, final MyAtMessage item) {
-//        RequestOptions options = new RequestOptions();
-//        options.transform(new GlideRoundTransform(mContext, 24));
-//        Glide.with(mContext).load(item.getRepeatUserimg()).apply(options).into((ImageView) helper.itemView.findViewById(R.id.iv_reply_head));
-//
-//        helper.setText(R.id.tv_reply_nick_name, item.getRepeatNickname())
-//                .setText(R.id.tv_reply_date, TimeUtils.millis2String(item.getAddTime() != null ? item.getAddTime() * 1000 : 0));
-//
-//        //回复的内容
-//        TextView replyTv = helper.itemView.findViewById(R.id.tv_reply_content);
-//        if (!StringUtils.isEmpty(item.getRepeatContent())) {
-//            String replyStr = item.getType() == 1 ? "评论我：" : "回复我：";
-//            SpannableString replySpan = new SpannableString(replyStr + item.getRepeatContent());
-//            replySpan.setSpan(new MyClickText(mContext), 0, replyStr.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-//            //当然这里也可以通过setSpan来设置哪些位置的文本哪些颜色
-//            replyTv.setText(replySpan);
-//            replyTv.setMovementMethod(LinkMovementMethod.getInstance());//不设置 没有点击事件
-//            replyTv.setHighlightColor(Color.TRANSPARENT); //设置点击后的颜色为透明
-//        }
-//
-//        //原内容
-//        TextView olgTv = helper.itemView.findViewById(R.id.tv_old_content);
-//        if (!StringUtils.isEmpty(item.getContent())) {
-//            String preStr = item.getType() == 1 ? "我的帖子：" : "我的评论：";
-//            SpannableString tempStr = new SpannableString(preStr + item.getContent());
-//            tempStr.setSpan(new MyClickText(mContext), 0, preStr.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-//            //当然这里也可以通过setSpan来设置哪些位置的文本哪些颜色
-//            olgTv.setText(tempStr);
-//            olgTv.setMovementMethod(LinkMovementMethod.getInstance());//不设置 没有点击事件
-//            olgTv.setHighlightColor(Color.TRANSPARENT); //设置点击后的颜色为透明
-//        }
+        //@的内容
+        RequestOptions options = new RequestOptions();
+        options.transform(new GlideRoundTransform(mContext, 24));
+        Glide.with(mContext).load(item.getUserimg()).apply(options).into((ImageView) helper.getView(R.id.iv_reply_head));
+        helper.setText(R.id.tv_reply_nick_name, item.getNickname())
+                .setText(R.id.tv_reply_content, Html.fromHtml(StringUtils.isEmpty(item.getContent()) ? "" : item.getContent()));
 
+        //帖子内容
+        Glide.with(mContext).load(item.getImage()).into((ImageView) helper.getView(R.id.iv_note_img));
+        helper.setText(R.id.tv_note_title, item.getMessageContent())
+                .setText(R.id.tv_reply_date, TimeUtils.millis2String(item.getAddTime() != null ? item.getAddTime() * 1000 : 0));
     }
 }

@@ -6,6 +6,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -21,6 +22,7 @@ import com.feiyou.headstyle.bean.UserInfoListRet;
 import com.feiyou.headstyle.common.Constants;
 import com.feiyou.headstyle.presenter.FollowInfoPresenterImp;
 import com.feiyou.headstyle.presenter.UserInfoListPresenterImp;
+import com.feiyou.headstyle.ui.activity.MyFollowActivity;
 import com.feiyou.headstyle.ui.adapter.AddFriendsListAdapter;
 import com.feiyou.headstyle.ui.adapter.MyFriendsListAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragment;
@@ -73,6 +75,10 @@ public class MyFriendsFragment extends BaseFragment implements UserInfoListView 
 
     private String intoUserId;
 
+    MyFollowActivity myFollowActivity;
+
+    private View rootView;
+
     public static MyFriendsFragment newInstance(int type, boolean ismy, String intoUserId) {
         MyFriendsFragment fragment = new MyFriendsFragment();
         Bundle bundle = new Bundle();
@@ -85,18 +91,35 @@ public class MyFriendsFragment extends BaseFragment implements UserInfoListView 
 
     @Override
     protected View onCreateView() {
-        View root = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_my_friends, null);
-        ButterKnife.bind(this, root);
-        initData();
-        return root;
+        if (null != rootView) {
+            ViewGroup parent = (ViewGroup) rootView.getParent();
+            if (null != parent) {
+                parent.removeView(rootView);
+            }
+        } else {
+            rootView = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_my_friends, null);
+            ButterKnife.bind(this, rootView);
+            initData();
+        }
+        return rootView;
     }
 
     public void initData() {
+
+        Logger.i("init view --->");
+
+        myFollowActivity = (MyFollowActivity) getActivity();
 
         Bundle bundle = getArguments();
         if (bundle != null && bundle.getInt("friend_type") > 0) {
             type = bundle.getInt("friend_type");
         }
+
+//        if (type == 0) {
+//            type = myFollowActivity.getTabIndex();
+//        }
+
+        //Logger.i("type--->" + type);
 
         if (bundle != null) {
             isMyInfo = bundle.getBoolean("is_my_info", false);
@@ -106,7 +129,6 @@ public class MyFriendsFragment extends BaseFragment implements UserInfoListView 
             intoUserId = bundle.getString("into_user_id");
         }
 
-        Logger.i("friend_type--->" + type);
         userInfo = App.getApp().getmUserInfo();
 
         myFriendsListAdapter = new MyFriendsListAdapter(getActivity(), null);
@@ -124,15 +146,30 @@ public class MyFriendsFragment extends BaseFragment implements UserInfoListView 
         myFriendsListAdapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
             @Override
             public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
-                if (view.getId() == R.id.layout_follow) {
-                    currentPosition = position;
-                    followInfoPresenterImp.addFollow(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", myFriendsListAdapter.getData().get(position).getId());
+                if (type == 1 || (type == 2 && myFriendsListAdapter.getData().get(position).getIsAllGuan() == 0)) {
+                    if (view.getId() == R.id.layout_follow) {
+                        currentPosition = position;
+                        followInfoPresenterImp.addFollow(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", myFriendsListAdapter.getData().get(position).getId());
+                    }
                 }
             }
         });
 
         followInfoPresenterImp = new FollowInfoPresenterImp(this, getActivity());
         userInfoListPresenterImp = new UserInfoListPresenterImp(this, getActivity());
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        //type = myFollowActivity.getTabIndex();
+        if (type == 0) {
+            type = myFollowActivity.getTabIndex();
+        }
+        isMyInfo = myFollowActivity.isMyInfo();
+        intoUserId = StringUtils.isEmpty(myFollowActivity.getIntoUserId())?userInfo.getId():myFollowActivity.getIntoUserId();
+
+        Logger.i("friend_type--->" + type + "--->" + isMyInfo + "--->" + intoUserId);
         userInfoListPresenterImp.getMyGuanFenList(currentPage, userInfo != null ? userInfo.getId() : "", isMyInfo ? userInfo.getId() : intoUserId, type);
     }
 
@@ -166,6 +203,7 @@ public class MyFriendsFragment extends BaseFragment implements UserInfoListView 
                 } else {
                     myFriendsListAdapter.loadMoreEnd();
                 }
+                myFriendsListAdapter.notifyDataSetChanged();
             }
             if (tData instanceof FollowInfoRet) {
                 int tempResult = ((FollowInfoRet) tData).getData().getIsGuan();
@@ -173,14 +211,13 @@ public class MyFriendsFragment extends BaseFragment implements UserInfoListView 
 
                 if (tempResult == 0) {
                     MyToastUtils.showToast(getActivity(), 1, "已取消");
+//                    if (currentPosition < myFriendsListAdapter.getData().size()) {
+//                        myFriendsListAdapter.getData().remove(currentPosition);
+//                    }
                 } else {
                     MyToastUtils.showToast(getActivity(), 0, "关注成功");
                 }
-
-                if (myFriendsListAdapter.getData().size() > 0) {
-                    myFriendsListAdapter.getData().remove(0);
-                }
-                myFriendsListAdapter.notifyDataSetChanged();
+                userInfoListPresenterImp.getMyGuanFenList(currentPage, userInfo != null ? userInfo.getId() : "", isMyInfo ? userInfo.getId() : intoUserId, type);
             }
         } else {
             if (tData instanceof UserInfoListRet) {

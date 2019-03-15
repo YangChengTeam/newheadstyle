@@ -10,6 +10,7 @@ import com.feiyou.headstyle.bean.NoteSubCommentRet;
 import com.feiyou.headstyle.bean.NoteTypeRet;
 import com.feiyou.headstyle.bean.ReplyResultInfoRet;
 import com.feiyou.headstyle.bean.ResultInfo;
+import com.feiyou.headstyle.bean.SystemInfoRet;
 import com.feiyou.headstyle.bean.ZanResultRet;
 
 import okhttp3.MultipartBody;
@@ -27,7 +28,9 @@ public interface MyMessageServiceApi {
     @POST("v1.userinfo/myNoticeList")
     Observable<MyCommentRet> getMyCommentList(@Body RequestBody requestBody);
 
-
     @POST("v1.userinfo/myNoticeList")
     Observable<MyAtMessageRet> getMyAtMessageList(@Body RequestBody requestBody);
+
+    @POST("v1.userinfo/myNoticeList")
+    Observable<SystemInfoRet> getSystemInfoList(@Body RequestBody requestBody);
 }

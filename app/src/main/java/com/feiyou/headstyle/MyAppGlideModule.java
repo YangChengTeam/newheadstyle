@@ -12,7 +12,7 @@ import com.bumptech.glide.module.AppGlideModule;
 import com.bumptech.glide.request.RequestOptions;
 
 /**
- * Created by HaiyuKing
+ *
  * Used 自定义GlideModule子类，设置内存缓存、Bitmap 池、磁盘缓存、、默认请求选项、解码格式等等
  * https://muyangmin.github.io/glide-docs-cn/doc/configuration.html#avoid-appglidemodule-in-libraries
  */

@@ -7,12 +7,12 @@ import android.view.ViewGroup;
 
 import com.feiyou.headstyle.ui.fragment.sub.MyAtMessageFragment;
 import com.feiyou.headstyle.ui.fragment.sub.MyCommentFragment;
-import com.feiyou.headstyle.ui.fragment.sub.NoticeFragment;
+import com.feiyou.headstyle.ui.fragment.sub.SystemInfoFragment;
 
 
 public class MyCommentFragmentAdapter extends FragmentPagerAdapter {
 
-    private final Fragment[] FRAGMENTS = new Fragment[]{MyCommentFragment.getInstance(), MyAtMessageFragment.getInstance(),NoticeFragment.getInstance()};
+    private final Fragment[] FRAGMENTS = new Fragment[]{MyCommentFragment.getInstance(), MyAtMessageFragment.getInstance(),SystemInfoFragment.getInstance()};
 
     public MyCommentFragmentAdapter(FragmentManager fragmentManager) {
         super(fragmentManager);

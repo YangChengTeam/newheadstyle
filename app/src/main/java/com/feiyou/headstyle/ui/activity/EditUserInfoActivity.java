@@ -363,8 +363,8 @@ public class EditUserInfoActivity extends BaseFragmentActivity implements View.O
 
     @OnClick(R.id.layout_sex)
     public void chooseSex() {
-        if (userInfo.getUpdateSexNum() == 1) {
-            ToastUtils.showLong("已修改过性别，暂无权限修改");
+        if (userInfo.getSexCanChange() == 0) {
+            ToastUtils.showLong("暂无权限修改");
             return;
         }
 
@@ -463,7 +463,7 @@ public class EditUserInfoActivity extends BaseFragmentActivity implements View.O
                 userInfo.setIntro(((UserInfoRet) tData).getData().getIntro());
                 userInfo.setBirthday(((UserInfoRet) tData).getData().getBirthday());
                 userInfo.setSex(((UserInfoRet) tData).getData().getSex());
-
+                userInfo.setSexCanChange(((UserInfoRet) tData).getData().getSexCanChange());
                 App.getApp().setmUserInfo(userInfo);
                 App.getApp().setLogin(true);
                 SPUtils.getInstance().put(Constants.USER_INFO, JSONObject.toJSONString(userInfo));

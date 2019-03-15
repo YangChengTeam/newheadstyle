@@ -629,7 +629,7 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
 
         if (switchType == 2) {
             repeatId = commentReplyAdapter.getData().get(currentReplyPos).getRepeatId();
-            repeatCommentUserId = commentReplyAdapter.getData().get(currentReplyPos).getOldUserId();
+            repeatCommentUserId = commentReplyAdapter.getData().get(currentReplyPos).getRepeatUserId();
 
             ReplyParams replyParams = new ReplyParams();
             replyParams.setModelType(1);
