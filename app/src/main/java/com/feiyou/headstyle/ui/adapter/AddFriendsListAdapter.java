@@ -5,6 +5,7 @@ import android.support.v4.content.ContextCompat;
 import android.widget.ImageView;
 
 import com.blankj.utilcode.util.SizeUtils;
+import com.blankj.utilcode.util.StringUtils;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.chad.library.adapter.base.BaseQuickAdapter;
@@ -32,7 +33,7 @@ public class AddFriendsListAdapter extends BaseQuickAdapter<UserInfo, BaseViewHo
     protected void convert(final BaseViewHolder helper, final UserInfo item) {
 
         helper.setText(R.id.tv_user_id, "头像号：" + item.getId())
-                .setText(R.id.tv_user_sign, item.getIntro())
+                .setText(R.id.tv_user_sign, StringUtils.isEmpty(item.getIntro()) ? "该用户比较懒~" : item.getIntro())
                 .setText(R.id.tv_user_nick_name, item.getNickname());
 
         RequestOptions options = new RequestOptions();

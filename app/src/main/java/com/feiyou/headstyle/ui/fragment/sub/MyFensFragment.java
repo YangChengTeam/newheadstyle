@@ -1,7 +1,6 @@
 package com.feiyou.headstyle.ui.fragment.sub;
 
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
@@ -27,7 +26,7 @@ import com.feiyou.headstyle.common.Constants;
 import com.feiyou.headstyle.presenter.FollowInfoPresenterImp;
 import com.feiyou.headstyle.presenter.UserInfoListPresenterImp;
 import com.feiyou.headstyle.ui.activity.MyFollowActivity;
-import com.feiyou.headstyle.ui.adapter.AddFriendsListAdapter;
+import com.feiyou.headstyle.ui.adapter.MyFensListAdapter;
 import com.feiyou.headstyle.ui.adapter.MyFriendsListAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragment;
 import com.feiyou.headstyle.ui.custom.NormalDecoration;
@@ -40,16 +39,13 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-import java.util.List;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 /**
  * Created by myflying on 2018/11/26.
  */
-public class MyFriendsFragment extends BaseFragment implements UserInfoListView {
-
+public class MyFensFragment extends BaseFragment implements UserInfoListView {
     @BindView(R.id.avi)
     AVLoadingIndicatorView avi;
 
@@ -65,7 +61,7 @@ public class MyFriendsFragment extends BaseFragment implements UserInfoListView 
     @BindView(R.id.tv_no_data)
     TextView mNoDataToTv;
 
-    MyFriendsListAdapter myFriendsListAdapter;
+    MyFensListAdapter myFensListAdapter;
 
     UserInfoListPresenterImp userInfoListPresenterImp;
 
@@ -85,8 +81,6 @@ public class MyFriendsFragment extends BaseFragment implements UserInfoListView 
 
     private int currentPosition;
 
-    private Handler handler = new Handler();
-
     private View rootView;
 
     @Override
@@ -98,7 +92,7 @@ public class MyFriendsFragment extends BaseFragment implements UserInfoListView 
     @Override
     protected View onCreateView() {
         if (rootView == null) {
-            rootView = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_my_friends, null);
+            rootView = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_my_fens, null);
             ButterKnife.bind(this, rootView);
             initData();
         }
@@ -108,42 +102,41 @@ public class MyFriendsFragment extends BaseFragment implements UserInfoListView 
     public void initData() {
         myFollowActivity = (MyFollowActivity) getActivity();
         userInfo = App.getApp().getmUserInfo();
-
         isMyInfo = myFollowActivity.isMyInfo();
+
         intoUserId = StringUtils.isEmpty(myFollowActivity.getIntoUserId()) ? userInfo.getId() : myFollowActivity.getIntoUserId();
         Logger.i("friend_type--->" + isMyInfo + "--->" + intoUserId);
-
         followInfoPresenterImp = new FollowInfoPresenterImp(this, getActivity());
         userInfoListPresenterImp = new UserInfoListPresenterImp(this, getActivity());
 
-        myFriendsListAdapter = new MyFriendsListAdapter(getActivity(), null);
+        myFensListAdapter = new MyFensListAdapter(getActivity(), null);
         mFriendsListView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        mFriendsListView.setAdapter(myFriendsListAdapter);
+        mFriendsListView.setAdapter(myFensListAdapter);
         mFriendsListView.addItemDecoration(new NormalDecoration(ContextCompat.getColor(getActivity(), R.color.line_color), 1));
-        myFriendsListAdapter.setOnLoadMoreListener(new BaseQuickAdapter.RequestLoadMoreListener() {
+        myFensListAdapter.setOnLoadMoreListener(new BaseQuickAdapter.RequestLoadMoreListener() {
             @Override
             public void onLoadMoreRequested() {
                 currentPage++;
-                userInfoListPresenterImp.getMyGuanFenList(currentPage, userInfo != null ? userInfo.getId() : "", isMyInfo ? userInfo.getId() : intoUserId, 1);
+                userInfoListPresenterImp.getMyGuanFenList(currentPage, userInfo != null ? userInfo.getId() : "", isMyInfo ? userInfo.getId() : intoUserId, 2);
             }
         }, mFriendsListView);
-        myFriendsListAdapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
+        myFensListAdapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
             @Override
             public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
                 if (view.getId() == R.id.layout_follow) {
                     currentPosition = position;
-                    followInfoPresenterImp.addFollow(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", myFriendsListAdapter.getData().get(position).getId());
+                    followInfoPresenterImp.addFollow(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", myFensListAdapter.getData().get(position).getId());
                 }
             }
         });
 
-        userInfoListPresenterImp.getMyGuanFenList(currentPage, userInfo != null ? userInfo.getId() : "", isMyInfo ? userInfo.getId() : intoUserId, 1);
+        userInfoListPresenterImp.getMyGuanFenList(currentPage, userInfo != null ? userInfo.getId() : "", isMyInfo ? userInfo.getId() : intoUserId, 2);
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void Event(MessageEvent messageEvent) {
         if (messageEvent.getMessage().equals("load_friend_list")) {
-            userInfoListPresenterImp.getMyGuanFenList(currentPage, userInfo != null ? userInfo.getId() : "", isMyInfo ? userInfo.getId() : intoUserId, 1);
+            userInfoListPresenterImp.getMyGuanFenList(currentPage, userInfo != null ? userInfo.getId() : "", isMyInfo ? userInfo.getId() : intoUserId, 2);
         }
     }
 
@@ -168,15 +161,15 @@ public class MyFriendsFragment extends BaseFragment implements UserInfoListView 
 
             if (tData instanceof UserInfoListRet) {
                 if (currentPage == 1) {
-                    myFriendsListAdapter.setNewData(((UserInfoListRet) tData).getData());
+                    myFensListAdapter.setNewData(((UserInfoListRet) tData).getData());
                 } else {
-                    myFriendsListAdapter.addData(((UserInfoListRet) tData).getData());
+                    myFensListAdapter.addData(((UserInfoListRet) tData).getData());
                 }
 
                 if (((UserInfoListRet) tData).getData().size() == pageSize) {
-                    myFriendsListAdapter.loadMoreComplete();
+                    myFensListAdapter.loadMoreComplete();
                 } else {
-                    myFriendsListAdapter.loadMoreEnd();
+                    myFensListAdapter.loadMoreEnd();
                 }
             }
             if (tData instanceof FollowInfoRet) {
@@ -187,8 +180,7 @@ public class MyFriendsFragment extends BaseFragment implements UserInfoListView 
                 } else {
                     MyToastUtils.showToast(getActivity(), 0, "关注成功");
                 }
-
-                userInfoListPresenterImp.getMyGuanFenList(currentPage, userInfo != null ? userInfo.getId() : "", isMyInfo ? userInfo.getId() : intoUserId, 1);
+                userInfoListPresenterImp.getMyGuanFenList(currentPage, userInfo != null ? userInfo.getId() : "", isMyInfo ? userInfo.getId() : intoUserId, 2);
             }
         } else {
             if (tData instanceof UserInfoListRet) {
@@ -211,4 +203,5 @@ public class MyFriendsFragment extends BaseFragment implements UserInfoListView 
         super.onDestroy();
         EventBus.getDefault().unregister(this);
     }
+
 }

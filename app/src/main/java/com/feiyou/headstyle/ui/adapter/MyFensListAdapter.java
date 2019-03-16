@@ -20,12 +20,12 @@ import java.util.List;
  * Created by admin on 2018/1/8.
  */
 
-public class MyFriendsListAdapter extends BaseQuickAdapter<UserInfo, BaseViewHolder> {
+public class MyFensListAdapter extends BaseQuickAdapter<UserInfo, BaseViewHolder> {
 
     private Context mContext;
 
-    public MyFriendsListAdapter(Context context, List<UserInfo> datas) {
-        super(R.layout.my_fiends_item, datas);
+    public MyFensListAdapter(Context context, List<UserInfo> datas) {
+        super(R.layout.my_fens_item, datas);
         this.mContext = context;
     }
 
@@ -36,8 +36,7 @@ public class MyFriendsListAdapter extends BaseQuickAdapter<UserInfo, BaseViewHol
                 .setText(R.id.tv_user_sign, item.getIntro())
                 .setText(R.id.tv_user_nick_name, item.getNickname());
 
-        RequestOptions options = new RequestOptions().skipMemoryCache(true);
-        options.placeholder(R.mipmap.head_def).error(R.mipmap.head_def);
+        RequestOptions options = new RequestOptions();
         options.override(SizeUtils.dp2px(60), SizeUtils.dp2px(60));
         options.transform(new GlideRoundTransform(mContext, 30));
         Glide.with(mContext).load(item.getUserimg()).apply(options).into((ImageView) helper.itemView.findViewById(R.id.iv_user_head));

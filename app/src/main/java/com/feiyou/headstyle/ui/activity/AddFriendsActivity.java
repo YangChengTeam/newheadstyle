@@ -222,14 +222,14 @@ public class AddFriendsActivity extends BaseFragmentActivity implements UserInfo
                 int tempResult = ((FollowInfoRet) tData).getData().getIsGuan();
                 //ToastUtils.showLong(tempResult == 0 ? "已取消" : "已关注");
 
-                if (tempResult == 0) {
-                    MyToastUtils.showToast(this, 1, "已取消");
-                } else {
-                    MyToastUtils.showToast(this, 0, "关注成功");
-                }
+//                if (tempResult == 0) {
+//                    MyToastUtils.showToast(this, 1, "已取消");
+//                } else {
+//                    MyToastUtils.showToast(this, 0, "关注成功");
+//                }
 
                 addFriendsListAdapter.getData().get(currentPosition).setFollow(tempResult == 0 ? false : true);
-                addFriendsListAdapter.notifyDataSetChanged();
+                addFriendsListAdapter.notifyItemChanged(currentPosition);
             }
         } else {
             if (tData instanceof UserInfoListRet) {

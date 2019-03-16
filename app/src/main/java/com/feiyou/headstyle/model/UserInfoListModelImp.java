@@ -10,6 +10,7 @@ import com.feiyou.headstyle.base.IBaseRequestCallBack;
 import com.feiyou.headstyle.bean.LoginRequest;
 import com.feiyou.headstyle.bean.UserInfoListRet;
 import com.feiyou.headstyle.bean.UserInfoRet;
+import com.orhanobut.logger.Logger;
 
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
@@ -122,6 +123,7 @@ public class UserInfoListModelImp extends BaseModel implements UserInfoListModel
 
     @Override
     public void getMyGuanFenList(int page, String userId, String intoUserId, int type, IBaseRequestCallBack<UserInfoListRet> iBaseRequestCallBack) {
+        Logger.i("request type --->" + type);
         JSONObject params = new JSONObject();
         try {
             params.put("user_id", userId);

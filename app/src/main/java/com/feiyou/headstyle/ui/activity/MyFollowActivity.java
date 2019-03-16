@@ -15,12 +15,16 @@ import android.widget.TabWidget;
 import android.widget.TextView;
 
 import com.feiyou.headstyle.R;
+import com.feiyou.headstyle.bean.MessageEvent;
 import com.feiyou.headstyle.ui.adapter.FollowFragmentAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragmentActivity;
+import com.feiyou.headstyle.ui.fragment.sub.MyFensFragment;
 import com.feiyou.headstyle.ui.fragment.sub.MyFriendsFragment;
 import com.feiyou.headstyle.utils.StringUtils;
 import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
+
+import org.greenrobot.eventbus.EventBus;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -86,7 +90,7 @@ public class MyFollowActivity extends BaseFragmentActivity implements ViewPager.
             intoUserId = bundle.getString("into_user_id");
         }
 
-        fragments = new Fragment[]{MyFriendsFragment.newInstance(1, isMyInfo, intoUserId), MyFriendsFragment.newInstance(2, isMyInfo, intoUserId)};
+        fragments = new Fragment[]{new MyFriendsFragment(), new MyFensFragment()};
 
         layoutInflater = LayoutInflater.from(this);
         //初始化TabHost
@@ -179,6 +183,7 @@ public class MyFollowActivity extends BaseFragmentActivity implements ViewPager.
         Logger.e("tabId---" + tabId);
         viewPager.setCurrentItem(mTabHost.getCurrentTab());
         setTabStyle(tabId);
+        EventBus.getDefault().post(new MessageEvent("load_friend_list"));
     }
 
     public void setTabStyle(String tabId) {
