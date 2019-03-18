@@ -42,6 +42,7 @@ import com.feiyou.headstyle.presenter.AddZanPresenterImp;
 import com.feiyou.headstyle.presenter.FollowInfoPresenterImp;
 import com.feiyou.headstyle.presenter.NoteDataPresenterImp;
 import com.feiyou.headstyle.ui.activity.CommunityArticleActivity;
+import com.feiyou.headstyle.ui.activity.CommunityType1Activity;
 import com.feiyou.headstyle.ui.activity.CommunityTypeActivity;
 import com.feiyou.headstyle.ui.activity.PushNoteActivity;
 import com.feiyou.headstyle.ui.activity.UserInfoActivity;
@@ -177,7 +178,7 @@ public class RecommendFragment extends BaseFragment implements NoteDataView, Swi
             topicAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
                 @Override
                 public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
-                    Intent intent = new Intent(getActivity(), CommunityTypeActivity.class);
+                    Intent intent = new Intent(getActivity(), CommunityType1Activity.class);
                     intent.putExtra("topic_id", topicAdapter.getData().get(position).getId());
                     startActivity(intent);
                 }

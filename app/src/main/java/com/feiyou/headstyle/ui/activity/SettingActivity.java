@@ -3,34 +3,24 @@ package com.feiyou.headstyle.ui.activity;
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.alibaba.fastjson.JSONObject;
 import com.blankj.utilcode.util.SPUtils;
 import com.blankj.utilcode.util.SizeUtils;
 import com.blankj.utilcode.util.StringUtils;
-import com.blankj.utilcode.util.ToastUtils;
 import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
-import com.feiyou.headstyle.bean.HeadType;
 import com.feiyou.headstyle.bean.UserInfo;
 import com.feiyou.headstyle.common.Constants;
-import com.feiyou.headstyle.ui.adapter.MoreHeadTypeAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragmentActivity;
 import com.feiyou.headstyle.ui.custom.ConfigDialog;
-import com.feiyou.headstyle.ui.custom.LoginDialog;
 import com.feiyou.headstyle.ui.custom.VersionUpdateDialog;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 import com.qmuiteam.qmui.widget.QMUITopBar;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -148,7 +138,7 @@ public class SettingActivity extends BaseFragmentActivity implements ConfigDialo
 
     @OnClick(R.id.layout_black)
     void blackList() {
-        Intent intent = new Intent(this, BlackListActivity.class);
+        Intent intent = new Intent(this, AdListActivity.class);
         startActivity(intent);
     }
 

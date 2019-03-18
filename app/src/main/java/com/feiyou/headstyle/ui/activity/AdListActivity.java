@@ -27,7 +27,7 @@ import butterknife.OnClick;
 /**
  * Created by myflying on 2018/11/23.
  */
-public class BlackListActivity extends BaseFragmentActivity {
+public class AdListActivity extends BaseFragmentActivity {
 
     @BindView(R.id.topbar)
     QMUITopBar mTopBar;

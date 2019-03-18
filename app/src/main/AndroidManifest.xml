@@ -74,7 +74,7 @@
         <activity android:name=".ui.activity.ShowImageListActivity" />
         <activity android:name=".ui.activity.HeadSaveActivity" />
         <activity android:name=".ui.activity.BindPhoneActivity" />
-        <activity android:name=".ui.activity.BlackListActivity" />
+        <activity android:name=".ui.activity.AdListActivity" />
         <activity android:name=".ui.activity.PushNoteActivity" />
         <activity android:name=".ui.activity.PhotoWallActivity" />
         <activity android:name=".ui.activity.MyNoteActivity" />
