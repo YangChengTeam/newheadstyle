@@ -99,6 +99,9 @@ dependencies {
     implementation files('libs/umeng-share-core-6.9.4.jar')
     implementation files('libs/umeng-share-wechat-simplify-6.9.4.jar')
     implementation files('libs/umeng-sharetool-6.9.4.jar')
+    implementation files('libs/umeng-share-QQ-full-6.9.4.jar')
+    implementation files('libs/open_sdk_r5756.jar')
+
     implementation 'com.zhihu.android:matisse:0.5.2-beta4'
     //implementation 'jp.co.cyberagent.android:gpuimage:2.0.3'
     implementation project(':Gpu-Image')
@@ -106,6 +109,5 @@ dependencies {
     implementation 'cn.yc:YCStatusBarLib:1.4.0'
     implementation 'lib.kingja.switchbutton:switchbutton:1.1.8'
     implementation 'com.just.agentweb:agentweb:4.0.2'
-    implementation files('libs/umeng-share-QQ-full-6.9.4.jar')
-    implementation files('libs/open_sdk_r5756.jar')
+
 }

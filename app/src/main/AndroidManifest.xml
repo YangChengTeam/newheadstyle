@@ -76,7 +76,7 @@
         <activity android:name=".ui.activity.ShowImageListActivity" />
         <activity android:name=".ui.activity.HeadSaveActivity" />
         <activity android:name=".ui.activity.BindPhoneActivity" />
-        <activity android:name=".ui.activity.BlackListActivity" />
+        <activity android:name=".ui.activity.AdListActivity" />
         <activity android:name=".ui.activity.PushNoteActivity" />
         <activity android:name=".ui.activity.PhotoWallActivity" />
         <activity android:name=".ui.activity.MyNoteActivity" />
@@ -89,7 +89,6 @@
         <activity android:name=".ui.activity.Test1Activity" />
         <activity android:name=".ui.activity.MoreTestActivity" />
         <activity android:name=".ui.activity.ReportInfoActivity" />
-        <activity android:name=".ui.activity.AdActivity" />
         <activity
             android:name=".ui.activity.CommunityTypeActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"

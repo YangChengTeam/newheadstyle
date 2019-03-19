@@ -234,7 +234,7 @@ public class RSAUtils {
         Key publicK = keyFactory.generatePublic(x509KeySpec);  
         // 对数据加密  
 //        Cipher cipher = Cipher.getInstance(keyFactory.getAlgorithm());
-        Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding"); 
+        Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
         cipher.init(Cipher.ENCRYPT_MODE, publicK);  
         int inputLen = data.length;  
         ByteArrayOutputStream out = new ByteArrayOutputStream();  

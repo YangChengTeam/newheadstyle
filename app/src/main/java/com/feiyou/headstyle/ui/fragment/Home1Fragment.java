@@ -29,7 +29,7 @@ import com.feiyou.headstyle.bean.ResultInfo;
 import com.feiyou.headstyle.common.Constants;
 import com.feiyou.headstyle.common.GlideImageLoader;
 import com.feiyou.headstyle.presenter.HomeDataPresenterImp;
-import com.feiyou.headstyle.ui.activity.AdActivity;
+import com.feiyou.headstyle.ui.activity.AdListActivity;
 import com.feiyou.headstyle.ui.activity.Collection2Activity;
 import com.feiyou.headstyle.ui.activity.HeadListActivity;
 import com.feiyou.headstyle.ui.activity.HeadShowActivity;
@@ -183,7 +183,7 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
             public void onClick(View view) {
                 switch (adType) {
                     case 1:
-                        Intent intent = new Intent(getActivity(), AdActivity.class);
+                        Intent intent = new Intent(getActivity(), AdListActivity.class);
                         startActivity(intent);
                         break;
                     case 2:
