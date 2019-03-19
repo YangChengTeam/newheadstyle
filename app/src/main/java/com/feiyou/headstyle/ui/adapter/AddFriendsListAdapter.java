@@ -45,5 +45,11 @@ public class AddFriendsListAdapter extends BaseQuickAdapter<UserInfo, BaseViewHo
         helper.setTextColor(R.id.tv_follow_txt, ContextCompat.getColor(mContext, item.isFollow() ? R.color.is_follow_color : R.color.tab_select_color));
         helper.setText(R.id.tv_follow_txt, item.isFollow() ? "已关注" : "+关注");
 
+        if (item.getSex() > 0) {
+            helper.setVisible(R.id.iv_sex, true);
+            Glide.with(mContext).load(item.getSex() == 1 ? R.mipmap.sex_boy : R.mipmap.sex_girl).into((ImageView) helper.getView(R.id.iv_sex));
+        } else {
+            helper.setVisible(R.id.iv_sex, false);
+        }
     }
 }

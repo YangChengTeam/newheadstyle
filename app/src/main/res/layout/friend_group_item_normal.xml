@@ -19,17 +19,16 @@
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
             android:layout_margin="12dp"
-
-            android:visibility="gone"
-            android:src="@mipmap/head_def" />
+            android:src="@mipmap/head_def"
+            android:visibility="gone" />
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_marginLeft="12dp"
-            android:gravity="left|center"
             android:layout_toRightOf="@+id/iv_group_item_img"
+            android:gravity="left|center"
             android:orientation="vertical">
 
             <TextView
@@ -40,16 +39,6 @@
                 android:text="用户的昵称"
                 android:textColor="@color/black"
                 android:textSize="18dp" />
-
-            <TextView
-                android:id="@+id/tv_user_id"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="left|center"
-                android:text="头像号："
-                android:visibility="gone"
-                android:textColor="@color/gray999"
-                android:textSize="13dp" />
         </LinearLayout>
 
         <ImageView

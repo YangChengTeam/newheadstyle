@@ -121,3 +121,6 @@
 -keep class com.android.dingtalk.share.ddsharemodule.** { *; }
 -keepattributes Signature
 -keep class com.tencent.** { *; }
+-keep class com.qq.e.** {
+    public protected *;
+}

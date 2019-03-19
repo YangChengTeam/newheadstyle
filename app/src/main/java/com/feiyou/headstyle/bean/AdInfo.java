@@ -10,7 +10,7 @@ public class AdInfo {
     private String ico;
     @SerializedName("jump_path")
     private String jumpPath;
-    private String type;
+    private int type;
     @SerializedName("origin_id")
     private String originOd;
     private String appid;
@@ -39,11 +39,11 @@ public class AdInfo {
         this.jumpPath = jumpPath;
     }
 
-    public String getType() {
+    public int getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(int type) {
         this.type = type;
     }
 

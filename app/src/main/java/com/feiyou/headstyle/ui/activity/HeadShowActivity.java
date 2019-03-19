@@ -1,5 +1,7 @@
 package com.feiyou.headstyle.ui.activity;
 
+import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
@@ -7,6 +9,7 @@ import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetDialog;
 import android.support.v4.content.ContextCompat;
@@ -18,24 +21,22 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
+import com.blankj.utilcode.util.DeviceUtils;
 import com.blankj.utilcode.util.ImageUtils;
 import com.blankj.utilcode.util.PathUtils;
 import com.blankj.utilcode.util.SPUtils;
 import com.blankj.utilcode.util.SizeUtils;
-import com.blankj.utilcode.util.SpanUtils;
 import com.blankj.utilcode.util.StringUtils;
 import com.blankj.utilcode.util.TimeUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.DataSource;
-import com.bumptech.glide.load.engine.GlideException;
-import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.SimpleTarget;
-import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.request.transition.Transition;
 import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
@@ -46,15 +47,18 @@ import com.feiyou.headstyle.bean.HomeDataRet;
 import com.feiyou.headstyle.bean.LoginRequest;
 import com.feiyou.headstyle.bean.MessageEvent;
 import com.feiyou.headstyle.bean.ResultInfo;
+import com.feiyou.headstyle.bean.UpdateHeadRet;
 import com.feiyou.headstyle.bean.UserInfo;
-import com.feiyou.headstyle.bean.VideoInfoRet;
 import com.feiyou.headstyle.common.Constants;
+import com.feiyou.headstyle.presenter.UpdateHeadPresenterImp;
+import com.feiyou.headstyle.ui.custom.GlideRoundTransform;
+import com.feiyou.headstyle.ui.custom.qqhead.BaseUIListener;
+
 import com.feiyou.headstyle.presenter.AddCollectionPresenterImp;
 import com.feiyou.headstyle.presenter.HeadListDataPresenterImp;
 import com.feiyou.headstyle.presenter.HomeDataPresenterImp;
 import com.feiyou.headstyle.ui.adapter.HeadShowItemAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragmentActivity;
-import com.feiyou.headstyle.ui.custom.GlideRoundTransform;
 import com.feiyou.headstyle.ui.custom.LoginDialog;
 import com.feiyou.headstyle.ui.fragment.StickerFragment;
 import com.feiyou.headstyle.view.HeadListDataView;
@@ -62,6 +66,11 @@ import com.feiyou.headstyle.view.flingswipe.SwipeFlingAdapterView;
 import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 import com.qmuiteam.qmui.widget.QMUITopBar;
+import com.tencent.connect.avatar.QQAvatar;
+import com.tencent.tauth.Tencent;
+import com.umeng.socialize.UMAuthListener;
+import com.umeng.socialize.UMShareAPI;
+import com.umeng.socialize.bean.SHARE_MEDIA;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -69,8 +78,8 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -158,6 +167,14 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
 
     private int showShape = 1; //展示的形状.1,正方形,2圆形
 
+    private Tencent mTencent;
+
+    UpdateHeadPresenterImp updateHeadPresenterImp;
+
+    private ProgressDialog progressDialog = null;
+
+    private UMShareAPI mShareAPI = null;
+
     @Override
     protected int getContextViewId() {
         return R.layout.activity_head_show;
@@ -201,7 +218,13 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
     }
 
     public void initDialog() {
+        mShareAPI = UMShareAPI.get(this);
+
+        mTencent = Tencent.createInstance("1105592461", this.getApplicationContext());
         loginType = App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getLoginType() : 1;
+
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("正在设置");
 
         bottomSheetDialog = new BottomSheetDialog(this);
         View setView = LayoutInflater.from(this).inflate(R.layout.set_head_dialog, null);
@@ -234,27 +257,57 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
         mSettingTypeLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (bottomSheetDialog != null && bottomSheetDialog.isShowing()) {
+                    bottomSheetDialog.dismiss();
+                }
                 if (loginType == 2) {
                     downImage();
-                    if (bottomSheetDialog != null && bottomSheetDialog.isShowing()) {
-                        bottomSheetDialog.dismiss();
-                    }
                 } else {
-
+                    if (App.isLoginAuth) {
+                        Glide.with(HeadShowActivity.this).asBitmap().load(currentImageUrl).into(new SimpleTarget<Bitmap>() {
+                            @Override
+                            public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                                Uri uri = Uri.parse(MediaStore.Images.Media.insertImage(getContentResolver(), resource, null, null));
+                                doSetAvatar(uri);
+                            }
+                        });
+                    } else {
+                        mShareAPI.getPlatformInfo(HeadShowActivity.this, SHARE_MEDIA.QQ, authListener);
+                    }
                 }
             }
         });
         mSettingAppLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (bottomSheetDialog != null && bottomSheetDialog.isShowing()) {
+                    bottomSheetDialog.dismiss();
+                }
+                if (progressDialog != null && !progressDialog.isShowing()) {
+                    progressDialog.show();
+                }
+
+                Glide.with(HeadShowActivity.this).asBitmap().load(currentImageUrl).into(new SimpleTarget<Bitmap>() {
+                    @Override
+                    public void onResourceReady(Bitmap resource, Transition<? super Bitmap> transition) {
+                        //加载成功，resource为加载到的bitmap
+                        filePath = PathUtils.getExternalPicturesPath() + File.separator + TimeUtils.getNowMills() + ".jpg";
+                        Logger.i("setting my head --->" + filePath);
+                        boolean isSave = ImageUtils.save(resource, filePath, Bitmap.CompressFormat.JPEG);
+                        if (isSave) {
+                            updateHeadPresenterImp.updateHead(userInfo != null ? userInfo.getId() : "", filePath);
+                        }
+                    }
+                });
 
             }
         });
     }
 
     public void initData() {
-        showShape = SPUtils.getInstance().getInt(Constants.SHOW_SHAPE, 1);
+        userInfo = App.getApp().getmUserInfo();
 
+        showShape = SPUtils.getInstance().getInt(Constants.SHOW_SHAPE, 1);
         switchMultiButton.setSelectedTab(showShape == 1 ? 0 : 1);
 
         Bundle bundle = getIntent().getExtras();
@@ -293,6 +346,7 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
         swipeView.setFlingListener(this);
         swipeView.setOnItemClickListener(this);
 
+        updateHeadPresenterImp = new UpdateHeadPresenterImp(this, this);
         homeDataPresenterImp = new HomeDataPresenterImp(this, this);
         headListDataPresenterImp = new HeadListDataPresenterImp(this, this);
         addCollectionPresenterImp = new AddCollectionPresenterImp(this, this);
@@ -404,7 +458,7 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
                 MediaScannerConnection.scanFile(HeadShowActivity.this, new String[]{filePath}, null, null);
                 // 最后通知图库更新
                 sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.parse("file://" + filePath)));
-                ToastUtils.showLong(loginType == 2 && bottomSheetDialog.isShowing() ? "已保存，请在微信中修改" : "已保存到图库");
+                ToastUtils.showLong(loginType == 2 && bottomSheetDialog.isShowing() ? "已保存，请在微信中设置" : "已保存到图库");
             } else {
                 flag = false;
             }
@@ -515,11 +569,17 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
 
     @Override
     public void dismissProgress() {
-
+        if (progressDialog != null && progressDialog.isShowing()) {
+            progressDialog.dismiss();
+        }
     }
 
     @Override
     public void loadDataSuccess(ResultInfo tData) {
+        if (progressDialog != null && progressDialog.isShowing()) {
+            progressDialog.dismiss();
+        }
+
         if (tData != null && tData.getCode() == Constants.SUCCESS) {
             if (tData instanceof HomeDataRet) {
                 if (isFirstLoad) {
@@ -578,15 +638,92 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
                     mKeepTextView.setCompoundDrawablesWithIntrinsicBounds(null, isCollection, null, null);
                 }
             }
+
+            if (tData instanceof UpdateHeadRet) {
+                if (!StringUtils.isEmpty(((UpdateHeadRet) tData).getData().getImage())) {
+                    ToastUtils.showLong("设置成功");
+                    userInfo.setUserimg(((UpdateHeadRet) tData).getData().getImage());
+
+                    App.getApp().setmUserInfo(userInfo);
+                    App.getApp().setLogin(true);
+                    SPUtils.getInstance().put(Constants.USER_INFO, JSONObject.toJSONString(userInfo));
+                }
+            }
+
         } else {
             if (tData instanceof AddCollectionRet) {
                 ToastUtils.showLong(tData.getMsg() != null ? tData.getMsg() : "操作失败");
+            }
+            
+            if (tData instanceof UpdateHeadRet) {
+                ToastUtils.showLong("设置失败");
             }
         }
     }
 
     @Override
     public void loadDataError(Throwable throwable) {
-
+        if (progressDialog != null && progressDialog.isShowing()) {
+            progressDialog.dismiss();
+        }
     }
+
+
+    private void doSetAvatar(Uri uri) {
+        QQAvatar qqAvatar = new QQAvatar(mTencent.getQQToken());
+        qqAvatar.setAvatar(this, uri, new BaseUIListener(this), R.anim.zoomout);
+    }
+
+    UMAuthListener authListener = new UMAuthListener() {
+        /**
+         * @desc 授权开始的回调
+         * @param platform 平台名称
+         */
+        @Override
+        public void onStart(SHARE_MEDIA platform) {
+
+        }
+
+        /**
+         * @desc 授权成功的回调
+         * @param platform 平台名称
+         * @param action 行为序号，开发者用不上
+         * @param data 用户资料返回
+         */
+        @Override
+        public void onComplete(SHARE_MEDIA platform, int action, Map<String, String> data) {
+            Logger.i(JSONObject.toJSONString(data));
+            //Toast.makeText(mContext, "授权成功了", Toast.LENGTH_LONG).show();
+            App.isLoginAuth = true;
+
+            Glide.with(HeadShowActivity.this).asBitmap().load(currentImageUrl).into(new SimpleTarget<Bitmap>() {
+                @Override
+                public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                    Uri uri = Uri.parse(MediaStore.Images.Media.insertImage(getContentResolver(), resource, null, null));
+                    doSetAvatar(uri);
+                }
+            });
+        }
+
+        /**
+         * @desc 授权失败的回调
+         * @param platform 平台名称
+         * @param action 行为序号，开发者用不上
+         * @param t 错误原因
+         */
+        @Override
+        public void onError(SHARE_MEDIA platform, int action, Throwable t) {
+            Toast.makeText(HeadShowActivity.this, "授权失败：" + t.getMessage(), Toast.LENGTH_LONG).show();
+        }
+
+        /**
+         * @desc 授权取消的回调
+         * @param platform 平台名称
+         * @param action 行为序号，开发者用不上
+         */
+        @Override
+        public void onCancel(SHARE_MEDIA platform, int action) {
+            Toast.makeText(HeadShowActivity.this, "授权取消了", Toast.LENGTH_LONG).show();
+        }
+    };
 }

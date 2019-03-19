@@ -2,7 +2,6 @@ package com.feiyou.headstyle.ui.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -13,7 +12,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.blankj.utilcode.util.SizeUtils;
 import com.blankj.utilcode.util.StringUtils;
@@ -22,7 +20,6 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
-import com.feiyou.headstyle.bean.FriendInfosEvent;
 import com.feiyou.headstyle.bean.FriendsGroup;
 import com.feiyou.headstyle.bean.FriendsGroupRet;
 import com.feiyou.headstyle.bean.FriendsInfo;
@@ -37,16 +34,11 @@ import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 import com.qmuiteam.qmui.widget.QMUITopBar;
 import com.yanzhenjie.recyclerview.swipe.SwipeItemClickListener;
 import com.yanzhenjie.recyclerview.swipe.SwipeMenuRecyclerView;
-import com.yanzhenjie.recyclerview.swipe.widget.DefaultItemDecoration;
 
 import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import butterknife.BindView;
 
@@ -266,26 +258,26 @@ public class FriendListActivity extends BaseFragmentActivity implements FriendsD
     }
 
     private class GroupViewHolder extends RecyclerView.ViewHolder {
-        private TextView userIdTv;
+        //private TextView userIdTv;
         private TextView userNickNameTv;
         private ImageView userHeadIv;
 
         GroupViewHolder(View itemView) {
             super(itemView);
             userNickNameTv = itemView.findViewById(R.id.tv_user_nick_name);
-            userIdTv = itemView.findViewById(R.id.tv_user_id);
+            //userIdTv = itemView.findViewById(R.id.tv_user_id);
             userHeadIv = itemView.findViewById(R.id.iv_group_item_img);
         }
 
         void bind(ListItem item) {
             if (item.id > -1) {
-                userIdTv.setVisibility(View.VISIBLE);
+                //userIdTv.setVisibility(View.VISIBLE);
                 userHeadIv.setVisibility(View.VISIBLE);
-                userIdTv.setText(item.id + "");
+                //userIdTv.setText(item.id + "");
                 userNickNameTv.setText(item.cname);
                 Glide.with(FriendListActivity.this).load(item.userHeadUrl).apply(requestOptions).into(userHeadIv);
             } else {
-                userIdTv.setVisibility(View.INVISIBLE);
+                //userIdTv.setVisibility(View.INVISIBLE);
                 userHeadIv.setVisibility(View.GONE);
                 userNickNameTv.setText(item.cname);
             }

@@ -37,6 +37,8 @@ public class App extends Application {
 
     public boolean isLogin;
 
+    public static boolean isLoginAuth = false;
+
     public App() {
         mInstance = this;
     }

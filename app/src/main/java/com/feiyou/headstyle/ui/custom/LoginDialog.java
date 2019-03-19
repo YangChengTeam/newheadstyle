@@ -168,7 +168,7 @@ public class LoginDialog extends Dialog implements View.OnClickListener, UserInf
         public void onComplete(SHARE_MEDIA platform, int action, Map<String, String> data) {
             Logger.i(JSONObject.toJSONString(data));
             //Toast.makeText(mContext, "授权成功了", Toast.LENGTH_LONG).show();
-
+            App.isLoginAuth = true;
             if (data != null) {
                 if (progressDialog != null && !progressDialog.isShowing()) {
                     progressDialog.show();

@@ -1,9 +1,10 @@
-package com.feiyou.headstyle.view.qqhead;
+package com.feiyou.headstyle.ui.custom.qqhead;
 
 import android.app.Activity;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Message;
+
 
 import com.tencent.tauth.IUiListener;
 import com.tencent.tauth.UiError;

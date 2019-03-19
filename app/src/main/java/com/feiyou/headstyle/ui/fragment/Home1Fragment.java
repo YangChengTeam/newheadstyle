@@ -17,6 +17,7 @@ import android.widget.TextView;
 
 import com.blankj.utilcode.util.BarUtils;
 import com.blankj.utilcode.util.SizeUtils;
+import com.blankj.utilcode.util.ToastUtils;
 import com.bumptech.glide.Glide;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.feiyou.headstyle.App;
@@ -28,6 +29,7 @@ import com.feiyou.headstyle.bean.ResultInfo;
 import com.feiyou.headstyle.common.Constants;
 import com.feiyou.headstyle.common.GlideImageLoader;
 import com.feiyou.headstyle.presenter.HomeDataPresenterImp;
+import com.feiyou.headstyle.ui.activity.AdActivity;
 import com.feiyou.headstyle.ui.activity.Collection2Activity;
 import com.feiyou.headstyle.ui.activity.HeadListActivity;
 import com.feiyou.headstyle.ui.activity.HeadShowActivity;
@@ -121,6 +123,8 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
 
     private String isChange = "";//默认是""
 
+    private int adType;
+
     @Override
     protected View onCreateView() {
         View root = LayoutInflater.from(getActivity()).inflate(R.layout.fragment1, null);
@@ -174,6 +178,25 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
 
         //广告模块
         LinearLayout adLayout = topView.findViewById(R.id.layout_ad);
+        adLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                switch (adType) {
+                    case 1:
+                        Intent intent = new Intent(getActivity(), AdActivity.class);
+                        startActivity(intent);
+                        break;
+                    case 2:
+                        ToastUtils.showLong("类型-软件下载");
+                        break;
+                    case 3:
+                        ToastUtils.showLong("类型-打开小程序");
+                        break;
+                    default:
+                        break;
+                }
+            }
+        });
 
         //加载更多动画
         mLoadingView = footView.findViewById(R.id.iv_loading);
@@ -370,6 +393,7 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
                         }
 
                         if (homeDataRet.getAdList() != null && homeDataRet.getAdList().size() > 0) {
+                            adType = homeDataRet.getAdList().get(0).getType();
                             Glide.with(getActivity()).load(homeDataRet.getAdList().get(0).getIco()).into(mAdImageView);
                         } else {
                             mAdLayout.setVisibility(View.GONE);

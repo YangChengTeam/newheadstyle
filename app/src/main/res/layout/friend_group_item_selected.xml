@@ -35,19 +35,10 @@
                 android:id="@+id/tv_user_nick_name"
                 android:layout_width="wrap_content"
                 android:layout_height="30dp"
-                android:gravity="left|bottom"
+                android:gravity="left|center"
                 android:text="用户的昵称"
                 android:textColor="@color/black"
                 android:textSize="14dp" />
-
-            <TextView
-                android:id="@+id/tv_user_id"
-                android:layout_width="wrap_content"
-                android:layout_height="30dp"
-                android:gravity="left|top"
-                android:text="头像号："
-                android:textColor="@color/gray999"
-                android:textSize="13dp" />
         </LinearLayout>
 
         <ImageView
