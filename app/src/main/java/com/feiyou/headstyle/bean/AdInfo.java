@@ -12,7 +12,7 @@ public class AdInfo {
     private String jumpPath;
     private int type;
     @SerializedName("origin_id")
-    private String originOd;
+    private String originId;
     private String appid;
 
     public String getId() {
@@ -47,12 +47,12 @@ public class AdInfo {
         this.type = type;
     }
 
-    public String getOriginOd() {
-        return originOd;
+    public String getOriginId() {
+        return originId;
     }
 
-    public void setOriginOd(String originOd) {
-        this.originOd = originOd;
+    public void setOriginId(String originId) {
+        this.originId = originId;
     }
 
     public String getAppid() {

@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
+import com.blankj.utilcode.util.StringUtils;
 import com.feiyou.headstyle.api.UserInfoServiceApi;
 import com.feiyou.headstyle.api.WordInfoServiceApi;
 import com.feiyou.headstyle.base.BaseModel;
@@ -38,10 +39,11 @@ public class UserInfoModelImp extends BaseModel implements UserInfoModel<UserInf
     }
 
     @Override
-    public void getUserInfo(String userId, IBaseRequestCallBack<UserInfoRet> iBaseRequestCallBack) {
+    public void getUserInfo(String userId, String toUserId, IBaseRequestCallBack<UserInfoRet> iBaseRequestCallBack) {
         JSONObject params = new JSONObject();
         try {
             params.put("user_id", userId);
+            params.put("to_user_id", toUserId);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -84,11 +86,11 @@ public class UserInfoModelImp extends BaseModel implements UserInfoModel<UserInf
         JSONObject params = new JSONObject();
         try {
             params.put("type", loginRequest.getType());
-            params.put("openid", loginRequest.getOpenid());
-            params.put("imeil", loginRequest.getImeil());
-            params.put("sex", loginRequest.getSex());
-            params.put("nickname", loginRequest.getNickname());
-            params.put("userimg", loginRequest.getUserimg());
+            params.put("openid", StringUtils.isEmpty(loginRequest.getOpenid()) ? "" : loginRequest.getOpenid());
+            params.put("imeil", StringUtils.isEmpty(loginRequest.getImeil()) ? "" : loginRequest.getImeil());
+            params.put("sex", StringUtils.isEmpty(loginRequest.getSex()) ? "" : loginRequest.getSex());
+            params.put("nickname", StringUtils.isEmpty(loginRequest.getNickname()) ? "" : loginRequest.getNickname());
+            params.put("userimg", StringUtils.isEmpty(loginRequest.getUserimg()) ? "" : loginRequest.getUserimg());
         } catch (JSONException e) {
             e.printStackTrace();
         }

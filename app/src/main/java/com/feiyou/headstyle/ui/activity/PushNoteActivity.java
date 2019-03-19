@@ -255,7 +255,7 @@ public class PushNoteActivity extends BaseFragmentActivity implements IBaseView 
                     ids.append(key).append(",");
 
                     //实际传递到后台的内容值
-                    sendContent = sendContent.replace(val.toString(), "<span style='color:#4383ff;'>" + val + "</span>");
+                    sendContent = sendContent.replace(val.toString(), "<span style='color:#4b79ad;'>" + val + "</span>");
                 }
             }
             tempStr = ids.substring(0, ids.length() - 1);

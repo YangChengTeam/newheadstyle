@@ -89,8 +89,13 @@
         <activity android:name=".ui.activity.Test1Activity" />
         <activity android:name=".ui.activity.MoreTestActivity" />
         <activity android:name=".ui.activity.ReportInfoActivity" />
+        <activity android:name=".ui.activity.MyCollectionActivity" />
         <activity
             android:name=".ui.activity.CommunityTypeActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ui.activity.CommunityType1Activity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:screenOrientation="portrait" />
         <activity

@@ -112,7 +112,7 @@ public class MsgEditText extends AppCompatEditText {
         int start = unSpanText.start;
         int end = unSpanText.end;
         //sps.setSpan(what, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        ForegroundColorSpan foregroundColorSpan=new ForegroundColorSpan(Color.parseColor("#4383ff"));
+        ForegroundColorSpan foregroundColorSpan=new ForegroundColorSpan(Color.parseColor("#4b79ad"));
         sps.setSpan(foregroundColorSpan,start,end,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
     }
 

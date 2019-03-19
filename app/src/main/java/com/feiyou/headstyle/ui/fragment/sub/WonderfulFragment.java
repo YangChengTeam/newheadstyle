@@ -115,6 +115,8 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
 
     LinearLayout mReplyNoDataLayout;
 
+    TextView mReplyTitleTv;
+
     ImageView topUserHeadImageView;
 
     TextView nickNameTv;
@@ -220,6 +222,7 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
         LinearLayout zanLayout = replyView.findViewById(R.id.layout_comment_zan);
 
         //顶部个人的回复信息
+        mReplyTitleTv = replyView.findViewById(R.id.tv_reply_title);
         topUserHeadImageView = replyView.findViewById(R.id.iv_user_head);
         nickNameTv = replyView.findViewById(R.id.tv_user_nick_name);
         addDateTv = replyView.findViewById(R.id.tv_add_date);
@@ -350,6 +353,7 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
                     options.error(R.mipmap.head_def);
                     options.placeholder(R.mipmap.head_def);
 
+                    mReplyTitleTv.setText(noteItem.getCommentNum() > 0 ? noteItem.getCommentNum() + "条回复" : "暂无回复");
                     Glide.with(getActivity()).load(noteItem.getCommentUserimg()).apply(options).into(topUserHeadImageView);
                     nickNameTv.setText(noteItem.getCommentNickname());
                     addDateTv.setText(TimeUtils.millis2String(noteItem.getAddTime() != null ? noteItem.getAddTime() * 1000 : 0));
@@ -678,7 +682,7 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
                 //举报评论
                 Intent intent = new Intent(getActivity(), ReportInfoActivity.class);
                 intent.putExtra("rid", commentAdapter.getData().get(currentCommentPos).getCommentId());
-                intent.putExtra("report_type",3);
+                intent.putExtra("report_type", 3);
                 startActivity(intent);
 
                 break;

@@ -10,4 +10,6 @@ public interface HeadListDataModel<T> {
     void getDataByTagId(String uid,String tagId, int page, int pageSize, IBaseRequestCallBack<T> iBaseRequestCallBack);
 
     void getSearchList(int page, String keyword, String userId, IBaseRequestCallBack<T> iBaseRequestCallBack);
+
+    void userCollection(int page, String userId, IBaseRequestCallBack<T> iBaseRequestCallBack);
 }

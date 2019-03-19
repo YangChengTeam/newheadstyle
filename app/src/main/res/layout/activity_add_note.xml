@@ -48,19 +48,12 @@
                 android:textSize="16dp" />
         </LinearLayout>
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/add_note_image_list"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="12dp"
-            android:layout_marginRight="12dp"
-            android:minHeight="70dp"></android.support.v7.widget.RecyclerView>
-
         <LinearLayout
             android:id="@+id/layout_topic"
             android:layout_width="100dp"
             android:layout_height="30dp"
-            android:layout_margin="12dp"
+            android:layout_marginLeft="12dp"
+            android:layout_marginBottom="6dp"
             android:background="@drawable/add_topic_bg"
             android:gravity="center">
 
@@ -75,6 +68,15 @@
                 android:textColor="@color/add_topic_color"
                 android:textSize="12dp" />
         </LinearLayout>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/add_note_image_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="12dp"
+            android:layout_marginRight="12dp"
+            android:layout_marginBottom="6dp"
+            android:minHeight="70dp"></android.support.v7.widget.RecyclerView>
     </LinearLayout>
 
     <View

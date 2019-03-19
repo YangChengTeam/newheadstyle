@@ -18,4 +18,7 @@ public interface HeadListDataServiceApi {
 
     @POST("v1.images/searchResult")
     Observable<HeadInfoRet> searchList(@Body RequestBody requestBody);
+
+    @POST("v1.userinfo/userImagesCollect")
+    Observable<HeadInfoRet> userCollection(@Body RequestBody requestBody);
 }

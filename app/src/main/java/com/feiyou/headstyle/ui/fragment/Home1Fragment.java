@@ -22,6 +22,7 @@ import com.bumptech.glide.Glide;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
+import com.feiyou.headstyle.bean.AdInfo;
 import com.feiyou.headstyle.bean.BannerInfo;
 import com.feiyou.headstyle.bean.HomeDataRet;
 import com.feiyou.headstyle.bean.HomeDataWrapper;
@@ -40,6 +41,9 @@ import com.feiyou.headstyle.ui.adapter.HeadTypeAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragment;
 import com.feiyou.headstyle.view.HomeDataView;
 import com.orhanobut.logger.Logger;
+import com.tencent.mm.opensdk.modelbiz.WXLaunchMiniProgram;
+import com.tencent.mm.opensdk.openapi.IWXAPI;
+import com.tencent.mm.opensdk.openapi.WXAPIFactory;
 import com.wang.avi.AVLoadingIndicatorView;
 import com.youth.banner.Banner;
 import com.youth.banner.listener.OnBannerListener;
@@ -123,7 +127,7 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
 
     private String isChange = "";//默认是""
 
-    private int adType;
+    private AdInfo adInfo;
 
     @Override
     protected View onCreateView() {
@@ -181,7 +185,7 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
         adLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                switch (adType) {
+                switch (adInfo.getType()) {
                     case 1:
                         Intent intent = new Intent(getActivity(), AdListActivity.class);
                         startActivity(intent);
@@ -190,7 +194,14 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
                         ToastUtils.showLong("类型-软件下载");
                         break;
                     case 3:
-                        ToastUtils.showLong("类型-打开小程序");
+                        String appId = adInfo.getAppid(); // 填应用AppId
+                        IWXAPI api = WXAPIFactory.createWXAPI(getActivity(), appId);
+
+                        WXLaunchMiniProgram.Req req = new WXLaunchMiniProgram.Req();
+                        req.userName = adInfo.getOriginId(); // 填小程序原始id
+                        req.path = adInfo.getJumpPath(); //拉起小程序页面的可带参路径，不填默认拉起小程序首页
+                        req.miniprogramType = WXLaunchMiniProgram.Req.MINIPTOGRAM_TYPE_RELEASE;// 可选打开 开发版，体验版和正式版
+                        api.sendReq(req);
                         break;
                     default:
                         break;
@@ -393,7 +404,7 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
                         }
 
                         if (homeDataRet.getAdList() != null && homeDataRet.getAdList().size() > 0) {
-                            adType = homeDataRet.getAdList().get(0).getType();
+                            adInfo = homeDataRet.getAdList().get(0);
                             Glide.with(getActivity()).load(homeDataRet.getAdList().get(0).getIco()).into(mAdImageView);
                         } else {
                             mAdLayout.setVisibility(View.GONE);

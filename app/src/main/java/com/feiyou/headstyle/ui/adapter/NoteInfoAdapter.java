@@ -23,6 +23,7 @@ import com.feiyou.headstyle.bean.HeadInfo;
 import com.feiyou.headstyle.bean.NoteInfo;
 import com.feiyou.headstyle.ui.activity.ShowImageListActivity;
 import com.feiyou.headstyle.ui.custom.GlideRoundTransform;
+import com.feiyou.headstyle.ui.custom.RoundedCornersTransformation;
 import com.feiyou.headstyle.utils.MyTimeUtil;
 
 import java.util.ArrayList;
@@ -88,9 +89,9 @@ public class NoteInfoAdapter extends BaseQuickAdapter<NoteInfo, BaseViewHolder> 
         helper.addOnClickListener(R.id.layout_item_zan).addOnClickListener(R.id.iv_user_head);
 
         RequestOptions options = new RequestOptions();
-        options.override(SizeUtils.dp2px(42), SizeUtils.dp2px(42));
-        options.transform(new GlideRoundTransform(mContext, 21));
-        //options.placeholder(R.mipmap.head_def);
+        options.override(SizeUtils.dp2px(36), SizeUtils.dp2px(36));
+        options.placeholder(R.mipmap.image_def);
+        options.transform(new RoundedCornersTransformation(SizeUtils.dp2px(18), 0));
         Glide.with(mContext).load(item.getUserimg()).apply(options).into((ImageView) helper.itemView.findViewById(R.id.iv_user_head));
 
         List<HeadInfo> headInfos = new ArrayList<>();

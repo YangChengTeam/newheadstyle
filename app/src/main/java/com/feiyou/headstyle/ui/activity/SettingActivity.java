@@ -44,9 +44,6 @@ public class SettingActivity extends BaseFragmentActivity implements ConfigDialo
     @BindView(R.id.tv_user_id)
     TextView mUserIdTv;
 
-    @BindView(R.id.tv_address)
-    TextView mUserAddressTv;
-
     @BindView(R.id.tv_user_phone)
     TextView mUserPhoneTv;
 
@@ -100,7 +97,7 @@ public class SettingActivity extends BaseFragmentActivity implements ConfigDialo
         userInfo = App.getApp().getmUserInfo();
         if (userInfo != null) {
             mUserIdTv.setText(userInfo.getId() + "");
-            mUserAddressTv.setText(userInfo.getAddr());
+            //mUserAddressTv.setText(userInfo.getAddr());
             if (!StringUtils.isEmpty(userInfo.getPhone())) {
                 mUserPhoneTv.setText(userInfo.getPhone() + "");
             }
@@ -134,12 +131,6 @@ public class SettingActivity extends BaseFragmentActivity implements ConfigDialo
         if (updateDialog != null && !updateDialog.isShowing()) {
             updateDialog.show();
         }
-    }
-
-    @OnClick(R.id.layout_black)
-    void blackList() {
-        Intent intent = new Intent(this, AdListActivity.class);
-        startActivity(intent);
     }
 
     @OnClick(R.id.layout_login_out)

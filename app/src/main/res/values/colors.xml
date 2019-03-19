@@ -85,4 +85,6 @@
     <color name="sticker_item_bg_color">#f2f2f2</color>
 
     <color name="report_title_color">#fde2e5</color>
+
+    <color name="at_user_name_color">#4b79ad</color>
 </resources>

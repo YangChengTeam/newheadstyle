@@ -35,6 +35,7 @@ import com.feiyou.headstyle.bean.UserInfoRet;
 import com.feiyou.headstyle.common.Constants;
 import com.feiyou.headstyle.presenter.UserInfoPresenterImp;
 import com.feiyou.headstyle.ui.activity.MainActivity;
+import com.feiyou.headstyle.ui.activity.MyCollectionActivity;
 import com.feiyou.headstyle.ui.activity.MyFollowActivity;
 import com.feiyou.headstyle.ui.activity.MyMessageActivity;
 import com.feiyou.headstyle.ui.activity.MyNoteActivity;
@@ -145,7 +146,8 @@ public class MyFragment extends BaseFragment implements UserInfoView {
         }
 
         if (userInfo != null) {
-            RequestOptions options = new RequestOptions();
+            RequestOptions options = new RequestOptions().skipMemoryCache(true);
+            options.placeholder(R.mipmap.head_def);
             options.transform(new GlideRoundTransform(getActivity(), 30));
             Glide.with(getActivity()).load(userInfo.getUserimg()).apply(options).into(mUserHeadImageView);
             mUserNickNameTv.setText(userInfo.getNickname());
@@ -159,6 +161,10 @@ public class MyFragment extends BaseFragment implements UserInfoView {
             LoginRequest loginRequest = new LoginRequest();
             loginRequest.setOpenid(userInfo.getOpenid());//openid全部大写
             loginRequest.setType(userInfo.getLoginType());
+            loginRequest.setImeil(DeviceUtils.getAndroidID());
+            loginRequest.setUserimg(userInfo.getUserimg());
+            loginRequest.setSex(userInfo.getSex() + "");
+            loginRequest.setNickname(userInfo.getNickname());
             userInfoPresenterImp.login(loginRequest);
 
         } else {
@@ -187,7 +193,8 @@ public class MyFragment extends BaseFragment implements UserInfoView {
             }
             if (userInfo != null) {
 
-                RequestOptions options = new RequestOptions();
+                RequestOptions options = new RequestOptions().skipMemoryCache(true);
+                options.placeholder(R.mipmap.head_def);
                 options.transform(new GlideRoundTransform(getActivity(), 30));
                 Glide.with(getActivity()).load(userInfo.getUserimg()).apply(options).into(mUserHeadImageView);
                 mUserNickNameTv.setText(userInfo.getNickname());
@@ -200,6 +207,10 @@ public class MyFragment extends BaseFragment implements UserInfoView {
                 LoginRequest loginRequest = new LoginRequest();
                 loginRequest.setOpenid(userInfo.getOpenid());//openid全部大写
                 loginRequest.setType(userInfo.getLoginType());
+                loginRequest.setImeil(DeviceUtils.getAndroidID());
+                loginRequest.setUserimg(userInfo.getUserimg());
+                loginRequest.setSex(userInfo.getSex() + "");
+                loginRequest.setNickname(userInfo.getNickname());
                 userInfoPresenterImp.login(loginRequest);
             }
         }
@@ -227,6 +238,11 @@ public class MyFragment extends BaseFragment implements UserInfoView {
         startActivity(2);
     }
 
+    @OnClick(R.id.layout_collection)
+    void collection() {
+        startActivity(5);
+    }
+
     @OnClick(R.id.tv_setting)
     public void setting() {
         startActivity(3);
@@ -246,12 +262,12 @@ public class MyFragment extends BaseFragment implements UserInfoView {
                 case 1:
                     intent = new Intent(getActivity(), MyFollowActivity.class);
                     intent.putExtra("type", 0);
-                    intent.putExtra("is_my_info",true);
+                    intent.putExtra("is_my_info", true);
                     break;
                 case 2:
                     intent = new Intent(getActivity(), MyFollowActivity.class);
                     intent.putExtra("type", 1);
-                    intent.putExtra("is_my_info",true);
+                    intent.putExtra("is_my_info", true);
                     break;
                 case 3:
                     intent = new Intent(getActivity(), SettingActivity.class);
@@ -259,6 +275,9 @@ public class MyFragment extends BaseFragment implements UserInfoView {
                 case 4:
                     intent = new Intent(getActivity(), UserInfoActivity.class);
                     intent.putExtra("is_my_info", true);
+                    break;
+                case 5:
+                    intent = new Intent(getActivity(), MyCollectionActivity.class);
                     break;
             }
             startActivity(intent);
@@ -319,7 +338,7 @@ public class MyFragment extends BaseFragment implements UserInfoView {
                 mKeepCountTv.setText(userInfo.getCollectNum() + "");
             }
         } else {
-            ToastUtils.showLong(StringUtils.isEmpty(tData.getMsg()) ? "登录失败" : tData.getMsg());
+            Logger.i(StringUtils.isEmpty(tData.getMsg()) ? "登录失败" : tData.getMsg());
         }
     }
 

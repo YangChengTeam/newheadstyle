@@ -67,6 +67,10 @@ import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -325,6 +329,19 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
         }
     }
 
+    public static String getNewContent(String htmltext) {
+        try {
+            Document doc = Jsoup.parse(htmltext);
+            Elements elements = doc.getElementsByTag("img");
+            for (Element element : elements) {
+                element.attr("width", "100%").attr("height", "auto");
+            }
+            return doc.toString();
+        } catch (Exception e) {
+            return htmltext;
+        }
+    }
+
     @OnClick(R.id.iv_back)
     void back() {
         popBackStack();
@@ -377,7 +394,7 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
                 //mNoteContentTextView.setText(Html.fromHtml(currentNoteInfo.getContent()));
                 mWebView = new MyWebView(CommunityArticleActivity.this);
                 mWebView.setScrollbarFadingEnabled(true);
-                mWebView.loadData(currentNoteInfo.getContent(), "text/html; charset=UTF-8", null);
+                mWebView.loadData(getNewContent(currentNoteInfo.getContent()), "text/html; charset=UTF-8", null);
                 mWebViewLayout.addView(mWebView);
 
                 mMessageCountTextView.setText(commentNum > 0 ? commentNum + "" : "");

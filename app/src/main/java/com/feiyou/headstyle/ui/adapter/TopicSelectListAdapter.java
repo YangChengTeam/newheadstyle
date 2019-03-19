@@ -3,6 +3,7 @@ package com.feiyou.headstyle.ui.adapter;
 import android.content.Context;
 import android.widget.ImageView;
 
+import com.blankj.utilcode.util.SizeUtils;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.chad.library.adapter.base.BaseQuickAdapter;
@@ -10,6 +11,7 @@ import com.chad.library.adapter.base.BaseViewHolder;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.bean.TopicInfo;
 import com.feiyou.headstyle.ui.custom.GlideRoundTransform;
+import com.feiyou.headstyle.ui.custom.RoundedCornersTransformation;
 
 import java.util.List;
 
@@ -28,8 +30,9 @@ public class TopicSelectListAdapter extends BaseQuickAdapter<TopicInfo, BaseView
 
     @Override
     protected void convert(final BaseViewHolder helper, final TopicInfo item) {
-        RequestOptions requestOptions = new RequestOptions();
-        requestOptions.transform(new GlideRoundTransform(mContext, 5));
+        RequestOptions requestOptions = new RequestOptions().skipMemoryCache(true);
+        requestOptions.placeholder(R.mipmap.image_def);
+        requestOptions.transform(new RoundedCornersTransformation(SizeUtils.dp2px(5), 0));
 
         Glide.with(mContext).load(item.getIco()).apply(requestOptions).into((ImageView) helper.itemView.findViewById(R.id.iv_topic_img));
         helper.setText(R.id.tv_topic_name, item.getName())

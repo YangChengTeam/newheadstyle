@@ -1,7 +1,10 @@
 package com.feiyou.headstyle.ui.activity;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -34,10 +37,13 @@ import butterknife.BindView;
 /**
  * Created by myflying on 2018/11/23.
  */
-public class HeadListActivity extends BaseFragmentActivity implements HeadListDataView {
+public class HeadListActivity extends BaseFragmentActivity implements HeadListDataView, SwipeRefreshLayout.OnRefreshListener {
 
     @BindView(R.id.topbar)
     QMUITopBar mTopBar;
+
+    @BindView(R.id.swipe_refresh)
+    SwipeRefreshLayout mRefreshLayout;
 
     @BindView(R.id.avi)
     AVLoadingIndicatorView avi;
@@ -106,7 +112,19 @@ public class HeadListActivity extends BaseFragmentActivity implements HeadListDa
     }
 
     public void initData() {
+        mRefreshLayout.setOnRefreshListener(this);
+        //设置进度View样式的大小，只有两个值DEFAULT和LARGE
+        //设置进度View下拉的起始点和结束点，scale 是指设置是否需要放大或者缩小动画
+        mRefreshLayout.setProgressViewOffset(true, -0, 200);
+        //设置进度View下拉的结束点，scale 是指设置是否需要放大或者缩小动画
+        mRefreshLayout.setProgressViewEndTarget(true, 180);
+        //设置进度View的组合颜色，在手指上下滑时使用第一个颜色，在刷新中，会一个个颜色进行切换
+        mRefreshLayout.setColorSchemeColors(ContextCompat.getColor(this, R.color.colorPrimary), Color.RED, Color.YELLOW, Color.BLUE);
 
+        //设置触发刷新的距离
+        mRefreshLayout.setDistanceToTriggerSync(200);
+        //如果child是自己自定义的view，可以通过这个回调，告诉mSwipeRefreshLayoutchild是否可以滑动
+        mRefreshLayout.setOnChildScrollUpCallback(null);
 
         headListDataPresenterImp = new HeadListDataPresenterImp(this, this);
 
@@ -123,7 +141,7 @@ public class HeadListActivity extends BaseFragmentActivity implements HeadListDa
                 Logger.i("jumpPage page--->" + jumpPage + "---jumpPosition--->" + jumpPosition);
 
                 Intent intent = new Intent(HeadListActivity.this, HeadShowActivity.class);
-                intent.putExtra("from_type",1);
+                intent.putExtra("from_type", 1);
                 intent.putExtra("tag_id", tagId);
                 intent.putExtra("jump_page", jumpPage + 1);
                 intent.putExtra("jump_position", jumpPosition);
@@ -156,38 +174,55 @@ public class HeadListActivity extends BaseFragmentActivity implements HeadListDa
 
     @Override
     public void dismissProgress() {
-
+        avi.hide();
+        mRefreshLayout.setRefreshing(false);
     }
 
     @Override
     public void loadDataSuccess(ResultInfo tData) {
         avi.hide();
+        mRefreshLayout.setRefreshing(false);
         if (tData != null && tData.getCode() == Constants.SUCCESS) {
             if (tData instanceof HeadInfoRet) {
-                mNoDataLayout.setVisibility(View.GONE);
 
-                if (currentPage == 1) {
-                    headInfoAdapter.setNewData(((HeadInfoRet) tData).getData());
-                } else {
-                    headInfoAdapter.addData(((HeadInfoRet) tData).getData());
-                }
+                if (((HeadInfoRet) tData).getData() != null && ((HeadInfoRet) tData).getData().size() > 0) {
+                    mHeadInfoListView.setVisibility(View.VISIBLE);
+                    mNoDataLayout.setVisibility(View.GONE);
+                    if (currentPage == 1) {
+                        headInfoAdapter.setNewData(((HeadInfoRet) tData).getData());
+                    } else {
+                        headInfoAdapter.addData(((HeadInfoRet) tData).getData());
+                    }
 
-                if (((HeadInfoRet) tData).getData().size() == pageSize) {
-                    headInfoAdapter.loadMoreComplete();
+                    if (((HeadInfoRet) tData).getData().size() == pageSize) {
+                        headInfoAdapter.loadMoreComplete();
+                    } else {
+                        headInfoAdapter.loadMoreEnd();
+                    }
                 } else {
-                    headInfoAdapter.loadMoreEnd();
+                    mHeadInfoListView.setVisibility(View.GONE);
+                    mNoDataLayout.setVisibility(View.VISIBLE);
                 }
             }
         } else {
             mHeadInfoListView.setVisibility(View.GONE);
             mNoDataLayout.setVisibility(View.VISIBLE);
-            ToastUtils.showLong(StringUtils.isEmpty(tData.getMsg()) ? "操作失败" : tData.getMsg());
+            Logger.i(StringUtils.isEmpty(tData.getMsg()) ? "加载失败" : tData.getMsg());
         }
-
     }
 
     @Override
     public void loadDataError(Throwable throwable) {
+        avi.hide();
+        mRefreshLayout.setRefreshing(false);
+        mHeadInfoListView.setVisibility(View.GONE);
+        mNoDataLayout.setVisibility(View.VISIBLE);
+    }
 
+    @Override
+    public void onRefresh() {
+        mRefreshLayout.setRefreshing(true);
+        currentPage = 1;
+        headListDataPresenterImp.getDataByTagId(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", tagId, currentPage, pageSize);
     }
 }

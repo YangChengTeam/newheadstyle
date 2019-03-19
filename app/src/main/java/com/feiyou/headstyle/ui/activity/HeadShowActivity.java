@@ -218,9 +218,6 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
     }
 
     public void initDialog() {
-        mShareAPI = UMShareAPI.get(this);
-
-        mTencent = Tencent.createInstance("1105592461", this.getApplicationContext());
         loginType = App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getLoginType() : 1;
 
         progressDialog = new ProgressDialog(this);
@@ -272,6 +269,9 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
                             }
                         });
                     } else {
+                        if (progressDialog != null && !progressDialog.isShowing()) {
+                            progressDialog.show();
+                        }
                         mShareAPI.getPlatformInfo(HeadShowActivity.this, SHARE_MEDIA.QQ, authListener);
                     }
                 }
@@ -305,6 +305,9 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
     }
 
     public void initData() {
+        mShareAPI = UMShareAPI.get(this);
+        mTencent = Tencent.createInstance("1105592461", this.getApplicationContext());
+
         userInfo = App.getApp().getmUserInfo();
 
         showShape = SPUtils.getInstance().getInt(Constants.SHOW_SHAPE, 1);
@@ -654,7 +657,7 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
             if (tData instanceof AddCollectionRet) {
                 ToastUtils.showLong(tData.getMsg() != null ? tData.getMsg() : "操作失败");
             }
-            
+
             if (tData instanceof UpdateHeadRet) {
                 ToastUtils.showLong("设置失败");
             }
@@ -694,8 +697,11 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
         public void onComplete(SHARE_MEDIA platform, int action, Map<String, String> data) {
             Logger.i(JSONObject.toJSONString(data));
             //Toast.makeText(mContext, "授权成功了", Toast.LENGTH_LONG).show();
-            App.isLoginAuth = true;
+            if (progressDialog != null && progressDialog.isShowing()) {
+                progressDialog.dismiss();
+            }
 
+            App.isLoginAuth = true;
             Glide.with(HeadShowActivity.this).asBitmap().load(currentImageUrl).into(new SimpleTarget<Bitmap>() {
                 @Override
                 public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
@@ -726,4 +732,10 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
             Toast.makeText(HeadShowActivity.this, "授权取消了", Toast.LENGTH_LONG).show();
         }
     };
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        UMShareAPI.get(this).onActivityResult(requestCode, resultCode, data);
+    }
 }

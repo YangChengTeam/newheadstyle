@@ -45,6 +45,7 @@ import com.feiyou.headstyle.ui.activity.CommunityArticleActivity;
 import com.feiyou.headstyle.ui.activity.CommunityType1Activity;
 import com.feiyou.headstyle.ui.activity.CommunityTypeActivity;
 import com.feiyou.headstyle.ui.activity.PushNoteActivity;
+import com.feiyou.headstyle.ui.activity.Test1Activity;
 import com.feiyou.headstyle.ui.activity.UserInfoActivity;
 import com.feiyou.headstyle.ui.adapter.NoteInfoAdapter;
 import com.feiyou.headstyle.ui.adapter.TopicAdapter;
@@ -108,7 +109,7 @@ public class RecommendFragment extends BaseFragment implements NoteDataView, Swi
 
     private int currentPage = 1;
 
-    private int pageSize = 10;
+    private int pageSize = 20;
 
     private int currentClickIndex;
 
@@ -227,13 +228,11 @@ public class RecommendFragment extends BaseFragment implements NoteDataView, Swi
             }
         });
 
-        noteInfoAdapter.setOnLoadMoreListener(new BaseQuickAdapter.RequestLoadMoreListener()
-
-        {
+        noteInfoAdapter.setOnLoadMoreListener(new BaseQuickAdapter.RequestLoadMoreListener() {
             @Override
             public void onLoadMoreRequested() {
                 currentPage++;
-                noteDataPresenterImp.getNoteData(currentPage, communityType, userInfo != null ? userInfo.getId() : "");
+                noteDataPresenterImp.getNoteData(currentPage, 2, userInfo != null ? userInfo.getId() : "");
             }
         }, mRecommendListView);
 
@@ -241,8 +240,12 @@ public class RecommendFragment extends BaseFragment implements NoteDataView, Swi
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 int topRowVerticalPosition = (recyclerView == null || recyclerView.getChildCount() == 0) ? 0 : recyclerView.getChildAt(0).getTop();
+
+                Logger.i("recomment height--->" + topRowVerticalPosition);
+
                 mRefreshLayout.setEnabled(topRowVerticalPosition >= 0);
             }
+
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
@@ -254,7 +257,7 @@ public class RecommendFragment extends BaseFragment implements NoteDataView, Swi
         followInfoPresenterImp = new FollowInfoPresenterImp(this, getActivity());
         addZanPresenterImp = new AddZanPresenterImp(this, getActivity());
 
-        noteDataPresenterImp.getNoteData(currentPage, communityType, userInfo != null ? userInfo.getId() : "");
+        noteDataPresenterImp.getNoteData(currentPage, 2, userInfo != null ? userInfo.getId() : "");
     }
 
     @Override
@@ -395,6 +398,6 @@ public class RecommendFragment extends BaseFragment implements NoteDataView, Swi
     public void onRefresh() {
         mRefreshLayout.setRefreshing(true);
         currentPage = 1;
-        noteDataPresenterImp.getNoteData(currentPage, communityType, userInfo != null ? userInfo.getId() : "");
+        noteDataPresenterImp.getNoteData(currentPage, 2, userInfo != null ? userInfo.getId() : "");
     }
 }

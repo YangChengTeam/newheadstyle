@@ -168,7 +168,7 @@ public class CommentDialog extends DialogFragment implements MsgEditText.BackLis
                     ids.append(key).append(",");
 
                     //实际传递到后台的内容值
-                    sendContent = sendContent.replace(val.toString(), "<span style='color:#4383ff;'>" + val + "</span>");
+                    sendContent = sendContent.replace(val.toString(), "<span style='color:#4b79ad;'>" + val + "</span>");
                 }
             }
             tempStr = ids.substring(0, ids.length() - 1);
@@ -212,7 +212,7 @@ public class CommentDialog extends DialogFragment implements MsgEditText.BackLis
         this.friendIds = friendIds;
         for (int i = 0; i < userNameList.size(); i++) {
             friendsMap.put(friendIds.get(i), MASK_STR + userNameList.get(i));
-            mInputEditText.addAtSpan(MASK_STR, userNameList.get(i), 100000, ContextCompat.getColor(mContext, R.color.set_qq_bg_color));
+            mInputEditText.addAtSpan(MASK_STR, userNameList.get(i), 100000, ContextCompat.getColor(mContext, R.color.at_user_name_color));
         }
     }
 

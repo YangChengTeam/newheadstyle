@@ -15,7 +15,7 @@
         <LinearLayout
             android:id="@+id/layout_search"
             android:layout_width="match_parent"
-            android:layout_height="35dp"
+            android:layout_height="36dp"
             android:background="@drawable/search_bg"
             android:gravity="center"
             android:orientation="horizontal">
@@ -49,7 +49,7 @@
         android:id="@+id/head_type_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="6dp"
         android:nestedScrollingEnabled="false"></android.support.v7.widget.RecyclerView>
 
     <LinearLayout
@@ -63,6 +63,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
     </LinearLayout>
+
+    <View
+        android:id="@+id/main_line_view"
+        android:layout_width="match_parent"
+        android:layout_height="0.3dp"
+        android:layout_marginTop="6dp"
+        android:background="@color/line_color"
+        android:visibility="gone"></View>
 
     <LinearLayout
         android:id="@+id/layout_top_refresh2"
@@ -83,13 +91,13 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
                 android:layout_centerVertical="true"
-                android:padding="6dp"
                 android:layout_toRightOf="@+id/iv_new"
+                android:clickable="true"
                 android:drawableLeft="@mipmap/iv_new"
                 android:drawablePadding="6dp"
                 android:gravity="center"
+                android:padding="6dp"
                 android:text="@string/new_head_txt"
-                android:clickable="true"
                 android:textColor="@color/rec_color"
                 android:textFontWeight="800"
                 android:textSize="16dp" />
@@ -100,20 +108,14 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
-                android:padding="6dp"
                 android:layout_toLeftOf="@+id/iv_refresh"
                 android:drawableRight="@mipmap/refresh_head"
                 android:drawablePadding="6dp"
+                android:padding="6dp"
                 android:text="@string/refresh_head_txt"
                 android:textColor="@color/into_community_color"
                 android:textSize="16dp" />
         </RelativeLayout>
     </LinearLayout>
 
-    <View
-        android:id="@+id/main_line_view"
-        android:layout_width="match_parent"
-        android:layout_height="0.3dp"
-        android:layout_marginBottom="12dp"
-        android:background="@color/line_color"></View>
 </LinearLayout>

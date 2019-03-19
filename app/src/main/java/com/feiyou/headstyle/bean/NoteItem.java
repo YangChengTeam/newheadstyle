@@ -22,7 +22,7 @@ public class NoteItem {
     private String commentNickname;
 
     @SerializedName("comment_num")
-    private String commentNum;
+    private int commentNum;
 
     @SerializedName("comment_userimg")
     private String commentUserimg;
@@ -71,11 +71,11 @@ public class NoteItem {
         this.commentNickname = commentNickname;
     }
 
-    public String getCommentNum() {
+    public int getCommentNum() {
         return commentNum;
     }
 
-    public void setCommentNum(String commentNum) {
+    public void setCommentNum(int commentNum) {
         this.commentNum = commentNum;
     }
 

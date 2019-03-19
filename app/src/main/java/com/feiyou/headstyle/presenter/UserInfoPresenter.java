@@ -11,6 +11,6 @@ public interface UserInfoPresenter {
     void login(LoginRequest loginRequest);
     void getUserSig(String userName);
     void updateUserInfo(UserInfo updateInfo);
-    void getUserInfo(String userId);
+    void getUserInfo(String userId,String toUserId);
     void updateOneInfo(UserInfo updateInfo);
 }

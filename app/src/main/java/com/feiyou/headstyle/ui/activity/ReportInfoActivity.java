@@ -2,6 +2,7 @@ package com.feiyou.headstyle.ui.activity;
 
 import android.app.ProgressDialog;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -73,6 +74,8 @@ public class ReportInfoActivity extends BaseFragmentActivity implements NoteType
 
     private ProgressDialog progressDialog = null;
 
+    private Handler handler = new Handler();
+
     @Override
     protected int getContextViewId() {
         return R.layout.activity_report_info;
@@ -104,11 +107,11 @@ public class ReportInfoActivity extends BaseFragmentActivity implements NoteType
 
     public void initData() {
         Bundle bundle = getIntent().getExtras();
-        if(bundle != null && !StringUtils.isEmpty(bundle.getString("rid"))){
+        if (bundle != null && !StringUtils.isEmpty(bundle.getString("rid"))) {
             rid = bundle.getString("rid");
         }
-        if(bundle != null){
-            reportType = bundle.getInt("report_type",1);
+        if (bundle != null) {
+            reportType = bundle.getInt("report_type", 1);
         }
         userInfo = App.getApp().getmUserInfo();
 
@@ -154,7 +157,20 @@ public class ReportInfoActivity extends BaseFragmentActivity implements NoteType
             progressDialog.show();
         }
 
-        reportInfoPresenterImp.takeReport(userInfo != null ? userInfo.getId() : "", rid, reportType, reportListAdapter.getData().get(lastIndex).getReportTypeName(), mReportEditText.getText().toString());
+        if (rid.equals("-1")) {
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    if (progressDialog != null && progressDialog.isShowing()) {
+                        progressDialog.dismiss();
+                    }
+                    ToastUtils.showLong("举报成功");
+                    finish();
+                }
+            }, 1500);
+        } else {
+            reportInfoPresenterImp.takeReport(userInfo != null ? userInfo.getId() : "", rid, reportType, reportListAdapter.getData().get(lastIndex).getReportTypeName(), mReportEditText.getText().toString());
+        }
     }
 
     @Override

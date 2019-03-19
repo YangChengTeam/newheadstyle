@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -32,6 +33,7 @@ import com.feiyou.headstyle.view.FriendsDataView;
 import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 import com.qmuiteam.qmui.widget.QMUITopBar;
+import com.wang.avi.AVLoadingIndicatorView;
 import com.yanzhenjie.recyclerview.swipe.SwipeItemClickListener;
 import com.yanzhenjie.recyclerview.swipe.SwipeMenuRecyclerView;
 
@@ -52,6 +54,12 @@ public class FriendListActivity extends BaseFragmentActivity implements FriendsD
 
     @BindView(R.id.friends_list)
     SwipeMenuRecyclerView mFriendsListView;
+
+    @BindView(R.id.avi)
+    AVLoadingIndicatorView avi;
+
+    @BindView(R.id.layout_no_data)
+    LinearLayout mNoDataLayout;
 
     ImageView mBackImageView;
 
@@ -165,25 +173,39 @@ public class FriendListActivity extends BaseFragmentActivity implements FriendsD
 
     @Override
     public void dismissProgress() {
+        avi.hide();
 
     }
 
     @Override
     public void loadDataSuccess(FriendsGroupRet tData) {
         Logger.i(JSONObject.toJSONString(tData));
+        avi.hide();
         if (tData != null && tData.getCode() == Constants.SUCCESS) {
             friendsGroups = tData.getData();
-            gAdapter = new GroupAdapter();
-            mFriendsListView.setAdapter(gAdapter);
-            gAdapter.setListItems(friendsGroups);
+            if (friendsGroups != null && friendsGroups.size() > 0) {
+                mFriendsListView.setVisibility(View.VISIBLE);
+                mNoDataLayout.setVisibility(View.GONE);
+                gAdapter = new GroupAdapter();
+                mFriendsListView.setAdapter(gAdapter);
+                gAdapter.setListItems(friendsGroups);
+            } else {
+                mNoDataLayout.setVisibility(View.VISIBLE);
+                mFriendsListView.setVisibility(View.GONE);
+            }
         } else {
+            avi.hide();
+            mNoDataLayout.setVisibility(View.VISIBLE);
+            mFriendsListView.setVisibility(View.GONE);
             ToastUtils.showLong(StringUtils.isEmpty(tData.getMsg()) ? "操作错误" : tData.getMsg());
         }
     }
 
     @Override
     public void loadDataError(Throwable throwable) {
-
+        avi.hide();
+        mNoDataLayout.setVisibility(View.VISIBLE);
+        mFriendsListView.setVisibility(View.GONE);
     }
 
     private class GroupAdapter extends RecyclerView.Adapter<GroupViewHolder> {

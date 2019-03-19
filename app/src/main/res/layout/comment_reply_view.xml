@@ -20,11 +20,11 @@
             android:src="@mipmap/close_share" />
 
         <TextView
-            android:id="@+id/tv_reply_count"
+            android:id="@+id/tv_reply_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:text="回复详情"
+            android:text="暂无回复"
             android:textColor="@color/black1"
             android:textSize="18dp" />
     </RelativeLayout>
@@ -107,7 +107,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="12dp"
-            android:layout_marginTop="6dp"
             android:layout_marginRight="12dp"
             android:layout_marginBottom="6dp"
             android:gravity="left">
@@ -116,15 +115,17 @@
                 android:id="@+id/tv_content"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:lineSpacingMultiplier="1.3"
-                android:text="你这是一个傻子啊你这是一个傻子啊你这是一个傻子啊你这是一个傻子啊你这是一个傻子啊"
+                android:lineSpacingMultiplier="1.2"
+                android:paddingLeft="2dp"
+                android:paddingRight="2dp"
+                android:text="数据加载失败~"
                 android:textColor="@color/black"
-                android:textSize="16dp" />
+                android:textSize="15dp" />
         </LinearLayout>
 
         <View
             android:layout_width="match_parent"
-            android:layout_height="4dp"
+            android:layout_height="6dp"
             android:background="@color/line1_color"></View>
 
         <FrameLayout

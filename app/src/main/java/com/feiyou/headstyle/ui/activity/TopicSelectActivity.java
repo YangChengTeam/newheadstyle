@@ -130,7 +130,8 @@ public class TopicSelectActivity extends BaseFragmentActivity {
                     topicSelectListAdapter.getData().get(lastPosition).setSelected(false);
                 }
                 topicSelectListAdapter.getData().get(position).setSelected(true);
-                topicSelectListAdapter.notifyDataSetChanged();
+                topicSelectListAdapter.notifyItemChanged(position);
+                topicSelectListAdapter.notifyItemChanged(lastPosition);
                 lastPosition = position;
             }
         });

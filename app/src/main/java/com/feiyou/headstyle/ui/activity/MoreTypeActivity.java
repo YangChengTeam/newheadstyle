@@ -2,6 +2,7 @@ package com.feiyou.headstyle.ui.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -13,6 +14,7 @@ import android.widget.TextView;
 import com.blankj.utilcode.util.SizeUtils;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.feiyou.headstyle.R;
+import com.feiyou.headstyle.bean.MoreTypeInfo;
 import com.feiyou.headstyle.bean.MoreTypeInfoRet;
 import com.feiyou.headstyle.common.Constants;
 import com.feiyou.headstyle.presenter.HeadListDataPresenterImp;
@@ -20,11 +22,15 @@ import com.feiyou.headstyle.presenter.MoreTypeDataPresenterImp;
 import com.feiyou.headstyle.ui.adapter.HeadInfoAdapter;
 import com.feiyou.headstyle.ui.adapter.MoreTypeAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragmentActivity;
+import com.feiyou.headstyle.ui.custom.NormalDecoration;
 import com.feiyou.headstyle.utils.StatusBarUtil;
 import com.feiyou.headstyle.view.HeadListDataView;
 import com.feiyou.headstyle.view.MoreTypeDataView;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 import com.qmuiteam.qmui.widget.QMUITopBar;
+import com.tencent.mm.opensdk.modelbiz.WXLaunchMiniProgram;
+import com.tencent.mm.opensdk.openapi.IWXAPI;
+import com.tencent.mm.opensdk.openapi.WXAPIFactory;
 import com.wang.avi.AVLoadingIndicatorView;
 
 import butterknife.BindView;
@@ -91,16 +97,29 @@ public class MoreTypeActivity extends BaseFragmentActivity implements MoreTypeDa
         moreTypeDataPresenterImp = new MoreTypeDataPresenterImp(this, this);
         moreTypeAdapter = new MoreTypeAdapter(this, null);
         mTypeListView.setLayoutManager(new LinearLayoutManager(this));
+        mTypeListView.addItemDecoration(new NormalDecoration(ContextCompat.getColor(this, R.color.line_color), 1));
         mTypeListView.setAdapter(moreTypeAdapter);
         avi.show();
         moreTypeDataPresenterImp.getMoreTypeList();
         moreTypeAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
-                Intent intent = new Intent(MoreTypeActivity.this, HeadListActivity.class);
-                intent.putExtra("tag_name", moreTypeAdapter.getData().get(position).getTagsname());
-                intent.putExtra("tag_id", moreTypeAdapter.getData().get(position).getId());
-                startActivity(intent);
+                MoreTypeInfo moreTypeInfo = moreTypeAdapter.getData().get(position);
+                if (moreTypeInfo.getType() == 4) {
+                    String appId = "wxba728ee907865b91"; // 填应用AppId
+                    IWXAPI api = WXAPIFactory.createWXAPI(MoreTypeActivity.this, appId);
+
+                    WXLaunchMiniProgram.Req req = new WXLaunchMiniProgram.Req();
+                    req.userName = "gh_c7bbf594c99b"; // 填小程序原始id
+                    //req.path = moreTypeInfo.getJumpPath(); //拉起小程序页面的可带参路径，不填默认拉起小程序首页
+                    //req.miniprogramType = WXLaunchMiniProgram.Req.MINIPTOGRAM_TYPE_RELEASE;// 可选打开 开发版，体验版和正式版
+                    api.sendReq(req);
+                } else {
+                    Intent intent = new Intent(MoreTypeActivity.this, HeadListActivity.class);
+                    intent.putExtra("tag_name", moreTypeAdapter.getData().get(position).getTagsname());
+                    intent.putExtra("tag_id", moreTypeAdapter.getData().get(position).getId());
+                    startActivity(intent);
+                }
             }
         });
     }

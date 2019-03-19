@@ -137,7 +137,8 @@ public class LoginDialog extends Dialog implements View.OnClickListener, UserInf
                 EventBus.getDefault().post(new MessageEvent("login_success"));
             }
         } else {
-            ToastUtils.showLong(StringUtils.isEmpty(tData.getMsg()) ? "登录失败" : tData.getMsg());
+            //ToastUtils.showLong(StringUtils.isEmpty(tData.getMsg()) ? "登录失败" : tData.getMsg());
+            Logger.i(StringUtils.isEmpty(tData.getMsg()) ? "登录失败" : tData.getMsg());
         }
     }
 

@@ -21,7 +21,7 @@ public class MoreTypeInfo {
 
     private String tagsname;
 
-    private String type;
+    private int type;//（1：一级分类，2：二级分类，3：三级分类 4：小程序）
 
     private String desc;
 
@@ -73,11 +73,11 @@ public class MoreTypeInfo {
         this.tagsname = tagsname;
     }
 
-    public String getType() {
+    public int getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(int type) {
         this.type = type;
     }
 

@@ -16,6 +16,7 @@ import com.chad.library.adapter.base.BaseViewHolder;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.bean.NoteItem;
 import com.feiyou.headstyle.ui.custom.GlideRoundTransform;
+import com.feiyou.headstyle.ui.custom.RoundedCornersTransformation;
 import com.orhanobut.logger.Logger;
 
 import java.util.List;
@@ -48,7 +49,7 @@ public class CommentAdapter extends BaseQuickAdapter<NoteItem, BaseViewHolder> {
             RequestOptions options = new RequestOptions();
             options.error(R.mipmap.head_def);
             options.placeholder(R.mipmap.empty_icon);
-            options.transform(new GlideRoundTransform(mContext, 21));
+            options.transform(new RoundedCornersTransformation(SizeUtils.dp2px(18), 0));
             Glide.with(mContext).load(item.getCommentUserimg()).apply(options).into((ImageView) helper.itemView.findViewById(R.id.iv_user_head));
 
             helper.setText(R.id.tv_nick_name, item.getCommentNickname())
@@ -68,7 +69,7 @@ public class CommentAdapter extends BaseQuickAdapter<NoteItem, BaseViewHolder> {
 
             isZanTv.setCompoundDrawablePadding(SizeUtils.dp2px(4));
 
-            helper.setText(R.id.btn_reply_count, item.getListNum() > 0 ? item.getListNum() + "条回复>" : "回复>");
+            helper.setText(R.id.btn_reply_count, item.getListNum() > 0 ? item.getListNum() + "条回复>" : "回复");
             helper.addOnClickListener(R.id.btn_reply_count);
         }
     }

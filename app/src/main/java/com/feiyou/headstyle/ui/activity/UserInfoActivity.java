@@ -50,6 +50,7 @@ import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 import com.qmuiteam.qmui.widget.QMUICollapsingTopBarLayout;
 import com.qmuiteam.qmui.widget.QMUITopBar;
+import com.wang.avi.AVLoadingIndicatorView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -85,6 +86,9 @@ public class UserInfoActivity extends BaseFragmentActivity implements UserInfoVi
 
     @BindView(R.id.tv_send_note)
     TextView mSendNoteTv;
+
+    @BindView(R.id.avi)
+    AVLoadingIndicatorView avi;
 
     @BindView(R.id.photo_list)
     RecyclerView mPhotoListView;
@@ -285,7 +289,7 @@ public class UserInfoActivity extends BaseFragmentActivity implements UserInfoVi
             @Override
             public void onLoadMoreRequested() {
                 currentPage++;
-                userInfoPresenterImp.getUserInfo(userId);
+                userInfoPresenterImp.getUserInfo(App.getApp().getmUserInfo().getId(),userId);
             }
         }, mNoteListView);
 
@@ -299,7 +303,7 @@ public class UserInfoActivity extends BaseFragmentActivity implements UserInfoVi
                 }
             }
         });
-        userInfoPresenterImp.getUserInfo(userId);
+        userInfoPresenterImp.getUserInfo(App.getApp().getmUserInfo().getId(),userId);
     }
 
     @OnClick(R.id.tv_follow_count)
@@ -327,13 +331,13 @@ public class UserInfoActivity extends BaseFragmentActivity implements UserInfoVi
 
     @Override
     public void dismissProgress() {
-
+        avi.hide();
     }
 
     @Override
     public void loadDataSuccess(ResultInfo tData) {
         Logger.i("other user info--->" + JSON.toJSONString(tData));
-
+        avi.hide();
         if (tData != null && tData.getCode() == Constants.SUCCESS) {
             if (tData instanceof UserInfoRet) {
                 userInfo = ((UserInfoRet) tData).getData();
@@ -391,7 +395,7 @@ public class UserInfoActivity extends BaseFragmentActivity implements UserInfoVi
 
     @Override
     public void loadDataError(Throwable throwable) {
-
+        avi.hide();
     }
 
     @Override
