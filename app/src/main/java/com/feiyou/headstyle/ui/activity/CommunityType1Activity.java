@@ -17,6 +17,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.blankj.utilcode.util.StringUtils;
 import com.blankj.utilcode.util.ToastUtils;
@@ -42,6 +43,12 @@ import com.feiyou.headstyle.ui.fragment.sub.NewFragment;
 import com.feiyou.headstyle.view.NoteTypeView;
 import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
+import com.umeng.socialize.ShareAction;
+import com.umeng.socialize.UMShareAPI;
+import com.umeng.socialize.UMShareListener;
+import com.umeng.socialize.bean.SHARE_MEDIA;
+import com.umeng.socialize.media.UMImage;
+import com.umeng.socialize.media.UMWeb;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -126,13 +133,13 @@ public class CommunityType1Activity extends BaseFragmentActivity implements Note
 
     LinearLayout mQQzoneLayout;
 
-    LinearLayout mCopyLinkLayout;
-
     LinearLayout mReportLayout;
 
     LinearLayout mBackHomeLayout;
 
     ImageView mCloseIv;
+
+    private ShareAction shareAction;
 
     @Override
     protected int getContextViewId() {
@@ -154,7 +161,6 @@ public class CommunityType1Activity extends BaseFragmentActivity implements Note
         mCircleLayout = mCommonShareView.findViewById(R.id.layout_circle);
         mQQLayout = mCommonShareView.findViewById(R.id.layout_qq);
         mQQzoneLayout = mCommonShareView.findViewById(R.id.layout_qzone);
-        mCopyLinkLayout = mCommonShareView.findViewById(R.id.layout_copy);
         mReportLayout = mCommonShareView.findViewById(R.id.layout_report);
         mBackHomeLayout = mCommonShareView.findViewById(R.id.layout_to_home);
 
@@ -163,7 +169,6 @@ public class CommunityType1Activity extends BaseFragmentActivity implements Note
         mCircleLayout.setOnClickListener(this);
         mQQLayout.setOnClickListener(this);
         mQQzoneLayout.setOnClickListener(this);
-        mCopyLinkLayout.setOnClickListener(this);
         mReportLayout.setOnClickListener(this);
         mBackHomeLayout.setOnClickListener(this);
         commonShareDialog = new BottomSheetDialog(this);
@@ -178,7 +183,10 @@ public class CommunityType1Activity extends BaseFragmentActivity implements Note
         }
 
         loginDialog = new LoginDialog(this, R.style.login_dialog);
-
+        if (shareAction == null) {
+            shareAction = new ShareAction(this);
+            shareAction.setCallback(shareListener);//回调监听器
+        }
         followInfoPresenterImp = new FollowInfoPresenterImp(this, this);
         noteTypePresenterImp = new NoteTypePresenterImp(this, this);
         addZanPresenterImp = new AddZanPresenterImp(this, this);
@@ -379,23 +387,79 @@ public class CommunityType1Activity extends BaseFragmentActivity implements Note
 
     }
 
+    private UMShareListener shareListener = new UMShareListener() {
+        /**
+         * @descrption 分享开始的回调
+         * @param platform 平台类型
+         */
+        @Override
+        public void onStart(SHARE_MEDIA platform) {
+
+        }
+
+        /**
+         * @descrption 分享成功的回调
+         * @param platform 平台类型
+         */
+        @Override
+        public void onResult(SHARE_MEDIA platform) {
+            dismissShareView();
+            Toast.makeText(CommunityType1Activity.this, "分享成功", Toast.LENGTH_LONG).show();
+        }
+
+        /**
+         * @descrption 分享失败的回调
+         * @param platform 平台类型
+         * @param t 错误原因
+         */
+        @Override
+        public void onError(SHARE_MEDIA platform, Throwable t) {
+            dismissShareView();
+            Toast.makeText(CommunityType1Activity.this, "分享失败", Toast.LENGTH_LONG).show();
+        }
+
+        /**
+         * @descrption 分享取消的回调
+         * @param platform 平台类型
+         */
+        @Override
+        public void onCancel(SHARE_MEDIA platform) {
+            dismissShareView();
+            Toast.makeText(CommunityType1Activity.this, "取消分享", Toast.LENGTH_LONG).show();
+        }
+    };
+
     @Override
     public void onClick(View view) {
+        String shareTitle = "一位神秘人士对你发出邀请";
+        String shareContent = "这里的老哥老姐个个都是人才，说话又好听，我超喜欢这里...";
+        UMWeb web = new UMWeb("http://gx.qqtn.com");
+        if (shareAction != null) {
+            UMImage image = new UMImage(CommunityType1Activity.this, R.drawable.app_share);
+            image.compressStyle = UMImage.CompressStyle.QUALITY;
+            web.setThumb(image);  //缩略图
+            web.setDescription(shareContent);//描述
+        }
+
         switch (view.getId()) {
             case R.id.iv_close_share:
-                if (commonShareDialog != null && commonShareDialog.isShowing()) {
-                    commonShareDialog.dismiss();
-                }
+                dismissShareView();
                 break;
             case R.id.layout_weixin:
+                web.setTitle(shareTitle);//标题
+                shareAction.withMedia(web).setPlatform(SHARE_MEDIA.WEIXIN).share();
                 break;
             case R.id.layout_circle:
+                web.setTitle("@你加入我们，这里的老哥老姐个个都是人才，说话超好听");//标题
+                shareAction.withMedia(web).setPlatform(SHARE_MEDIA.WEIXIN_CIRCLE).share();
                 break;
             case R.id.layout_qq:
+                web.setTitle(shareTitle);//标题
+                shareAction.withMedia(web).setPlatform(SHARE_MEDIA.QQ).share();
                 break;
             case R.id.layout_qzone:
-                break;
-            case R.id.layout_copy:
+                web.setTitle(shareTitle);//标题
+                shareAction.withMedia(web).setPlatform(SHARE_MEDIA.QZONE).share();
                 break;
             case R.id.layout_report:
                 if (commonShareDialog != null && commonShareDialog.isShowing()) {
@@ -410,6 +474,21 @@ public class CommunityType1Activity extends BaseFragmentActivity implements Note
                 break;
             default:
                 break;
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        UMShareAPI.get(this).onActivityResult(requestCode, resultCode, data);
+    }
+
+    /**
+     * 关闭分享窗口
+     */
+    public void dismissShareView() {
+        if (commonShareDialog != null && commonShareDialog.isShowing()) {
+            commonShareDialog.dismiss();
         }
     }
 

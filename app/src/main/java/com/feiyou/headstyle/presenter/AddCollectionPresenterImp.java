@@ -33,4 +33,9 @@ public class AddCollectionPresenterImp extends BasePresenterImp<IBaseView, AddCo
     public void addCollection(String uid, String imgId) {
         addCollectionModelImp.addCollection(uid, imgId, this);
     }
+
+    @Override
+    public void addVideoCollection(String uid, String vid) {
+        addCollectionModelImp.addVideoCollection(uid, vid, this);
+    }
 }

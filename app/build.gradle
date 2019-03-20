@@ -110,5 +110,5 @@ dependencies {
     implementation 'lib.kingja.switchbutton:switchbutton:1.1.8'
     implementation 'com.just.agentweb:agentweb:4.0.2'
     implementation 'org.jsoup:jsoup:1.10.2'
-    implementation 'com.tencent.mm.opensdk:wechat-sdk-android-with-mta:+'
+    implementation 'com.tencent.mm.opensdk:wechat-sdk-android-without-mta:5.3.1'
 }

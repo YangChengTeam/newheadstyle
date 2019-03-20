@@ -61,7 +61,7 @@ public class TestActivity extends BaseFragmentActivity {
     }
 
     public void initData() {
-        currentBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.app_logo);
+        currentBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.app_share);
         mGPUImageView.setImage(currentBitmap);
     }
 

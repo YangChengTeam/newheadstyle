@@ -13,6 +13,7 @@ public class TestDetailInfoWrapper {
 
     private String desc;
 
+    @SerializedName("ico")
     private String image;
 
     @SerializedName("share_title")

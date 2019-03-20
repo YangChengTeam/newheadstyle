@@ -10,4 +10,6 @@ import java.util.List;
 
 public interface AddCollectionModel<T> {
     void addCollection(String uid, String imgId,IBaseRequestCallBack<T> iBaseRequestCallBack);
+
+    void addVideoCollection(String uid, String vid,IBaseRequestCallBack<T> iBaseRequestCallBack);
 }

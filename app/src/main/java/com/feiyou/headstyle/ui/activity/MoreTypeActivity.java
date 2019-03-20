@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -12,6 +13,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.blankj.utilcode.util.SizeUtils;
+import com.blankj.utilcode.util.ToastUtils;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.bean.MoreTypeInfo;
@@ -23,9 +25,11 @@ import com.feiyou.headstyle.ui.adapter.HeadInfoAdapter;
 import com.feiyou.headstyle.ui.adapter.MoreTypeAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragmentActivity;
 import com.feiyou.headstyle.ui.custom.NormalDecoration;
+import com.feiyou.headstyle.ui.custom.OpenDialog;
 import com.feiyou.headstyle.utils.StatusBarUtil;
 import com.feiyou.headstyle.view.HeadListDataView;
 import com.feiyou.headstyle.view.MoreTypeDataView;
+import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 import com.qmuiteam.qmui.widget.QMUITopBar;
 import com.tencent.mm.opensdk.modelbiz.WXLaunchMiniProgram;
@@ -38,7 +42,7 @@ import butterknife.BindView;
 /**
  * Created by myflying on 2019/1/11.
  */
-public class MoreTypeActivity extends BaseFragmentActivity implements MoreTypeDataView {
+public class MoreTypeActivity extends BaseFragmentActivity implements MoreTypeDataView, OpenDialog.ConfigListener {
 
     @BindView(R.id.topbar)
     QMUITopBar mTopBar;
@@ -61,6 +65,10 @@ public class MoreTypeActivity extends BaseFragmentActivity implements MoreTypeDa
     private MoreTypeDataPresenterImp moreTypeDataPresenterImp;
 
     private MoreTypeAdapter moreTypeAdapter;
+
+    OpenDialog openDialog;
+
+    MoreTypeInfo moreTypeInfo;
 
     @Override
     protected int getContextViewId() {
@@ -104,16 +112,14 @@ public class MoreTypeActivity extends BaseFragmentActivity implements MoreTypeDa
         moreTypeAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
-                MoreTypeInfo moreTypeInfo = moreTypeAdapter.getData().get(position);
-                if (moreTypeInfo.getType() == 4) {
-                    String appId = "wxba728ee907865b91"; // 填应用AppId
-                    IWXAPI api = WXAPIFactory.createWXAPI(MoreTypeActivity.this, appId);
+                moreTypeInfo = moreTypeAdapter.getData().get(position);
 
-                    WXLaunchMiniProgram.Req req = new WXLaunchMiniProgram.Req();
-                    req.userName = "gh_c7bbf594c99b"; // 填小程序原始id
-                    //req.path = moreTypeInfo.getJumpPath(); //拉起小程序页面的可带参路径，不填默认拉起小程序首页
-                    //req.miniprogramType = WXLaunchMiniProgram.Req.MINIPTOGRAM_TYPE_RELEASE;// 可选打开 开发版，体验版和正式版
-                    api.sendReq(req);
+                if (moreTypeInfo.getType() == 4) {
+                    if (openDialog != null && !openDialog.isShowing()) {
+                        openDialog.setTitle("打开提示");
+                        openDialog.setContent("即将打开\"" + moreTypeInfo.getTagsname() + "\"小程序");
+                        openDialog.show();
+                    }
                 } else {
                     Intent intent = new Intent(MoreTypeActivity.this, HeadListActivity.class);
                     intent.putExtra("tag_name", moreTypeAdapter.getData().get(position).getTagsname());
@@ -122,6 +128,10 @@ public class MoreTypeActivity extends BaseFragmentActivity implements MoreTypeDa
                 }
             }
         });
+
+        openDialog = new OpenDialog(this, R.style.login_dialog);
+        openDialog.setConfigListener(this);
+
     }
 
     @Override
@@ -149,6 +159,23 @@ public class MoreTypeActivity extends BaseFragmentActivity implements MoreTypeDa
 
     @Override
     public void loadDataError(Throwable throwable) {
+
+    }
+
+    @Override
+    public void config() {
+        String appId = "wxd1112ca9a216aeda"; // 填应用AppId
+        IWXAPI api = WXAPIFactory.createWXAPI(this, appId);
+
+        WXLaunchMiniProgram.Req req = new WXLaunchMiniProgram.Req();
+        req.userName = moreTypeInfo.getOriginId(); // 填小程序原始id
+        req.path = moreTypeInfo.getJumpPath(); //拉起小程序页面的可带参路径，不填默认拉起小程序首页
+        req.miniprogramType = WXLaunchMiniProgram.Req.MINIPTOGRAM_TYPE_RELEASE;// 可选打开 开发版，体验版和正式版
+        api.sendReq(req);
+    }
+
+    @Override
+    public void cancel() {
 
     }
 

@@ -237,10 +237,14 @@ public class TestDetailActivity extends BaseFragmentActivity implements TestDeta
 
     @Override
     public void loadDataSuccess(ResultInfo tData) {
+        Logger.i("detail--->" + JSONObject.toJSONString(tData));
         if (tData != null && tData.getCode() == Constants.SUCCESS) {
-            //Logger.i("detail--->" + JSONObject.toJSONString(tData));
             if (tData instanceof TestDetailInfoRet) {
+
                 if (((TestDetailInfoRet) tData).getData() != null) {
+                    //设置全局的测试信息
+                    App.getApp().setTestInfo(((TestDetailInfoRet) tData).getData());
+
                     TestMsgInfo guideInfo = new TestMsgInfo(((TestDetailInfoRet) tData).getData().getImage(), ((TestDetailInfoRet) tData).getData().getDesc(), TestMsgInfo.TYPE_RECEIVED);
                     chatListAdapter.addData(guideInfo);
                     chatListAdapter.notifyDataSetChanged();

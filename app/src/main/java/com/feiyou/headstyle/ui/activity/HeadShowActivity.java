@@ -68,9 +68,13 @@ import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 import com.qmuiteam.qmui.widget.QMUITopBar;
 import com.tencent.connect.avatar.QQAvatar;
 import com.tencent.tauth.Tencent;
+import com.umeng.socialize.ShareAction;
 import com.umeng.socialize.UMAuthListener;
 import com.umeng.socialize.UMShareAPI;
+import com.umeng.socialize.UMShareListener;
 import com.umeng.socialize.bean.SHARE_MEDIA;
+import com.umeng.socialize.media.UMImage;
+import com.umeng.socialize.media.UMWeb;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -89,7 +93,7 @@ import lib.kingja.switchbutton.SwitchMultiButton;
  * Created by myflying on 2018/11/23.
  */
 public class HeadShowActivity extends BaseFragmentActivity implements SwipeFlingAdapterView.onFlingListener,
-        SwipeFlingAdapterView.OnItemClickListener, HeadListDataView {
+        SwipeFlingAdapterView.OnItemClickListener, HeadListDataView, View.OnClickListener {
 
     @BindView(R.id.topbar)
     QMUITopBar mTopBar;
@@ -174,6 +178,10 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
     private ProgressDialog progressDialog = null;
 
     private UMShareAPI mShareAPI = null;
+
+    BottomSheetDialog shareDialog;
+
+    private ShareAction shareAction;
 
     @Override
     protected int getContextViewId() {
@@ -302,6 +310,21 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
 
             }
         });
+
+        //初始化分享弹窗
+        shareDialog = new BottomSheetDialog(this);
+        View shareView = LayoutInflater.from(this).inflate(R.layout.share_dialog_view, null);
+        mCloseImageView = shareView.findViewById(R.id.iv_close_share);
+        LinearLayout weixinLayout = shareView.findViewById(R.id.layout_weixin);
+        LinearLayout circleLayout = shareView.findViewById(R.id.layout_circle);
+        LinearLayout qqLayout = shareView.findViewById(R.id.layout_qq_friends);
+        LinearLayout qzoneLayout = shareView.findViewById(R.id.layout_qzone);
+        weixinLayout.setOnClickListener(this);
+        circleLayout.setOnClickListener(this);
+        qqLayout.setOnClickListener(this);
+        qzoneLayout.setOnClickListener(this);
+        mCloseImageView.setOnClickListener(this);
+        shareDialog.setContentView(shareView);
     }
 
     public void initData() {
@@ -339,6 +362,11 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
 
         isCollection = ContextCompat.getDrawable(this, R.mipmap.is_keep);
         notCollection = ContextCompat.getDrawable(this, R.mipmap.add_keep);
+
+        if (shareAction == null) {
+            shareAction = new ShareAction(this);
+            shareAction.setCallback(shareListener);//回调监听器
+        }
 
         loginDialog = new LoginDialog(this, R.style.login_dialog);
 
@@ -396,6 +424,13 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
             adapter.setShowShape(showShape);
         }
         adapter.notifyDataSetChanged();
+    }
+
+    @OnClick(R.id.layout_share)
+    public void share() {
+        if (shareDialog != null && !shareDialog.isShowing()) {
+            shareDialog.show();
+        }
     }
 
     @OnClick(R.id.layout_edit)
@@ -524,6 +559,11 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
                 adapter.remove(0);
 
                 currentImageUrl = adapter.getHeads().get(0).getImgurl();
+
+                if (shareAction != null) {
+                    UMImage image = new UMImage(HeadShowActivity.this, StringUtils.isEmpty(currentImageUrl) ? "http://gx.qqtn.com/images/gext_pc_body_mx.png" : currentImageUrl);
+                    shareAction.withMedia(image);
+                }
             }
 
             if (adapter.getHeads().size() > 0) {
@@ -541,6 +581,11 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
                 adapter.remove(0);
 
                 currentImageUrl = adapter.getHeads().get(0).getImgurl();
+
+                if (shareAction != null) {
+                    UMImage image = new UMImage(HeadShowActivity.this, StringUtils.isEmpty(currentImageUrl) ? "http://gx.qqtn.com/images/gext_pc_body_mx.png" : currentImageUrl);
+                    shareAction.withMedia(image);
+                }
             }
         }
     }
@@ -600,6 +645,12 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
                             mKeepTextView.setCompoundDrawablesWithIntrinsicBounds(null, isCollection, null, null);
                         }
                         currentImageUrl = adapter.getHeads().get(0).getImgurl();
+
+                        if (shareAction != null) {
+                            UMImage image = new UMImage(HeadShowActivity.this, StringUtils.isEmpty(currentImageUrl) ? "http://gx.qqtn.com/images/gext_pc_body_mx.png" : currentImageUrl);
+                            image.setThumb(image);
+                            shareAction.withMedia(image);
+                        }
                     }
 
                 } else {
@@ -733,9 +784,80 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
         }
     };
 
+    private UMShareListener shareListener = new UMShareListener() {
+        /**
+         * @descrption 分享开始的回调
+         * @param platform 平台类型
+         */
+        @Override
+        public void onStart(SHARE_MEDIA platform) {
+
+        }
+
+        /**
+         * @descrption 分享成功的回调
+         * @param platform 平台类型
+         */
+        @Override
+        public void onResult(SHARE_MEDIA platform) {
+            dismissShareView();
+            Toast.makeText(HeadShowActivity.this, "分享成功", Toast.LENGTH_LONG).show();
+        }
+
+        /**
+         * @descrption 分享失败的回调
+         * @param platform 平台类型
+         * @param t 错误原因
+         */
+        @Override
+        public void onError(SHARE_MEDIA platform, Throwable t) {
+            dismissShareView();
+            Toast.makeText(HeadShowActivity.this, "分享失败", Toast.LENGTH_LONG).show();
+        }
+
+        /**
+         * @descrption 分享取消的回调
+         * @param platform 平台类型
+         */
+        @Override
+        public void onCancel(SHARE_MEDIA platform) {
+            dismissShareView();
+            Toast.makeText(HeadShowActivity.this, "取消分享", Toast.LENGTH_LONG).show();
+        }
+    };
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         UMShareAPI.get(this).onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.layout_weixin:
+                shareAction.setPlatform(SHARE_MEDIA.WEIXIN).share();
+                break;
+            case R.id.layout_circle:
+                shareAction.setPlatform(SHARE_MEDIA.WEIXIN_CIRCLE).share();
+                break;
+            case R.id.layout_qq_friends:
+                shareAction.setPlatform(SHARE_MEDIA.QQ).share();
+                break;
+            case R.id.layout_qzone:
+                shareAction.setPlatform(SHARE_MEDIA.QZONE).share();
+                break;
+            case R.id.iv_close_share:
+                dismissShareView();
+                break;
+            default:
+                break;
+        }
+    }
+
+    public void dismissShareView(){
+        if (shareDialog != null && shareDialog.isShowing()) {
+            shareDialog.dismiss();
+        }
     }
 }

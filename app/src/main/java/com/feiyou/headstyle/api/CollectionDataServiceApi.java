@@ -16,4 +16,7 @@ public interface CollectionDataServiceApi {
 
     @POST("v1.images/userImageCollect")
     Observable<AddCollectionRet> addCollection(@Body RequestBody requestBody);
+
+    @POST("v1.vedio/userVedioCollect")
+    Observable<AddCollectionRet> addVideoCollection(@Body RequestBody requestBody);
 }

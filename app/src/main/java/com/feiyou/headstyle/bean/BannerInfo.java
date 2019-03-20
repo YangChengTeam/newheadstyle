@@ -13,7 +13,7 @@ public class BannerInfo {
 
     @SerializedName("jump_path")
     private String jumpPath;
-    private String type;
+    private int type;
 
     @SerializedName("origin_id")
     private String originId;
@@ -44,11 +44,11 @@ public class BannerInfo {
         this.jumpPath = jumpPath;
     }
 
-    public String getType() {
+    public int getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(int type) {
         this.type = type;
     }
 

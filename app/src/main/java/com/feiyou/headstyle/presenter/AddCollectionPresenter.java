@@ -8,4 +8,5 @@ import java.util.List;
 
 public interface AddCollectionPresenter {
     void addCollection(String uid, String imgId);
+    void addVideoCollection(String uid, String vid);
 }

@@ -9,12 +9,16 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
+import android.support.design.widget.BottomSheetDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.alibaba.fastjson.JSONObject;
 import com.blankj.utilcode.util.ImageUtils;
@@ -40,6 +44,11 @@ import com.feiyou.headstyle.ui.base.BaseFragmentActivity;
 import com.feiyou.headstyle.utils.StatusBarUtil;
 import com.feiyou.headstyle.view.ForecastView;
 import com.orhanobut.logger.Logger;
+import com.umeng.socialize.ShareAction;
+import com.umeng.socialize.UMShareAPI;
+import com.umeng.socialize.UMShareListener;
+import com.umeng.socialize.bean.SHARE_MEDIA;
+import com.umeng.socialize.media.UMImage;
 import com.willy.ratingbar.ScaleRatingBar;
 
 import java.io.File;
@@ -51,7 +60,7 @@ import butterknife.OnClick;
 /**
  * Created by myflying on 2018/11/23.
  */
-public class StarDetailActivity extends BaseFragmentActivity implements ForecastView {
+public class StarDetailActivity extends BaseFragmentActivity implements ForecastView, View.OnClickListener {
 
     @BindView(R.id.iv_back)
     ImageView mBackImageView;
@@ -114,6 +123,12 @@ public class StarDetailActivity extends BaseFragmentActivity implements Forecast
 
     private String filePath;
 
+    BottomSheetDialog shareDialog;
+
+    private ShareAction shareAction;
+
+    private boolean isShare;
+
     @Override
     protected int getContextViewId() {
         return R.layout.activity_star_detail;
@@ -141,7 +156,6 @@ public class StarDetailActivity extends BaseFragmentActivity implements Forecast
 
     public void initData() {
 
-
         Bundle bundle = getIntent().getExtras();
         if (bundle != null && bundle.getInt("star_index") > -1) {
             starIndex = bundle.getInt("star_index");
@@ -149,6 +163,26 @@ public class StarDetailActivity extends BaseFragmentActivity implements Forecast
 
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("正在保存");
+
+        if (shareAction == null) {
+            shareAction = new ShareAction(this);
+            shareAction.setCallback(shareListener);//回调监听器
+        }
+
+        //初始化分享弹窗
+        shareDialog = new BottomSheetDialog(this);
+        View shareView = LayoutInflater.from(this).inflate(R.layout.share_dialog_view, null);
+        ImageView closeDialog = shareView.findViewById(R.id.iv_close_share);
+        LinearLayout weixinLayout = shareView.findViewById(R.id.layout_weixin);
+        LinearLayout circleLayout = shareView.findViewById(R.id.layout_circle);
+        LinearLayout qqLayout = shareView.findViewById(R.id.layout_qq_friends);
+        LinearLayout qzoneLayout = shareView.findViewById(R.id.layout_qzone);
+        weixinLayout.setOnClickListener(this);
+        circleLayout.setOnClickListener(this);
+        qqLayout.setOnClickListener(this);
+        qzoneLayout.setOnClickListener(this);
+        closeDialog.setOnClickListener(this);
+        shareDialog.setContentView(shareView);
 
         userInfo = App.getApp().getmUserInfo();
 
@@ -164,6 +198,16 @@ public class StarDetailActivity extends BaseFragmentActivity implements Forecast
         mForeCastListView.setNestedScrollingEnabled(false);//禁止滑动
 
         forecastPresenterImp.getForecastData(starName[starIndex], "today");
+    }
+
+    @OnClick(R.id.layout_share)
+    void share() {
+        isShare = true;
+        if (progressDialog != null && !progressDialog.isShowing()) {
+            progressDialog.setMessage("正在分享");
+            progressDialog.show();
+        }
+        starPosterPresenterImp.createPoster(userInfo.getNickname(), userInfo.getUserimg(), uniqid);
     }
 
     @OnClick(R.id.layout_save_poster)
@@ -226,7 +270,20 @@ public class StarDetailActivity extends BaseFragmentActivity implements Forecast
                 }
             }
             if (tData instanceof StarPosterRet) {
-                downImage(((StarPosterRet) tData).getData().getImage());
+                if (isShare) {
+                    if (shareDialog != null && !shareDialog.isShowing()) {
+                        shareDialog.show();
+                    }
+                    if (shareAction != null) {
+                        UMImage timage = new UMImage(StarDetailActivity.this, ((StarPosterRet) tData).getData().getImage());
+                        timage.compressStyle = UMImage.CompressStyle.QUALITY;
+                        UMImage image = new UMImage(StarDetailActivity.this, ((StarPosterRet) tData).getData().getImage());
+                        image.setThumb(timage);
+                        shareAction.withMedia(image);
+                    }
+                } else {
+                    downImage(((StarPosterRet) tData).getData().getImage());
+                }
             }
         } else {
             if (tData instanceof StarPosterRet) {
@@ -235,11 +292,8 @@ public class StarDetailActivity extends BaseFragmentActivity implements Forecast
         }
     }
 
-    void downImage(String imgUrl) {
-//        if (StringUtils.isEmpty(imgUrl)) {
-//            ToastUtils.showLong("下载失败，请稍后重试");
-//            return;
-//        }
+    public void downImage(String imgUrl) {
+
         Glide.with(this).asBitmap().load(imgUrl).into(new SimpleTarget<Bitmap>() {
             @Override
             public void onResourceReady(Bitmap resource, Transition<? super Bitmap> transition) {
@@ -259,7 +313,6 @@ public class StarDetailActivity extends BaseFragmentActivity implements Forecast
             }
 
         });
-
     }
 
     // 其次把文件插入到系统图库
@@ -300,6 +353,83 @@ public class StarDetailActivity extends BaseFragmentActivity implements Forecast
     public void loadDataError(Throwable throwable) {
         if (progressDialog != null && progressDialog.isShowing()) {
             progressDialog.dismiss();
+        }
+    }
+
+    private UMShareListener shareListener = new UMShareListener() {
+        /**
+         * @descrption 分享开始的回调
+         * @param platform 平台类型
+         */
+        @Override
+        public void onStart(SHARE_MEDIA platform) {
+
+        }
+
+        /**
+         * @descrption 分享成功的回调
+         * @param platform 平台类型
+         */
+        @Override
+        public void onResult(SHARE_MEDIA platform) {
+            dismissShareView();
+            Toast.makeText(StarDetailActivity.this, "分享成功", Toast.LENGTH_LONG).show();
+        }
+
+        /**
+         * @descrption 分享失败的回调
+         * @param platform 平台类型
+         * @param t 错误原因
+         */
+        @Override
+        public void onError(SHARE_MEDIA platform, Throwable t) {
+            dismissShareView();
+            Toast.makeText(StarDetailActivity.this, "分享失败", Toast.LENGTH_LONG).show();
+        }
+
+        /**
+         * @descrption 分享取消的回调
+         * @param platform 平台类型
+         */
+        @Override
+        public void onCancel(SHARE_MEDIA platform) {
+            dismissShareView();
+            Toast.makeText(StarDetailActivity.this, "取消分享", Toast.LENGTH_LONG).show();
+        }
+    };
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        UMShareAPI.get(this).onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.layout_weixin:
+                shareAction.setPlatform(SHARE_MEDIA.WEIXIN).share();
+                break;
+            case R.id.layout_circle:
+                shareAction.setPlatform(SHARE_MEDIA.WEIXIN_CIRCLE).share();
+                break;
+            case R.id.layout_qq_friends:
+                shareAction.setPlatform(SHARE_MEDIA.QQ).share();
+                break;
+            case R.id.layout_qzone:
+                shareAction.setPlatform(SHARE_MEDIA.QZONE).share();
+                break;
+            case R.id.iv_close_share:
+                dismissShareView();
+                break;
+            default:
+                break;
+        }
+    }
+
+    public void dismissShareView() {
+        if (shareDialog != null && shareDialog.isShowing()) {
+            shareDialog.dismiss();
         }
     }
 }

@@ -113,24 +113,6 @@
         android:orientation="horizontal">
 
         <LinearLayout
-            android:id="@+id/layout_copy"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:drawableTop="@mipmap/copy_link_icon"
-                android:drawablePadding="4dp"
-                android:gravity="center"
-                android:text="复制链接"
-                android:textColor="@color/black3"
-                android:textSize="14dp" />
-        </LinearLayout>
-
-        <LinearLayout
             android:id="@+id/layout_report"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -162,6 +144,21 @@
                 android:drawablePadding="4dp"
                 android:gravity="center"
                 android:text="返回首页"
+                android:textColor="@color/black3"
+                android:textSize="14dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layout_copy"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
                 android:textColor="@color/black3"
                 android:textSize="14dp" />
         </LinearLayout>

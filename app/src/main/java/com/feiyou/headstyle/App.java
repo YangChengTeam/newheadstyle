@@ -5,6 +5,7 @@ import android.content.Context;
 
 import com.blankj.utilcode.util.Utils;
 import com.bumptech.glide.Glide;
+import com.feiyou.headstyle.bean.TestDetailInfoWrapper;
 import com.feiyou.headstyle.bean.TestInfo;
 import com.feiyou.headstyle.bean.TopicInfo;
 import com.feiyou.headstyle.bean.UserInfo;
@@ -38,6 +39,8 @@ public class App extends Application {
     public boolean isLogin;
 
     public static boolean isLoginAuth = false;
+
+    public TestDetailInfoWrapper testInfo;
 
     public App() {
         mInstance = this;
@@ -82,5 +85,13 @@ public class App extends Application {
 
     public void setLogin(boolean login) {
         isLogin = login;
+    }
+
+    public TestDetailInfoWrapper getTestInfo() {
+        return testInfo;
+    }
+
+    public void setTestInfo(TestDetailInfoWrapper testInfo) {
+        this.testInfo = testInfo;
     }
 }

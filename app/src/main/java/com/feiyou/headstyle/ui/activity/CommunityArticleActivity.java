@@ -25,6 +25,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
@@ -63,6 +64,12 @@ import com.feiyou.headstyle.view.CommentDialog;
 import com.feiyou.headstyle.view.NoteInfoDetailDataView;
 import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
+import com.umeng.socialize.ShareAction;
+import com.umeng.socialize.UMShareAPI;
+import com.umeng.socialize.UMShareListener;
+import com.umeng.socialize.bean.SHARE_MEDIA;
+import com.umeng.socialize.media.UMImage;
+import com.umeng.socialize.media.UMWeb;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -179,13 +186,13 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
 
     LinearLayout mQQzoneLayout;
 
-    LinearLayout mCopyLinkLayout;
-
     LinearLayout mReportLayout;
 
     LinearLayout mBackHomeLayout;
 
     ImageView mCloseIv;
+
+    private ShareAction shareAction;
 
     @Override
     protected int getContextViewId() {
@@ -208,7 +215,7 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
         mCircleLayout = mCommonShareView.findViewById(R.id.layout_circle);
         mQQLayout = mCommonShareView.findViewById(R.id.layout_qq);
         mQQzoneLayout = mCommonShareView.findViewById(R.id.layout_qzone);
-        mCopyLinkLayout = mCommonShareView.findViewById(R.id.layout_copy);
+
         mReportLayout = mCommonShareView.findViewById(R.id.layout_report);
         mBackHomeLayout = mCommonShareView.findViewById(R.id.layout_to_home);
 
@@ -217,7 +224,6 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
         mCircleLayout.setOnClickListener(this);
         mQQLayout.setOnClickListener(this);
         mQQzoneLayout.setOnClickListener(this);
-        mCopyLinkLayout.setOnClickListener(this);
         mReportLayout.setOnClickListener(this);
         mBackHomeLayout.setOnClickListener(this);
         commonShareDialog = new BottomSheetDialog(this);
@@ -266,6 +272,11 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
         progressDialog.setMessage("回复中");
 
         loginDialog = new LoginDialog(this, R.style.login_dialog);
+
+        if (shareAction == null) {
+            shareAction = new ShareAction(this);
+            shareAction.setCallback(shareListener);//回调监听器
+        }
     }
 
     public void showDialog() {
@@ -509,6 +520,48 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
         }
     }
 
+    private UMShareListener shareListener = new UMShareListener() {
+        /**
+         * @descrption 分享开始的回调
+         * @param platform 平台类型
+         */
+        @Override
+        public void onStart(SHARE_MEDIA platform) {
+
+        }
+
+        /**
+         * @descrption 分享成功的回调
+         * @param platform 平台类型
+         */
+        @Override
+        public void onResult(SHARE_MEDIA platform) {
+            dismissShareView();
+            Toast.makeText(CommunityArticleActivity.this, "分享成功", Toast.LENGTH_LONG).show();
+        }
+
+        /**
+         * @descrption 分享失败的回调
+         * @param platform 平台类型
+         * @param t 错误原因
+         */
+        @Override
+        public void onError(SHARE_MEDIA platform, Throwable t) {
+            dismissShareView();
+            Toast.makeText(CommunityArticleActivity.this, "分享失败", Toast.LENGTH_LONG).show();
+        }
+
+        /**
+         * @descrption 分享取消的回调
+         * @param platform 平台类型
+         */
+        @Override
+        public void onCancel(SHARE_MEDIA platform) {
+            dismissShareView();
+            Toast.makeText(CommunityArticleActivity.this, "取消分享", Toast.LENGTH_LONG).show();
+        }
+    };
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -517,26 +570,38 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
 
     @Override
     public void onClick(View view) {
+        String shareContent = StringUtils.isEmpty(currentNoteInfo.getContent()) ? "快来试试炫酷的头像吧" : currentNoteInfo.getContent();
+        UMWeb web = new UMWeb("http://gx.qqtn.com");
+        if (shareAction != null) {
+            UMImage image = new UMImage(CommunityArticleActivity.this, R.drawable.app_share);
+            if (imageUrls != null && imageUrls.size() > 0) {
+                image = new UMImage(CommunityArticleActivity.this, imageUrls.get(0));
+                image.compressStyle = UMImage.CompressStyle.QUALITY;
+            }
+            web.setTitle(shareContent);//标题
+            web.setThumb(image);  //缩略图
+            web.setDescription(shareContent);//描述
+        }
+
         switch (view.getId()) {
             case R.id.iv_close_share:
-                if (commonShareDialog != null && commonShareDialog.isShowing()) {
-                    commonShareDialog.dismiss();
-                }
+                dismissShareView();
                 break;
             case R.id.layout_weixin:
+                shareAction.withMedia(web).setPlatform(SHARE_MEDIA.WEIXIN).share();
                 break;
             case R.id.layout_circle:
+                shareAction.withMedia(web).setPlatform(SHARE_MEDIA.WEIXIN_CIRCLE).share();
                 break;
             case R.id.layout_qq:
+                shareAction.withMedia(web).setPlatform(SHARE_MEDIA.QQ).share();
                 break;
             case R.id.layout_qzone:
-                break;
-            case R.id.layout_copy:
+                shareAction.withMedia(web).setPlatform(SHARE_MEDIA.QZONE).share();
                 break;
             case R.id.layout_report:
-                if (commonShareDialog != null && commonShareDialog.isShowing()) {
-                    commonShareDialog.dismiss();
-                }
+                dismissShareView();
+
                 Intent intent = new Intent(this, ReportInfoActivity.class);
                 intent.putExtra("rid", currentNoteInfo != null ? currentNoteInfo.getId() : "");
                 intent.putExtra("report_type", 2);
@@ -546,6 +611,21 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
                 break;
             default:
                 break;
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        UMShareAPI.get(this).onActivityResult(requestCode, resultCode, data);
+    }
+
+    /**
+     * 关闭分享窗口
+     */
+    public void dismissShareView() {
+        if (commonShareDialog != null && commonShareDialog.isShowing()) {
+            commonShareDialog.dismiss();
         }
     }
 }

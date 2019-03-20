@@ -27,6 +27,7 @@ import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.VideoView;
 
 import com.alibaba.fastjson.JSON;
@@ -45,6 +46,7 @@ import com.dingmouren.layoutmanagergroup.viewpager.OnViewPagerListener;
 import com.dingmouren.layoutmanagergroup.viewpager.ViewPagerLayoutManager;
 import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
+import com.feiyou.headstyle.bean.AddCollectionRet;
 import com.feiyou.headstyle.bean.FollowInfoRet;
 import com.feiyou.headstyle.bean.MessageEvent;
 import com.feiyou.headstyle.bean.NoteItem;
@@ -58,6 +60,7 @@ import com.feiyou.headstyle.bean.VideoCommentRet;
 import com.feiyou.headstyle.bean.VideoInfoRet;
 import com.feiyou.headstyle.bean.ZanResultRet;
 import com.feiyou.headstyle.common.Constants;
+import com.feiyou.headstyle.presenter.AddCollectionPresenterImp;
 import com.feiyou.headstyle.presenter.AddZanPresenterImp;
 import com.feiyou.headstyle.presenter.FollowInfoPresenterImp;
 import com.feiyou.headstyle.presenter.NoteSubCommentDataPresenterImp;
@@ -73,6 +76,11 @@ import com.feiyou.headstyle.ui.custom.LoginDialog;
 import com.feiyou.headstyle.view.CommentDialog;
 import com.feiyou.headstyle.view.VideoInfoView;
 import com.orhanobut.logger.Logger;
+import com.umeng.socialize.ShareAction;
+import com.umeng.socialize.UMShareListener;
+import com.umeng.socialize.bean.SHARE_MEDIA;
+import com.umeng.socialize.media.UMImage;
+import com.umeng.socialize.media.UMWeb;
 import com.wang.avi.AVLoadingIndicatorView;
 
 import org.greenrobot.eventbus.EventBus;
@@ -87,7 +95,7 @@ import butterknife.OnClick;
 /**
  * Created by myflying on 2018/11/23.
  */
-public class VideoShowActivity extends BaseFragmentActivity implements VideoInfoView, CommentDialog.SendBackListener {
+public class VideoShowActivity extends BaseFragmentActivity implements VideoInfoView, CommentDialog.SendBackListener, View.OnClickListener {
 
     private static final String TAG = "VideoShowActivity";
 
@@ -173,6 +181,8 @@ public class VideoShowActivity extends BaseFragmentActivity implements VideoInfo
 
     private FollowInfoPresenterImp followInfoPresenterImp;
 
+    private AddCollectionPresenterImp addCollectionPresenterImp;
+
     LoginDialog loginDialog;
 
     private int videoPage = 1;
@@ -192,6 +202,12 @@ public class VideoShowActivity extends BaseFragmentActivity implements VideoInfo
     TextView mReplyFollowTv;
 
     LinearLayout replyZanLayout;
+
+    TextView mVideoZanCount;
+
+    BottomSheetDialog shareDialog;
+
+    private ShareAction shareAction;
 
     @Override
     protected int getContextViewId() {
@@ -223,6 +239,25 @@ public class VideoShowActivity extends BaseFragmentActivity implements VideoInfo
 
         loginDialog = new LoginDialog(this, R.style.login_dialog);
 
+        if (shareAction == null) {
+            shareAction = new ShareAction(this);
+            shareAction.setCallback(shareListener);//回调监听器
+        }
+        //初始化分享弹窗
+        shareDialog = new BottomSheetDialog(this);
+        View shareView = LayoutInflater.from(this).inflate(R.layout.share_dialog_view, null);
+        ImageView closeDialog = shareView.findViewById(R.id.iv_close_share);
+        LinearLayout weixinLayout = shareView.findViewById(R.id.layout_weixin);
+        LinearLayout circleLayout = shareView.findViewById(R.id.layout_circle);
+        LinearLayout qqLayout = shareView.findViewById(R.id.layout_qq_friends);
+        LinearLayout qzoneLayout = shareView.findViewById(R.id.layout_qzone);
+        weixinLayout.setOnClickListener(this);
+        circleLayout.setOnClickListener(this);
+        qqLayout.setOnClickListener(this);
+        qzoneLayout.setOnClickListener(this);
+        closeDialog.setOnClickListener(this);
+        shareDialog.setContentView(shareView);
+
         isZan = ContextCompat.getDrawable(this, R.mipmap.is_zan);
         notZan = ContextCompat.getDrawable(this, R.mipmap.note_zan);
 
@@ -231,6 +266,7 @@ public class VideoShowActivity extends BaseFragmentActivity implements VideoInfo
         mVideoListView.setLayoutManager(mLayoutManager);
         mVideoListView.setAdapter(mVideoAdapter);
 
+        addCollectionPresenterImp = new AddCollectionPresenterImp(this, this);
         videoInfoPresenterImp = new VideoInfoPresenterImp(this, this);
         videoCommentPresenterImp = new VideoCommentPresenterImp(this, this);
         replyCommentPresenterImp = new ReplyCommentPresenterImp(this, this);
@@ -265,11 +301,35 @@ public class VideoShowActivity extends BaseFragmentActivity implements VideoInfo
                         avi.show();
                         // 设置popupWindow的显示位置，此处是在手机屏幕底部且水平居中的位置
                         popupWindow.showAtLocation(mVideoShowLayout, Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL, 0, 0);
+
+                        int tempNum = mVideoAdapter.getData().get(selectVideoIndex).getZanNum();
+
+                        //TODO, 此处缺少字段，用户是否对视频点赞 getIsCollect 暂时代替
+                        if (mVideoAdapter.getData().get(selectVideoIndex).getIsCollect() == 0) {
+                            mVideoZanCount.setCompoundDrawablesWithIntrinsicBounds(notZan, null, null, null);
+                            mVideoZanCount.setCompoundDrawablePadding(SizeUtils.dp2px(4));
+                        } else {
+                            mVideoZanCount.setCompoundDrawablesWithIntrinsicBounds(isZan, null, null, null);
+                            mVideoZanCount.setCompoundDrawablePadding(SizeUtils.dp2px(4));
+                        }
+                        mVideoZanCount.setText((tempNum < 0 ? 0 : tempNum) + "");
+
                     }
                 }
 
                 if (view.getId() == R.id.btn_is_follow) {
                     followInfoPresenterImp.addFollow(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", mVideoAdapter.getData().get(position).getUserId());
+                }
+
+                //收藏
+                if (view.getId() == R.id.tv_collect_num) {
+                    addCollectionPresenterImp.addCollection(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", mVideoAdapter.getData().get(position).getId());
+                }
+
+                if (view.getId() == R.id.layout_share) {
+                    if (shareDialog != null && !shareDialog.isShowing()) {
+                        shareDialog.show();
+                    }
                 }
             }
         });
@@ -282,6 +342,7 @@ public class VideoShowActivity extends BaseFragmentActivity implements VideoInfo
         mNoDataLayout = commentView.findViewById(R.id.layout_no_data);
         mCloseComment = commentView.findViewById(R.id.iv_close);
         commentListView = commentView.findViewById(R.id.video_comment_list);
+
         commentAdapter = new CommentAdapter(this, null);
         commentListView.setLayoutManager(new LinearLayoutManager(this));
         commentListView.setAdapter(commentAdapter);
@@ -296,12 +357,23 @@ public class VideoShowActivity extends BaseFragmentActivity implements VideoInfo
         });
 
         LinearLayout addMessageLayout = commentView.findViewById(R.id.layout_add_message);
-
+        mVideoZanCount = commentView.findViewById(R.id.tv_video_zan_count);
         addMessageLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 switchType = 1;
                 showInputDialog();
+            }
+        });
+
+        LinearLayout videoZanLayout = commentView.findViewById(R.id.layout_video_zan);
+        videoZanLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                switchType = 1;
+                String vid = mVideoAdapter.getData().get(selectVideoIndex).getId();
+                String zanUserId = mVideoAdapter.getData().get(selectVideoIndex).getUserId();
+                addZanPresenterImp.addZan(1, App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", zanUserId, vid, "", "", 2);
             }
         });
 
@@ -632,23 +704,16 @@ public class VideoShowActivity extends BaseFragmentActivity implements VideoInfo
             if (tData instanceof ZanResultRet) {
 
                 if (switchType == 1) {
-                    int tempNum = commentAdapter.getData().get(currentCommentPos).getZanNum();
+                    int tempNum = ((ZanResultRet) tData).getData().getZanNum();
 
                     if (((ZanResultRet) tData).getData().getIsZan() == 0) {
-                        tempNum = tempNum - 1;
-                        zanCountTv.setCompoundDrawablesWithIntrinsicBounds(notZan, null, null, null);
-                        zanCountTv.setCompoundDrawablePadding(SizeUtils.dp2px(4));
+                        mVideoZanCount.setCompoundDrawablesWithIntrinsicBounds(notZan, null, null, null);
+                        mVideoZanCount.setCompoundDrawablePadding(SizeUtils.dp2px(4));
                     } else {
-                        tempNum = tempNum + 1;
-                        zanCountTv.setCompoundDrawablesWithIntrinsicBounds(isZan, null, null, null);
-                        zanCountTv.setCompoundDrawablePadding(SizeUtils.dp2px(4));
+                        mVideoZanCount.setCompoundDrawablesWithIntrinsicBounds(isZan, null, null, null);
+                        mVideoZanCount.setCompoundDrawablePadding(SizeUtils.dp2px(4));
                     }
-
-                    commentAdapter.getData().get(currentCommentPos).setZanNum(tempNum);
-                    commentAdapter.getData().get(currentCommentPos).setIsZan(((ZanResultRet) tData).getData().getIsZan());
-                    commentAdapter.notifyDataSetChanged();
-
-                    zanCountTv.setText(tempNum + "");
+                    mVideoZanCount.setText((tempNum < 0 ? 0 : tempNum) + "");
                 }
 
                 if (switchType == 2) {
@@ -690,6 +755,29 @@ public class VideoShowActivity extends BaseFragmentActivity implements VideoInfo
                     }
                 } else {
                     ToastUtils.showLong(StringUtils.isEmpty(tData.getMsg()) ? "回复失败" : tData.getMsg());
+                }
+            }
+
+            if (tData instanceof AddCollectionRet) {
+
+                int tempNum = mVideoAdapter.getData().get(selectVideoIndex).getCollectNum();
+                if (((AddCollectionRet) tData).getData().getIsCollect() == 0) {
+                    ToastUtils.showLong("已取消");
+                    tempNum = tempNum - 1;
+                } else {
+                    ToastUtils.showLong("已收藏");
+                    tempNum = tempNum + 1;
+                }
+
+                mVideoAdapter.getData().get(selectVideoIndex).setCollectNum(tempNum < 0 ? 0 : tempNum);
+                mVideoAdapter.getData().get(selectVideoIndex).setIsCollect(((AddCollectionRet) tData).getData().getIsCollect());
+                mVideoAdapter.notifyItemChanged(selectVideoIndex);
+
+                if (((AddCollectionRet) tData).getData().getIsCollect() == 0) {
+                    ToastUtils.showLong("已取消");
+
+                } else {
+                    ToastUtils.showLong("已收藏");
                 }
             }
         }
@@ -764,5 +852,100 @@ public class VideoShowActivity extends BaseFragmentActivity implements VideoInfo
     protected void onDestroy() {
         super.onDestroy();
         EventBus.getDefault().unregister(this);
+    }
+
+
+    private UMShareListener shareListener = new UMShareListener() {
+        /**
+         * @descrption 分享开始的回调
+         * @param platform 平台类型
+         */
+        @Override
+        public void onStart(SHARE_MEDIA platform) {
+
+        }
+
+        /**
+         * @descrption 分享成功的回调
+         * @param platform 平台类型
+         */
+        @Override
+        public void onResult(SHARE_MEDIA platform) {
+            dismissShareView();
+            Toast.makeText(VideoShowActivity.this, "分享成功", Toast.LENGTH_LONG).show();
+        }
+
+        /**
+         * @descrption 分享失败的回调
+         * @param platform 平台类型
+         * @param t 错误原因
+         */
+        @Override
+        public void onError(SHARE_MEDIA platform, Throwable t) {
+            dismissShareView();
+            Toast.makeText(VideoShowActivity.this, "分享失败", Toast.LENGTH_LONG).show();
+        }
+
+        /**
+         * @descrption 分享取消的回调
+         * @param platform 平台类型
+         */
+        @Override
+        public void onCancel(SHARE_MEDIA platform) {
+            dismissShareView();
+            Toast.makeText(VideoShowActivity.this, "取消分享", Toast.LENGTH_LONG).show();
+        }
+    };
+
+
+    @Override
+    public void onClick(View view) {
+        String shareTitle = "这个搞笑沙雕视频，99%的人看了都笑了";
+        String shareContent = "超级搞笑的沙雕视频集锦来了，你能忍住不笑，算你牛！";
+        String shareImageUrl = "";
+
+        if (mVideoAdapter.getData().get(selectVideoIndex) != null) {
+            shareTitle = mVideoAdapter.getData().get(selectVideoIndex).getName();
+            shareContent = mVideoAdapter.getData().get(selectVideoIndex).getName();
+            shareImageUrl = mVideoAdapter.getData().get(selectVideoIndex).getVideoCover();
+        }
+
+        UMWeb web = new UMWeb("http://gx.qqtn.com");
+        if (shareAction != null) {
+            UMImage image = new UMImage(VideoShowActivity.this, R.drawable.app_share);
+            if (!StringUtils.isEmpty(shareImageUrl)) {
+                image = new UMImage(VideoShowActivity.this, shareImageUrl);
+                image.compressStyle = UMImage.CompressStyle.QUALITY;
+            }
+            web.setTitle(shareTitle);//标题
+            web.setThumb(image);  //缩略图
+            web.setDescription(shareContent);//描述
+        }
+
+        switch (view.getId()) {
+            case R.id.layout_weixin:
+                shareAction.withMedia(web).setPlatform(SHARE_MEDIA.WEIXIN).share();
+                break;
+            case R.id.layout_circle:
+                shareAction.withMedia(web).setPlatform(SHARE_MEDIA.WEIXIN_CIRCLE).share();
+                break;
+            case R.id.layout_qq_friends:
+                shareAction.withMedia(web).setPlatform(SHARE_MEDIA.QQ).share();
+                break;
+            case R.id.layout_qzone:
+                shareAction.withMedia(web).setPlatform(SHARE_MEDIA.QZONE).share();
+                break;
+            case R.id.iv_close_share:
+                dismissShareView();
+                break;
+            default:
+                break;
+        }
+    }
+
+    public void dismissShareView() {
+        if (shareDialog != null && shareDialog.isShowing()) {
+            shareDialog.dismiss();
+        }
     }
 }

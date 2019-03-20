@@ -214,6 +214,7 @@ public class HeadSaveActivity extends BaseFragmentActivity implements HeadListDa
         bottomSheetDialog = new BottomSheetDialog(this);
         View shareView = LayoutInflater.from(this).inflate(R.layout.share_dialog_view, null);
         mCloseImageView = shareView.findViewById(R.id.iv_close_share);
+
         bottomSheetDialog.setContentView(shareView);
 
         mCloseImageView.setOnClickListener(new View.OnClickListener() {
@@ -363,4 +364,6 @@ public class HeadSaveActivity extends BaseFragmentActivity implements HeadListDa
         super.onActivityResult(requestCode, resultCode, data);
         UMShareAPI.get(this).onActivityResult(requestCode, resultCode, data);
     }
+
+
 }

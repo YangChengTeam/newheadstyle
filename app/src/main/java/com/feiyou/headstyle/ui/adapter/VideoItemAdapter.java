@@ -64,7 +64,7 @@ public class VideoItemAdapter extends BaseQuickAdapter<VideoInfo, BaseViewHolder
                 .setText(R.id.tv_comment_num, item.getCommentNum() + "")
                 .setText(R.id.tv_collect_num, item.getCollectNum() + "");
 
-        RequestOptions headOptions = new RequestOptions();
+        RequestOptions headOptions = new RequestOptions().skipMemoryCache(true);
         headOptions.transform(new GlideRoundTransform(mContext, SizeUtils.dp2px(10)));
         Glide.with(mContext).load(item.getUserHeadImg()).apply(headOptions).into((ImageView) helper.itemView.findViewById(R.id.iv_user_head));
 
@@ -84,7 +84,8 @@ public class VideoItemAdapter extends BaseQuickAdapter<VideoInfo, BaseViewHolder
         } else {
             isCollectTv.setCompoundDrawablesWithIntrinsicBounds(isCollect, null, null, null);
         }
-
+        helper.addOnClickListener(R.id.tv_collect_num);
         helper.addOnClickListener(R.id.tv_comment_num);
+        helper.addOnClickListener(R.id.layout_share);
     }
 }

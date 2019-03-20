@@ -32,6 +32,7 @@ import com.feiyou.headstyle.common.GlideImageLoader;
 import com.feiyou.headstyle.presenter.HomeDataPresenterImp;
 import com.feiyou.headstyle.ui.activity.AdListActivity;
 import com.feiyou.headstyle.ui.activity.Collection2Activity;
+import com.feiyou.headstyle.ui.activity.CommunityArticleActivity;
 import com.feiyou.headstyle.ui.activity.HeadListActivity;
 import com.feiyou.headstyle.ui.activity.HeadShowActivity;
 import com.feiyou.headstyle.ui.activity.MoreTypeActivity;
@@ -39,6 +40,8 @@ import com.feiyou.headstyle.ui.activity.SearchActivity;
 import com.feiyou.headstyle.ui.adapter.HeadInfoAdapter;
 import com.feiyou.headstyle.ui.adapter.HeadTypeAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragment;
+import com.feiyou.headstyle.ui.custom.ConfigDialog;
+import com.feiyou.headstyle.ui.custom.OpenDialog;
 import com.feiyou.headstyle.view.HomeDataView;
 import com.orhanobut.logger.Logger;
 import com.tencent.mm.opensdk.modelbiz.WXLaunchMiniProgram;
@@ -58,7 +61,7 @@ import butterknife.OnClick;
 /**
  * Created by myflying on 2019/1/3.
  */
-public class Home1Fragment extends BaseFragment implements HomeDataView, View.OnClickListener, SwipeRefreshLayout.OnRefreshListener {
+public class Home1Fragment extends BaseFragment implements HomeDataView, View.OnClickListener, SwipeRefreshLayout.OnRefreshListener, OpenDialog.ConfigListener {
 
     LinearLayout mSearchLayout;
 
@@ -129,6 +132,12 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
 
     private AdInfo adInfo;
 
+    OpenDialog openDialog;
+
+    private BannerInfo bannerInfo;
+
+    private int clickType = 1;//1：banner，2：广告
+
     @Override
     protected View onCreateView() {
         View root = LayoutInflater.from(getActivity()).inflate(R.layout.fragment1, null);
@@ -180,11 +189,16 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
         refreshParams.setMargins(0, 0, 0, 0);
         refreshLayout1.setLayoutParams(refreshParams);
 
+
+        openDialog = new OpenDialog(getActivity(), R.style.login_dialog);
+        openDialog.setConfigListener(this);
+
         //广告模块
         LinearLayout adLayout = topView.findViewById(R.id.layout_ad);
         adLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                clickType = 1;
                 switch (adInfo.getType()) {
                     case 1:
                         Intent intent = new Intent(getActivity(), AdListActivity.class);
@@ -194,14 +208,9 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
                         ToastUtils.showLong("类型-软件下载");
                         break;
                     case 3:
-                        String appId = adInfo.getAppid(); // 填应用AppId
-                        IWXAPI api = WXAPIFactory.createWXAPI(getActivity(), appId);
-
-                        WXLaunchMiniProgram.Req req = new WXLaunchMiniProgram.Req();
-                        req.userName = adInfo.getOriginId(); // 填小程序原始id
-                        req.path = adInfo.getJumpPath(); //拉起小程序页面的可带参路径，不填默认拉起小程序首页
-                        req.miniprogramType = WXLaunchMiniProgram.Req.MINIPTOGRAM_TYPE_RELEASE;// 可选打开 开发版，体验版和正式版
-                        api.sendReq(req);
+                        openDialog.setTitle("打开提示");
+                        openDialog.setContent("即将打开\"xxx\"小程序");
+                        openDialog.show();
                         break;
                     default:
                         break;
@@ -338,9 +347,23 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
         mBanner.setOnBannerListener(new OnBannerListener() {
             @Override
             public void OnBannerClick(int position) {
-                Intent intent = new Intent(getActivity(), Collection2Activity.class);
-                intent.putExtra("banner_id", bannerInfos.get(position).getId());
-                startActivity(intent);
+                clickType = 2;
+                bannerInfo = bannerInfos.get(position);
+                if (bannerInfo.getType() == 1) {
+                    Intent intent = new Intent(getActivity(), Collection2Activity.class);
+                    intent.putExtra("banner_id", bannerInfo.getId());
+                    startActivity(intent);
+                }
+                if (bannerInfo.getType() == 2) {
+                    Intent intent = new Intent(getActivity(), CommunityArticleActivity.class);
+                    intent.putExtra("msg_id", bannerInfo.getJumpPath());
+                    startActivity(intent);
+                }
+                if (bannerInfo.getType() == 3) {
+                    openDialog.setTitle("打开小程序");
+                    openDialog.setContent("是否打开小程序?");
+                    openDialog.show();
+                }
             }
         });
     }
@@ -473,5 +496,57 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
     @Override
     public void onRefresh() {
         refresh();
+    }
+
+    @Override
+    public void config() {
+        String appId = "wxd1112ca9a216aeda"; // 填应用AppId
+        IWXAPI api = WXAPIFactory.createWXAPI(getActivity(), appId);
+
+        if (clickType == 1) {
+            switch (adInfo.getType()) {
+                case 1:
+
+                    break;
+                case 2:
+                    ToastUtils.showLong("类型-软件下载");
+                    break;
+                case 3:
+
+
+                    WXLaunchMiniProgram.Req req = new WXLaunchMiniProgram.Req();
+                    req.userName = adInfo.getOriginId(); // 填小程序原始id
+                    req.path = adInfo.getJumpPath(); //拉起小程序页面的可带参路径，不填默认拉起小程序首页
+                    req.miniprogramType = WXLaunchMiniProgram.Req.MINIPTOGRAM_TYPE_RELEASE;// 可选打开 开发版，体验版和正式版
+                    api.sendReq(req);
+                    break;
+                default:
+                    break;
+            }
+        }
+        if (clickType == 2) {
+            switch (bannerInfo.getType()) {
+                case 1:
+                    //网页
+                    break;
+                case 2:
+                    //软件
+                    break;
+                case 3:
+                    WXLaunchMiniProgram.Req req = new WXLaunchMiniProgram.Req();
+                    req.userName = bannerInfo.getOriginId(); // 填小程序原始id
+                    req.path = bannerInfo.getJumpPath(); //拉起小程序页面的可带参路径，不填默认拉起小程序首页
+                    req.miniprogramType = WXLaunchMiniProgram.Req.MINIPTOGRAM_TYPE_RELEASE;// 可选打开 开发版，体验版和正式版
+                    api.sendReq(req);
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    @Override
+    public void cancel() {
+
     }
 }

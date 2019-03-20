@@ -299,6 +299,8 @@ public class TestImageDetailActivity extends BaseFragmentActivity implements Tes
 
             if (tData instanceof TestDetailInfoRet) {
                 if (((TestDetailInfoRet) tData).getData() != null) {
+                    //设置全局的测试信息
+                    App.getApp().setTestInfo(((TestDetailInfoRet) tData).getData());
                     TestMsgInfo guideInfo = new TestMsgInfo(((TestDetailInfoRet) tData).getData().getImage(), ((TestDetailInfoRet) tData).getData().getDesc(), TestMsgInfo.TYPE_RECEIVED);
                     chatListAdapter.addData(guideInfo);
                     chatListAdapter.notifyDataSetChanged();
