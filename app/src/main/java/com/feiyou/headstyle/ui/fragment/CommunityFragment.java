@@ -204,13 +204,6 @@ public class CommunityFragment extends BaseFragment implements ViewPager.OnPageC
 
     @OnClick(R.id.iv_add_friends)
     void addFriends() {
-        if (!App.getApp().isLogin) {
-            if (loginDialog != null && !loginDialog.isShowing()) {
-                loginDialog.show();
-            }
-            return;
-        }
-
         Intent intent = new Intent(getActivity(), AddFriendsActivity.class);
         startActivity(intent);
     }

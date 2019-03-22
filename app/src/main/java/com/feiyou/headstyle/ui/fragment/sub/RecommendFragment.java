@@ -3,6 +3,7 @@ package com.feiyou.headstyle.ui.fragment.sub;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.design.widget.BottomSheetDialog;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
@@ -14,8 +15,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
@@ -45,6 +48,7 @@ import com.feiyou.headstyle.ui.activity.CommunityArticleActivity;
 import com.feiyou.headstyle.ui.activity.CommunityType1Activity;
 import com.feiyou.headstyle.ui.activity.CommunityTypeActivity;
 import com.feiyou.headstyle.ui.activity.PushNoteActivity;
+import com.feiyou.headstyle.ui.activity.ReportInfoActivity;
 import com.feiyou.headstyle.ui.activity.Test1Activity;
 import com.feiyou.headstyle.ui.activity.UserInfoActivity;
 import com.feiyou.headstyle.ui.adapter.NoteInfoAdapter;
@@ -54,6 +58,12 @@ import com.feiyou.headstyle.ui.custom.GlideRoundTransform;
 import com.feiyou.headstyle.ui.custom.LoginDialog;
 import com.feiyou.headstyle.view.NoteDataView;
 import com.orhanobut.logger.Logger;
+import com.umeng.socialize.ShareAction;
+import com.umeng.socialize.UMShareAPI;
+import com.umeng.socialize.UMShareListener;
+import com.umeng.socialize.bean.SHARE_MEDIA;
+import com.umeng.socialize.media.UMImage;
+import com.umeng.socialize.media.UMWeb;
 import com.wang.avi.AVLoadingIndicatorView;
 
 import org.greenrobot.eventbus.EventBus;
@@ -70,7 +80,7 @@ import butterknife.OnClick;
 /**
  * Created by myflying on 2018/11/26.
  */
-public class RecommendFragment extends BaseFragment implements NoteDataView, SwipeRefreshLayout.OnRefreshListener {
+public class RecommendFragment extends BaseFragment implements NoteDataView, SwipeRefreshLayout.OnRefreshListener, View.OnClickListener {
 
     @BindView(R.id.swipe_refresh)
     SwipeRefreshLayout mRefreshLayout;
@@ -113,15 +123,19 @@ public class RecommendFragment extends BaseFragment implements NoteDataView, Swi
 
     private int currentClickIndex;
 
-    public static RecommendFragment getInstance() {
-        return new RecommendFragment();
-    }
-
     private UserInfo userInfo;
 
     LoginDialog loginDialog;
 
     private int communityType = 2;
+
+    private ShareAction shareAction;
+
+    BottomSheetDialog bottomSheetDialog;
+
+    public static RecommendFragment getInstance() {
+        return new RecommendFragment();
+    }
 
     public static RecommendFragment newInstance(int type) {
         RecommendFragment fragment = new RecommendFragment();
@@ -154,8 +168,26 @@ public class RecommendFragment extends BaseFragment implements NoteDataView, Swi
         //如果child是自己自定义的view，可以通过这个回调，告诉mSwipeRefreshLayoutchild是否可以滑动
         mRefreshLayout.setOnChildScrollUpCallback(null);
 
-        Bundle bundle = getArguments();
+        if (shareAction == null) {
+            shareAction = new ShareAction(getActivity());
+            shareAction.setCallback(shareListener);//回调监听器
+        }
 
+        bottomSheetDialog = new BottomSheetDialog(getActivity());
+        View shareView = LayoutInflater.from(getActivity()).inflate(R.layout.share_dialog_view, null);
+        ImageView mCloseImageView = shareView.findViewById(R.id.iv_close_share);
+        LinearLayout weixinLayout = shareView.findViewById(R.id.layout_weixin);
+        LinearLayout circleLayout = shareView.findViewById(R.id.layout_circle);
+        LinearLayout qqLayout = shareView.findViewById(R.id.layout_qq_friends);
+        LinearLayout qzoneLayout = shareView.findViewById(R.id.layout_qzone);
+        weixinLayout.setOnClickListener(this);
+        circleLayout.setOnClickListener(this);
+        qqLayout.setOnClickListener(this);
+        qzoneLayout.setOnClickListener(this);
+        mCloseImageView.setOnClickListener(this);
+        bottomSheetDialog.setContentView(shareView);
+
+        Bundle bundle = getArguments();
         if (bundle != null && bundle.getInt("community_type") > 0) {
             communityType = bundle.getInt("community_type");
         }
@@ -203,7 +235,8 @@ public class RecommendFragment extends BaseFragment implements NoteDataView, Swi
         noteInfoAdapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
             @Override
             public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
-                if (!App.getApp().isLogin) {
+
+                if (!App.getApp().isLogin && view.getId() != R.id.layout_note_share) {
                     if (loginDialog != null && !loginDialog.isShowing()) {
                         loginDialog.show();
                     }
@@ -223,6 +256,13 @@ public class RecommendFragment extends BaseFragment implements NoteDataView, Swi
                         Intent intent = new Intent(getActivity(), UserInfoActivity.class);
                         intent.putExtra("user_id", noteInfoAdapter.getData().get(position).getUserId());
                         startActivity(intent);
+                    }
+                }
+
+                //分享
+                if (view.getId() == R.id.layout_note_share) {
+                    if (bottomSheetDialog != null && !bottomSheetDialog.isShowing()) {
+                        bottomSheetDialog.show();
                     }
                 }
             }
@@ -399,5 +439,100 @@ public class RecommendFragment extends BaseFragment implements NoteDataView, Swi
         mRefreshLayout.setRefreshing(true);
         currentPage = 1;
         noteDataPresenterImp.getNoteData(currentPage, 2, userInfo != null ? userInfo.getId() : "");
+    }
+
+    private UMShareListener shareListener = new UMShareListener() {
+        /**
+         * @descrption 分享开始的回调
+         * @param platform 平台类型
+         */
+        @Override
+        public void onStart(SHARE_MEDIA platform) {
+
+        }
+
+        /**
+         * @descrption 分享成功的回调
+         * @param platform 平台类型
+         */
+        @Override
+        public void onResult(SHARE_MEDIA platform) {
+            dismissShareView();
+            Toast.makeText(getActivity(), "分享成功", Toast.LENGTH_LONG).show();
+        }
+
+        /**
+         * @descrption 分享失败的回调
+         * @param platform 平台类型
+         * @param t 错误原因
+         */
+        @Override
+        public void onError(SHARE_MEDIA platform, Throwable t) {
+            dismissShareView();
+            Toast.makeText(getActivity(), "分享失败", Toast.LENGTH_LONG).show();
+        }
+
+        /**
+         * @descrption 分享取消的回调
+         * @param platform 平台类型
+         */
+        @Override
+        public void onCancel(SHARE_MEDIA platform) {
+            dismissShareView();
+            Toast.makeText(getActivity(), "取消分享", Toast.LENGTH_LONG).show();
+        }
+    };
+
+    @Override
+    public void onClick(View view) {
+
+        NoteInfo tempNoteInfo = noteInfoAdapter.getData().get(currentClickIndex);
+        String shareContent = StringUtils.isEmpty(tempNoteInfo.getContent()) ? "快来试试炫酷的头像吧" : tempNoteInfo.getContent();
+        UMWeb web = new UMWeb("http://gx.qqtn.com");
+        if (shareAction != null) {
+            UMImage image = new UMImage(getActivity(), R.drawable.app_share);
+            if (tempNoteInfo.getImageArr() != null && tempNoteInfo.getImageArr().length > 0) {
+                image = new UMImage(getActivity(), tempNoteInfo.getImageArr()[0]);
+                image.compressStyle = UMImage.CompressStyle.QUALITY;
+            }
+            web.setTitle(shareContent);//标题
+            web.setThumb(image);  //缩略图
+            web.setDescription(shareContent);//描述
+        }
+
+        switch (view.getId()) {
+            case R.id.iv_close_share:
+                dismissShareView();
+                break;
+            case R.id.layout_weixin:
+                shareAction.withMedia(web).setPlatform(SHARE_MEDIA.WEIXIN).share();
+                break;
+            case R.id.layout_circle:
+                shareAction.withMedia(web).setPlatform(SHARE_MEDIA.WEIXIN_CIRCLE).share();
+                break;
+            case R.id.layout_qq:
+                shareAction.withMedia(web).setPlatform(SHARE_MEDIA.QQ).share();
+                break;
+            case R.id.layout_qzone:
+                shareAction.withMedia(web).setPlatform(SHARE_MEDIA.QZONE).share();
+                break;
+            default:
+                break;
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        UMShareAPI.get(getActivity()).onActivityResult(requestCode, resultCode, data);
+    }
+
+    /**
+     * 关闭分享窗口
+     */
+    public void dismissShareView() {
+        if (bottomSheetDialog != null && bottomSheetDialog.isShowing()) {
+            bottomSheetDialog.dismiss();
+        }
     }
 }

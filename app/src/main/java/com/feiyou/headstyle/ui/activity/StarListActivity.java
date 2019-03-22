@@ -97,6 +97,7 @@ public class StarListActivity extends BaseFragmentActivity {
                 Intent intent = new Intent(StarListActivity.this, StarDetailActivity.class);
                 intent.putExtra("star_index", position);
                 startActivity(intent);
+                StarListActivity.this.finish();
             }
         });
     }

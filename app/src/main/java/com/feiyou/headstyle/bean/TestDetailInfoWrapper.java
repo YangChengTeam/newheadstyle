@@ -13,7 +13,8 @@ public class TestDetailInfoWrapper {
 
     private String desc;
 
-    @SerializedName("ico")
+    private String ico;
+
     private String image;
 
     @SerializedName("share_title")
@@ -45,6 +46,14 @@ public class TestDetailInfoWrapper {
 
     public void setDesc(String desc) {
         this.desc = desc;
+    }
+
+    public String getIco() {
+        return ico;
+    }
+
+    public void setIco(String ico) {
+        this.ico = ico;
     }
 
     public String getImage() {

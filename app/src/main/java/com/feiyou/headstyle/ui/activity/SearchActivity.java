@@ -234,7 +234,7 @@ public class SearchActivity extends BaseFragmentActivity implements HotWordDataV
 
     @OnClick(R.id.layout_clear)
     public void clearHistory() {
-        if (searchHistoryAdapter != null || searchHistoryAdapter.getData().size() > 0) {
+        if (searchHistoryAdapter != null && searchHistoryAdapter.getData().size() > 0) {
             if (configDialog != null && !configDialog.isShowing()) {
                 configDialog.show();
             }

@@ -2,7 +2,10 @@ package com.feiyou.headstyle.ui.fragment;
 
 import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
+import android.os.Build;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -16,6 +19,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.blankj.utilcode.util.BarUtils;
+import com.blankj.utilcode.util.PathUtils;
 import com.blankj.utilcode.util.SizeUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.bumptech.glide.Glide;
@@ -43,6 +47,10 @@ import com.feiyou.headstyle.ui.base.BaseFragment;
 import com.feiyou.headstyle.ui.custom.ConfigDialog;
 import com.feiyou.headstyle.ui.custom.OpenDialog;
 import com.feiyou.headstyle.view.HomeDataView;
+import com.liulishuo.filedownloader.BaseDownloadTask;
+import com.liulishuo.filedownloader.DownloadTask;
+import com.liulishuo.filedownloader.FileDownloadListener;
+import com.liulishuo.filedownloader.FileDownloader;
 import com.orhanobut.logger.Logger;
 import com.tencent.mm.opensdk.modelbiz.WXLaunchMiniProgram;
 import com.tencent.mm.opensdk.openapi.IWXAPI;
@@ -51,12 +59,14 @@ import com.wang.avi.AVLoadingIndicatorView;
 import com.youth.banner.Banner;
 import com.youth.banner.listener.OnBannerListener;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import es.dmoral.toasty.Toasty;
 
 /**
  * Created by myflying on 2019/1/3.
@@ -138,10 +148,13 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
 
     private int clickType = 1;//1：banner，2：广告
 
+    BaseDownloadTask task;
+
     @Override
     protected View onCreateView() {
         View root = LayoutInflater.from(getActivity()).inflate(R.layout.fragment1, null);
         ButterKnife.bind(this, root);
+        FileDownloader.setup(getActivity());
         initTopView();
         initBanner();
         initData();
@@ -205,7 +218,11 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
                         startActivity(intent);
                         break;
                     case 2:
-                        ToastUtils.showLong("类型-软件下载");
+                        if (task != null && task.isRunning()) {
+                            Toasty.normal(getActivity(), "正在下载打开请稍后...").show();
+                        } else {
+                            downAppFile("http://zs.qqtn.com/zbsq/Apk/tnzbsq_LIURENJUN1.apk");
+                        }
                         break;
                     case 3:
                         openDialog.setTitle("打开提示");
@@ -512,8 +529,6 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
                     ToastUtils.showLong("类型-软件下载");
                     break;
                 case 3:
-
-
                     WXLaunchMiniProgram.Req req = new WXLaunchMiniProgram.Req();
                     req.userName = adInfo.getOriginId(); // 填小程序原始id
                     req.path = adInfo.getJumpPath(); //拉起小程序页面的可带参路径，不填默认拉起小程序首页
@@ -547,6 +562,74 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
 
     @Override
     public void cancel() {
+        if (openDialog != null && openDialog.isShowing()) {
+            openDialog.dismiss();
+        }
+    }
 
+    public void downAppFile(String downUrl) {
+        final String filePath = PathUtils.getExternalAppFilesPath() + "/temp_app.apk";
+        Logger.i("down app path --->" + filePath);
+
+        task = FileDownloader.getImpl().create(downUrl)
+                .setPath(filePath)
+                .setListener(new FileDownloadListener() {
+                    @Override
+                    protected void pending(BaseDownloadTask task, int soFarBytes, int totalBytes) {
+                        Toasty.normal(getActivity(), "正在下载打开请稍后...").show();
+                    }
+
+                    @Override
+                    protected void connected(BaseDownloadTask task, String etag, boolean isContinue, int soFarBytes, int totalBytes) {
+                    }
+
+                    @Override
+                    protected void progress(BaseDownloadTask task, int soFarBytes, int totalBytes) {
+                    }
+
+                    @Override
+                    protected void blockComplete(BaseDownloadTask task) {
+                    }
+
+                    @Override
+                    protected void retry(final BaseDownloadTask task, final Throwable ex, final int retryingTimes, final int soFarBytes) {
+                    }
+
+                    @Override
+                    protected void completed(BaseDownloadTask task) {
+                        ToastUtils.showLong("下载完成");
+                        install(filePath);
+                    }
+
+                    @Override
+                    protected void paused(BaseDownloadTask task, int soFarBytes, int totalBytes) {
+                    }
+
+                    @Override
+                    protected void error(BaseDownloadTask task, Throwable e) {
+                    }
+
+                    @Override
+                    protected void warn(BaseDownloadTask task) {
+                    }
+                });
+
+        task.start();
+    }
+
+    private void install(String filePath) {
+
+        File apkFile = new File(filePath);
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+
+            intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            Uri contentUri = FileProvider.getUriForFile(getActivity(), "com.feiyou.headstyle.fileprovider", apkFile);
+            intent.setDataAndType(contentUri, "application/vnd.android.package-archive");
+        } else {
+            intent.setDataAndType(Uri.fromFile(apkFile), "application/vnd.android.package-archive");
+        }
+        startActivity(intent);
     }
 }

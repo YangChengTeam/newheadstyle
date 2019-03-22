@@ -7,6 +7,9 @@ import com.google.gson.annotations.SerializedName;
  */
 public class NoteInfo {
 
+    @SerializedName("comment_time")
+    private Long commentTime;
+
     @SerializedName("add_time")
     private Long addTime;
 
@@ -132,5 +135,13 @@ public class NoteInfo {
 
     public void setIsGuan(int isGuan) {
         this.isGuan = isGuan;
+    }
+
+    public Long getCommentTime() {
+        return commentTime;
+    }
+
+    public void setCommentTime(Long commentTime) {
+        this.commentTime = commentTime;
     }
 }

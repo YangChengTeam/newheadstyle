@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.InputFilter;
+import android.text.Spanned;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -39,9 +41,12 @@ import com.qmuiteam.qmui.widget.QMUITopBar;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import butterknife.BindView;
 import butterknife.OnClick;
+import es.dmoral.toasty.Toasty;
 
 /**
  * Created by myflying on 2019/2/20.
@@ -104,6 +109,8 @@ public class TestImageDetailActivity extends BaseFragmentActivity implements Tes
 
     private UserInfo userInfo;
 
+    TextView titleTv;
+
     @Override
     protected int getContextViewId() {
         return R.layout.activity_test_image_detail;
@@ -121,7 +128,7 @@ public class TestImageDetailActivity extends BaseFragmentActivity implements Tes
         mTopBar.setTitle(getResources().getString(R.string.app_name));
         View topSearchView = getLayoutInflater().inflate(R.layout.common_top_back, null);
         topSearchView.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, SizeUtils.dp2px(48)));
-        TextView titleTv = topSearchView.findViewById(R.id.tv_title);
+        titleTv = topSearchView.findViewById(R.id.tv_title);
         titleTv.setText("测试详情");
 
         mTopBar.setCenterView(topSearchView);
@@ -159,6 +166,10 @@ public class TestImageDetailActivity extends BaseFragmentActivity implements Tes
                 }
             }
         });
+
+        //设置过滤器，
+        InputFilter[] filters = {new NameLengthFilter(10)};
+        mInputUserNameEt.setFilters(filters);
 
         testDetailInfoPresenterImp = new TestDetailInfoPresenterImp(this, this);
         testResultInfoPresenterImp = new TestResultInfoPresenterImp(this, this);
@@ -209,16 +220,19 @@ public class TestImageDetailActivity extends BaseFragmentActivity implements Tes
     void config() {
         if (inputStep == 1) {
             if (StringUtils.isEmpty(selectSexValue)) {
-                ToastUtils.showLong("请选择性别");
+                Toasty.normal(this, "请选择性别").show();
                 return;
             }
             checkSex(selectSexValue);
             inputStep = 2;
         } else {
             if (StringUtils.isEmpty(mInputUserNameEt.getText())) {
-                ToastUtils.showLong("请输入用户姓名");
+                Toasty.normal(this, "请输入用户姓名").show();
                 return;
             }
+
+            //隐藏输入框
+            KeyboardUtils.hideSoftInput(this);
 
             TestMsgInfo inputName = new TestMsgInfo();
             inputName.setType(TestMsgInfo.TYPE_SENT);
@@ -301,6 +315,10 @@ public class TestImageDetailActivity extends BaseFragmentActivity implements Tes
                 if (((TestDetailInfoRet) tData).getData() != null) {
                     //设置全局的测试信息
                     App.getApp().setTestInfo(((TestDetailInfoRet) tData).getData());
+
+                    String title = StringUtils.isEmpty(((TestDetailInfoRet) tData).getData().getTitle()) ? "测试详情" : ((TestDetailInfoRet) tData).getData().getTitle();
+                    titleTv.setText(title);
+
                     TestMsgInfo guideInfo = new TestMsgInfo(((TestDetailInfoRet) tData).getData().getImage(), ((TestDetailInfoRet) tData).getData().getDesc(), TestMsgInfo.TYPE_RECEIVED);
                     chatListAdapter.addData(guideInfo);
                     chatListAdapter.notifyDataSetChanged();
@@ -335,6 +353,43 @@ public class TestImageDetailActivity extends BaseFragmentActivity implements Tes
     public void loadDataError(Throwable throwable) {
         if (progressDialog != null && progressDialog.isShowing()) {
             progressDialog.dismiss();
+        }
+    }
+
+    private class NameLengthFilter implements InputFilter {
+        int MAX_EN;// 最大英文/数字长度 一个汉字算两个字母
+        String regEx = "[\\u4e00-\\u9fa5]"; // unicode编码，判断是否为汉字
+
+        public NameLengthFilter(int mAX_EN) {
+            super();
+            MAX_EN = mAX_EN;
+        }
+
+        @Override
+        public CharSequence filter(CharSequence source, int start, int end,
+                                   Spanned dest, int dstart, int dend) {
+            int destCount = dest.toString().length()
+                    + getChineseCount(dest.toString());
+            int sourceCount = source.toString().length()
+                    + getChineseCount(source.toString());
+            if (destCount + sourceCount > MAX_EN) {
+                Toasty.normal(TestImageDetailActivity.this, "字数达到上限").show();
+                return "";
+            } else {
+                return source;
+            }
+        }
+
+        private int getChineseCount(String str) {
+            int count = 0;
+            Pattern p = Pattern.compile(regEx);
+            Matcher m = p.matcher(str);
+            while (m.find()) {
+                for (int i = 0; i <= m.groupCount(); i++) {
+                    count = count + 1;
+                }
+            }
+            return count;
         }
     }
 }

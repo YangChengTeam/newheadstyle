@@ -1,6 +1,7 @@
 package com.feiyou.headstyle.ui.activity;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.BottomSheetDialog;
@@ -8,6 +9,7 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -19,6 +21,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.alibaba.fastjson.JSON;
 import com.blankj.utilcode.util.StringUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.bumptech.glide.Glide;
@@ -49,6 +52,7 @@ import com.umeng.socialize.UMShareListener;
 import com.umeng.socialize.bean.SHARE_MEDIA;
 import com.umeng.socialize.media.UMImage;
 import com.umeng.socialize.media.UMWeb;
+import com.wang.avi.AVLoadingIndicatorView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,7 +63,7 @@ import butterknife.OnClick;
 /**
  * Created by myflying on 2018/11/28.
  */
-public class CommunityType1Activity extends BaseFragmentActivity implements NoteTypeView, View.OnClickListener {
+public class CommunityType1Activity extends BaseFragmentActivity implements NoteTypeView, View.OnClickListener, SwipeRefreshLayout.OnRefreshListener {
 
     @BindView(R.id.app_bar_layout)
     AppBarLayout appBarLayout;
@@ -67,8 +71,14 @@ public class CommunityType1Activity extends BaseFragmentActivity implements Note
     @BindView(R.id.toolbar)
     Toolbar toolbar;
 
-//    @BindView(R.id.toolbar_iv_image)
-//    ImageView mTopBarImageView;
+    @BindView(R.id.swipe_refresh)
+    SwipeRefreshLayout mRefreshLayout;
+
+    @BindView(R.id.avi)
+    AVLoadingIndicatorView avi;
+
+    @BindView(R.id.layout_no_data)
+    LinearLayout mNoDataLayout;
 
     @BindView(R.id.iv_back)
     ImageView mBackImageView;
@@ -91,11 +101,11 @@ public class CommunityType1Activity extends BaseFragmentActivity implements Note
     @BindView(R.id.tv_top1_note_name)
     TextView mTop1NoteNameTv;
 
-    @BindView(R.id.layout_is_follow)
-    FrameLayout mFollowLayout;
+    @BindView(R.id.layout_community_follow)
+    FrameLayout mCommunityFollowLayout;
 
-    @BindView(R.id.tv_follow_txt)
-    TextView mFollowTv;
+    @BindView(R.id.tv_community_follow_txt)
+    TextView mCommunityFollowTv;
 
     @BindView(R.id.community_type_list)
     RecyclerView mCommunityTypeListView;
@@ -104,7 +114,7 @@ public class CommunityType1Activity extends BaseFragmentActivity implements Note
 
     private int currentPage = 1;
 
-    private int pageSize = 20;
+    private int pageSize = 10;
 
     private FollowInfoPresenterImp followInfoPresenterImp;
 
@@ -141,6 +151,13 @@ public class CommunityType1Activity extends BaseFragmentActivity implements Note
 
     private ShareAction shareAction;
 
+    /**
+     * 标识 关注话题/用户
+     */
+    private boolean followTopic;
+
+    BottomSheetDialog normalShareDialog;
+
     @Override
     protected int getContextViewId() {
         return R.layout.activity_community_type1;
@@ -173,9 +190,38 @@ public class CommunityType1Activity extends BaseFragmentActivity implements Note
         mBackHomeLayout.setOnClickListener(this);
         commonShareDialog = new BottomSheetDialog(this);
         commonShareDialog.setContentView(mCommonShareView);
+
+        //普通的分享弹窗
+        normalShareDialog = new BottomSheetDialog(this);
+        View shareNormalView = LayoutInflater.from(this).inflate(R.layout.share_normal_dialog_view, null);
+        ImageView mCloseNormalImageView = shareNormalView.findViewById(R.id.iv_normal_close_share);
+        LinearLayout weixinNormalLayout = shareNormalView.findViewById(R.id.layout_normal_weixin);
+        LinearLayout circleNormalLayout = shareNormalView.findViewById(R.id.layout_normal_circle);
+        LinearLayout qqNormalLayout = shareNormalView.findViewById(R.id.layout_normal_qq_friends);
+        LinearLayout qzoneNormalLayout = shareNormalView.findViewById(R.id.layout_normal_qzone);
+        weixinNormalLayout.setOnClickListener(this);
+        circleNormalLayout.setOnClickListener(this);
+        qqNormalLayout.setOnClickListener(this);
+        qzoneNormalLayout.setOnClickListener(this);
+        mCloseNormalImageView.setOnClickListener(this);
+        normalShareDialog.setContentView(shareNormalView);
     }
 
     public void initData() {
+        mRefreshLayout.setOnRefreshListener(this);
+        //设置进度View样式的大小，只有两个值DEFAULT和LARGE
+        //设置进度View下拉的起始点和结束点，scale 是指设置是否需要放大或者缩小动画
+        mRefreshLayout.setProgressViewOffset(true, -0, 200);
+        //设置进度View下拉的结束点，scale 是指设置是否需要放大或者缩小动画
+        mRefreshLayout.setProgressViewEndTarget(true, 180);
+        //设置进度View的组合颜色，在手指上下滑时使用第一个颜色，在刷新中，会一个个颜色进行切换
+        mRefreshLayout.setColorSchemeColors(ContextCompat.getColor(this, R.color.colorPrimary), Color.RED, Color.YELLOW, Color.BLUE);
+
+        //设置触发刷新的距离
+        mRefreshLayout.setDistanceToTriggerSync(200);
+        //如果child是自己自定义的view，可以通过这个回调，告诉mSwipeRefreshLayoutchild是否可以滑动
+        mRefreshLayout.setOnChildScrollUpCallback(null);
+
         Bundle bundle = getIntent().getExtras();
 
         if (bundle != null && bundle.getString("topic_id") != null) {
@@ -207,16 +253,18 @@ public class CommunityType1Activity extends BaseFragmentActivity implements Note
         noteInfoAdapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
             @Override
             public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
-                currentClickIndex = position;
 
-                if (!App.getApp().isLogin) {
+                if (!App.getApp().isLogin && view.getId() != R.id.layout_note_share) {
                     if (loginDialog != null && !loginDialog.isShowing()) {
                         loginDialog.show();
                     }
                     return;
                 }
 
+                currentClickIndex = position;
+
                 if (view.getId() == R.id.layout_follow) {
+                    followTopic = false;
                     followInfoPresenterImp.addFollow(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", noteInfoAdapter.getData().get(position).getUserId());
                 }
                 if (view.getId() == R.id.layout_item_zan) {
@@ -227,6 +275,13 @@ public class CommunityType1Activity extends BaseFragmentActivity implements Note
                     Intent intent = new Intent(CommunityType1Activity.this, UserInfoActivity.class);
                     intent.putExtra("user_id", noteInfoAdapter.getData().get(position).getUserId());
                     startActivity(intent);
+                }
+
+                //分享
+                if (view.getId() == R.id.layout_note_share) {
+                    if (normalShareDialog != null && !normalShareDialog.isShowing()) {
+                        normalShareDialog.show();
+                    }
                 }
             }
         });
@@ -266,6 +321,7 @@ public class CommunityType1Activity extends BaseFragmentActivity implements Note
     void topNote() {
         Intent intent = new Intent(this, CommunityArticleActivity.class);
         intent.putExtra("msg_id", noteId);
+        intent.putExtra("if_from_stick", true);
         startActivity(intent);
     }
 
@@ -274,7 +330,7 @@ public class CommunityType1Activity extends BaseFragmentActivity implements Note
         popBackStack();
     }
 
-    @OnClick(R.id.layout_is_follow)
+    @OnClick(R.id.layout_community_follow)
     void followTopic() {
         if (!App.getApp().isLogin) {
             if (loginDialog != null && !loginDialog.isShowing()) {
@@ -282,6 +338,7 @@ public class CommunityType1Activity extends BaseFragmentActivity implements Note
             }
             return;
         }
+        followTopic = true;
         followInfoPresenterImp.followTopic(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", topicId);
     }
 
@@ -292,12 +349,18 @@ public class CommunityType1Activity extends BaseFragmentActivity implements Note
 
     @Override
     public void dismissProgress() {
-
+        avi.hide();
+        mRefreshLayout.setRefreshing(false);
     }
 
     @Override
     public void loadDataSuccess(ResultInfo tData) {
+        Logger.i("community type data --->" + JSON.toJSONString(tData));
+        avi.hide();
+        mRefreshLayout.setRefreshing(false);
         if (tData != null && tData.getCode() == Constants.SUCCESS) {
+            mNoDataLayout.setVisibility(View.GONE);
+            mCommunityTypeListView.setVisibility(View.VISIBLE);
 
             if (tData instanceof NoteTypeRet) {
                 NoteTypeWrapper noteTypeWrapper = ((NoteTypeRet) tData).getData();
@@ -335,26 +398,34 @@ public class CommunityType1Activity extends BaseFragmentActivity implements Note
                 }
 
                 if (noteTypeWrapper.getIsGuan() == 0) {
-                    mFollowLayout.setBackgroundResource(R.mipmap.not_follow_topic);
-                    mFollowTv.setTextColor(ContextCompat.getColor(this, R.color.white));
+                    mCommunityFollowLayout.setBackgroundResource(R.mipmap.not_follow_topic);
+                    mCommunityFollowTv.setTextColor(ContextCompat.getColor(this, R.color.white));
                 } else {
-                    mFollowLayout.setBackgroundResource(R.mipmap.is_follow_icon);
-                    mFollowTv.setTextColor(ContextCompat.getColor(this, R.color.is_follow_topic_bg_color));
-                    mFollowTv.setText("已关注");
+                    mCommunityFollowLayout.setBackgroundResource(R.mipmap.is_follow_icon);
+                    mCommunityFollowTv.setTextColor(ContextCompat.getColor(this, R.color.is_follow_topic_bg_color));
+                    mCommunityFollowTv.setText("已关注");
                 }
             }
 
             if (tData instanceof FollowInfoRet) {
                 if (((FollowInfoRet) tData).getData() != null) {
-                    if (((FollowInfoRet) tData).getData().getIsGuan() == 0) {
-                        ToastUtils.showLong("已取消");
-                        mFollowLayout.setBackgroundResource(R.mipmap.not_follow_topic);
-                        mFollowTv.setTextColor(ContextCompat.getColor(this, R.color.white));
+                    //关注话题
+                    if (followTopic) {
+                        if (((FollowInfoRet) tData).getData().getIsGuan() == 0) {
+                            ToastUtils.showLong("已取消");
+                            mCommunityFollowLayout.setBackgroundResource(R.mipmap.not_follow_topic);
+                            mCommunityFollowTv.setTextColor(ContextCompat.getColor(this, R.color.white));
+                        } else {
+                            ToastUtils.showLong("已关注");
+                            mCommunityFollowLayout.setBackgroundResource(R.mipmap.is_follow_icon);
+                            mCommunityFollowTv.setTextColor(ContextCompat.getColor(this, R.color.is_follow_topic_bg_color));
+                            mCommunityFollowTv.setText("已关注");
+                        }
                     } else {
-                        ToastUtils.showLong("已关注");
-                        mFollowLayout.setBackgroundResource(R.mipmap.is_follow_icon);
-                        mFollowTv.setTextColor(ContextCompat.getColor(this, R.color.is_follow_topic_bg_color));
-                        mFollowTv.setText("已关注");
+                        //关注用户
+                        ToastUtils.showLong(((FollowInfoRet) tData).getData().getIsGuan() == 0 ? "已取消" : "已关注");
+                        noteInfoAdapter.getData().get(currentClickIndex).setIsGuan(((FollowInfoRet) tData).getData().getIsGuan());
+                        noteInfoAdapter.notifyDataSetChanged();
                     }
                 } else {
                     ToastUtils.showLong(StringUtils.isEmpty(tData.getMsg()) ? "操作错误" : tData.getMsg());
@@ -374,6 +445,12 @@ public class CommunityType1Activity extends BaseFragmentActivity implements Note
                 noteInfoAdapter.notifyDataSetChanged();
             }
         } else {
+
+            if (tData instanceof NoteTypeRet) {
+                mNoDataLayout.setVisibility(View.VISIBLE);
+                mCommunityTypeListView.setVisibility(View.GONE);
+            }
+
             if (tData instanceof FollowInfoRet) {
                 ToastUtils.showLong(StringUtils.isEmpty(tData.getMsg()) ? "操作错误" : tData.getMsg());
             } else {
@@ -384,7 +461,8 @@ public class CommunityType1Activity extends BaseFragmentActivity implements Note
 
     @Override
     public void loadDataError(Throwable throwable) {
-
+        avi.hide();
+        mRefreshLayout.setRefreshing(false);
     }
 
     private UMShareListener shareListener = new UMShareListener() {
@@ -433,12 +511,22 @@ public class CommunityType1Activity extends BaseFragmentActivity implements Note
     public void onClick(View view) {
         String shareTitle = "一位神秘人士对你发出邀请";
         String shareContent = "这里的老哥老姐个个都是人才，说话又好听，我超喜欢这里...";
+        String tempStr = StringUtils.isEmpty(noteInfoAdapter.getData().get(currentClickIndex).getContent()) ? "一位神秘人士对你发出邀请" : noteInfoAdapter.getData().get(currentClickIndex).getContent();
         UMWeb web = new UMWeb("http://gx.qqtn.com");
         if (shareAction != null) {
             UMImage image = new UMImage(CommunityType1Activity.this, R.drawable.app_share);
             image.compressStyle = UMImage.CompressStyle.QUALITY;
             web.setThumb(image);  //缩略图
             web.setDescription(shareContent);//描述
+        }
+
+        UMImage normalImage = null;
+        if (noteInfoAdapter.getData().get(currentClickIndex).getImageArr() != null && noteInfoAdapter.getData().get(currentClickIndex).getImageArr().length > 0) {
+            normalImage = new UMImage(CommunityType1Activity.this, noteInfoAdapter.getData().get(currentClickIndex).getImageArr()[0]);
+            normalImage.compressStyle = UMImage.CompressStyle.QUALITY;
+        }else{
+            normalImage = new UMImage(CommunityType1Activity.this, R.drawable.app_share);
+            normalImage.compressStyle = UMImage.CompressStyle.QUALITY;
         }
 
         switch (view.getId()) {
@@ -462,6 +550,14 @@ public class CommunityType1Activity extends BaseFragmentActivity implements Note
                 shareAction.withMedia(web).setPlatform(SHARE_MEDIA.QZONE).share();
                 break;
             case R.id.layout_report:
+
+                if (!App.getApp().isLogin) {
+                    if (loginDialog != null && !loginDialog.isShowing()) {
+                        loginDialog.show();
+                    }
+                    return;
+                }
+
                 if (commonShareDialog != null && commonShareDialog.isShowing()) {
                     commonShareDialog.dismiss();
                 }
@@ -471,6 +567,37 @@ public class CommunityType1Activity extends BaseFragmentActivity implements Note
                 startActivity(intent);
                 break;
             case R.id.layout_to_home:
+                Intent intent1 = new Intent(this, Main1Activity.class);
+                startActivity(intent1);
+                finish();
+                break;
+
+            case R.id.iv_normal_close_share:
+                dismissShareView();
+                break;
+            case R.id.layout_normal_weixin:
+                web.setTitle(tempStr);//标题
+                web.setDescription(tempStr);
+                web.setThumb(normalImage);
+                shareAction.withMedia(web).setPlatform(SHARE_MEDIA.WEIXIN).share();
+                break;
+            case R.id.layout_normal_circle:
+                web.setTitle(tempStr);//标题
+                web.setDescription(tempStr);
+                web.setThumb(normalImage);
+                shareAction.withMedia(web).setPlatform(SHARE_MEDIA.WEIXIN_CIRCLE).share();
+                break;
+            case R.id.layout_normal_qq_friends:
+                web.setTitle(tempStr);//标题
+                web.setDescription(tempStr);
+                web.setThumb(normalImage);
+                shareAction.withMedia(web).setPlatform(SHARE_MEDIA.QQ).share();
+                break;
+            case R.id.layout_normal_qzone:
+                web.setTitle(tempStr);//标题
+                web.setDescription(tempStr);
+                web.setThumb(normalImage);
+                shareAction.withMedia(web).setPlatform(SHARE_MEDIA.QZONE).share();
                 break;
             default:
                 break;
@@ -490,11 +617,21 @@ public class CommunityType1Activity extends BaseFragmentActivity implements Note
         if (commonShareDialog != null && commonShareDialog.isShowing()) {
             commonShareDialog.dismiss();
         }
+        if (normalShareDialog != null && normalShareDialog.isShowing()) {
+            normalShareDialog.dismiss();
+        }
     }
 
     @Override
     public void onBackPressed() {
         super.onBackPressed();
         popBackStack();
+    }
+
+    @Override
+    public void onRefresh() {
+        mRefreshLayout.setRefreshing(true);
+        currentPage = 1;
+        noteTypePresenterImp.getNoteTypeData(topicId, currentPage, 1, App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "");
     }
 }

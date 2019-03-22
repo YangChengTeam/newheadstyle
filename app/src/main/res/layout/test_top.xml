@@ -42,8 +42,8 @@
         app:delay_time="4000"
         app:indicator_drawable_selected="@mipmap/indicator_select"
         app:indicator_drawable_unselected="@mipmap/indicator_normal"
-        app:indicator_height="4dp"
-        app:indicator_width="4dp" />
+        app:indicator_height="6dp"
+        app:indicator_width="10dp"/>
 
     <LinearLayout
         android:layout_width="match_parent"

@@ -129,7 +129,10 @@
                         android:paddingLeft="12dp"
                         android:paddingRight="12dp"
                         android:paddingBottom="6dp"></android.support.v7.widget.RecyclerView>
-
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="8dp"
+                        android:background="@color/search_bg_color"></View>
                 </LinearLayout>
 
                 <android.support.v7.widget.Toolbar
@@ -177,17 +180,12 @@
 
                         <View
                             android:layout_width="match_parent"
-                            android:layout_height="0.5dp"
+                            android:layout_height="1dp"
                             android:layout_gravity="bottom"
-                            android:background="@color/line_color"></View>
+                            android:background="@color/line1_color"></View>
                     </LinearLayout>
                 </android.support.v7.widget.Toolbar>
             </android.support.design.widget.CollapsingToolbarLayout>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="8dp"
-                android:background="@color/search_bg_color"></View>
         </android.support.design.widget.AppBarLayout>
 
 
@@ -201,10 +199,10 @@
 
     <View
         android:layout_width="match_parent"
-        android:layout_height="0.5dp"
+        android:layout_height="1dp"
         android:layout_gravity="bottom"
         android:layout_marginBottom="48dp"
-        android:background="@color/line_color"></View>
+        android:background="@color/line1_color"></View>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -213,6 +211,7 @@
         android:gravity="center">
 
         <LinearLayout
+            android:id="@+id/layout_note_share"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"

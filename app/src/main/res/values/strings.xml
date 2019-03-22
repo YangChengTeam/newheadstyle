@@ -6,8 +6,8 @@
     <string name="button_deny">拒绝</string>
 
     <string name="permission_storage_never_ask_again">不再询问</string>
-    <string name="permission_storage_rationale">必须要开启存储权限，才能正常使用，请开启</string>
-    <string name="permission_storage_denied">禁止了存储权限，开启权限才能正常使用</string>
+    <string name="permission_storage_rationale">必须要开启权限，才能正常使用，请开启</string>
+    <string name="permission_storage_denied">禁止了权限，开启权限才能正常使用</string>
 
     <string name="search_txt">搜索头像</string>
     <string name="rec_txt">为你推荐</string>
@@ -32,7 +32,7 @@
 
     <string name="version_update_txt">新版本邀请你内侧\n修复已知的bug</string>
 
-    <string name="no_photo_txt">你还没有头像\n快上传一个试试吧</string>
+    <string name="no_photo_txt">还没有上传任何照片\n快上传一个试试吧</string>
 
     <string name="search_test_txt">搜索测试</string>
 

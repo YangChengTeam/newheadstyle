@@ -1,5 +1,6 @@
 package com.feiyou.headstyle.ui.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
@@ -30,6 +31,7 @@ import com.feiyou.headstyle.presenter.UserInfoListPresenterImp;
 import com.feiyou.headstyle.ui.adapter.AddFriendsListAdapter;
 import com.feiyou.headstyle.ui.adapter.BlackListAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragmentActivity;
+import com.feiyou.headstyle.ui.custom.LoginDialog;
 import com.feiyou.headstyle.ui.custom.NormalDecoration;
 import com.feiyou.headstyle.utils.MyToastUtils;
 import com.feiyou.headstyle.view.UserInfoListView;
@@ -80,6 +82,8 @@ public class AddFriendsActivity extends BaseFragmentActivity implements UserInfo
 
     private int currentPosition;
 
+    LoginDialog loginDialog;
+
     @Override
     protected int getContextViewId() {
         return R.layout.activity_add_friends;
@@ -111,6 +115,7 @@ public class AddFriendsActivity extends BaseFragmentActivity implements UserInfo
 
     public void initData() {
         initProgress("搜索中");
+        loginDialog = new LoginDialog(this, R.style.login_dialog);
         mHotWordEditText.setOnEditorActionListener(new EditorActionListener());
 
         addFriendsListAdapter = new AddFriendsListAdapter(this, null);
@@ -130,11 +135,28 @@ public class AddFriendsActivity extends BaseFragmentActivity implements UserInfo
             }
         }, mFriendsListView);
 
-        addFriendsListAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
+        addFriendsListAdapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
             @Override
-            public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
+            public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
+
+                if (!App.getApp().isLogin) {
+                    if (loginDialog != null && !loginDialog.isShowing()) {
+                        loginDialog.show();
+                    }
+                    return;
+                }
+
                 currentPosition = position;
-                followInfoPresenterImp.addFollow(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", addFriendsListAdapter.getData().get(position).getId());
+
+                if (view.getId() == R.id.iv_user_head) {
+                    Intent intent = new Intent(AddFriendsActivity.this, UserInfoActivity.class);
+                    intent.putExtra("user_id", addFriendsListAdapter.getData().get(position).getId());
+                    startActivity(intent);
+                }
+
+                if (view.getId() == R.id.layout_follow) {
+                    followInfoPresenterImp.addFollow(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", addFriendsListAdapter.getData().get(position).getId());
+                }
             }
         });
 

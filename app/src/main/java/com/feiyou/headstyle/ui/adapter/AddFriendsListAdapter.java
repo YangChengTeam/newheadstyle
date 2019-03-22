@@ -51,5 +51,6 @@ public class AddFriendsListAdapter extends BaseQuickAdapter<UserInfo, BaseViewHo
         } else {
             helper.setVisible(R.id.iv_sex, false);
         }
+        helper.addOnClickListener(R.id.layout_follow).addOnClickListener(R.id.iv_user_head);
     }
 }

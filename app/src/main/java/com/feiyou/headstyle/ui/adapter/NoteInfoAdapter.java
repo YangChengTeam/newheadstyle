@@ -50,8 +50,8 @@ public class NoteInfoAdapter extends BaseQuickAdapter<NoteInfo, BaseViewHolder> 
     protected void convert(final BaseViewHolder helper, final NoteInfo item) {
 
 
-        Date currentDate = TimeUtils.millis2Date(item.getAddTime() != null ? item.getAddTime() * 1000 : 0);
-        String tempDateStr = MyTimeUtil.isOutMouth(currentDate) ? TimeUtils.millis2String(item.getAddTime() != null ? item.getAddTime() * 1000 : 0) : MyTimeUtil.getTimeFormatText(currentDate);
+        Date currentDate = TimeUtils.millis2Date(item.getCommentTime() != null ? item.getCommentTime() * 1000 : 0);
+        String tempDateStr = MyTimeUtil.isOutMouth(currentDate) ? TimeUtils.millis2String(item.getCommentTime() != null ? item.getCommentTime() * 1000 : 0) : MyTimeUtil.getTimeFormatText(currentDate);
 
         helper.setText(R.id.tv_nick_name, item.getNickname())
                 .setText(R.id.tv_topic_name, item.getName())
@@ -86,7 +86,7 @@ public class NoteInfoAdapter extends BaseQuickAdapter<NoteInfo, BaseViewHolder> 
         helper.setTextColor(R.id.tv_follow_txt, ContextCompat.getColor(mContext, item.getIsGuan() == 0 ? R.color.tab_select_color : R.color.is_follow_color));
         helper.setText(R.id.tv_follow_txt, item.getIsGuan() == 0 ? "+关注" : "已关注");
 
-        helper.addOnClickListener(R.id.layout_item_zan).addOnClickListener(R.id.iv_user_head);
+        helper.addOnClickListener(R.id.layout_item_zan).addOnClickListener(R.id.iv_user_head).addOnClickListener(R.id.layout_note_share);
 
         RequestOptions options = new RequestOptions();
         options.override(SizeUtils.dp2px(36), SizeUtils.dp2px(36));

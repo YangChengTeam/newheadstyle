@@ -186,6 +186,11 @@ public class MyNoteActivity extends BaseFragmentActivity implements NoteDataView
                         bottomSheetDialog.show();
                     }
                 }
+                if (view.getId() == R.id.iv_user_head) {
+                    Intent intent = new Intent(MyNoteActivity.this, UserInfoActivity.class);
+                    intent.putExtra("user_id", userInfo != null ? userInfo.getId() : "");
+                    startActivity(intent);
+                }
             }
         });
 

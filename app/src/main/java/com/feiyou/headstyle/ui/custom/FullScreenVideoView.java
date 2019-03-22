@@ -7,11 +7,6 @@ import android.widget.VideoView;
 import com.blankj.utilcode.util.ScreenUtils;
 import com.orhanobut.logger.Logger;
 
-/**
- * Created by 钉某人
- * github: https://github.com/DingMouRen
- * email: naildingmouren@gmail.com
- */
 public class FullScreenVideoView extends VideoView {
 
     private int mWidth;

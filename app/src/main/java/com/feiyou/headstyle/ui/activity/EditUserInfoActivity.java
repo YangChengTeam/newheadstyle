@@ -18,6 +18,8 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.InputFilter;
+import android.text.Spanned;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -66,12 +68,18 @@ import com.zhihu.matisse.Matisse;
 import com.zhihu.matisse.MimeType;
 
 import java.io.File;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import butterknife.BindView;
 import butterknife.OnClick;
+import es.dmoral.toasty.Toasty;
 import permissions.dispatcher.NeedsPermission;
 import permissions.dispatcher.OnNeverAskAgain;
 import permissions.dispatcher.OnPermissionDenied;
@@ -166,6 +174,14 @@ public class EditUserInfoActivity extends BaseFragmentActivity implements View.O
 
     private int selectSexItem = 1;
 
+    public static final String[] constellationArray = {"水瓶座", "双鱼座", "白羊座", "金牛座", "双子座", "巨蟹座", "狮子座", "处女座", "天秤座", "天蝎座", "射手座", "魔羯座"};
+
+    public static final int[] constellationEdgeDay = {20, 19, 21, 21, 21, 22, 23, 23, 23, 23, 22, 22};
+
+    private int maxInputLength = 280;
+
+    private int nickNameMaxLen = 100;
+
     @Override
     protected int getContextViewId() {
         return R.layout.activity_edit_user_info;
@@ -197,6 +213,13 @@ public class EditUserInfoActivity extends BaseFragmentActivity implements View.O
                 popBackStack();
             }
         });
+
+        //设置过滤器，
+        InputFilter[] filters = {new NameLengthFilter(maxInputLength)};
+        mIntroInputEt.setFilters(filters);
+
+        InputFilter[] nickFilters = {new NameLengthFilter(nickNameMaxLen)};
+        mUserNickNameInputEt.setFilters(nickFilters);
 
         saveTv.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -276,7 +299,7 @@ public class EditUserInfoActivity extends BaseFragmentActivity implements View.O
             options.transform(new GlideRoundTransform(this, 30));
             Glide.with(this).load(userInfo.getUserimg()).apply(options).into(mUserHeadIv);
             mIntroInputEt.setText(userInfo.getIntro());
-            mBirthdayTv.setText(userInfo.getBirthday());
+            mBirthdayTv.setText(userInfo.getBirthday() + "  " + userInfo.getStar());
             mSexLabelTv.setText(userInfo.getSex() == 1 ? "男" : "女");
 
             if (userInfo.getImageWall() != null && userInfo.getImageWall().length > 0) {
@@ -380,7 +403,9 @@ public class EditUserInfoActivity extends BaseFragmentActivity implements View.O
             @Override
             public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
                 Logger.i("year--->" + year + "---month--->" + (monthOfYear + 1) + "---day--->" + dayOfMonth);
-                mBirthdayTv.setText(year + "-" + (monthOfYear + 1) + "-" + dayOfMonth);
+                String tempDate = year + "-" + (monthOfYear + 1) + "-" + dayOfMonth;
+                String tempStar = date2Constellation(tempDate);
+                mBirthdayTv.setText(tempDate + "  " + tempStar);
             }
         }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH));
 
@@ -396,6 +421,9 @@ public class EditUserInfoActivity extends BaseFragmentActivity implements View.O
     public void onClick(View view) {
         if (bottomSheetDialog != null && bottomSheetDialog.isShowing()) {
             bottomSheetDialog.dismiss();
+        }
+        if (updateHeadBottomSheetDialog != null && updateHeadBottomSheetDialog.isShowing()) {
+            updateHeadBottomSheetDialog.dismiss();
         }
         switch (view.getId()) {
             case R.id.layout_sex_boy:
@@ -606,6 +634,86 @@ public class EditUserInfoActivity extends BaseFragmentActivity implements View.O
         }
         if (bottomSheetDialog != null && bottomSheetDialog.isShowing()) {
             bottomSheetDialog.dismiss();
+        }
+    }
+
+    /**
+     * 根据日期获取星座
+     *
+     * @param time
+     * @return
+     */
+    public static String date2Constellation(Calendar time) {
+        int month = time.get(Calendar.MONTH);
+        int day = time.get(Calendar.DAY_OF_MONTH);
+        if (day < constellationEdgeDay[month]) {
+            month = month - 1;
+        }
+        if (month >= 0) {
+            return constellationArray[month];
+        }
+        // default to return 魔羯
+        return constellationArray[11];
+    }
+
+    /**
+     * 根据日期获取星座
+     *
+     * @param time
+     * @return
+     */
+    public String date2Constellation(String time) {
+
+        Calendar cal = Calendar.getInstance();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        Date date;
+        try {
+            date = sdf.parse(time);
+            cal.setTime(date);
+
+            String constellation = date2Constellation(cal);
+            Logger.i("星座--->" + constellation);
+            return constellation;
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private class NameLengthFilter implements InputFilter {
+        int MAX_EN;// 最大英文/数字长度 一个汉字算两个字母
+        String regEx = "[\\u4e00-\\u9fa5]"; // unicode编码，判断是否为汉字
+
+        public NameLengthFilter(int mAX_EN) {
+            super();
+            MAX_EN = mAX_EN;
+        }
+
+        @Override
+        public CharSequence filter(CharSequence source, int start, int end,
+                                   Spanned dest, int dstart, int dend) {
+            int destCount = dest.toString().length()
+                    + getChineseCount(dest.toString());
+            int sourceCount = source.toString().length()
+                    + getChineseCount(source.toString());
+            if (destCount + sourceCount > MAX_EN) {
+                Toasty.normal(EditUserInfoActivity.this, "字数达到上限").show();
+                return "";
+            } else {
+                return source;
+            }
+        }
+
+        private int getChineseCount(String str) {
+            int count = 0;
+            Pattern p = Pattern.compile(regEx);
+            Matcher m = p.matcher(str);
+            while (m.find()) {
+                for (int i = 0; i <= m.groupCount(); i++) {
+                    count = count + 1;
+                }
+            }
+            return count;
         }
     }
 }

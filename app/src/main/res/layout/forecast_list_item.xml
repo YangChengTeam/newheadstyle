@@ -2,8 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="12dp"
-    android:background="@drawable/common_white_bg"
+    android:layout_marginBottom="12dp"
+    android:background="@drawable/forecast_white_bg"
     android:gravity="left|center"
     android:orientation="vertical">
 

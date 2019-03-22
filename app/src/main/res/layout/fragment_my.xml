@@ -77,6 +77,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="6dp"
+                    android:gravity="center"
+                    android:maxWidth="180dp"
                     android:text="登录可以换头像哦"
                     android:textColor="@color/white"
                     android:textSize="14dp" />

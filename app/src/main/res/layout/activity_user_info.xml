@@ -8,7 +8,7 @@
 
     <com.qmuiteam.qmui.widget.QMUIAppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="375dp"
+        android:layout_height="wrap_content"
         android:background="@color/my_info_bg_color"
         android:fitsSystemWindows="true">
 
@@ -19,18 +19,16 @@
             android:minHeight="?attr/qmui_topbar_height"
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
             app:qmui_collapsedTitleGravity="center"
-            app:qmui_contentScrim="@color/tab_select_color"
+            app:qmui_contentScrim="#c9a0a8"
             app:qmui_expandedTitleGravity="center_horizontal|bottom"
-            app:qmui_statusBarScrim="@color/tab_select_color">
+            app:qmui_statusBarScrim="#c9a0a8">
 
             <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="375dp"
+                android:layout_height="wrap_content"
                 android:background="@color/my_info_bg_color"
                 android:fitsSystemWindows="false"
-                android:orientation="horizontal"
-                app:qmui_layout_collapseMode="parallax"
-                app:qmui_layout_collapseParallaxMultiplier="0.7">
+                android:orientation="horizontal">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -42,16 +40,17 @@
 
                 <FrameLayout
                     android:layout_width="match_parent"
-                    android:layout_height="250dp"
-                    android:layout_gravity="bottom"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="162dp"
                     android:background="@color/transparent">
 
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="213dp"
+                        android:layout_height="wrap_content"
                         android:layout_gravity="bottom"
                         android:layout_marginLeft="12dp"
                         android:layout_marginRight="12dp"
+                        android:paddingBottom="12dp"
                         android:background="@drawable/common_white_bg"
                         android:gravity="top|center"
                         android:orientation="vertical">
@@ -132,9 +131,11 @@
 
                         <LinearLayout
                             android:layout_width="match_parent"
-                            android:layout_height="30dp"
+                            android:layout_height="wrap_content"
                             android:layout_marginLeft="30dp"
+                            android:layout_marginTop="6dp"
                             android:layout_marginRight="30dp"
+                            android:layout_marginBottom="6dp"
                             android:gravity="left|center"
                             android:orientation="horizontal">
 
@@ -156,9 +157,11 @@
 
                         <LinearLayout
                             android:layout_width="match_parent"
-                            android:layout_height="30dp"
+                            android:layout_height="wrap_content"
                             android:layout_marginLeft="30dp"
+                            android:layout_marginTop="6dp"
                             android:layout_marginRight="30dp"
+                            android:layout_marginBottom="6dp"
                             android:gravity="left|center"
                             android:orientation="horizontal">
 
@@ -197,9 +200,11 @@
                         <LinearLayout
                             android:id="@+id/layout_sign"
                             android:layout_width="match_parent"
-                            android:layout_height="30dp"
+                            android:layout_height="wrap_content"
                             android:layout_marginLeft="30dp"
+                            android:layout_marginTop="6dp"
                             android:layout_marginRight="30dp"
+                            android:layout_marginBottom="6dp"
                             android:gravity="left|center"
                             android:orientation="horizontal">
 
@@ -227,7 +232,9 @@
                             android:layout_width="match_parent"
                             android:layout_height="36dp"
                             android:layout_marginLeft="30dp"
+                            android:layout_marginTop="6dp"
                             android:layout_marginRight="30dp"
+                            android:layout_marginBottom="6dp"
                             android:layout_weight="1"
                             android:gravity="left|center">
 
@@ -259,16 +266,16 @@
                                 android:layout_gravity="center"
                                 android:src="@mipmap/iv_right_icon" />
                         </RelativeLayout>
-
                     </LinearLayout>
-
-                    <ImageView
-                        android:id="@+id/iv_user_head"
-                        android:layout_width="60dp"
-                        android:layout_height="60dp"
-                        android:layout_gravity="top|center"
-                        android:src="@mipmap/head_def" />
                 </FrameLayout>
+
+                <ImageView
+                    android:id="@+id/iv_user_head"
+                    android:layout_width="84dp"
+                    android:layout_height="84dp"
+                    android:layout_gravity="top|center"
+                    android:layout_marginTop="120dp"
+                    android:src="@mipmap/head_def" />
             </FrameLayout>
 
             <com.qmuiteam.qmui.widget.QMUITopBar

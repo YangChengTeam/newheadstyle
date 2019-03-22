@@ -151,7 +151,7 @@ public class MyFragment extends BaseFragment implements UserInfoView {
             options.transform(new GlideRoundTransform(getActivity(), 30));
             Glide.with(getActivity()).load(userInfo.getUserimg()).apply(options).into(mUserHeadImageView);
             mUserNickNameTv.setText(userInfo.getNickname());
-            mUserIdTv.setText("ID：" + userInfo.getId());
+            mUserIdTv.setText("头像号：" + userInfo.getId());
 
             mFollowTv.setText(userInfo.getGuanNum() + "");
             mFansCountTv.setText(userInfo.getFenNum() + "");
@@ -181,6 +181,7 @@ public class MyFragment extends BaseFragment implements UserInfoView {
         if (loginDialog != null && loginDialog.isShowing()) {
             loginDialog.dismiss();
         }
+
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -198,7 +199,7 @@ public class MyFragment extends BaseFragment implements UserInfoView {
                 options.transform(new GlideRoundTransform(getActivity(), 30));
                 Glide.with(getActivity()).load(userInfo.getUserimg()).apply(options).into(mUserHeadImageView);
                 mUserNickNameTv.setText(userInfo.getNickname());
-                mUserIdTv.setText("ID：" + userInfo.getId());
+                mUserIdTv.setText("头像号：" + userInfo.getId());
 
                 mFollowTv.setText(userInfo.getGuanNum() + "");
                 mFansCountTv.setText(userInfo.getFenNum() + "");

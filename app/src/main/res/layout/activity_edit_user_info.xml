@@ -53,8 +53,9 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="135dp"
+            android:layout_height="wrap_content"
             android:background="@color/white"
+            android:minHeight="135dp"
             android:orientation="vertical">
 
             <RelativeLayout
@@ -83,7 +84,6 @@
                     android:layout_toRightOf="@+id/tv_nick_name_txt"
                     android:background="@null"
                     android:hint="填写你要修改的昵称"
-                    android:maxLength="50"
                     android:minWidth="200dp"
                     android:textColor="@color/black1"
                     android:textSize="14dp" />
@@ -197,9 +197,9 @@
 
                 <TextView
                     android:layout_width="0dp"
-                    android:layout_weight="1"
                     android:layout_height="wrap_content"
-                    android:text="请点击上传照片"
+                    android:layout_weight="1"
+                    android:text="点击上传照片"
                     android:textColor="@color/hint_txt_color"
                     android:textSize="16dp" />
 
@@ -279,10 +279,9 @@
                 android:background="@drawable/line_border_bg"
                 android:gravity="left|top"
                 android:hint="你还没有个性签名"
-                android:lines="3"
-                android:maxLength="200"
-                android:minHeight="100dp"
-                android:padding="6dp" />
+                android:minHeight="120dp"
+                android:padding="6dp"
+                android:textSize="14dp" />
         </LinearLayout>
     </LinearLayout>
 </android.support.v4.widget.NestedScrollView>

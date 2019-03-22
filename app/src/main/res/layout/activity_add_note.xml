@@ -42,7 +42,6 @@
                 android:layout_marginRight="6dp"
                 android:background="@null"
                 android:hint="来啊，互相伤害啊"
-                android:maxLength="255"
                 android:padding="6dp"
                 android:textColor="@color/black1"
                 android:textSize="16dp" />

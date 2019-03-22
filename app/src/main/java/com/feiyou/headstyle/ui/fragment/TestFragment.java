@@ -7,20 +7,24 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.alibaba.fastjson.JSON;
 import com.blankj.utilcode.util.BarUtils;
+import com.blankj.utilcode.util.SPUtils;
 import com.blankj.utilcode.util.SizeUtils;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
+import com.feiyou.headstyle.bean.TestInfo;
 import com.feiyou.headstyle.bean.TestInfoRet;
 import com.feiyou.headstyle.common.Constants;
 import com.feiyou.headstyle.common.GlideImageLoader;
 import com.feiyou.headstyle.presenter.TestInfoPresenterImp;
 import com.feiyou.headstyle.ui.activity.MoreTestActivity;
+import com.feiyou.headstyle.ui.activity.StarDetailActivity;
 import com.feiyou.headstyle.ui.activity.StarListActivity;
 import com.feiyou.headstyle.ui.activity.TestActivity;
 import com.feiyou.headstyle.ui.activity.TestCategoryActivity;
@@ -30,9 +34,14 @@ import com.feiyou.headstyle.ui.adapter.TestInfoAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragment;
 import com.feiyou.headstyle.ui.custom.LoginDialog;
 import com.feiyou.headstyle.ui.custom.NormalDecoration;
+import com.feiyou.headstyle.ui.custom.OpenDialog;
 import com.feiyou.headstyle.view.TestInfoView;
 import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
+import com.tencent.mm.opensdk.modelbiz.WXLaunchMiniProgram;
+import com.tencent.mm.opensdk.openapi.IWXAPI;
+import com.tencent.mm.opensdk.openapi.WXAPIFactory;
+import com.wang.avi.AVLoadingIndicatorView;
 import com.youth.banner.Banner;
 import com.youth.banner.listener.OnBannerListener;
 
@@ -45,12 +54,18 @@ import butterknife.ButterKnife;
 /**
  * Created by myflying on 2019/2/20.
  */
-public class TestFragment extends BaseFragment implements TestInfoView, View.OnClickListener {
+public class TestFragment extends BaseFragment implements TestInfoView, View.OnClickListener, OpenDialog.ConfigListener {
 
     LinearLayout mSearchWrapperLayout;
 
     @BindView(R.id.hot_list)
     RecyclerView mHotTestListView;
+
+    @BindView(R.id.avi)
+    AVLoadingIndicatorView avi;
+
+    @BindView(R.id.layout_no_data)
+    LinearLayout mNoDataLayout;
 
     LinearLayout mFunTestLayout;
 
@@ -74,6 +89,8 @@ public class TestFragment extends BaseFragment implements TestInfoView, View.OnC
 
     LoginDialog loginDialog;
 
+    OpenDialog openDialog;
+
     @Override
     protected View onCreateView() {
         View root = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_test, null);
@@ -84,6 +101,8 @@ public class TestFragment extends BaseFragment implements TestInfoView, View.OnC
 
     public void initViews() {
         loginDialog = new LoginDialog(getActivity(), R.style.login_dialog);
+        openDialog = new OpenDialog(getActivity(), R.style.login_dialog);
+        openDialog.setConfigListener(this);
 
         topView = LayoutInflater.from(getActivity()).inflate(R.layout.test_top, null);
         mSearchWrapperLayout = topView.findViewById(R.id.layout_search_wrapper);
@@ -108,7 +127,7 @@ public class TestFragment extends BaseFragment implements TestInfoView, View.OnC
         mHotTestListView.setAdapter(testInfoAdapter);
         mHotTestListView.addItemDecoration(new NormalDecoration(ContextCompat.getColor(getActivity(), R.color.line_color), 1));
 
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
         params.setMargins(0, 0, 0, SizeUtils.dp2px(48));
         mHotTestListView.setLayoutParams(params);
 
@@ -125,9 +144,30 @@ public class TestFragment extends BaseFragment implements TestInfoView, View.OnC
         mBanner.setOnBannerListener(new OnBannerListener() {
             @Override
             public void OnBannerClick(int position) {
-//                Intent intent = new Intent(getActivity(), Collection2Activity.class);
-//                intent.putExtra("banner_id", bannerInfos.get(position).getId());
-//                startActivity(intent);
+                if (position == 0) {
+                    if (!App.getApp().isLogin) {
+                        if (loginDialog != null && !loginDialog.isShowing()) {
+                            loginDialog.show();
+                        }
+                        return;
+                    }
+
+                    int tempIndex = SPUtils.getInstance().getInt("star_index", -1);
+                    if (tempIndex > -1) {
+                        Intent intent = new Intent(getActivity(), StarDetailActivity.class);
+                        intent.putExtra("star_index", tempIndex);
+                        startActivity(intent);
+                    } else {
+                        Intent intent = new Intent(getActivity(), StarListActivity.class);
+                        startActivity(intent);
+                    }
+                }
+
+                if (position == 1) {
+                    openDialog.setTitle("打开提示");
+                    openDialog.setContent("即将打开\"gif在线制作\"小程序");
+                    openDialog.show();
+                }
             }
         });
 
@@ -171,9 +211,10 @@ public class TestFragment extends BaseFragment implements TestInfoView, View.OnC
         mBanner.stopAutoPlay();
     }
 
-    public void testCategory(String cid) {
+    public void testCategory(String cid, String title) {
         Intent intent = new Intent(getActivity(), TestCategoryActivity.class);
         intent.putExtra("cid", cid);
+        intent.putExtra("title", title);
         startActivity(intent);
     }
 
@@ -184,37 +225,51 @@ public class TestFragment extends BaseFragment implements TestInfoView, View.OnC
 
     @Override
     public void dismissProgress() {
-
+        avi.hide();
     }
 
     @Override
     public void loadDataSuccess(TestInfoRet tData) {
         Logger.i("test list data --->" + JSON.toJSONString(tData));
+        avi.hide();
         if (tData != null && tData.getCode() == Constants.SUCCESS) {
-            testInfoAdapter.setNewData(tData.getData());
-            App.testInfoList = tData.getData();
+            if (tData.getData() != null) {
+                mNoDataLayout.setVisibility(View.GONE);
+                mHotTestListView.setVisibility(View.VISIBLE);
+                App.testInfoList = tData.getData();
+                List<TestInfo> tempDateList = tData.getData();
+                int maxLength = tempDateList.size() > 20 ? 20 : tempDateList.size();
+                testInfoAdapter.setNewData(tempDateList.subList(0, maxLength));
+            } else {
+                mNoDataLayout.setVisibility(View.VISIBLE);
+                mHotTestListView.setVisibility(View.GONE);
+            }
+        } else {
+            mNoDataLayout.setVisibility(View.VISIBLE);
+            mHotTestListView.setVisibility(View.GONE);
         }
     }
 
     @Override
     public void loadDataError(Throwable throwable) {
-
+        mNoDataLayout.setVisibility(View.VISIBLE);
+        mHotTestListView.setVisibility(View.GONE);
     }
 
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.layout_funs:
-                testCategory("1");
+                testCategory("1", "趣味测试");
                 break;
             case R.id.layout_iq:
-                testCategory("1");
+                testCategory("2", "智商测试");
                 break;
             case R.id.layout_xinli:
-                testCategory("1");
+                testCategory("3", "心理测试");
                 break;
             case R.id.layout_tuodan:
-                testCategory("1");
+                testCategory("4", "脱单测试");
                 break;
             case R.id.tv_more:
                 Intent intentMore = new Intent(getActivity(), MoreTestActivity.class);
@@ -227,9 +282,33 @@ public class TestFragment extends BaseFragment implements TestInfoView, View.OnC
                     }
                     return;
                 }
-                Intent intent = new Intent(getActivity(), StarListActivity.class);
-                startActivity(intent);
+                int tempIndex = SPUtils.getInstance().getInt("star_index", -1);
+                if (tempIndex > -1) {
+                    Intent intent = new Intent(getActivity(), StarDetailActivity.class);
+                    intent.putExtra("star_index", tempIndex);
+                    startActivity(intent);
+                } else {
+                    Intent intent = new Intent(getActivity(), StarListActivity.class);
+                    startActivity(intent);
+                }
                 break;
+        }
+    }
+
+    @Override
+    public void config() {
+        String appId = "wxd1112ca9a216aeda"; // 填应用AppId
+        IWXAPI api = WXAPIFactory.createWXAPI(getActivity(), appId);
+        WXLaunchMiniProgram.Req req = new WXLaunchMiniProgram.Req();
+        req.userName = "gh_066fa13db09f"; // 填小程序原始idx
+        req.miniprogramType = WXLaunchMiniProgram.Req.MINIPTOGRAM_TYPE_RELEASE;// 可选打开 开发版，体验版和正式版
+        api.sendReq(req);
+    }
+
+    @Override
+    public void cancel() {
+        if (openDialog != null && openDialog.isShowing()) {
+            openDialog.dismiss();
         }
     }
 }

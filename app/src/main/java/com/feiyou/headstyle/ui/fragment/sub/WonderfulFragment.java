@@ -505,7 +505,7 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
             }
 
             if (tData instanceof ReplyResultInfoRet) {
-                ToastUtils.showLong("回复成功");
+                //ToastUtils.showLong("回复成功");
                 replyListView.setVisibility(View.VISIBLE);
                 mReplyNoDataLayout.setVisibility(View.GONE);
                 if (switchType == 1) {

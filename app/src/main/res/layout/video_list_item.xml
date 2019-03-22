@@ -18,9 +18,7 @@
         <ImageView
             android:id="@+id/iv_video_cover"
             android:layout_width="166dp"
-            android:layout_height="270dp"
-
-            android:src="@mipmap/video_def" />
+            android:layout_height="270dp" />
 
         <RelativeLayout
             android:layout_width="match_parent"

@@ -8,20 +8,21 @@ import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.Editable;
-import android.text.TextWatcher;
+import android.text.InputFilter;
+import android.text.Spanned;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.blankj.utilcode.util.SizeUtils;
 import com.blankj.utilcode.util.StringUtils;
 import com.blankj.utilcode.util.ToastUtils;
-import com.bumptech.glide.Glide;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
@@ -40,15 +41,18 @@ import com.qmuiteam.qmui.widget.QMUITopBar;
 import com.zhihu.matisse.Matisse;
 import com.zhihu.matisse.MimeType;
 
-import java.io.File;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import butterknife.BindView;
 import butterknife.OnClick;
+import es.dmoral.toasty.Toasty;
 
 /**
  * Created by myflying on 2018/11/23.
@@ -116,6 +120,9 @@ public class PushNoteActivity extends BaseFragmentActivity implements IBaseView 
 
     private Drawable isAddTopicDw;
 
+    //最大输入长度
+    final int maxInputLength = 500;
+
     @Override
     protected int getContextViewId() {
         return R.layout.activity_add_note;
@@ -144,12 +151,16 @@ public class PushNoteActivity extends BaseFragmentActivity implements IBaseView 
             }
         });
 
+        //设置过滤器，
+        InputFilter[] filters = {new NameLengthFilter(maxInputLength)};
+        mInputNoteEditText.setFilters(filters);
+
         mAddNoteBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 String tempInputContent = mInputNoteEditText.getText().toString();
                 if (StringUtils.isEmpty(tempInputContent)) {
-                    ToastUtils.showLong("请输入内容");
+                    Toasty.normal(PushNoteActivity.this, "你还没有输入内容哦").show();
                     return;
                 }
 
@@ -163,12 +174,12 @@ public class PushNoteActivity extends BaseFragmentActivity implements IBaseView 
                 }
 
                 if (result.size() == 0) {
-                    ToastUtils.showLong("请选择图片");
+                    Toasty.normal(PushNoteActivity.this, "配图可以让更多人注意到你").show();
                     return;
                 }
 
                 if (topicSelectIndex == -1) {
-                    ToastUtils.showLong("请选择话题");
+                    Toasty.normal(PushNoteActivity.this, "别忘了选择话题，否则大家看不到喔").show();
                     return;
                 }
 
@@ -179,7 +190,7 @@ public class PushNoteActivity extends BaseFragmentActivity implements IBaseView 
 
                 //TODO,此方法有问题
                 Logger.i("sendContent--->" + sendContent);
-                addNotePresenterImp.addNote(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", StringUtils.isEmpty(sendContent) ? tempInputContent : sendContent, "1", tempIds, result);
+                addNotePresenterImp.addNote(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", StringUtils.isEmpty(sendContent) ? tempInputContent : sendContent, topicId, tempIds, result);
             }
         });
 
@@ -397,6 +408,43 @@ public class PushNoteActivity extends BaseFragmentActivity implements IBaseView 
     public void loadDataError(Throwable throwable) {
         if (progressDialog != null && progressDialog.isShowing()) {
             progressDialog.dismiss();
+        }
+    }
+
+    private class NameLengthFilter implements InputFilter {
+        int MAX_EN;// 最大英文/数字长度 一个汉字算两个字母
+        String regEx = "[\\u4e00-\\u9fa5]"; // unicode编码，判断是否为汉字
+
+        public NameLengthFilter(int mAX_EN) {
+            super();
+            MAX_EN = mAX_EN;
+        }
+
+        @Override
+        public CharSequence filter(CharSequence source, int start, int end,
+                                   Spanned dest, int dstart, int dend) {
+            int destCount = dest.toString().length()
+                    + getChineseCount(dest.toString());
+            int sourceCount = source.toString().length()
+                    + getChineseCount(source.toString());
+            if (destCount + sourceCount > MAX_EN) {
+                Toasty.normal(PushNoteActivity.this, "字数达到上限").show();
+                return "";
+            } else {
+                return source;
+            }
+        }
+
+        private int getChineseCount(String str) {
+            int count = 0;
+            Pattern p = Pattern.compile(regEx);
+            Matcher m = p.matcher(str);
+            while (m.find()) {
+                for (int i = 0; i <= m.groupCount(); i++) {
+                    count = count + 1;
+                }
+            }
+            return count;
         }
     }
 }

@@ -1,7 +1,5 @@
 package com.feiyou.headstyle.ui.activity;
 
-import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
@@ -19,8 +17,6 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -50,7 +46,6 @@ import com.feiyou.headstyle.bean.AddCollectionRet;
 import com.feiyou.headstyle.bean.FollowInfoRet;
 import com.feiyou.headstyle.bean.MessageEvent;
 import com.feiyou.headstyle.bean.NoteItem;
-import com.feiyou.headstyle.bean.NoteSubComment;
 import com.feiyou.headstyle.bean.NoteSubCommentRet;
 import com.feiyou.headstyle.bean.ReplyParams;
 import com.feiyou.headstyle.bean.ReplyResultInfoRet;

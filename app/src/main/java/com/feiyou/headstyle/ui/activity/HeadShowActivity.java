@@ -388,12 +388,19 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
             } else {
                 headListDataPresenterImp.getDataByTagId(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", tagId, currentPage, pageSize);
             }
-        } else {
+        }
+
+        if (fromType == 2) {
             if (startPosition < collectionList.size()) {
                 adapter.addDatas(collectionList.subList(startPosition, collectionList.size() - 1));
             } else {
                 adapter.addDatas(collectionList);
             }
+            currentImageUrl = adapter.getHeads().get(0).getImgurl();
+        }
+
+        if (fromType == 3) {
+            headListDataPresenterImp.userCollection(currentPage, App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "");
         }
 
         switchMultiButton.setOnSwitchListener(new SwitchMultiButton.OnSwitchListener() {
@@ -480,8 +487,15 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
 
     @OnClick(R.id.layout_setting_head)
     void setting() {
-        if (bottomSheetDialog != null && !bottomSheetDialog.isShowing()) {
-            bottomSheetDialog.show();
+        if (!App.getApp().isLogin) {
+            if (loginDialog != null && !loginDialog.isShowing()) {
+                loginDialog.show();
+            }
+            return;
+        } else {
+            if (bottomSheetDialog != null && !bottomSheetDialog.isShowing()) {
+                bottomSheetDialog.show();
+            }
         }
     }
 
@@ -542,13 +556,19 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
 
     @Override
     public void removeFirstObjectInAdapter() {
-        if (fromType == 1) {
+        if (fromType == 1 || fromType == 3) {
             if (adapter.getCount() < 6) {
                 currentPage++;
-                if (StringUtils.isEmpty(tagId)) {
-                    homeDataPresenterImp.getData(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", currentPage + "", "", "", 1);
-                } else {
-                    headListDataPresenterImp.getDataByTagId(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", tagId, currentPage, pageSize);
+                if (fromType == 1) {
+                    if (StringUtils.isEmpty(tagId)) {
+                        homeDataPresenterImp.getData(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", currentPage + "", "", "", 1);
+                    } else {
+                        headListDataPresenterImp.getDataByTagId(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", tagId, currentPage, pageSize);
+                    }
+                }
+
+                if (fromType == 3) {
+                    headListDataPresenterImp.userCollection(currentPage, App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "");
                 }
             }
 
@@ -572,6 +592,10 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
                 } else {
                     mKeepTextView.setCompoundDrawablesWithIntrinsicBounds(null, isCollection, null, null);
                 }
+            }
+
+            if(fromType == 3){
+                mKeepTextView.setCompoundDrawablesWithIntrinsicBounds(null, isCollection, null, null);
             }
         } else {
             if (adapter.getCount() <= 1) {
@@ -653,6 +677,10 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
                         }
                     }
 
+                    if (fromType == 3) {
+                        mKeepTextView.setCompoundDrawablesWithIntrinsicBounds(null, isCollection, null, null);
+                    }
+
                 } else {
                     adapter.addDatas(((HomeDataRet) tData).getData().getImagesList());
                 }
@@ -677,6 +705,9 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
                         }
                     }
 
+                    if (fromType == 3) {
+                        mKeepTextView.setCompoundDrawablesWithIntrinsicBounds(null, isCollection, null, null);
+                    }
                 } else {
                     adapter.addDatas(((HeadInfoRet) tData).getData());
                 }
@@ -855,7 +886,7 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
         }
     }
 
-    public void dismissShareView(){
+    public void dismissShareView() {
         if (shareDialog != null && shareDialog.isShowing()) {
             shareDialog.dismiss();
         }

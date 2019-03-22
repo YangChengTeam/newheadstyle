@@ -194,6 +194,8 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
 
     private ShareAction shareAction;
 
+    private boolean isFromStick;
+
     @Override
     protected int getContextViewId() {
         return R.layout.activity_article_detail;
@@ -234,6 +236,10 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
         Bundle bundle = getIntent().getExtras();
         if (bundle != null && !StringUtils.isEmpty(bundle.getString("msg_id"))) {
             messageId = bundle.getString("msg_id");
+        }
+
+        if (bundle != null) {
+            isFromStick = bundle.getBoolean("if_from_stick", false);
         }
 
         FragmentManager manager = getSupportFragmentManager();
@@ -285,6 +291,15 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
         commentDialog.show(getFragmentManager(), "dialog");
     }
 
+    @OnClick(R.id.iv_user_head)
+    public void currentUserInfo() {
+        if (currentNoteInfo != null) {
+            Intent intent = new Intent(this, UserInfoActivity.class);
+            intent.putExtra("user_id", currentNoteInfo.getUserId());
+            startActivity(intent);
+        }
+    }
+
     @OnClick(R.id.layout_follow)
     void addFollow() {
         if (!App.getApp().isLogin) {
@@ -333,7 +348,7 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
         }
     }
 
-    @OnClick(R.id.iv_share)
+    @OnClick({R.id.iv_share, R.id.layout_note_share})
     void commonShare() {
         if (commonShareDialog != null && !commonShareDialog.isShowing()) {
             commonShareDialog.show();
@@ -447,7 +462,7 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
             }
 
             if (tData instanceof ReplyResultInfoRet) {
-                ToastUtils.showLong("回复成功");
+                //ToastUtils.showLong("回复成功");
                 commentNum++;
                 mMessageCountTextView.setText(commentNum > 0 ? commentNum + "" : "");
 
@@ -570,7 +585,12 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
 
     @Override
     public void onClick(View view) {
+
         String shareContent = StringUtils.isEmpty(currentNoteInfo.getContent()) ? "快来试试炫酷的头像吧" : currentNoteInfo.getContent();
+        String shareTitle = "一位神秘人士对你发出邀请";
+        if (isFromStick) {
+            shareContent = "这里的老哥老姐个个都是人才，说话又好听，我超喜欢这里...";
+        }
         UMWeb web = new UMWeb("http://gx.qqtn.com");
         if (shareAction != null) {
             UMImage image = new UMImage(CommunityArticleActivity.this, R.drawable.app_share);
@@ -578,8 +598,8 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
                 image = new UMImage(CommunityArticleActivity.this, imageUrls.get(0));
                 image.compressStyle = UMImage.CompressStyle.QUALITY;
             }
-            web.setTitle(shareContent);//标题
-            web.setThumb(image);  //缩略图
+            web.setTitle(isFromStick ? shareTitle : shareContent);//标题
+            web.setThumb(image);//缩略图
             web.setDescription(shareContent);//描述
         }
 
@@ -600,14 +620,23 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
                 shareAction.withMedia(web).setPlatform(SHARE_MEDIA.QZONE).share();
                 break;
             case R.id.layout_report:
-                dismissShareView();
+                if (!App.getApp().isLogin) {
+                    if (loginDialog != null && !loginDialog.isShowing()) {
+                        loginDialog.show();
+                    }
+                    return;
+                }
 
+                dismissShareView();
                 Intent intent = new Intent(this, ReportInfoActivity.class);
                 intent.putExtra("rid", currentNoteInfo != null ? currentNoteInfo.getId() : "");
                 intent.putExtra("report_type", 2);
                 startActivity(intent);
                 break;
             case R.id.layout_to_home:
+                Intent intent1 = new Intent(this, Main1Activity.class);
+                startActivity(intent1);
+                finish();
                 break;
             default:
                 break;

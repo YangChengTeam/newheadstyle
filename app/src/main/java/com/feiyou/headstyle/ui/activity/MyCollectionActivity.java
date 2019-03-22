@@ -8,16 +8,20 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.alibaba.fastjson.JSON;
 import com.blankj.utilcode.util.SizeUtils;
 import com.blankj.utilcode.util.StringUtils;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
+import com.feiyou.headstyle.bean.HeadInfo;
 import com.feiyou.headstyle.bean.HeadInfoRet;
 import com.feiyou.headstyle.bean.ResultInfo;
 import com.feiyou.headstyle.common.Constants;
@@ -30,6 +34,8 @@ import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 import com.qmuiteam.qmui.widget.QMUITopBar;
 import com.wang.avi.AVLoadingIndicatorView;
+
+import java.util.ArrayList;
 
 import butterknife.BindView;
 
@@ -62,6 +68,8 @@ public class MyCollectionActivity extends BaseFragmentActivity implements HeadLi
     private int currentPage = 1;
 
     private int pageSize = 30;
+
+    private ArrayList<HeadInfo> collectionList;
 
     @Override
     protected int getContextViewId() {
@@ -119,6 +127,10 @@ public class MyCollectionActivity extends BaseFragmentActivity implements HeadLi
         mHeadInfoListView.setLayoutManager(new GridLayoutManager(this, 3));
         mHeadInfoListView.setAdapter(headInfoAdapter);
 
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
+        params.setMargins(SizeUtils.dp2px(12), SizeUtils.dp2px(12), SizeUtils.dp2px(12), 0);
+        mHeadInfoListView.setLayoutParams(params);
+
         headInfoAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
@@ -128,9 +140,10 @@ public class MyCollectionActivity extends BaseFragmentActivity implements HeadLi
                 Logger.i("jumpPage page--->" + jumpPage + "---jumpPosition--->" + jumpPosition);
 
                 Intent intent = new Intent(MyCollectionActivity.this, HeadShowActivity.class);
-                intent.putExtra("from_type", 1);
+                intent.putExtra("from_type", 3);
                 intent.putExtra("jump_page", jumpPage + 1);
                 intent.putExtra("jump_position", jumpPosition);
+                //intent.putExtra("collection_list", JSON.toJSONString(collectionList));
                 startActivity(intent);
             }
         });

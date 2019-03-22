@@ -23,6 +23,7 @@ import android.widget.Toast;
 import com.alibaba.fastjson.JSONObject;
 import com.blankj.utilcode.util.ImageUtils;
 import com.blankj.utilcode.util.PathUtils;
+import com.blankj.utilcode.util.SPUtils;
 import com.blankj.utilcode.util.SizeUtils;
 import com.blankj.utilcode.util.StringUtils;
 import com.blankj.utilcode.util.TimeUtils;
@@ -161,6 +162,8 @@ public class StarDetailActivity extends BaseFragmentActivity implements Forecast
             starIndex = bundle.getInt("star_index");
         }
 
+        SPUtils.getInstance().put("star_index", starIndex);
+
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("正在保存");
 
@@ -198,6 +201,13 @@ public class StarDetailActivity extends BaseFragmentActivity implements Forecast
         mForeCastListView.setNestedScrollingEnabled(false);//禁止滑动
 
         forecastPresenterImp.getForecastData(starName[starIndex], "today");
+    }
+
+    @OnClick(R.id.iv_change_star)
+    void changeStar() {
+        Intent intent = new Intent(this, StarListActivity.class);
+        startActivity(intent);
+        finish();
     }
 
     @OnClick(R.id.layout_share)

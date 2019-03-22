@@ -86,6 +86,8 @@ public class TestDetailActivity extends BaseFragmentActivity implements TestDeta
 
     private UserInfo userInfo;
 
+    TextView titleTv;
+
     @Override
     protected int getContextViewId() {
         return R.layout.activity_test_detail;
@@ -100,10 +102,9 @@ public class TestDetailActivity extends BaseFragmentActivity implements TestDeta
 
     private void initTopBar() {
         QMUIStatusBarHelper.setStatusBarLightMode(this);
-        mTopBar.setTitle(getResources().getString(R.string.app_name));
         View topSearchView = getLayoutInflater().inflate(R.layout.common_top_back, null);
         topSearchView.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, SizeUtils.dp2px(48)));
-        TextView titleTv = topSearchView.findViewById(R.id.tv_title);
+        titleTv = topSearchView.findViewById(R.id.tv_title);
         titleTv.setText("测试详情");
 
         mTopBar.setCenterView(topSearchView);
@@ -202,7 +203,7 @@ public class TestDetailActivity extends BaseFragmentActivity implements TestDeta
 
         } else {
             selectResultIndex = jump.get(currentSubjectIndex).getJumpAnswer()[pos];
-            ToastUtils.showLong("最后一题,选择的答案是--->" + selectResultIndex);
+            //ToastUtils.showLong("最后一题,选择的答案是--->" + selectResultIndex);
             //回复选择的答案
             TestMsgInfo answerInfo = new TestMsgInfo();
             answerInfo.setType(TestMsgInfo.TYPE_SENT);
@@ -244,7 +245,8 @@ public class TestDetailActivity extends BaseFragmentActivity implements TestDeta
                 if (((TestDetailInfoRet) tData).getData() != null) {
                     //设置全局的测试信息
                     App.getApp().setTestInfo(((TestDetailInfoRet) tData).getData());
-
+                    String title = StringUtils.isEmpty(((TestDetailInfoRet) tData).getData().getTitle()) ? "测试详情" : ((TestDetailInfoRet) tData).getData().getTitle();
+                    titleTv.setText(title);
                     TestMsgInfo guideInfo = new TestMsgInfo(((TestDetailInfoRet) tData).getData().getImage(), ((TestDetailInfoRet) tData).getData().getDesc(), TestMsgInfo.TYPE_RECEIVED);
                     chatListAdapter.addData(guideInfo);
                     chatListAdapter.notifyDataSetChanged();

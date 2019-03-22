@@ -1,6 +1,11 @@
 package com.feiyou.headstyle.ui.activity;
 
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.media.MediaScannerConnection;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.design.widget.BottomSheetDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -14,12 +19,19 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
+import com.blankj.utilcode.util.ImageUtils;
+import com.blankj.utilcode.util.PathUtils;
 import com.blankj.utilcode.util.SizeUtils;
 import com.blankj.utilcode.util.StringUtils;
+import com.blankj.utilcode.util.TimeUtils;
+import com.blankj.utilcode.util.ToastUtils;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
+import com.feiyou.headstyle.bean.StarPosterRet;
 import com.feiyou.headstyle.bean.TestInfoRet;
 import com.feiyou.headstyle.common.Constants;
 import com.feiyou.headstyle.presenter.TestInfoPresenterImp;
@@ -37,6 +49,8 @@ import com.umeng.socialize.bean.SHARE_MEDIA;
 import com.umeng.socialize.media.UMImage;
 import com.umeng.socialize.media.UMWeb;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -79,6 +93,10 @@ public class TestResultActivity extends BaseFragmentActivity implements TestInfo
     private ShareAction shareAction;
 
     BottomSheetDialog shareDialog;
+
+    private String filePath;
+
+    private Bitmap tempBitmap;
 
     @Override
     protected int getContextViewId() {
@@ -145,6 +163,13 @@ public class TestResultActivity extends BaseFragmentActivity implements TestInfo
         closeDialog.setOnClickListener(this);
         shareDialog.setContentView(shareView);
 
+        Glide.with(this).asBitmap().load(imageUrl).into(new SimpleTarget<Bitmap>() {
+            @Override
+            public void onResourceReady(Bitmap resource, Transition<? super Bitmap> transition) {
+                tempBitmap = resource;
+            }
+        });
+
 
         testInfoPresenterImp = new TestInfoPresenterImp(this, this);
         testInfoAdapter = new TestInfoAdapter(this, null);
@@ -163,12 +188,45 @@ public class TestResultActivity extends BaseFragmentActivity implements TestInfo
 
     @OnClick(R.id.btn_save)
     void save() {
-
+        Glide.with(this).asBitmap().load(imageUrl).into(new SimpleTarget<Bitmap>() {
+            @Override
+            public void onResourceReady(Bitmap resource, Transition<? super Bitmap> transition) {
+                //加载成功，resource为加载到的bitmap
+                filePath = PathUtils.getExternalPicturesPath() + File.separator + TimeUtils.getNowMills() + ".jpg";
+                Logger.i("save test result --->" + filePath);
+                boolean isSave = ImageUtils.save(resource, filePath, Bitmap.CompressFormat.JPEG);
+                if (isSave) {
+                    saveImageToGallery();
+                }
+            }
+        });
     }
 
     @OnClick(R.id.btn_test_again)
     void testAgain() {
 
+    }
+
+    // 其次把文件插入到系统图库
+    public boolean saveImageToGallery() {
+        boolean flag = true;
+        try {
+            if (!StringUtils.isEmpty(filePath)) {
+                MediaStore.Images.Media.insertImage(getContentResolver(),
+                        filePath, filePath.substring(filePath.lastIndexOf("/") + 1, filePath.length()), null);
+
+                MediaScannerConnection.scanFile(TestResultActivity.this, new String[]{filePath}, null, null);
+                // 最后通知图库更新
+                sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.parse("file://" + filePath)));
+                ToastUtils.showLong("已保存到图库");
+            } else {
+                flag = false;
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            flag = false;
+        }
+        return flag;
     }
 
     @Override
@@ -249,45 +307,32 @@ public class TestResultActivity extends BaseFragmentActivity implements TestInfo
 
     @Override
     public void onClick(View view) {
-        String shareTitle = "一个最近很火的心理测试，准到可怕！";
-        String shareContent = "最近很火的心理测试，据说非常准，测过的人都说可怕...";
-        String shareImageUrl = "";
-        if (App.getApp().getTestInfo() != null) {
-            if (App.getApp().getTestInfo().getShare_title() != null && App.getApp().getTestInfo().getShare_title().length > 0) {
-                shareTitle = App.getApp().getTestInfo().getShare_title()[0];
+        UMImage noImage = new UMImage(TestResultActivity.this, R.drawable.app_share);
+        if (StringUtils.isEmpty(imageUrl)) {
+            shareAction.withMedia(noImage);
+        } else {
+            UMImage image = new UMImage(TestResultActivity.this, imageUrl);
+            if (tempBitmap != null) {
+                UMImage scaImage = new UMImage(TestResultActivity.this, ImageUtils.compressByScale(tempBitmap, 200, 200));
+                image.setThumb(scaImage);
+            } else {
+                image.setThumb(noImage);
             }
-            if (!StringUtils.isEmpty(App.getApp().getTestInfo().getImage())) {
-                shareImageUrl = App.getApp().getTestInfo().getImage();
-            }
-            if (!StringUtils.isEmpty(App.getApp().getTestInfo().getDesc())) {
-                shareContent = App.getApp().getTestInfo().getDesc();
-            }
-        }
-
-        UMWeb web = new UMWeb("http://gx.qqtn.com");
-        if (shareAction != null) {
-            UMImage image = new UMImage(TestResultActivity.this, R.drawable.app_share);
-            if (!StringUtils.isEmpty(shareImageUrl)) {
-                image = new UMImage(TestResultActivity.this, shareImageUrl);
-                image.compressStyle = UMImage.CompressStyle.QUALITY;
-            }
-            web.setTitle(shareTitle);//标题
-            web.setThumb(image);  //缩略图
-            web.setDescription(shareContent);//描述
+            shareAction.withMedia(image);
         }
 
         switch (view.getId()) {
             case R.id.layout_weixin:
-                shareAction.withMedia(web).setPlatform(SHARE_MEDIA.WEIXIN).share();
+                shareAction.setPlatform(SHARE_MEDIA.WEIXIN).share();
                 break;
             case R.id.layout_circle:
-                shareAction.withMedia(web).setPlatform(SHARE_MEDIA.WEIXIN_CIRCLE).share();
+                shareAction.setPlatform(SHARE_MEDIA.WEIXIN_CIRCLE).share();
                 break;
             case R.id.layout_qq_friends:
-                shareAction.withMedia(web).setPlatform(SHARE_MEDIA.QQ).share();
+                shareAction.setPlatform(SHARE_MEDIA.QQ).share();
                 break;
             case R.id.layout_qzone:
-                shareAction.withMedia(web).setPlatform(SHARE_MEDIA.QZONE).share();
+                shareAction.setPlatform(SHARE_MEDIA.QZONE).share();
                 break;
             case R.id.iv_close_share:
                 dismissShareView();

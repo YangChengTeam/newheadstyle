@@ -25,9 +25,11 @@ import com.blankj.utilcode.util.SizeUtils;
 import com.blankj.utilcode.util.StringUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.feiyou.headstyle.App;
+import com.feiyou.headstyle.GlideApp;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.bean.CollectInfoRet;
 import com.feiyou.headstyle.bean.NoteInfoRet;
@@ -42,6 +44,7 @@ import com.feiyou.headstyle.ui.adapter.CommonImageAdapter;
 import com.feiyou.headstyle.ui.adapter.HeadInfoAdapter;
 import com.feiyou.headstyle.ui.adapter.NoteInfoAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragmentActivity;
+import com.feiyou.headstyle.ui.custom.GlideCircleTransformWithBorder;
 import com.feiyou.headstyle.ui.custom.GlideRoundTransform;
 import com.feiyou.headstyle.view.CollectDataView;
 import com.feiyou.headstyle.view.NoteDataView;
@@ -153,6 +156,8 @@ public class UserInfoActivity extends BaseFragmentActivity implements UserInfoVi
 
     LinearLayout mUpdateCancelLayout;
 
+    RequestOptions options;
+
     @Override
     protected int getContextViewId() {
         return R.layout.activity_user_info;
@@ -174,6 +179,7 @@ public class UserInfoActivity extends BaseFragmentActivity implements UserInfoVi
         ImageView rightIv = topView.findViewById(R.id.iv_right);
         TextView titleTv = topView.findViewById(R.id.tv_title);
         titleTv.setText(isMyInfo ? "我的主页" : "个人主页");
+
         mBackImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -197,12 +203,15 @@ public class UserInfoActivity extends BaseFragmentActivity implements UserInfoVi
             isMyInfo = bundle.getBoolean("is_my_info", false);
         }
 
+        //设置白色边框的图片
+        options = new RequestOptions().skipMemoryCache(true).diskCacheStrategy(DiskCacheStrategy.ALL);
+        options.placeholder(R.mipmap.head_def);
+        options.transform(new GlideCircleTransformWithBorder(this, 2, ContextCompat.getColor(this, R.color.white)));
+
         if (isMyInfo) {
             userInfo = App.getApp().getmUserInfo();
             userId = userInfo.getId();
 
-            RequestOptions options = new RequestOptions();
-            options.transform(new GlideRoundTransform(this, 30));
             Glide.with(this).load(userInfo.getUserimg()).apply(options).into(mUserHeadIv);
 
             mFollowCountTv.setText(userInfo.getGuanNum() + "");
@@ -289,7 +298,7 @@ public class UserInfoActivity extends BaseFragmentActivity implements UserInfoVi
             @Override
             public void onLoadMoreRequested() {
                 currentPage++;
-                userInfoPresenterImp.getUserInfo(App.getApp().getmUserInfo().getId(),userId);
+                userInfoPresenterImp.getUserInfo(App.getApp().getmUserInfo().getId(), userId);
             }
         }, mNoteListView);
 
@@ -303,7 +312,7 @@ public class UserInfoActivity extends BaseFragmentActivity implements UserInfoVi
                 }
             }
         });
-        userInfoPresenterImp.getUserInfo(App.getApp().getmUserInfo().getId(),userId);
+        userInfoPresenterImp.getUserInfo(App.getApp().getmUserInfo().getId(), userId);
     }
 
     @OnClick(R.id.tv_follow_count)
@@ -341,8 +350,7 @@ public class UserInfoActivity extends BaseFragmentActivity implements UserInfoVi
         if (tData != null && tData.getCode() == Constants.SUCCESS) {
             if (tData instanceof UserInfoRet) {
                 userInfo = ((UserInfoRet) tData).getData();
-                RequestOptions options = new RequestOptions();
-                options.transform(new GlideRoundTransform(this, 30));
+
                 Glide.with(this).load(userInfo.getUserimg()).apply(options).into(mUserHeadIv);
 
                 mFollowCountTv.setText(userInfo.getGuanNum() + "");
