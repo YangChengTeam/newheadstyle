@@ -2,6 +2,7 @@ package com.feiyou.headstyle.ui.activity;
 
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.GridLayoutManager;
@@ -100,6 +101,8 @@ public class SearchActivity extends BaseFragmentActivity implements HotWordDataV
 
     ConfigDialog configDialog;
 
+    private String mKeyWord;
+
     @Override
     protected int getContextViewId() {
         return R.layout.activity_search;
@@ -156,6 +159,31 @@ public class SearchActivity extends BaseFragmentActivity implements HotWordDataV
         mSearchResultListView.setLayoutManager(new GridLayoutManager(this, 3));
         mSearchResultListView.setAdapter(headInfoAdapter);
 
+        headInfoAdapter.setOnLoadMoreListener(new BaseQuickAdapter.RequestLoadMoreListener() {
+            @Override
+            public void onLoadMoreRequested() {
+                currentPage++;
+                headListDataPresenterImp.getSearchList(currentPage, StringUtils.isEmpty(mKeyWord) ? "" : mKeyWord, "");
+            }
+        }, mSearchResultListView);
+
+        headInfoAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
+                int jumpPage = position / pageSize;
+                int jumpPosition = position % pageSize;
+
+                Logger.i("jumpPage page--->" + jumpPage + "---jumpPosition--->" + jumpPosition);
+
+                Intent intent = new Intent(SearchActivity.this, HeadShowActivity.class);
+                intent.putExtra("from_type", 4);
+                intent.putExtra("key_word", mKeyWord);
+                intent.putExtra("jump_page", jumpPage + 1);
+                intent.putExtra("jump_position", jumpPosition);
+                startActivity(intent);
+            }
+        });
+
         //请求数据
         headListDataPresenterImp = new HeadListDataPresenterImp(this, this);
         hotWordDataPresenterImp = new HotWordDataPresenterImp(this, this);
@@ -178,7 +206,7 @@ public class SearchActivity extends BaseFragmentActivity implements HotWordDataV
     }
 
     public void addSearchKey(String keyWord) {
-
+        mKeyWord = keyWord;
         if (historySearchList != null) {
             if (!historySearchList.contains(keyWord)) {
                 historySearchList.add(keyWord);
@@ -198,9 +226,9 @@ public class SearchActivity extends BaseFragmentActivity implements HotWordDataV
                             ToastUtils.showLong("请输入关键词后搜索");
                             break;
                         }
-                        String keyWord = textView.getText().toString();
+                        mKeyWord = textView.getText().toString();
 
-                        startSearch(keyWord);
+                        startSearch(mKeyWord);
                     }
                     break;
                 default:

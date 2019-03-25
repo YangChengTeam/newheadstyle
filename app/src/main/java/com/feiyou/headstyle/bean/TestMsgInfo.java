@@ -11,6 +11,8 @@ public class TestMsgInfo {
     private String imgUrl;
     private int type;
 
+    private String codeImageUrl;
+
     private String resultImageUrl;
 
     private List<String> answer;
@@ -72,5 +74,13 @@ public class TestMsgInfo {
 
     public void setResultImageUrl(String resultImageUrl) {
         this.resultImageUrl = resultImageUrl;
+    }
+
+    public String getCodeImageUrl() {
+        return codeImageUrl;
+    }
+
+    public void setCodeImageUrl(String codeImageUrl) {
+        this.codeImageUrl = codeImageUrl;
     }
 }

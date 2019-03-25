@@ -8,6 +8,8 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -131,6 +133,10 @@ public class HeadListActivity extends BaseFragmentActivity implements HeadListDa
         headInfoAdapter = new HeadInfoAdapter(this, null);
         mHeadInfoListView.setLayoutManager(new GridLayoutManager(this, 3));
         mHeadInfoListView.setAdapter(headInfoAdapter);
+
+        View topEmptyView = new View(this);
+        topEmptyView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, SizeUtils.dp2px(12)));
+        headInfoAdapter.setHeaderView(topEmptyView);
 
         headInfoAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
             @Override

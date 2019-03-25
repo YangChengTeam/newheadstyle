@@ -19,6 +19,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.blankj.utilcode.util.BarUtils;
+import com.blankj.utilcode.util.NetworkUtils;
 import com.blankj.utilcode.util.PathUtils;
 import com.blankj.utilcode.util.SizeUtils;
 import com.blankj.utilcode.util.ToastUtils;
@@ -211,7 +212,7 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
         adLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                clickType = 1;
+                clickType = 2;
                 switch (adInfo.getType()) {
                     case 1:
                         Intent intent = new Intent(getActivity(), AdListActivity.class);
@@ -221,12 +222,19 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
                         if (task != null && task.isRunning()) {
                             Toasty.normal(getActivity(), "正在下载打开请稍后...").show();
                         } else {
-                            downAppFile("http://zs.qqtn.com/zbsq/Apk/tnzbsq_LIURENJUN1.apk");
+                            if (NetworkUtils.isMobileData()) {
+                                openDialog.setTitle("温馨提示");
+                                openDialog.setContent("当前是移动网络，是否继续下载？");
+                            } else {
+                                openDialog.setTitle("下载提示");
+                                openDialog.setContent("即将下载" + adInfo.getName());
+                            }
+                            openDialog.show();
                         }
                         break;
                     case 3:
                         openDialog.setTitle("打开提示");
-                        openDialog.setContent("即将打开\"xxx\"小程序");
+                        openDialog.setContent("即将打开\"" + adInfo.getName() + "\"小程序");
                         openDialog.show();
                         break;
                     default:
@@ -364,7 +372,7 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
         mBanner.setOnBannerListener(new OnBannerListener() {
             @Override
             public void OnBannerClick(int position) {
-                clickType = 2;
+                clickType = 1;
                 bannerInfo = bannerInfos.get(position);
                 if (bannerInfo.getType() == 1) {
                     Intent intent = new Intent(getActivity(), Collection2Activity.class);
@@ -378,7 +386,7 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
                 }
                 if (bannerInfo.getType() == 3) {
                     openDialog.setTitle("打开小程序");
-                    openDialog.setContent("是否打开小程序?");
+                    openDialog.setContent("是否打开\"" + bannerInfo.getName() + "\"小程序?");
                     openDialog.show();
                 }
             }
@@ -521,17 +529,17 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
         IWXAPI api = WXAPIFactory.createWXAPI(getActivity(), appId);
 
         if (clickType == 1) {
-            switch (adInfo.getType()) {
+            switch (bannerInfo.getType()) {
                 case 1:
-
+                    //网页
                     break;
                 case 2:
-                    ToastUtils.showLong("类型-软件下载");
+
                     break;
                 case 3:
                     WXLaunchMiniProgram.Req req = new WXLaunchMiniProgram.Req();
-                    req.userName = adInfo.getOriginId(); // 填小程序原始id
-                    req.path = adInfo.getJumpPath(); //拉起小程序页面的可带参路径，不填默认拉起小程序首页
+                    req.userName = bannerInfo.getOriginId(); // 填小程序原始id
+                    req.path = bannerInfo.getJumpPath(); //拉起小程序页面的可带参路径，不填默认拉起小程序首页
                     req.miniprogramType = WXLaunchMiniProgram.Req.MINIPTOGRAM_TYPE_RELEASE;// 可选打开 开发版，体验版和正式版
                     api.sendReq(req);
                     break;
@@ -540,17 +548,17 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
             }
         }
         if (clickType == 2) {
-            switch (bannerInfo.getType()) {
+            switch (adInfo.getType()) {
                 case 1:
-                    //网页
+
                     break;
                 case 2:
-                    //软件
+                    downAppFile("http://zs.qqtn.com/zbsq/Apk/tnzbsq_LIURENJUN1.apk");
                     break;
                 case 3:
                     WXLaunchMiniProgram.Req req = new WXLaunchMiniProgram.Req();
-                    req.userName = bannerInfo.getOriginId(); // 填小程序原始id
-                    req.path = bannerInfo.getJumpPath(); //拉起小程序页面的可带参路径，不填默认拉起小程序首页
+                    req.userName = adInfo.getOriginId(); // 填小程序原始id
+                    req.path = adInfo.getJumpPath(); //拉起小程序页面的可带参路径，不填默认拉起小程序首页
                     req.miniprogramType = WXLaunchMiniProgram.Req.MINIPTOGRAM_TYPE_RELEASE;// 可选打开 开发版，体验版和正式版
                     api.sendReq(req);
                     break;

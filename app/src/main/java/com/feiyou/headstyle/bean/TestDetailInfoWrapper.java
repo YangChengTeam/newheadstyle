@@ -11,6 +11,8 @@ import java.util.List;
  */
 public class TestDetailInfoWrapper {
 
+    private String testId;
+
     private String desc;
 
     private String ico;
@@ -102,5 +104,13 @@ public class TestDetailInfoWrapper {
 
     public void setSex(Integer sex) {
         this.sex = sex;
+    }
+
+    public String getTestId() {
+        return testId;
+    }
+
+    public void setTestId(String testId) {
+        this.testId = testId;
     }
 }

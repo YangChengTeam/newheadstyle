@@ -21,6 +21,7 @@ import com.blankj.utilcode.util.SizeUtils;
 import com.blankj.utilcode.util.StringUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.chad.library.adapter.base.BaseQuickAdapter;
+import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.bean.PhotoInfo;
 import com.feiyou.headstyle.bean.PhotoWallRet;
@@ -36,6 +37,7 @@ import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 import com.qmuiteam.qmui.widget.QMUITopBar;
 import com.zhihu.matisse.Matisse;
 import com.zhihu.matisse.MimeType;
+import com.zhihu.matisse.listener.OnCheckedListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -202,6 +204,12 @@ public class PhotoWallActivity extends BaseFragmentActivity implements View.OnCl
                     .restrictOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED)
                     .thumbnailScale(0.85f)
                     .imageEngine(new Glide4Engine())
+                    .setOnCheckedListener(new OnCheckedListener() {
+                        @Override
+                        public void onCheck(boolean isChecked) {
+
+                        }
+                    })
                     .forResult(REQUEST_CODE_CHOOSE);
         } else {
             ToastUtils.showLong("不能上传更多图片哦");
@@ -224,7 +232,7 @@ public class PhotoWallActivity extends BaseFragmentActivity implements View.OnCl
                 progressDialog.show();
             }
 
-            uploadPhotoPresenterImp.deletePhoto("1021601", tempStr);
+            uploadPhotoPresenterImp.deletePhoto(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", tempStr);
         }
     }
 
@@ -282,7 +290,7 @@ public class PhotoWallActivity extends BaseFragmentActivity implements View.OnCl
 
                         List<String> tempList = Matisse.obtainPathResult(data);
 
-                        uploadPhotoPresenterImp.uploadPhotoWall("1021601", tempList);
+                        uploadPhotoPresenterImp.uploadPhotoWall(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", tempList);
                     }
                     break;
 

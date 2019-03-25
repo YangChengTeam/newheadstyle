@@ -56,8 +56,6 @@ import butterknife.ButterKnife;
  */
 public class TestFragment extends BaseFragment implements TestInfoView, View.OnClickListener, OpenDialog.ConfigListener {
 
-    LinearLayout mSearchWrapperLayout;
-
     @BindView(R.id.hot_list)
     RecyclerView mHotTestListView;
 
@@ -66,6 +64,8 @@ public class TestFragment extends BaseFragment implements TestInfoView, View.OnC
 
     @BindView(R.id.layout_no_data)
     LinearLayout mNoDataLayout;
+
+    LinearLayout mBannerLayout;
 
     LinearLayout mFunTestLayout;
 
@@ -105,7 +105,7 @@ public class TestFragment extends BaseFragment implements TestInfoView, View.OnC
         openDialog.setConfigListener(this);
 
         topView = LayoutInflater.from(getActivity()).inflate(R.layout.test_top, null);
-        mSearchWrapperLayout = topView.findViewById(R.id.layout_search_wrapper);
+        mBannerLayout = topView.findViewById(R.id.layout_banner);
         mBanner = topView.findViewById(R.id.test_banner);
         mFunTestLayout = topView.findViewById(R.id.layout_funs);
         mIQTestLayout = topView.findViewById(R.id.layout_iq);
@@ -131,9 +131,9 @@ public class TestFragment extends BaseFragment implements TestInfoView, View.OnC
         params.setMargins(0, 0, 0, SizeUtils.dp2px(48));
         mHotTestListView.setLayoutParams(params);
 
-        LinearLayout.LayoutParams searchParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, SizeUtils.dp2px(48));
-        searchParams.setMargins(0, BarUtils.getStatusBarHeight(), 0, 0);
-        mSearchWrapperLayout.setLayoutParams(searchParams);
+        LinearLayout.LayoutParams bannerParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, SizeUtils.dp2px(112));
+        bannerParams.setMargins(0, BarUtils.getStatusBarHeight(), 0, 0);
+        mBannerLayout.setLayoutParams(bannerParams);
 
         List<Integer> urls = new ArrayList<>();
         urls.add(R.mipmap.test_banner1);

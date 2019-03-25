@@ -2,6 +2,7 @@ package com.feiyou.headstyle.ui.activity;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.RectF;
 import android.media.MediaScannerConnection;
@@ -211,7 +212,6 @@ public class HeadEditActivity extends BaseFragmentActivity implements StickerDat
         }
 
         RequestOptions options = new RequestOptions().diskCacheStrategy(DiskCacheStrategy.NONE).skipMemoryCache(true);
-
         Glide.with(this).asBitmap().apply(options).load(imagePath).into(new SimpleTarget<Bitmap>() {
             @Override
             public void onResourceReady(Bitmap resource, Transition<? super Bitmap> transition) {

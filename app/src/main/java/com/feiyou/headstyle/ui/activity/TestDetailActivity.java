@@ -22,6 +22,7 @@ import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.bean.QuestionJumpInfo;
 import com.feiyou.headstyle.bean.ResultInfo;
 import com.feiyou.headstyle.bean.TestDetailInfoRet;
+import com.feiyou.headstyle.bean.TestDetailInfoWrapper;
 import com.feiyou.headstyle.bean.TestMsgInfo;
 import com.feiyou.headstyle.bean.TestResultInfoRet;
 import com.feiyou.headstyle.bean.TestResultParams;
@@ -188,19 +189,21 @@ public class TestDetailActivity extends BaseFragmentActivity implements TestDeta
 
             //回复答案后继续下一题
             if (jump != null) {
-                currentSubjectIndex = Integer.parseInt(jump.get(currentSubjectIndex).getJumpQuestion()[pos]) - 1;
-            }
-            Logger.i("currentSubjectIndex--->" + currentSubjectIndex);
+                if (jump.get(currentSubjectIndex).getJumpType() != 2) {
+                    currentSubjectIndex = Integer.parseInt(jump.get(currentSubjectIndex).getJumpQuestion()[pos]) - 1;
+                    Logger.i("currentSubjectIndex--->" + currentSubjectIndex);
 
-            if (currentSubjectIndex < question.size()) {
-                showSubject();
-            }
+                    if (currentSubjectIndex < question.size()) {
+                        showSubject();
+                    }
+                } else {
+                    isLastSubject = true;
 
-            //判断此题目是否是最后一个题目
-            if (jump != null && jump.get(currentSubjectIndex).getJumpType() == 2) {
-                isLastSubject = true;
+                    selectResultIndex = jump.get(currentSubjectIndex).getJumpAnswer()[pos];
+                    mCommentLayout.setVisibility(View.VISIBLE);
+                    mCommentTextView.setText("提交");
+                }
             }
-
         } else {
             selectResultIndex = jump.get(currentSubjectIndex).getJumpAnswer()[pos];
             //ToastUtils.showLong("最后一题,选择的答案是--->" + selectResultIndex);
@@ -244,7 +247,10 @@ public class TestDetailActivity extends BaseFragmentActivity implements TestDeta
 
                 if (((TestDetailInfoRet) tData).getData() != null) {
                     //设置全局的测试信息
-                    App.getApp().setTestInfo(((TestDetailInfoRet) tData).getData());
+                    TestDetailInfoWrapper testInfo = ((TestDetailInfoRet) tData).getData();
+                    testInfo.setTestId(tid);
+                    App.getApp().setTestInfo(testInfo);
+
                     String title = StringUtils.isEmpty(((TestDetailInfoRet) tData).getData().getTitle()) ? "测试详情" : ((TestDetailInfoRet) tData).getData().getTitle();
                     titleTv.setText(title);
                     TestMsgInfo guideInfo = new TestMsgInfo(((TestDetailInfoRet) tData).getData().getImage(), ((TestDetailInfoRet) tData).getData().getDesc(), TestMsgInfo.TYPE_RECEIVED);
@@ -261,9 +267,11 @@ public class TestDetailActivity extends BaseFragmentActivity implements TestDeta
             if (tData instanceof TestResultInfoRet) {
                 if (((TestResultInfoRet) tData).getData() != null) {
                     Intent intent = new Intent(this, TestResultActivity.class);
+                    intent.putExtra("from_type", 1);
                     intent.putExtra("image_url", ((TestResultInfoRet) tData).getData().getImage());
                     intent.putExtra("nocode_image_url", ((TestResultInfoRet) tData).getData().getImageNocode());
                     startActivity(intent);
+                    finish();
                 }
             }
         }

@@ -32,6 +32,7 @@ import com.umeng.socialize.UMShareAPI;
 
 import butterknife.BindView;
 import butterknife.OnClick;
+import es.dmoral.toasty.Toasty;
 import permissions.dispatcher.NeedsPermission;
 import permissions.dispatcher.OnNeverAskAgain;
 import permissions.dispatcher.OnPermissionDenied;
@@ -52,6 +53,8 @@ public class Main1Activity extends BaseFragmentActivity implements ViewPager.OnP
     private MyFragmentAdapter adapter;
 
     private UserInfo userInfo;
+
+    private long clickTime = 0;
 
     @Override
     protected int getContextViewId() {
@@ -76,22 +79,22 @@ public class Main1Activity extends BaseFragmentActivity implements ViewPager.OnP
         Main1ActivityPermissionsDispatcher.onRequestPermissionsResult(this, requestCode, grantResults);
     }
 
-    @NeedsPermission({Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.READ_PHONE_STATE})
+    @NeedsPermission({Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_PHONE_STATE})
     void showRecord() {
         //ToastUtils.showLong("允许使用存储权限");
     }
 
-    @OnPermissionDenied({Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.READ_PHONE_STATE})
+    @OnPermissionDenied({Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_PHONE_STATE})
     void onRecordDenied() {
         Toast.makeText(this, R.string.permission_storage_denied, Toast.LENGTH_SHORT).show();
     }
 
-    @OnShowRationale({Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.READ_PHONE_STATE})
+    @OnShowRationale({Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_PHONE_STATE})
     void showRationaleForRecord(PermissionRequest request) {
         showRationaleDialog(R.string.permission_storage_rationale, request);
     }
 
-    @OnNeverAskAgain({Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.READ_PHONE_STATE})
+    @OnNeverAskAgain({Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_PHONE_STATE})
     void onCameraNeverAskAgain() {
         Toast.makeText(this, R.string.permission_storage_never_ask_again, Toast.LENGTH_SHORT).show();
     }
@@ -186,4 +189,17 @@ public class Main1Activity extends BaseFragmentActivity implements ViewPager.OnP
         UMShareAPI.get(this).onActivityResult(requestCode, resultCode, data);
     }
 
+    @Override
+    public void onBackPressed() {
+        exit();
+    }
+
+    private void exit() {
+        if ((System.currentTimeMillis() - clickTime) > 2000) {
+            clickTime = System.currentTimeMillis();
+            Toasty.normal(getApplicationContext(), "再按一次退出").show();
+        } else {
+            System.exit(0);
+        }
+    }
 }

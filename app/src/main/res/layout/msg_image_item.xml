@@ -134,7 +134,7 @@
                     android:layout_toRightOf="@+id/iv_chat_horn_left2"
                     android:background="@color/white"
                     android:padding="6dp"
-                    android:scaleType="fitXY"
+                    android:scaleType="centerInside"
                     android:src="@mipmap/test_detail_def" />
             </RelativeLayout>
         </LinearLayout>

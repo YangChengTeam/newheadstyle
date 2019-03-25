@@ -183,6 +183,10 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
 
     private ShareAction shareAction;
 
+    private String keyWord;
+
+    UMImage defUmImage;
+
     @Override
     protected int getContextViewId() {
         return R.layout.activity_head_show;
@@ -311,6 +315,8 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
             }
         });
 
+        defUmImage = new UMImage(this,R.drawable.app_share);
+
         //初始化分享弹窗
         shareDialog = new BottomSheetDialog(this);
         View shareView = LayoutInflater.from(this).inflate(R.layout.share_dialog_view, null);
@@ -337,6 +343,11 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
         switchMultiButton.setSelectedTab(showShape == 1 ? 0 : 1);
 
         Bundle bundle = getIntent().getExtras();
+
+        if (bundle != null && bundle.getInt("from_type") > 0) {
+            fromType = bundle.getInt("from_type");
+        }
+
         if (bundle != null && bundle.getInt("jump_page") > 0) {
             currentPage = bundle.getInt("jump_page");
         }
@@ -348,8 +359,8 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
             tagId = bundle.getString("tag_id");
         }
 
-        if (bundle != null && bundle.getInt("from_type") > 0) {
-            fromType = bundle.getInt("from_type");
+        if (bundle != null && !StringUtils.isEmpty(bundle.getString("key_word"))) {
+            keyWord = bundle.getString("key_word");
         }
 
         if (fromType == 2 && bundle != null && !StringUtils.isEmpty(bundle.getString("collection_list"))) {
@@ -401,6 +412,10 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
 
         if (fromType == 3) {
             headListDataPresenterImp.userCollection(currentPage, App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "");
+        }
+
+        if (fromType == 4) {
+            headListDataPresenterImp.getSearchList(currentPage, StringUtils.isEmpty(keyWord) ? "" : keyWord, "");
         }
 
         switchMultiButton.setOnSwitchListener(new SwitchMultiButton.OnSwitchListener() {
@@ -556,7 +571,7 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
 
     @Override
     public void removeFirstObjectInAdapter() {
-        if (fromType == 1 || fromType == 3) {
+        if (fromType != 2) {
             if (adapter.getCount() < 6) {
                 currentPage++;
                 if (fromType == 1) {
@@ -570,6 +585,10 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
                 if (fromType == 3) {
                     headListDataPresenterImp.userCollection(currentPage, App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "");
                 }
+
+                if (fromType == 4) {
+                    headListDataPresenterImp.getSearchList(currentPage, StringUtils.isEmpty(keyWord) ? "" : keyWord, "");
+                }
             }
 
             if (adapter.getCount() <= 1) {
@@ -581,8 +600,12 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
                 currentImageUrl = adapter.getHeads().get(0).getImgurl();
 
                 if (shareAction != null) {
-                    UMImage image = new UMImage(HeadShowActivity.this, StringUtils.isEmpty(currentImageUrl) ? "http://gx.qqtn.com/images/gext_pc_body_mx.png" : currentImageUrl);
-                    shareAction.withMedia(image);
+                    if(!StringUtils.isEmpty(currentImageUrl)){
+                        UMImage image = new UMImage(HeadShowActivity.this, currentImageUrl);
+                        shareAction.withMedia(image);
+                    }else{
+                        shareAction.withMedia(defUmImage);
+                    }
                 }
             }
 
@@ -594,9 +617,11 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
                 }
             }
 
-            if(fromType == 3){
+            //我的收藏列表页面，设置所有的图片为收藏
+            if (fromType == 3) {
                 mKeepTextView.setCompoundDrawablesWithIntrinsicBounds(null, isCollection, null, null);
             }
+
         } else {
             if (adapter.getCount() <= 1) {
                 ToastUtils.showLong("已经是最后一张了");
@@ -607,8 +632,12 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
                 currentImageUrl = adapter.getHeads().get(0).getImgurl();
 
                 if (shareAction != null) {
-                    UMImage image = new UMImage(HeadShowActivity.this, StringUtils.isEmpty(currentImageUrl) ? "http://gx.qqtn.com/images/gext_pc_body_mx.png" : currentImageUrl);
-                    shareAction.withMedia(image);
+                    if(!StringUtils.isEmpty(currentImageUrl)){
+                        UMImage image = new UMImage(HeadShowActivity.this, currentImageUrl);
+                        shareAction.withMedia(image);
+                    }else{
+                        shareAction.withMedia(defUmImage);
+                    }
                 }
             }
         }
@@ -671,9 +700,13 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
                         currentImageUrl = adapter.getHeads().get(0).getImgurl();
 
                         if (shareAction != null) {
-                            UMImage image = new UMImage(HeadShowActivity.this, StringUtils.isEmpty(currentImageUrl) ? "http://gx.qqtn.com/images/gext_pc_body_mx.png" : currentImageUrl);
-                            image.setThumb(image);
-                            shareAction.withMedia(image);
+                            if(!StringUtils.isEmpty(currentImageUrl)){
+                                UMImage image = new UMImage(HeadShowActivity.this, currentImageUrl);
+                                image.setThumb(image);
+                                shareAction.withMedia(image);
+                            }else{
+                                shareAction.withMedia(defUmImage);
+                            }
                         }
                     }
 
@@ -703,6 +736,17 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
                         } else {
                             mKeepTextView.setCompoundDrawablesWithIntrinsicBounds(null, isCollection, null, null);
                         }
+
+                        currentImageUrl = adapter.getHeads().get(0).getImgurl();
+
+                        if (shareAction != null) {
+                            if(!StringUtils.isEmpty(currentImageUrl)){
+                                UMImage image = new UMImage(HeadShowActivity.this, currentImageUrl);
+                                shareAction.withMedia(image);
+                            }else{
+                                shareAction.withMedia(defUmImage);
+                            }
+                        }
                     }
 
                     if (fromType == 3) {
@@ -716,10 +760,10 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
 
             if (tData instanceof AddCollectionRet) {
                 if (((AddCollectionRet) tData).getData().getIsCollect() == 0) {
-                    ToastUtils.showLong("已取消");
+                    ToastUtils.showLong("取消收藏");
                     mKeepTextView.setCompoundDrawablesWithIntrinsicBounds(null, notCollection, null, null);
                 } else {
-                    ToastUtils.showLong("已收藏");
+                    ToastUtils.showLong("收藏成功");
                     mKeepTextView.setCompoundDrawablesWithIntrinsicBounds(null, isCollection, null, null);
                 }
             }
@@ -832,7 +876,7 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
         @Override
         public void onResult(SHARE_MEDIA platform) {
             dismissShareView();
-            Toast.makeText(HeadShowActivity.this, "分享成功", Toast.LENGTH_LONG).show();
+            //Toast.makeText(HeadShowActivity.this, "分享成功", Toast.LENGTH_LONG).show();
         }
 
         /**
@@ -843,7 +887,7 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
         @Override
         public void onError(SHARE_MEDIA platform, Throwable t) {
             dismissShareView();
-            Toast.makeText(HeadShowActivity.this, "分享失败", Toast.LENGTH_LONG).show();
+            //Toast.makeText(HeadShowActivity.this, "分享失败", Toast.LENGTH_LONG).show();
         }
 
         /**
@@ -853,7 +897,7 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
         @Override
         public void onCancel(SHARE_MEDIA platform) {
             dismissShareView();
-            Toast.makeText(HeadShowActivity.this, "取消分享", Toast.LENGTH_LONG).show();
+            //Toast.makeText(HeadShowActivity.this, "取消分享", Toast.LENGTH_LONG).show();
         }
     };
 

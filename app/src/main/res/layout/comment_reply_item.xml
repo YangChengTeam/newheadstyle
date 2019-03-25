@@ -117,16 +117,16 @@
 
         <Button
             android:id="@+id/btn_reply_count"
-            android:layout_width="80dp"
-            android:layout_height="28dp"
-            android:layout_marginLeft="66dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
+            android:layout_width="wrap_content"
+            android:layout_height="20dp"
+            android:layout_marginLeft="62dp"
+            android:layout_marginTop="6dp"
+            android:layout_marginBottom="4dp"
             android:background="@drawable/reply_bg"
             android:gravity="center"
-            android:text="123 回复"
+            android:minWidth="56dp"
             android:textColor="@color/tab_normal_color"
-            android:textSize="12dp" />
+            android:textSize="10dp"  />
 
     </LinearLayout>
 

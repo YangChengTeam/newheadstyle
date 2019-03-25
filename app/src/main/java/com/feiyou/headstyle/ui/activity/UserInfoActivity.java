@@ -208,6 +208,10 @@ public class UserInfoActivity extends BaseFragmentActivity implements UserInfoVi
         options.placeholder(R.mipmap.head_def);
         options.transform(new GlideCircleTransformWithBorder(this, 2, ContextCompat.getColor(this, R.color.white)));
 
+        commonImageAdapter = new CommonImageAdapter(this, null, 32);
+        mPhotoListView.setLayoutManager(new GridLayoutManager(this, 4));
+        mPhotoListView.setAdapter(commonImageAdapter);
+
         if (isMyInfo) {
             userInfo = App.getApp().getmUserInfo();
             userId = userInfo.getId();
@@ -227,8 +231,6 @@ public class UserInfoActivity extends BaseFragmentActivity implements UserInfoVi
             //设置照片墙
             if (userInfo.getImageWall() != null && userInfo.getImageWall().length > 0) {
                 mPhotoLayout.setVisibility(View.VISIBLE);
-                mPhotoLayout.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, SizeUtils.dp2px(80)));
-                mPhotoListView.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, SizeUtils.dp2px(60)));
                 String[] tempPhotos = userInfo.getImageWall();
                 photoList = new ArrayList<>();
                 for (int i = 0; i < tempPhotos.length; i++) {
@@ -237,12 +239,10 @@ public class UserInfoActivity extends BaseFragmentActivity implements UserInfoVi
                 if (photoList.size() > 4) {
                     photoList = photoList.subList(0, 4);
                 }
-
+                //TODO
                 commonImageAdapter.setNewData(photoList);
             } else {
                 mPhotoLayout.setVisibility(View.GONE);
-                mPhotoLayout.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0));
-                mPhotoListView.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, 0));
             }
         } else {
             if (bundle != null && !StringUtils.isEmpty(bundle.getString("user_id"))) {
@@ -271,9 +271,7 @@ public class UserInfoActivity extends BaseFragmentActivity implements UserInfoVi
         mUpdateCancelLayout.setOnClickListener(this);
         updateBgDialog.setContentView(updateBgView);
 
-        commonImageAdapter = new CommonImageAdapter(this, null, 32);
-        mPhotoListView.setLayoutManager(new GridLayoutManager(this, 4));
-        mPhotoListView.setAdapter(commonImageAdapter);
+
         commonImageAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
@@ -333,6 +331,12 @@ public class UserInfoActivity extends BaseFragmentActivity implements UserInfoVi
         startActivity(intent);
     }
 
+    @OnClick(R.id.layout_photos)
+    void photoWall(){
+        Intent intent = new Intent(UserInfoActivity.this, PhotoWallActivity.class);
+        startActivity(intent);
+    }
+
     @Override
     public void showProgress() {
 
@@ -366,12 +370,8 @@ public class UserInfoActivity extends BaseFragmentActivity implements UserInfoVi
 
                 if (userInfo.getImageWall() != null && userInfo.getImageWall().length > 0) {
                     mPhotoLayout.setVisibility(View.VISIBLE);
-                    mPhotoLayout.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, SizeUtils.dp2px(80)));
-                    mPhotoListView.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, SizeUtils.dp2px(60)));
                 } else {
                     mPhotoLayout.setVisibility(View.GONE);
-                    mPhotoLayout.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0));
-                    mPhotoListView.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, 0));
                 }
 
                 if (userInfo.getNoteList() != null && userInfo.getNoteList().size() > 0) {

@@ -21,10 +21,13 @@ import com.blankj.utilcode.util.KeyboardUtils;
 import com.blankj.utilcode.util.SizeUtils;
 import com.blankj.utilcode.util.StringUtils;
 import com.blankj.utilcode.util.ToastUtils;
+import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.bean.ResultInfo;
 import com.feiyou.headstyle.bean.TestDetailInfoRet;
+import com.feiyou.headstyle.bean.TestDetailInfoWrapper;
+import com.feiyou.headstyle.bean.TestInfoWrapper;
 import com.feiyou.headstyle.bean.TestMsgInfo;
 import com.feiyou.headstyle.bean.TestResultInfoRet;
 import com.feiyou.headstyle.bean.TestResultParams;
@@ -41,6 +44,7 @@ import com.qmuiteam.qmui.widget.QMUITopBar;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -167,6 +171,22 @@ public class TestImageDetailActivity extends BaseFragmentActivity implements Tes
             }
         });
 
+        chatListAdapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
+            @Override
+            public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
+                if (view.getId() == R.id.layout_left_result) {
+                    Logger.i(chatListAdapter.getData().get(position).getResultImageUrl());
+
+                    Intent intent = new Intent(TestImageDetailActivity.this, TestResultActivity.class);
+                    intent.putExtra("from_type", 2);
+                    intent.putExtra("image_url", chatListAdapter.getData().get(position).getCodeImageUrl());
+                    intent.putExtra("nocode_image_url", chatListAdapter.getData().get(position).getResultImageUrl());
+                    startActivity(intent);
+                    finish();
+                }
+            }
+        });
+
         //设置过滤器，
         InputFilter[] filters = {new NameLengthFilter(10)};
         mInputUserNameEt.setFilters(filters);
@@ -180,19 +200,12 @@ public class TestImageDetailActivity extends BaseFragmentActivity implements Tes
     @OnClick(R.id.layout_comment)
     void commentEvent() {
         if (isOver) {
-            if (progressDialog != null && !progressDialog.isShowing()) {
-                progressDialog.show();
-            }
-
-            TestResultParams params = new TestResultParams();
-            params.setId(tid);
-            params.setTestType("2");
-            params.setNickname(userInfo != null ? userInfo.getNickname() : "火星用户");
-            params.setHeadimg(userInfo != null ? userInfo.getUserimg() : "");
-            params.setSex(userInfo != null ? userInfo.getSex() : 1);
-            params.setUserId(userInfo != null ? userInfo.getId() : "0");
-
-            testResultInfoPresenterImp.createImage(params);
+            isOver = false;
+            //再测一次
+            Intent intent = new Intent(this, TestImageDetailActivity.class);
+            intent.putExtra("tid", tid);
+            startActivity(intent);
+            finish();
         } else {
             mCommentLayout.setVisibility(View.GONE);
             TestMsgInfo startInfo = new TestMsgInfo("", "开始测试", TestMsgInfo.TYPE_SENT);
@@ -314,7 +327,9 @@ public class TestImageDetailActivity extends BaseFragmentActivity implements Tes
             if (tData instanceof TestDetailInfoRet) {
                 if (((TestDetailInfoRet) tData).getData() != null) {
                     //设置全局的测试信息
-                    App.getApp().setTestInfo(((TestDetailInfoRet) tData).getData());
+                    TestDetailInfoWrapper testInfo = ((TestDetailInfoRet) tData).getData();
+                    testInfo.setTestId(tid);
+                    App.getApp().setTestInfo(testInfo);
 
                     String title = StringUtils.isEmpty(((TestDetailInfoRet) tData).getData().getTitle()) ? "测试详情" : ((TestDetailInfoRet) tData).getData().getTitle();
                     titleTv.setText(title);
@@ -327,12 +342,13 @@ public class TestImageDetailActivity extends BaseFragmentActivity implements Tes
                 }
             }
             if (tData instanceof TestResultInfoRet) {
-
+                isOver = true;
                 if (((TestResultInfoRet) tData).getData() != null) {
                     TestMsgInfo resultInfo = new TestMsgInfo();
                     resultInfo.setType(TestMsgInfo.TYPE_RECEIVED);
                     resultInfo.setContent("点击图片查看结果");
                     resultInfo.setImgUrl("");
+                    resultInfo.setCodeImageUrl(((TestResultInfoRet) tData).getData().getImage());
                     resultInfo.setResultImageUrl(((TestResultInfoRet) tData).getData().getImageNocode());
                     chatListAdapter.addData(resultInfo);
                     //刷新列表页面

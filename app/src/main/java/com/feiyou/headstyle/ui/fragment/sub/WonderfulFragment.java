@@ -260,18 +260,9 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
             }
         });
 
-        RelativeLayout.LayoutParams contentParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-        int contentMarginHeight = BarUtils.getNavBarHeight() + SizeUtils.dp2px(62);
-        contentParams.setMargins(0, SizeUtils.dp2px(49), 0, contentMarginHeight);
-        contentLayout.setLayoutParams(contentParams);
-
         RelativeLayout.LayoutParams bottomParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, SizeUtils.dp2px(49));
-        //int tempHeight = ScreenUtils.getScreenHeight() - BarUtils.getNavBarHeight() - BarUtils.getStatusBarHeight() - SizeUtils.dp2px(49);
         bottomParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-        bottomParams.setMargins(0, 0, 0, BarUtils.getNavBarHeight() - BarUtils.getStatusBarHeight());
         bottomLayout.setLayoutParams(bottomParams);
-
-        replyView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ScreenUtils.getScreenHeight()));
         commitReplyDialog.setContentView(replyView);
 
         //setPeekHeight,设置弹出窗口的高度为全屏的状态.
@@ -421,10 +412,27 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
                 switchType = 2;
                 currentReplyPos = position;
 
-                if (view.getId() == R.id.layout_zan || view.getId() == R.id.btn_reply_count) {
+                if (view.getId() == R.id.layout_zan) {
                     repeatId = commentReplyAdapter.getData().get(position).getRepeatId();
                     addZanPresenterImp.addZan(3, App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", commentReplyAdapter.getData().get(position).getRepeatUserId(), "", "", repeatId, 1);
                 }
+
+                if (view.getId() == R.id.btn_reply_count) {
+                    showDialog();
+                }
+            }
+        });
+
+
+        commentReplyAdapter.setOnItemLongClickListener(new BaseQuickAdapter.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(BaseQuickAdapter adapter, View view, int position) {
+                longClickType = 2;
+                currentReplyPos = position;
+                if (reportDialog != null && !reportDialog.isShowing()) {
+                    reportDialog.show();
+                }
+                return false;
             }
         });
 
@@ -668,21 +676,22 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
                 if (reportDialog != null && reportDialog.isShowing()) {
                     reportDialog.dismiss();
                 }
-                if (longClickType == 1) {
-                    String tempContent = commentAdapter.getData().get(currentCommentPos).getCommentContent();
-                    ClipboardManager cmb = (ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
-                    cmb.setText(tempContent); //将内容放入粘贴管理器,在别的地方长按选择"粘贴"即可
-                    ToastUtils.showLong("已复制");
-                }
+
+                String tempContent = longClickType == 1 ? commentAdapter.getData().get(currentCommentPos).getCommentContent() : commentReplyAdapter.getData().get(currentReplyPos).getRepeatContent();
+                ClipboardManager cmb = (ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
+                cmb.setText(tempContent); //将内容放入粘贴管理器,在别的地方长按选择"粘贴"即可
+                ToastUtils.showLong("已复制");
                 break;
             case R.id.layout_report:
                 if (reportDialog != null && reportDialog.isShowing()) {
                     reportDialog.dismiss();
                 }
+
+                String rid = longClickType == 1 ? commentAdapter.getData().get(currentCommentPos).getCommentId() : commentReplyAdapter.getData().get(currentReplyPos).getRepeatId();
                 //举报评论
                 Intent intent = new Intent(getActivity(), ReportInfoActivity.class);
-                intent.putExtra("rid", commentAdapter.getData().get(currentCommentPos).getCommentId());
-                intent.putExtra("report_type", 3);
+                intent.putExtra("rid", rid);
+                intent.putExtra("report_type", longClickType == 1 ? 3 : 4);
                 startActivity(intent);
 
                 break;

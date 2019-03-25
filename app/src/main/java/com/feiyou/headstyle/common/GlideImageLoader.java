@@ -26,7 +26,7 @@ public class GlideImageLoader extends ImageLoader {
 
         RequestOptions options = new RequestOptions().skipMemoryCache(true);
         //options.transform(new GlideRoundTransform(context, 6));
-        options.transform(new RoundedCornersTransformation(SizeUtils.dp2px(10),0));
+        options.transform(new RoundedCornersTransformation(SizeUtils.dp2px(12),0));
         Glide.with(context).load(path).apply(options).into(imageView);
     }
 

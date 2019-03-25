@@ -29,13 +29,12 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
+import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
-import com.feiyou.headstyle.bean.StarPosterRet;
 import com.feiyou.headstyle.bean.TestInfoRet;
 import com.feiyou.headstyle.common.Constants;
 import com.feiyou.headstyle.presenter.TestInfoPresenterImp;
-import com.feiyou.headstyle.ui.adapter.BlackListAdapter;
 import com.feiyou.headstyle.ui.adapter.TestInfoAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragmentActivity;
 import com.feiyou.headstyle.ui.custom.GlideRoundTransform;
@@ -47,12 +46,9 @@ import com.umeng.socialize.ShareAction;
 import com.umeng.socialize.UMShareListener;
 import com.umeng.socialize.bean.SHARE_MEDIA;
 import com.umeng.socialize.media.UMImage;
-import com.umeng.socialize.media.UMWeb;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.List;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -98,6 +94,8 @@ public class TestResultActivity extends BaseFragmentActivity implements TestInfo
 
     private Bitmap tempBitmap;
 
+    private int fromType = 1;
+
     @Override
     protected int getContextViewId() {
         return R.layout.activity_test_result;
@@ -130,6 +128,10 @@ public class TestResultActivity extends BaseFragmentActivity implements TestInfo
 
     public void initData() {
         Bundle bundle = getIntent().getExtras();
+        if (bundle != null) {
+            fromType = bundle.getInt("from_type", 1);
+        }
+
         if (bundle != null && bundle.getString("image_url") != null) {
             imageUrl = bundle.getString("image_url");
         }
@@ -175,6 +177,25 @@ public class TestResultActivity extends BaseFragmentActivity implements TestInfo
         testInfoAdapter = new TestInfoAdapter(this, null);
         mRecommendListView.setLayoutManager(new LinearLayoutManager(this));
         mRecommendListView.setAdapter(testInfoAdapter);
+        testInfoAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
+
+                if (testInfoAdapter.getData().get(position).getTestType() == 1) {
+                    Intent intent = new Intent(TestResultActivity.this, TestDetailActivity.class);
+                    intent.putExtra("tid", testInfoAdapter.getData().get(position).getId());
+                    startActivity(intent);
+                    finish();
+                } else {
+                    Intent intent = new Intent(TestResultActivity.this, TestImageDetailActivity.class);
+                    intent.putExtra("tid", testInfoAdapter.getData().get(position).getId());
+                    startActivity(intent);
+                    finish();
+                }
+            }
+        });
+
+
         //推荐列表
         testInfoPresenterImp.getHotAndRecommendList(2);
     }
@@ -204,7 +225,17 @@ public class TestResultActivity extends BaseFragmentActivity implements TestInfo
 
     @OnClick(R.id.btn_test_again)
     void testAgain() {
-
+        if (fromType == 1) {
+            Intent intent = new Intent(this, TestDetailActivity.class);
+            intent.putExtra("tid", App.getApp().getTestInfo().getTestId());
+            startActivity(intent);
+            finish();
+        } else {
+            Intent intent = new Intent(this, TestImageDetailActivity.class);
+            intent.putExtra("tid", App.getApp().getTestInfo().getTestId());
+            startActivity(intent);
+            finish();
+        }
     }
 
     // 其次把文件插入到系统图库
@@ -313,7 +344,7 @@ public class TestResultActivity extends BaseFragmentActivity implements TestInfo
         } else {
             UMImage image = new UMImage(TestResultActivity.this, imageUrl);
             if (tempBitmap != null) {
-                UMImage scaImage = new UMImage(TestResultActivity.this, ImageUtils.compressByScale(tempBitmap, 200, 200));
+                UMImage scaImage = new UMImage(TestResultActivity.this, ImageUtils.compressByScale(tempBitmap, 300, 300));
                 image.setThumb(scaImage);
             } else {
                 image.setThumb(noImage);

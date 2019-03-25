@@ -43,10 +43,9 @@ public class CommentReplyAdapter extends BaseQuickAdapter<NoteSubComment, BaseVi
     @Override
     protected void convert(final BaseViewHolder helper, NoteSubComment item) {
         Logger.i("image url --->" + item.getRepeatUserimg());
-        RequestOptions options = new RequestOptions();
+        RequestOptions options = new RequestOptions().skipMemoryCache(true);
         options.transform(new GlideRoundTransform(mContext, 18));
-        options.error(R.mipmap.head_def);
-        options.placeholder(R.mipmap.empty_icon);
+        options.placeholder(R.mipmap.image_def);
         Glide.with(mContext).load(item.getRepeatUserimg()).apply(options).into((ImageView) helper.itemView.findViewById(R.id.iv_user_head));
 
         helper.setText(R.id.tv_nick_name, item.getRepeatNickname())

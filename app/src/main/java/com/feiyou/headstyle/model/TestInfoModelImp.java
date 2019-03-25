@@ -42,6 +42,7 @@ public class TestInfoModelImp extends BaseTestModel implements TestInfoModel<Tes
         try {
             params.put("is_app", "1");
             params.put("app_id", "37");
+            params.put("status", "-1");
         } catch (JSONException e) {
             e.printStackTrace();
         }
