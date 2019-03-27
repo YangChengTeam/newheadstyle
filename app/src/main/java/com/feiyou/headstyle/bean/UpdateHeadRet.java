@@ -16,13 +16,21 @@ public class UpdateHeadRet extends ResultInfo {
 
     public class UpdateHeadWrapper {
         private String image;
-
+        private String background;
         public String getImage() {
             return image;
         }
 
         public void setImage(String image) {
             this.image = image;
+        }
+
+        public String getBackground() {
+            return background;
+        }
+
+        public void setBackground(String background) {
+            this.background = background;
         }
     }
 }

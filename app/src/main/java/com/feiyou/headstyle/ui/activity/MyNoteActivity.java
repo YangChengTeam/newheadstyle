@@ -262,7 +262,7 @@ public class MyNoteActivity extends BaseFragmentActivity implements NoteDataView
                     if (((NoteInfoRet) tData).getData().size() == pageSize) {
                         noteInfoAdapter.loadMoreComplete();
                     } else {
-                        noteInfoAdapter.loadMoreEnd();
+                        noteInfoAdapter.loadMoreEnd(true);
                     }
                 } else {
                     noDataLayout.setVisibility(View.VISIBLE);

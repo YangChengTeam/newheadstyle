@@ -21,6 +21,7 @@ import com.feiyou.headstyle.bean.VideoInfoRet;
 import com.feiyou.headstyle.common.Constants;
 import com.feiyou.headstyle.presenter.MyCommentPresenterImp;
 import com.feiyou.headstyle.presenter.VideoInfoPresenterImp;
+import com.feiyou.headstyle.ui.activity.CommunityArticleActivity;
 import com.feiyou.headstyle.ui.activity.VideoShowActivity;
 import com.feiyou.headstyle.ui.adapter.MyCommentAdapter;
 import com.feiyou.headstyle.ui.adapter.VideoListAdapter;
@@ -96,6 +97,9 @@ public class MyCommentFragment extends BaseFragment implements MyCommentView, Sw
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
                 Logger.i("my comment pos--->" + position);
+                Intent intent = new Intent(getActivity(), CommunityArticleActivity.class);
+                intent.putExtra("msg_id", myCommentAdapter.getData().get(position).getMessageId());
+                startActivity(intent);
             }
         });
 
@@ -137,7 +141,7 @@ public class MyCommentFragment extends BaseFragment implements MyCommentView, Sw
             if (tData.getData().size() == pageSize) {
                 myCommentAdapter.loadMoreComplete();
             } else {
-                myCommentAdapter.loadMoreEnd();
+                myCommentAdapter.loadMoreEnd(true);
             }
 
         } else {

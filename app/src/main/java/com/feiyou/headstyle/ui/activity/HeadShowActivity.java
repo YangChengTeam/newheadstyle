@@ -87,6 +87,7 @@ import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.OnClick;
+import es.dmoral.toasty.Toasty;
 import lib.kingja.switchbutton.SwitchMultiButton;
 
 /**
@@ -315,7 +316,7 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
             }
         });
 
-        defUmImage = new UMImage(this,R.drawable.app_share);
+        defUmImage = new UMImage(this, R.drawable.app_share);
 
         //初始化分享弹窗
         shareDialog = new BottomSheetDialog(this);
@@ -464,7 +465,7 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
             intent.putExtra("image_url", adapter.getHeads().get(0).getImgurl());
             startActivity(intent);
         } else {
-            ToastUtils.showLong("图片加载错误，请重试");
+            Toasty.normal(this,"图片加载错误，请重试").show();
         }
     }
 
@@ -478,7 +479,7 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
             if (adapter.getHeads().size() > 0) {
                 addCollectionPresenterImp.addCollection(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", adapter.getHeads().get(0).getId());
             } else {
-                ToastUtils.showLong("系统错误，请重试");
+                Toasty.normal(this,"系统错误，请重试").show();
             }
         }
     }
@@ -525,7 +526,7 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
                 MediaScannerConnection.scanFile(HeadShowActivity.this, new String[]{filePath}, null, null);
                 // 最后通知图库更新
                 sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.parse("file://" + filePath)));
-                ToastUtils.showLong(loginType == 2 && bottomSheetDialog.isShowing() ? "已保存，请在微信中设置" : "已保存到图库");
+                Toasty.normal(this,loginType == 2 && bottomSheetDialog.isShowing() ? "已保存到相册，打开微信更换头像" : "已保存到相册").show();
             } else {
                 flag = false;
             }
@@ -592,7 +593,7 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
             }
 
             if (adapter.getCount() <= 1) {
-                ToastUtils.showLong("已经是最后一张了");
+                Toasty.normal(this,"已经是最后一张了").show();
             } else {
                 //滑动时,移除最上面一个图片
                 adapter.remove(0);
@@ -600,10 +601,10 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
                 currentImageUrl = adapter.getHeads().get(0).getImgurl();
 
                 if (shareAction != null) {
-                    if(!StringUtils.isEmpty(currentImageUrl)){
+                    if (!StringUtils.isEmpty(currentImageUrl)) {
                         UMImage image = new UMImage(HeadShowActivity.this, currentImageUrl);
                         shareAction.withMedia(image);
-                    }else{
+                    } else {
                         shareAction.withMedia(defUmImage);
                     }
                 }
@@ -624,7 +625,7 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
 
         } else {
             if (adapter.getCount() <= 1) {
-                ToastUtils.showLong("已经是最后一张了");
+                Toasty.normal(this,"已经是最后一张了").show();
             } else {
                 //滑动时,移除最上面一个图片
                 adapter.remove(0);
@@ -632,10 +633,10 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
                 currentImageUrl = adapter.getHeads().get(0).getImgurl();
 
                 if (shareAction != null) {
-                    if(!StringUtils.isEmpty(currentImageUrl)){
+                    if (!StringUtils.isEmpty(currentImageUrl)) {
                         UMImage image = new UMImage(HeadShowActivity.this, currentImageUrl);
                         shareAction.withMedia(image);
-                    }else{
+                    } else {
                         shareAction.withMedia(defUmImage);
                     }
                 }
@@ -700,11 +701,11 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
                         currentImageUrl = adapter.getHeads().get(0).getImgurl();
 
                         if (shareAction != null) {
-                            if(!StringUtils.isEmpty(currentImageUrl)){
+                            if (!StringUtils.isEmpty(currentImageUrl)) {
                                 UMImage image = new UMImage(HeadShowActivity.this, currentImageUrl);
                                 image.setThumb(image);
                                 shareAction.withMedia(image);
-                            }else{
+                            } else {
                                 shareAction.withMedia(defUmImage);
                             }
                         }
@@ -740,10 +741,10 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
                         currentImageUrl = adapter.getHeads().get(0).getImgurl();
 
                         if (shareAction != null) {
-                            if(!StringUtils.isEmpty(currentImageUrl)){
+                            if (!StringUtils.isEmpty(currentImageUrl)) {
                                 UMImage image = new UMImage(HeadShowActivity.this, currentImageUrl);
                                 shareAction.withMedia(image);
-                            }else{
+                            } else {
                                 shareAction.withMedia(defUmImage);
                             }
                         }
@@ -760,17 +761,17 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
 
             if (tData instanceof AddCollectionRet) {
                 if (((AddCollectionRet) tData).getData().getIsCollect() == 0) {
-                    ToastUtils.showLong("取消收藏");
+                    Toasty.normal(this,"取消收藏").show();
                     mKeepTextView.setCompoundDrawablesWithIntrinsicBounds(null, notCollection, null, null);
                 } else {
-                    ToastUtils.showLong("收藏成功");
+                    Toasty.normal(this,"收藏成功").show();
                     mKeepTextView.setCompoundDrawablesWithIntrinsicBounds(null, isCollection, null, null);
                 }
             }
 
             if (tData instanceof UpdateHeadRet) {
                 if (!StringUtils.isEmpty(((UpdateHeadRet) tData).getData().getImage())) {
-                    ToastUtils.showLong("设置成功");
+                    Toasty.normal(this,"设置成功").show();
                     userInfo.setUserimg(((UpdateHeadRet) tData).getData().getImage());
 
                     App.getApp().setmUserInfo(userInfo);
@@ -781,11 +782,11 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
 
         } else {
             if (tData instanceof AddCollectionRet) {
-                ToastUtils.showLong(tData.getMsg() != null ? tData.getMsg() : "操作失败");
+                Toasty.normal(this,tData.getMsg() != null ? tData.getMsg() : "操作失败").show();
             }
 
             if (tData instanceof UpdateHeadRet) {
-                ToastUtils.showLong("设置失败");
+                Toasty.normal(this,"设置失败").show();
             }
         }
     }

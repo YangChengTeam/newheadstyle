@@ -84,6 +84,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.OnClick;
+import es.dmoral.toasty.Toasty;
 
 /**
  * Created by myflying on 2018/11/28.
@@ -409,7 +410,7 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
                 commentNum = currentNoteInfo.getCommentNum();
                 RequestOptions options = new RequestOptions();
                 options.transform(new GlideRoundTransform(this, 21));
-                options.placeholder(R.mipmap.empty_icon).error(R.mipmap.empty_icon);
+                options.placeholder(R.mipmap.head_def).error(R.mipmap.head_def);
                 Glide.with(this).load(currentNoteInfo.getUserimg()).apply(options).into(mUserHeadImageView);
 
                 mNickNameTextView.setText(currentNoteInfo.getNickname());
@@ -459,6 +460,12 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
                 mFollowLayout.setBackgroundResource(tempResult == 0 ? R.drawable.into_bg : R.drawable.is_follow_bg);
                 mFollowTv.setTextColor(ContextCompat.getColor(this, tempResult == 0 ? R.color.tab_select_color : R.color.black2));
                 mFollowTv.setText(tempResult == 0 ? "+关注" : "已关注");
+
+                //自己对自己发的贴，隐藏相关操作按钮
+                if (App.getApp().getmUserInfo() != null && App.getApp().getmUserInfo().getId().equals(currentNoteInfo.getUserId())) {
+                    mFollowLayout.setVisibility(View.GONE);
+                    mFollowTv.setVisibility(View.GONE);
+                }
             }
 
             if (tData instanceof ReplyResultInfoRet) {
@@ -496,9 +503,9 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
             mFollowTv.setTextColor(ContextCompat.getColor(this, tempResult == 0 ? R.color.tab_select_color : R.color.black2));
             mFollowTv.setText(tempResult == 0 ? "+关注" : "已关注");
             if (tData instanceof NoteInfoDetailRet) {
-                Logger.i(StringUtils.isEmpty(tData.getMsg()) ? "操作失败" : tData.getMsg());
+                Logger.i(StringUtils.isEmpty(tData.getMsg()) ? "数据加载失败" : tData.getMsg());
             } else {
-                ToastUtils.showLong(StringUtils.isEmpty(tData.getMsg()) ? "操作失败" : tData.getMsg());
+                Toasty.normal(this, StringUtils.isEmpty(tData.getMsg()) ? "操作失败" : tData.getMsg()).show();
             }
         }
     }

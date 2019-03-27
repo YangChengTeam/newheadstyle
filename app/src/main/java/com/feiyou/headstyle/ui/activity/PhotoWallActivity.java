@@ -357,6 +357,7 @@ public class PhotoWallActivity extends BaseFragmentActivity implements View.OnCl
                 //照片墙更新后重新设置用户的信息
                 if (userInfo != null) {
                     userInfo.setImageWall(tempPhotos);
+                    App.getApp().setmUserInfo(userInfo);
                     SPUtils.getInstance().put(Constants.USER_INFO, JSONObject.toJSONString(userInfo));
                 }
 

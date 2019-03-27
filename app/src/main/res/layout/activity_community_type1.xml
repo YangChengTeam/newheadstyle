@@ -236,5 +236,21 @@
         </FrameLayout>
     </android.support.v4.widget.SwipeRefreshLayout>
 
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right|bottom"
+        android:layout_marginRight="12dp"
+        android:layout_marginBottom="56dp"
+        android:elevation="8dp"
+        android:scaleType="center"
+        android:src="@mipmap/float_button_icon"
+        app:backgroundTint="@color/tab_select_color"
+        app:borderWidth="0dp"
+        app:fabSize="normal"
+        app:pressedTranslationZ="16dp"
+        app:rippleColor="#00000000" />
 </android.support.design.widget.CoordinatorLayout>
 

@@ -1,6 +1,11 @@
 package com.feiyou.headstyle.ui.adapter;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.renderscript.Allocation;
+import android.renderscript.Element;
+import android.renderscript.RenderScript;
+import android.renderscript.ScriptIntrinsicBlur;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -8,14 +13,17 @@ import android.widget.LinearLayout;
 import com.blankj.utilcode.util.StringUtils;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.bean.TestMsgInfo;
-import com.feiyou.headstyle.ui.custom.BlurTransformation;
 import com.feiyou.headstyle.ui.custom.GlideRoundTransform;
 
 import java.util.List;
+
+import jp.wasabeef.glide.transformations.BlurTransformation;
 
 /**
  * Created by admin on 2018/1/8.
@@ -50,7 +58,10 @@ public class TestChatImageListAdapter extends BaseQuickAdapter<TestMsgInfo, Base
 
                 if (!StringUtils.isEmpty(item.getResultImageUrl())) {
                     helper.setVisible(R.id.layout_left_result, true);
-                    Glide.with(mContext).load(item.getResultImageUrl()).apply(RequestOptions.bitmapTransform(new BlurTransformation(15, 2))).into((ImageView) helper.itemView.findViewById(R.id.iv_left_result));
+
+                    RequestOptions options = new RequestOptions();
+                    options.transform(new BlurTransformation(15, 1));
+                    Glide.with(mContext).load(item.getResultImageUrl()).apply(options).into((ImageView) helper.itemView.findViewById(R.id.iv_left_result));
                     helper.addOnClickListener(R.id.layout_left_result);
                 }
 
@@ -74,5 +85,35 @@ public class TestChatImageListAdapter extends BaseQuickAdapter<TestMsgInfo, Base
                 break;
         }
 
+    }
+
+    private Bitmap rsBlur(Context context, Bitmap source, int radius) {
+
+        Bitmap inputBmp = source;
+        //(1)
+        RenderScript renderScript = RenderScript.create(context);
+
+        // Allocate memory for Renderscript to work with
+        //(2)
+        final Allocation input = Allocation.createFromBitmap(renderScript, inputBmp);
+        final Allocation output = Allocation.createTyped(renderScript, input.getType());
+        //(3)
+        // Load up an instance of the specific script that we want to use.
+        ScriptIntrinsicBlur scriptIntrinsicBlur = ScriptIntrinsicBlur.create(renderScript, Element.U8_4(renderScript));
+        //(4)
+        scriptIntrinsicBlur.setInput(input);
+        //(5)
+        // Set the blur radius
+        scriptIntrinsicBlur.setRadius(radius);
+        //(6)
+        // Start the ScriptIntrinisicBlur
+        scriptIntrinsicBlur.forEach(output);
+        //(7)
+        // Copy the output to the blurred bitmap
+        output.copyTo(inputBmp);
+        //(8)
+        renderScript.destroy();
+
+        return inputBmp;
     }
 }

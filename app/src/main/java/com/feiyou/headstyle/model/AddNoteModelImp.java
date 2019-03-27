@@ -9,6 +9,7 @@ import com.feiyou.headstyle.api.NoteDataServiceApi;
 import com.feiyou.headstyle.base.BaseModel;
 import com.feiyou.headstyle.base.BaseNoRsaModel;
 import com.feiyou.headstyle.base.IBaseRequestCallBack;
+import com.feiyou.headstyle.bean.AddNoteRet;
 import com.feiyou.headstyle.bean.CollectInfoRet;
 import com.feiyou.headstyle.bean.NoteInfoRet;
 import com.feiyou.headstyle.bean.ResultInfo;
@@ -29,7 +30,7 @@ import rx.subscriptions.CompositeSubscription;
  * Created by iflying on 2018/1/9.
  */
 
-public class AddNoteModelImp extends BaseNoRsaModel implements AddNoteModel<ResultInfo> {
+public class AddNoteModelImp extends BaseNoRsaModel implements AddNoteModel<AddNoteRet> {
 
     private Context context = null;
     private NoteDataServiceApi noteDataServiceApi;
@@ -62,13 +63,13 @@ public class AddNoteModelImp extends BaseNoRsaModel implements AddNoteModel<Resu
     }
 
     @Override
-    public void addNote(String uid, String content, String topicId, String friends, List<String> filePaths, final IBaseRequestCallBack<ResultInfo> iBaseRequestCallBack) {
+    public void addNote(String uid, String content, String topicId, String friends, List<String> filePaths, final IBaseRequestCallBack<AddNoteRet> iBaseRequestCallBack) {
 
         MultipartBody multipartBody = filesToMultipartBody(uid,content,topicId,friends,filePaths);
         mCompositeSubscription.add(noteDataServiceApi.addNote(multipartBody)  //将subscribe添加到subscription，用于注销subscribe
                 .observeOn(AndroidSchedulers.mainThread())//指定事件消费线程
                 .subscribeOn(Schedulers.io())  //指定 subscribe() 发生在 IO 线程
-                .subscribe(new Subscriber<ResultInfo>() {
+                .subscribe(new Subscriber<AddNoteRet>() {
 
                     @Override
                     public void onStart() {
@@ -90,9 +91,9 @@ public class AddNoteModelImp extends BaseNoRsaModel implements AddNoteModel<Resu
                     }
 
                     @Override
-                    public void onNext(ResultInfo resultInfo) {
+                    public void onNext(AddNoteRet addNoteRet) {
                         //回调接口：请求成功，获取实体类对象
-                        iBaseRequestCallBack.requestSuccess(resultInfo);
+                        iBaseRequestCallBack.requestSuccess(addNoteRet);
                     }
                 }));
     }

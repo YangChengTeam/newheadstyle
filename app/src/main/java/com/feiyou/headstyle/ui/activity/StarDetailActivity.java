@@ -203,7 +203,7 @@ public class StarDetailActivity extends BaseFragmentActivity implements Forecast
         forecastPresenterImp.getForecastData(starName[starIndex], "today");
     }
 
-    @OnClick(R.id.iv_change_star)
+    @OnClick(R.id.tv_change_star)
     void changeStar() {
         Intent intent = new Intent(this, StarListActivity.class);
         startActivity(intent);

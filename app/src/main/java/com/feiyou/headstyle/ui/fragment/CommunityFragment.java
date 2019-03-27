@@ -143,7 +143,7 @@ public class CommunityFragment extends BaseFragment implements ViewPager.OnPageC
      * 给Tab按钮设置图标和文字
      */
     private View getTabItemView(int index) {
-        View view = layoutInflater.inflate(R.layout.tab_item_view, null);
+        View view = layoutInflater.inflate(R.layout.note_tab_item_view, null);
 
         TextView tabText = view.findViewById(R.id.tv_tab_text);
         tabText.setText(mTextviewArray[index]);

@@ -70,7 +70,7 @@ public class CommentAdapter extends BaseQuickAdapter<NoteItem, BaseViewHolder> {
             isZanTv.setCompoundDrawablePadding(SizeUtils.dp2px(4));
 
             helper.setText(R.id.btn_reply_count, item.getListNum() > 0 ? item.getListNum() + "条回复>" : "回复");
-            helper.addOnClickListener(R.id.btn_reply_count);
+            helper.addOnClickListener(R.id.btn_reply_count).addOnClickListener(R.id.iv_user_head);
         }
     }
 }

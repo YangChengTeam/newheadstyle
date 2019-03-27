@@ -24,6 +24,7 @@ import com.blankj.utilcode.util.SizeUtils;
 import com.blankj.utilcode.util.StringUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
@@ -34,6 +35,8 @@ import com.feiyou.headstyle.bean.UserInfo;
 import com.feiyou.headstyle.bean.UserInfoRet;
 import com.feiyou.headstyle.common.Constants;
 import com.feiyou.headstyle.presenter.UserInfoPresenterImp;
+import com.feiyou.headstyle.ui.activity.AboutActivity;
+import com.feiyou.headstyle.ui.activity.FeedBackActivity;
 import com.feiyou.headstyle.ui.activity.MainActivity;
 import com.feiyou.headstyle.ui.activity.MyCollectionActivity;
 import com.feiyou.headstyle.ui.activity.MyFollowActivity;
@@ -89,6 +92,9 @@ public class MyFragment extends BaseFragment implements UserInfoView {
     @BindView(R.id.tv_keep_count)
     TextView mKeepCountTv;
 
+    @BindView(R.id.iv_my_remind)
+    ImageView mMyRemindIv;
+
     LoginDialog loginDialog;
 
     private UserInfo userInfo;
@@ -137,6 +143,12 @@ public class MyFragment extends BaseFragment implements UserInfoView {
     public void onResume() {
         super.onResume();
 
+        Logger.i("my fragment onResume --->");
+
+        if (App.isShowTotalCount) {
+            mMyRemindIv.setVisibility(View.VISIBLE);
+        }
+
         if (!StringUtils.isEmpty(SPUtils.getInstance().getString(Constants.USER_INFO))) {
             Logger.i(SPUtils.getInstance().getString(Constants.USER_INFO));
             userInfo = JSON.parseObject(SPUtils.getInstance().getString(Constants.USER_INFO), new TypeReference<UserInfo>() {
@@ -146,7 +158,7 @@ public class MyFragment extends BaseFragment implements UserInfoView {
         }
 
         if (userInfo != null) {
-            RequestOptions options = new RequestOptions().skipMemoryCache(true);
+            RequestOptions options = new RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL);
             options.placeholder(R.mipmap.head_def);
             options.transform(new GlideRoundTransform(getActivity(), 30));
             Glide.with(getActivity()).load(userInfo.getUserimg()).apply(options).into(mUserHeadImageView);
@@ -194,7 +206,7 @@ public class MyFragment extends BaseFragment implements UserInfoView {
             }
             if (userInfo != null) {
 
-                RequestOptions options = new RequestOptions().skipMemoryCache(true);
+                RequestOptions options = new RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL);
                 options.placeholder(R.mipmap.head_def);
                 options.transform(new GlideRoundTransform(getActivity(), 30));
                 Glide.with(getActivity()).load(userInfo.getUserimg()).apply(options).into(mUserHeadImageView);
@@ -254,6 +266,16 @@ public class MyFragment extends BaseFragment implements UserInfoView {
         startActivity(4);
     }
 
+    @OnClick(R.id.layout_about)
+    public void about() {
+        startActivity(6);
+    }
+
+    @OnClick(R.id.layout_feed_back)
+    public void feedBack() {
+        startActivity(7);
+    }
+
     void startActivity(int type) {
         if (userInfo == null && loginDialog != null && !loginDialog.isShowing()) {
             loginDialog.show();
@@ -280,6 +302,12 @@ public class MyFragment extends BaseFragment implements UserInfoView {
                 case 5:
                     intent = new Intent(getActivity(), MyCollectionActivity.class);
                     break;
+                case 6:
+                    intent = new Intent(getActivity(), AboutActivity.class);
+                    break;
+                case 7:
+                    intent = new Intent(getActivity(), FeedBackActivity.class);
+                    break;
             }
             startActivity(intent);
         }
@@ -305,6 +333,12 @@ public class MyFragment extends BaseFragment implements UserInfoView {
             }
             return;
         }
+
+        if (mMyRemindIv.getVisibility() == View.VISIBLE) {
+            mMyRemindIv.setVisibility(View.GONE);
+            App.isShowTotalCount = false;
+        }
+
         Intent intent = new Intent(getActivity(), MyMessageActivity.class);
         startActivity(intent);
     }
@@ -337,6 +371,34 @@ public class MyFragment extends BaseFragment implements UserInfoView {
                 mFollowTv.setText(userInfo.getGuanNum() + "");
                 mFansCountTv.setText(userInfo.getFenNum() + "");
                 mKeepCountTv.setText(userInfo.getCollectNum() + "");
+
+                //通知消息
+                if (SPUtils.getInstance().getInt(Constants.COMMENT_COUNT, 0) > 0) {
+                    if (userInfo.getCommentNum() > SPUtils.getInstance().getInt(Constants.COMMENT_COUNT, 0)) {
+                        App.isRemindComment = true;
+                    }
+                }
+                if (SPUtils.getInstance().getInt(Constants.AT_COUNT, 0) > 0) {
+                    if (userInfo.getAiteNum() > SPUtils.getInstance().getInt(Constants.AT_COUNT, 0)) {
+                        App.isRemindAt = true;
+                    }
+                }
+                if (SPUtils.getInstance().getInt(Constants.NOTICE_COUNT, 0) > 0) {
+                    if (userInfo.getNoticeNum() > SPUtils.getInstance().getInt(Constants.NOTICE_COUNT, 0)) {
+                        App.isRemindNotice = true;
+                    }
+                }
+                if (SPUtils.getInstance().getInt(Constants.TOTAL_COUNT, 0) > 0) {
+                    if (userInfo.getMyTotalNum() > SPUtils.getInstance().getInt(Constants.TOTAL_COUNT, 0)) {
+                        //EventBus.getDefault().post(new MessageEvent("home_message_remind"));
+                        mMyRemindIv.setVisibility(View.VISIBLE);
+                    }
+                }
+
+                SPUtils.getInstance().put(Constants.COMMENT_COUNT, userInfo.getCommentNum());
+                SPUtils.getInstance().put(Constants.AT_COUNT, userInfo.getAiteNum());
+                SPUtils.getInstance().put(Constants.NOTICE_COUNT, userInfo.getNoticeNum());
+                SPUtils.getInstance().put(Constants.TOTAL_COUNT, userInfo.getMyTotalNum());
             }
         } else {
             Logger.i(StringUtils.isEmpty(tData.getMsg()) ? "登录失败" : tData.getMsg());

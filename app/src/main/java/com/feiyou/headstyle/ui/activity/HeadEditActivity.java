@@ -254,7 +254,7 @@ public class HeadEditActivity extends BaseFragmentActivity implements StickerDat
 
         View firstView = tabLayout.getTabAt(lastTab).getCustomView().findViewById(R.id.tab_line_view);
         //lastView.setBackgroundColor(ContextCompat.getColor(HeadEditActivity.this,R.color.tab_select_color));
-        firstView.setVisibility(View.VISIBLE);
+        //firstView.setVisibility(View.VISIBLE);
         firstView.setBackgroundResource(R.drawable.common_red_bg);
 
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
@@ -270,6 +270,7 @@ public class HeadEditActivity extends BaseFragmentActivity implements StickerDat
                     bottomParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
                     mBottomLayout.setLayoutParams(bottomParams);
                 }
+
                 if (tab.getPosition() == 1) {
                     mStickerLayout.setVisibility(View.GONE);
                     mFilterLayout.setVisibility(View.VISIBLE);
@@ -287,12 +288,12 @@ public class HeadEditActivity extends BaseFragmentActivity implements StickerDat
 
                 View lineView = tab.getCustomView().findViewById(R.id.tab_line_view);
                 lineView.setBackgroundResource(R.drawable.common_red_bg);
-                lineView.setVisibility(View.VISIBLE);
+                //lineView.setVisibility(View.VISIBLE);
 
 
                 View lastView = tabLayout.getTabAt(lastTab).getCustomView().findViewById(R.id.tab_line_view);
-                lastView.setBackgroundColor(ContextCompat.getColor(HeadEditActivity.this, R.color.transparent));
-                lastView.setVisibility(View.INVISIBLE);
+                lastView.setBackgroundColor(ContextCompat.getColor(HeadEditActivity.this, R.color.white));
+                //lastView.setVisibility(View.INVISIBLE);
 
                 lastTab = tab.getPosition();
             }

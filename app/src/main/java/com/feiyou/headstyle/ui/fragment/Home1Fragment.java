@@ -21,9 +21,11 @@ import android.widget.TextView;
 import com.blankj.utilcode.util.BarUtils;
 import com.blankj.utilcode.util.NetworkUtils;
 import com.blankj.utilcode.util.PathUtils;
+import com.blankj.utilcode.util.SPUtils;
 import com.blankj.utilcode.util.SizeUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
@@ -31,6 +33,7 @@ import com.feiyou.headstyle.bean.AdInfo;
 import com.feiyou.headstyle.bean.BannerInfo;
 import com.feiyou.headstyle.bean.HomeDataRet;
 import com.feiyou.headstyle.bean.HomeDataWrapper;
+import com.feiyou.headstyle.bean.MessageEvent;
 import com.feiyou.headstyle.bean.ResultInfo;
 import com.feiyou.headstyle.common.Constants;
 import com.feiyou.headstyle.common.GlideImageLoader;
@@ -47,6 +50,7 @@ import com.feiyou.headstyle.ui.adapter.HeadTypeAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragment;
 import com.feiyou.headstyle.ui.custom.ConfigDialog;
 import com.feiyou.headstyle.ui.custom.OpenDialog;
+import com.feiyou.headstyle.ui.custom.RoundedCornersTransformation;
 import com.feiyou.headstyle.view.HomeDataView;
 import com.liulishuo.filedownloader.BaseDownloadTask;
 import com.liulishuo.filedownloader.DownloadTask;
@@ -59,6 +63,8 @@ import com.tencent.mm.opensdk.openapi.WXAPIFactory;
 import com.wang.avi.AVLoadingIndicatorView;
 import com.youth.banner.Banner;
 import com.youth.banner.listener.OnBannerListener;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -216,6 +222,7 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
                 switch (adInfo.getType()) {
                     case 1:
                         Intent intent = new Intent(getActivity(), AdListActivity.class);
+                        intent.putExtra("open_url",adInfo.getJumpPath());
                         startActivity(intent);
                         break;
                     case 2:
@@ -453,11 +460,21 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
 
                         if (homeDataRet.getAdList() != null && homeDataRet.getAdList().size() > 0) {
                             adInfo = homeDataRet.getAdList().get(0);
-                            Glide.with(getActivity()).load(homeDataRet.getAdList().get(0).getIco()).into(mAdImageView);
+                            RequestOptions options = new RequestOptions().skipMemoryCache(true);
+                            options.transform(new RoundedCornersTransformation(SizeUtils.dp2px(16), 1));
+                            Glide.with(getActivity()).load(homeDataRet.getAdList().get(0).getIco()).apply(options).into(mAdImageView);
                         } else {
                             mAdLayout.setVisibility(View.GONE);
                         }
+
                     }
+
+                    if (SPUtils.getInstance().getInt(Constants.TOTAL_COUNT, 0) > 0) {
+                        if (homeDataRet.getMyTotalNum() > SPUtils.getInstance().getInt(Constants.TOTAL_COUNT, 0)) {
+                            EventBus.getDefault().post(new MessageEvent("home_message_remind"));
+                        }
+                    }
+                    SPUtils.getInstance().put(Constants.TOTAL_COUNT, homeDataRet.getMyTotalNum());
 
                     if (homeDataRet.getBannerList() != null && homeDataRet.getBannerList().size() > 0) {
                         bannerInfos = homeDataRet.getBannerList();
@@ -482,7 +499,7 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
                         if (homeDataRet.getImagesList().size() == pageSize) {
                             headInfoAdapter.loadMoreComplete();
                         } else {
-                            headInfoAdapter.loadMoreEnd();
+                            headInfoAdapter.loadMoreEnd(true);
                         }
                     }
                 } else {

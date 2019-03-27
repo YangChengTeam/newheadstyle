@@ -229,7 +229,7 @@ public class NewFragment extends BaseFragment implements NoteTypeView, SwipeRefr
                 if (((NoteTypeRet) tData).getData() != null && ((NoteTypeRet) tData).getData().getList().size() == pageSize) {
                     noteInfoAdapter.loadMoreComplete();
                 } else {
-                    noteInfoAdapter.loadMoreEnd();
+                    noteInfoAdapter.loadMoreEnd(true);
                 }
             }
 

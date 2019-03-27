@@ -11,8 +11,6 @@
         android:id="@+id/layout_my_message_top"
         android:layout_width="match_parent"
         android:layout_height="48dp"
-        android:layout_marginTop="2dp"
-        android:layout_marginBottom="2dp"
         android:background="@color/white">
 
         <ImageView
@@ -42,7 +40,7 @@
 
     <View
         android:layout_width="match_parent"
-        android:layout_height="0.5dp"
+        android:layout_height="0.3dp"
         android:background="@color/line_color"></View>
 
     <android.support.v4.view.ViewPager

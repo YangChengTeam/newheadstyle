@@ -51,4 +51,6 @@
     <dimen name="twenty_one">21dp</dimen>
 
     <dimen name="custom_peek_height">500dp</dimen>
+
+    <dimen name="design_fab_size_normal">45dp</dimen>
 </resources>

@@ -2,6 +2,7 @@ package com.feiyou.headstyle.ui.adapter;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.text.Html;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
@@ -21,8 +22,10 @@ import com.feiyou.headstyle.bean.SystemInfo;
 import com.feiyou.headstyle.ui.custom.GlideRoundTransform;
 import com.feiyou.headstyle.ui.custom.GlideRoundedCornersTransform;
 import com.feiyou.headstyle.ui.custom.RoundedCornersTransformation;
+import com.feiyou.headstyle.utils.MyTimeUtil;
 import com.feiyou.headstyle.view.MyClickText;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -44,9 +47,12 @@ public class MyNoticeAdapter extends BaseQuickAdapter<SystemInfo, BaseViewHolder
         options.transform(new RoundedCornersTransformation(SizeUtils.dp2px(22), 0));
         Glide.with(mContext).load(item.getUserimg()).apply(options).into((ImageView) helper.getView(R.id.iv_user_img));
 
+        Date currentDate = TimeUtils.millis2Date(item.getAddTime() != null ? item.getAddTime() * 1000 : 0);
+        String tempDateStr = MyTimeUtil.isOutMouth(currentDate) ? TimeUtils.millis2String(item.getAddTime() != null ? item.getAddTime() * 1000 : 0) : MyTimeUtil.getTimeFormatText(currentDate);
+
         helper.setText(R.id.tv_notice_nick_name, item.getNickname())
                 .setText(R.id.tv_note_type_content, item.getType() == 1 ? "赞了你的评论" : "关注了你")
-                .setText(R.id.tv_note_content, item.getContent())
-                .setText(R.id.tv_notice_date, TimeUtils.millis2String(item.getAddTime() != null ? item.getAddTime() * 1000 : 0));
+                .setText(R.id.tv_notice_content, Html.fromHtml(item.getContent()))
+                .setText(R.id.tv_notice_date, tempDateStr);
     }
 }

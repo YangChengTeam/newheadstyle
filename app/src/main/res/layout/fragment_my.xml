@@ -65,8 +65,10 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:ellipsize="end"
+                    android:gravity="center"
                     android:maxWidth="180dp"
                     android:maxLines="2"
+                    android:minWidth="100dp"
                     android:text="未登录"
                     android:textColor="@color/white"
                     android:textSize="18dp"
@@ -79,6 +81,7 @@
                     android:layout_marginTop="6dp"
                     android:gravity="center"
                     android:maxWidth="180dp"
+                    android:minWidth="100dp"
                     android:text="登录可以换头像哦"
                     android:textColor="@color/white"
                     android:textSize="14dp" />
@@ -202,6 +205,7 @@
                 android:src="@mipmap/my_message_icon" />
 
             <TextView
+                android:id="@+id/tv_message_txt"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
@@ -210,6 +214,17 @@
                 android:text="我的消息" />
 
             <ImageView
+                android:id="@+id/iv_my_remind"
+                android:layout_width="10dp"
+                android:layout_height="10dp"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="6dp"
+                android:layout_toRightOf="@+id/tv_message_txt"
+                android:src="@mipmap/message_remind_icon"
+                android:visibility="gone" />
+
+            <ImageView
+                android:id="@+id/iv_message_right"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
@@ -257,6 +272,7 @@
 
 
     <LinearLayout
+        android:id="@+id/layout_about"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="24dp"
@@ -301,6 +317,7 @@
             android:background="@color/line_color"></View>
 
         <RelativeLayout
+            android:id="@+id/layout_add_score"
             android:layout_width="match_parent"
             android:layout_height="48dp">
 
@@ -332,6 +349,7 @@
     </LinearLayout>
 
     <RelativeLayout
+        android:id="@+id/layout_feed_back"
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:layout_marginLeft="24dp"

@@ -28,6 +28,7 @@ import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.bean.FollowInfoRet;
 import com.feiyou.headstyle.bean.MessageEvent;
+import com.feiyou.headstyle.bean.NoteInfo;
 import com.feiyou.headstyle.bean.NoteInfoRet;
 import com.feiyou.headstyle.bean.ResultInfo;
 import com.feiyou.headstyle.bean.UserInfo;
@@ -56,6 +57,7 @@ import org.greenrobot.eventbus.ThreadMode;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import es.dmoral.toasty.Toasty;
 
 /**
  * Created by myflying on 2018/11/26.
@@ -302,7 +304,7 @@ public class FollowFragment extends BaseFragment implements NoteDataView, SwipeR
                     if (((NoteInfoRet) tData).getData().size() == pageSize) {
                         noteInfoAdapter.loadMoreComplete();
                     } else {
-                        noteInfoAdapter.loadMoreEnd();
+                        noteInfoAdapter.loadMoreEnd(true);
                     }
                 } else {
                     mRecommendListView.setVisibility(View.GONE);
@@ -314,11 +316,18 @@ public class FollowFragment extends BaseFragment implements NoteDataView, SwipeR
 
             if (tData instanceof FollowInfoRet) {
                 if (((FollowInfoRet) tData).getData() != null) {
-                    ToastUtils.showLong(((FollowInfoRet) tData).getData().getIsGuan() == 0 ? "已取消" : "已关注");
-                    noteInfoAdapter.getData().get(currentClickIndex).setIsGuan(((FollowInfoRet) tData).getData().getIsGuan());
+                    int isGuan = ((FollowInfoRet) tData).getData().getIsGuan();
+                    Toasty.normal(getActivity(), isGuan == 0 ? "已取消" : "已关注").show();
+                    noteInfoAdapter.getData().get(currentClickIndex).setIsGuan(isGuan);
+                    String gUserId = noteInfoAdapter.getData().get(currentClickIndex).getUserId();
+                    for (NoteInfo noteInfo : noteInfoAdapter.getData()) {
+                        if (noteInfo.getUserId().equals(gUserId)) {
+                            noteInfo.setIsGuan(isGuan);
+                        }
+                    }
                     noteInfoAdapter.notifyDataSetChanged();
                 } else {
-                    ToastUtils.showLong(StringUtils.isEmpty(tData.getMsg()) ? "操作错误" : tData.getMsg());
+                    Toasty.normal(getActivity(), StringUtils.isEmpty(tData.getMsg()) ? "操作错误" : tData.getMsg()).show();
                 }
             }
 

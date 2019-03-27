@@ -55,6 +55,20 @@ public class UserInfo {
     @SerializedName("sex_can_change")
     private int sexCanChange;
 
+    @SerializedName("comment_num")
+    private int commentNum;//评论消息数
+
+    @SerializedName("aite_num")
+    private int aiteNum;//艾特消息数
+
+    @SerializedName("noticeNum")
+    private int noticeNum;//通知消息数
+
+    @SerializedName("my_notice_num")
+    private int myTotalNum;//我的消息总数
+
+    private String background;
+
     public String getId() {
         return id;
     }
@@ -238,5 +252,45 @@ public class UserInfo {
 
     public void setSexCanChange(int sexCanChange) {
         this.sexCanChange = sexCanChange;
+    }
+
+    public int getCommentNum() {
+        return commentNum;
+    }
+
+    public void setCommentNum(int commentNum) {
+        this.commentNum = commentNum;
+    }
+
+    public int getAiteNum() {
+        return aiteNum;
+    }
+
+    public void setAiteNum(int aiteNum) {
+        this.aiteNum = aiteNum;
+    }
+
+    public int getNoticeNum() {
+        return noticeNum;
+    }
+
+    public void setNoticeNum(int noticeNum) {
+        this.noticeNum = noticeNum;
+    }
+
+    public int getMyTotalNum() {
+        return myTotalNum;
+    }
+
+    public void setMyTotalNum(int myTotalNum) {
+        this.myTotalNum = myTotalNum;
+    }
+
+    public String getBackground() {
+        return background;
+    }
+
+    public void setBackground(String background) {
+        this.background = background;
     }
 }

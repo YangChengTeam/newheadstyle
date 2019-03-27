@@ -86,6 +86,6 @@ public class VideoItemAdapter extends BaseQuickAdapter<VideoInfo, BaseViewHolder
         }
         helper.addOnClickListener(R.id.tv_collect_num);
         helper.addOnClickListener(R.id.tv_comment_num);
-        helper.addOnClickListener(R.id.layout_share);
+        helper.addOnClickListener(R.id.layout_share).addOnClickListener(R.id.iv_user_head);
     }
 }

@@ -36,14 +36,18 @@
                 android:textColor="@color/white"
                 android:textSize="16dp" />
 
-            <ImageView
-                android:id="@+id/iv_change_star"
+            <TextView
+                android:id="@+id/tv_change_star"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
+                android:drawableRight="@mipmap/change_star"
+                android:drawablePadding="4dp"
                 android:padding="12dp"
-                android:src="@mipmap/change_star" />
+                android:text="切换"
+                android:textColor="@color/white"
+                android:textSize="14dp" />
         </RelativeLayout>
     </RelativeLayout>
 
@@ -64,7 +68,7 @@
                 android:layout_marginLeft="12dp"
                 android:layout_marginTop="10dp"
                 android:layout_marginRight="12dp"
-                android:background="@drawable/common_white_bg"
+                android:background="@drawable/forecast_white_bg"
                 android:orientation="vertical">
 
                 <LinearLayout
@@ -359,7 +363,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/layout_top_info"
-                android:layout_margin="12dp"
+                android:layout_marginLeft="12dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginRight="12dp"
                 android:orientation="vertical">
 
                 <android.support.v7.widget.RecyclerView

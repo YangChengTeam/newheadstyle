@@ -31,11 +31,10 @@
                 android:orientation="horizontal">
 
                 <LinearLayout
+                    android:id="@+id/top_bg_layout"
                     android:layout_width="match_parent"
                     android:layout_height="183dp"
-                    android:layout_gravity="top|center"
-                    android:background="@mipmap/user_info_top_bg">
-
+                    android:layout_gravity="top|center">
                 </LinearLayout>
 
                 <FrameLayout
@@ -50,10 +49,10 @@
                         android:layout_gravity="bottom"
                         android:layout_marginLeft="12dp"
                         android:layout_marginRight="12dp"
-                        android:paddingBottom="12dp"
                         android:background="@drawable/common_white_bg"
                         android:gravity="top|center"
-                        android:orientation="vertical">
+                        android:orientation="vertical"
+                        android:paddingBottom="12dp">
 
                         <RelativeLayout
                             android:id="@+id/layout_guan_fen"
@@ -317,14 +316,16 @@
             android:id="@+id/layout_no_data"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_gravity="top|center"
             android:background="@color/white"
-            android:gravity="center"
+            android:gravity="top|center"
             android:orientation="vertical"
             android:visibility="gone">
 
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="50dp"
                 android:src="@mipmap/empty_icon" />
 
             <TextView

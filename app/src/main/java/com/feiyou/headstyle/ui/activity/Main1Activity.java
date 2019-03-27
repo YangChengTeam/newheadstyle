@@ -10,6 +10,8 @@ import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
+import android.view.View;
+import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
@@ -21,6 +23,7 @@ import com.blankj.utilcode.util.SPUtils;
 import com.blankj.utilcode.util.StringUtils;
 import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
+import com.feiyou.headstyle.bean.MessageEvent;
 import com.feiyou.headstyle.bean.UserInfo;
 import com.feiyou.headstyle.common.Constants;
 import com.feiyou.headstyle.ui.adapter.MyFragmentAdapter;
@@ -29,6 +32,10 @@ import com.feiyou.headstyle.utils.NotificationUtils;
 import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 import com.umeng.socialize.UMShareAPI;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -49,6 +56,9 @@ public class Main1Activity extends BaseFragmentActivity implements ViewPager.OnP
 
     @BindView(R.id.layout_bottom_nav)
     RadioGroup mTabRadioGroup;
+
+    @BindView(R.id.iv_home_message_remind)
+    ImageView mTotalCountIv;
 
     private MyFragmentAdapter adapter;
 
@@ -178,9 +188,32 @@ public class Main1Activity extends BaseFragmentActivity implements ViewPager.OnP
         for (int i = 0; i < radioGroup.getChildCount(); i++) {
             if (radioGroup.getChildAt(i).getId() == checkedId) {
                 viewPager.setCurrentItem(i);
+                if (i == 4 && mTotalCountIv.getVisibility() == View.VISIBLE) {
+                    mTotalCountIv.setVisibility(View.GONE);
+                }
                 return;
             }
         }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void Event(MessageEvent messageEvent) {
+        if (messageEvent.getMessage().equals("home_message_remind")) {
+            mTotalCountIv.setVisibility(View.VISIBLE);
+            App.isShowTotalCount = true;
+        }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        EventBus.getDefault().unregister(this);
     }
 
     @Override

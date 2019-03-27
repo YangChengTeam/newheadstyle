@@ -3,27 +3,40 @@ package com.feiyou.headstyle.ui.activity;
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.blankj.utilcode.util.CacheDiskUtils;
+import com.blankj.utilcode.util.CacheDoubleUtils;
+import com.blankj.utilcode.util.FileUtils;
 import com.blankj.utilcode.util.SPUtils;
 import com.blankj.utilcode.util.SizeUtils;
 import com.blankj.utilcode.util.StringUtils;
+import com.blankj.utilcode.util.ToastUtils;
+import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.bean.UserInfo;
 import com.feiyou.headstyle.common.Constants;
+import com.feiyou.headstyle.ui.adapter.CommonImageAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragmentActivity;
 import com.feiyou.headstyle.ui.custom.ConfigDialog;
 import com.feiyou.headstyle.ui.custom.VersionUpdateDialog;
+import com.feiyou.headstyle.utils.GlideCacheUtil;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 import com.qmuiteam.qmui.widget.QMUITopBar;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import butterknife.BindView;
 import butterknife.OnClick;
+import es.dmoral.toasty.Toasty;
 
 /**
  * Created by myflying on 2018/11/23.
@@ -46,6 +59,31 @@ public class SettingActivity extends BaseFragmentActivity implements ConfigDialo
 
     @BindView(R.id.tv_user_phone)
     TextView mUserPhoneTv;
+
+    @BindView(R.id.photo_list)
+    RecyclerView mPhotoListView;
+
+    @BindView(R.id.layout_wrapper)
+    LinearLayout mWrapperLayout;
+
+    @BindView(R.id.layout_no_photo)
+    LinearLayout mNoPhotoLayout;
+
+    @BindView(R.id.layout_photos)
+    RelativeLayout mPhotosLayout;
+
+    @BindView(R.id.tv_total_count)
+    TextView mTotalCountTv;
+
+    @BindView(R.id.layout_clear_cache)
+    RelativeLayout mClearCacheLayout;
+
+    @BindView(R.id.tv_cache_count)
+    TextView mCacheTv;
+
+    CommonImageAdapter commonImageAdapter;
+
+    private List<Object> photoList;
 
     VersionUpdateDialog updateDialog;
 
@@ -88,6 +126,18 @@ public class SettingActivity extends BaseFragmentActivity implements ConfigDialo
     public void initData() {
         configDialog = new ConfigDialog(this, R.style.login_dialog, 1, "确认退出吗?", "请你确认是否退出当前账号，退出后无法获取更多消息哦!");
         configDialog.setConfigListener(this);
+
+        commonImageAdapter = new CommonImageAdapter(this, null, 48);
+        mPhotoListView.setLayoutManager(new GridLayoutManager(this, 3));
+        mPhotoListView.setAdapter(commonImageAdapter);
+        commonImageAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
+                Intent intent = new Intent(SettingActivity.this, PhotoWallActivity.class);
+                startActivity(intent);
+            }
+        });
+        mCacheTv.setText(GlideCacheUtil.getInstance().getCacheSize(this) + "");
     }
 
     @Override
@@ -97,9 +147,29 @@ public class SettingActivity extends BaseFragmentActivity implements ConfigDialo
         userInfo = App.getApp().getmUserInfo();
         if (userInfo != null) {
             mUserIdTv.setText(userInfo.getId() + "");
-            //mUserAddressTv.setText(userInfo.getAddr());
             if (!StringUtils.isEmpty(userInfo.getPhone())) {
                 mUserPhoneTv.setText(userInfo.getPhone() + "");
+            }
+
+            if (userInfo.getImageWall() != null && userInfo.getImageWall().length > 0) {
+                mNoPhotoLayout.setVisibility(View.GONE);
+                mPhotosLayout.setVisibility(View.VISIBLE);
+
+                String[] tempPhotos = userInfo.getImageWall();
+                mTotalCountTv.setText(tempPhotos.length + "张");
+                photoList = new ArrayList<>();
+                for (int i = 0; i < tempPhotos.length; i++) {
+                    photoList.add(tempPhotos[i]);
+                }
+                if (photoList.size() > 3) {
+                    photoList = photoList.subList(0, 3);
+                }
+
+                //获取值后重新设置
+                commonImageAdapter.setNewData(photoList);
+            } else {
+                mNoPhotoLayout.setVisibility(View.VISIBLE);
+                mPhotosLayout.setVisibility(View.GONE);
             }
         }
     }
@@ -112,6 +182,12 @@ public class SettingActivity extends BaseFragmentActivity implements ConfigDialo
             }
         };
         updateDialog = new VersionUpdateDialog(this, R.style.login_dialog, listener);
+    }
+
+    @OnClick({R.id.layout_no_photo, R.id.layout_photos})
+    void photoList() {
+        Intent intent = new Intent(SettingActivity.this, PhotoWallActivity.class);
+        startActivity(intent);
     }
 
     @OnClick(R.id.layout_bind_phone)
@@ -138,6 +214,13 @@ public class SettingActivity extends BaseFragmentActivity implements ConfigDialo
         if (configDialog != null && !configDialog.isShowing()) {
             configDialog.show();
         }
+    }
+
+    @OnClick(R.id.layout_clear_cache)
+    void clearCache() {
+        GlideCacheUtil.getInstance().clearImageDiskCache(this);
+        mCacheTv.setText("");
+        Toasty.normal(this, "缓存已清除").show();
     }
 
     @Override

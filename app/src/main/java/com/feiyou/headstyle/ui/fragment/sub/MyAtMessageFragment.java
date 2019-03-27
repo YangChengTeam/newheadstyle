@@ -1,5 +1,6 @@
 package com.feiyou.headstyle.ui.fragment.sub;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -19,6 +20,7 @@ import com.feiyou.headstyle.bean.MyCommentRet;
 import com.feiyou.headstyle.common.Constants;
 import com.feiyou.headstyle.presenter.MyAtMessagePresenterImp;
 import com.feiyou.headstyle.presenter.MyCommentPresenterImp;
+import com.feiyou.headstyle.ui.activity.CommunityArticleActivity;
 import com.feiyou.headstyle.ui.adapter.MyAtMessageAdapter;
 import com.feiyou.headstyle.ui.adapter.MyCommentAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragment;
@@ -93,6 +95,9 @@ public class MyAtMessageFragment extends BaseFragment implements MyAtMessageView
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
                 Logger.i("my comment pos--->" + position);
+                Intent intent = new Intent(getActivity(), CommunityArticleActivity.class);
+                intent.putExtra("msg_id", myAtMessageAdapter.getData().get(position).getMessageId());
+                startActivity(intent);
             }
         });
 
@@ -136,7 +141,7 @@ public class MyAtMessageFragment extends BaseFragment implements MyAtMessageView
             if (tData.getData().size() == pageSize) {
                 myAtMessageAdapter.loadMoreComplete();
             } else {
-                myAtMessageAdapter.loadMoreEnd();
+                myAtMessageAdapter.loadMoreEnd(true);
             }
         } else {
             noDataLayout.setVisibility(View.VISIBLE);

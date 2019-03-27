@@ -136,7 +136,7 @@ public class UserInfoModelImp extends BaseModel implements UserInfoModel<UserInf
             params.put("nickname", updateInfo.getNickname());
             params.put("sex", updateInfo.getSex());
             params.put("birthday", updateInfo.getBirthday());
-            params.put("star", "星座");
+            params.put("star", updateInfo.getStar());
             params.put("intro", updateInfo.getIntro());
         } catch (JSONException e) {
             e.printStackTrace();

@@ -30,6 +30,7 @@ import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.bean.FollowInfoRet;
+import com.feiyou.headstyle.bean.NoteInfo;
 import com.feiyou.headstyle.bean.NoteTypeRet;
 import com.feiyou.headstyle.bean.NoteTypeWrapper;
 import com.feiyou.headstyle.bean.ResultInfo;
@@ -59,6 +60,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.OnClick;
+import es.dmoral.toasty.Toasty;
 
 /**
  * Created by myflying on 2018/11/28.
@@ -310,6 +312,19 @@ public class CommunityType1Activity extends BaseFragmentActivity implements Note
         noteTypePresenterImp.getNoteTypeData(topicId, currentPage, 1, App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "");
     }
 
+    @OnClick(R.id.fab)
+    void fabButton() {
+        if (!App.getApp().isLogin) {
+            if (loginDialog != null && !loginDialog.isShowing()) {
+                loginDialog.show();
+            }
+            return;
+        }
+
+        Intent intent = new Intent(this, PushNoteActivity.class);
+        startActivity(intent);
+    }
+
     @OnClick(R.id.iv_top_share)
     void shareInfo() {
         if (commonShareDialog != null && !commonShareDialog.isShowing()) {
@@ -394,7 +409,7 @@ public class CommunityType1Activity extends BaseFragmentActivity implements Note
                 if (noteTypeWrapper != null && noteTypeWrapper.getList().size() == pageSize) {
                     noteInfoAdapter.loadMoreComplete();
                 } else {
-                    noteInfoAdapter.loadMoreEnd();
+                    noteInfoAdapter.loadMoreEnd(true);
                 }
 
                 if (noteTypeWrapper.getIsGuan() == 0) {
@@ -423,8 +438,15 @@ public class CommunityType1Activity extends BaseFragmentActivity implements Note
                         }
                     } else {
                         //关注用户
-                        ToastUtils.showLong(((FollowInfoRet) tData).getData().getIsGuan() == 0 ? "已取消" : "已关注");
-                        noteInfoAdapter.getData().get(currentClickIndex).setIsGuan(((FollowInfoRet) tData).getData().getIsGuan());
+                        int isGuan = ((FollowInfoRet) tData).getData().getIsGuan();
+                        Toasty.normal(this, isGuan == 0 ? "已取消" : "已关注").show();
+                        noteInfoAdapter.getData().get(currentClickIndex).setIsGuan(isGuan);
+                        String gUserId = noteInfoAdapter.getData().get(currentClickIndex).getUserId();
+                        for (NoteInfo noteInfo : noteInfoAdapter.getData()) {
+                            if (noteInfo.getUserId().equals(gUserId)) {
+                                noteInfo.setIsGuan(isGuan);
+                            }
+                        }
                         noteInfoAdapter.notifyDataSetChanged();
                     }
                 } else {
@@ -524,7 +546,7 @@ public class CommunityType1Activity extends BaseFragmentActivity implements Note
         if (noteInfoAdapter.getData().get(currentClickIndex).getImageArr() != null && noteInfoAdapter.getData().get(currentClickIndex).getImageArr().length > 0) {
             normalImage = new UMImage(CommunityType1Activity.this, noteInfoAdapter.getData().get(currentClickIndex).getImageArr()[0]);
             normalImage.compressStyle = UMImage.CompressStyle.QUALITY;
-        }else{
+        } else {
             normalImage = new UMImage(CommunityType1Activity.this, R.drawable.app_share);
             normalImage.compressStyle = UMImage.CompressStyle.QUALITY;
         }

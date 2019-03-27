@@ -47,4 +47,12 @@ public class Constants {
     public static final String USER_INFO = "user_info";
 
     public static final String SHOW_SHAPE = "show_shape";
+
+    public static final String COMMENT_COUNT = "comment_count";
+
+    public static final String AT_COUNT = "at_count";
+
+    public static final String NOTICE_COUNT = "notice_count";
+
+    public static final String TOTAL_COUNT = "total_count";
 }

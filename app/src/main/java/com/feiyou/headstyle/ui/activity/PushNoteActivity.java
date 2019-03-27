@@ -27,6 +27,8 @@ import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.base.IBaseView;
+import com.feiyou.headstyle.bean.AddNoteRet;
+import com.feiyou.headstyle.bean.MessageEvent;
 import com.feiyou.headstyle.bean.ResultInfo;
 import com.feiyou.headstyle.common.Constants;
 import com.feiyou.headstyle.presenter.AddNotePresenterImp;
@@ -35,11 +37,14 @@ import com.feiyou.headstyle.ui.base.BaseFragmentActivity;
 import com.feiyou.headstyle.ui.custom.Glide4Engine;
 import com.feiyou.headstyle.ui.custom.MsgEditText;
 import com.feiyou.headstyle.utils.MyToastUtils;
+import com.feiyou.headstyle.view.AddNoteView;
 import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 import com.qmuiteam.qmui.widget.QMUITopBar;
 import com.zhihu.matisse.Matisse;
 import com.zhihu.matisse.MimeType;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -57,7 +62,7 @@ import es.dmoral.toasty.Toasty;
 /**
  * Created by myflying on 2018/11/23.
  */
-public class PushNoteActivity extends BaseFragmentActivity implements IBaseView {
+public class PushNoteActivity extends BaseFragmentActivity implements AddNoteView {
 
     public static final int REQUEST_CODE_CHOOSE = 23;
 
@@ -206,7 +211,7 @@ public class PushNoteActivity extends BaseFragmentActivity implements IBaseView 
         }
         list.add(R.mipmap.add_my_photo);
 
-        addNoteImageAdapter = new AddNoteImageAdapter(this, list);
+        addNoteImageAdapter = new AddNoteImageAdapter(this, list,1);
         mNoteImageListView.setLayoutManager(new GridLayoutManager(this, 3));
         mNoteImageListView.setAdapter(addNoteImageAdapter);
         addNoteImageAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
@@ -266,7 +271,7 @@ public class PushNoteActivity extends BaseFragmentActivity implements IBaseView 
                     ids.append(key).append(",");
 
                     //实际传递到后台的内容值
-                    sendContent = sendContent.replace(val.toString(), "<span style='color:#4b79ad;'>" + val + "</span>");
+                    sendContent = sendContent.replace(val.toString(), "<font color='#4b79ad'>" + val + "</font>");
                 }
             }
             tempStr = ids.substring(0, ids.length() - 1);
@@ -389,18 +394,22 @@ public class PushNoteActivity extends BaseFragmentActivity implements IBaseView 
     }
 
     @Override
-    public void loadDataSuccess(Object tData) {
+    public void loadDataSuccess(AddNoteRet tData) {
+        Logger.i(JSON.toJSONString(tData));
+
         if (progressDialog != null && progressDialog.isShowing()) {
             progressDialog.dismiss();
         }
-        Logger.i(JSON.toJSONString(tData));
-        if (tData instanceof ResultInfo) {
-            if (((ResultInfo) tData).getCode() == Constants.SUCCESS) {
-                MyToastUtils.showToast(this, 0, "发帖成功");
-                finish();
-            } else {
-                MyToastUtils.showToast(this, 1, "发帖失败");
+
+        if (tData.getCode() == Constants.SUCCESS) {
+            if (tData.getData() != null) {
+                MessageEvent addMessage = new MessageEvent("add_note");
+                addMessage.setAddNoteInfo(tData.getData());
+                EventBus.getDefault().post(addMessage);
             }
+            finish();
+        } else {
+            Toasty.normal(this, StringUtils.isEmpty(tData.getMsg()) ? "发帖失败" : tData.getMsg()).show();
         }
     }
 
@@ -409,6 +418,7 @@ public class PushNoteActivity extends BaseFragmentActivity implements IBaseView 
         if (progressDialog != null && progressDialog.isShowing()) {
             progressDialog.dismiss();
         }
+        Toasty.normal(this, "发帖失败").show();
     }
 
     private class NameLengthFilter implements InputFilter {

@@ -8,4 +8,6 @@ import java.util.List;
 
 public interface UpdateHeadPresenter {
     void updateHead(String userId, String filePath);
+
+    void updateBackground(String userId, String filePath);
 }

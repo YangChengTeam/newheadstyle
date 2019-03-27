@@ -8,13 +8,11 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.alibaba.fastjson.JSON;
 import com.blankj.utilcode.util.StringUtils;
-import com.blankj.utilcode.util.ToastUtils;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
@@ -27,7 +25,6 @@ import com.feiyou.headstyle.common.Constants;
 import com.feiyou.headstyle.presenter.FollowInfoPresenterImp;
 import com.feiyou.headstyle.presenter.UserInfoListPresenterImp;
 import com.feiyou.headstyle.ui.activity.MyFollowActivity;
-import com.feiyou.headstyle.ui.adapter.AddFriendsListAdapter;
 import com.feiyou.headstyle.ui.adapter.MyFriendsListAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragment;
 import com.feiyou.headstyle.ui.custom.NormalDecoration;
@@ -39,8 +36,6 @@ import com.wang.avi.AVLoadingIndicatorView;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
-
-import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -176,17 +171,17 @@ public class MyFriendsFragment extends BaseFragment implements UserInfoListView 
                 if (((UserInfoListRet) tData).getData().size() == pageSize) {
                     myFriendsListAdapter.loadMoreComplete();
                 } else {
-                    myFriendsListAdapter.loadMoreEnd();
+                    myFriendsListAdapter.loadMoreEnd(true);
                 }
             }
             if (tData instanceof FollowInfoRet) {
                 int tempResult = ((FollowInfoRet) tData).getData().getIsGuan();
 
-                if (tempResult == 0) {
-                    MyToastUtils.showToast(getActivity(), 1, "已取消");
-                } else {
-                    MyToastUtils.showToast(getActivity(), 0, "关注成功");
-                }
+//                if (tempResult == 0) {
+//                    MyToastUtils.showToast(getActivity(), 1, "已取消");
+//                } else {
+//                    MyToastUtils.showToast(getActivity(), 0, "关注成功");
+//                }
 
                 userInfoListPresenterImp.getMyGuanFenList(currentPage, userInfo != null ? userInfo.getId() : "", isMyInfo ? userInfo.getId() : intoUserId, 1);
             }
@@ -197,7 +192,7 @@ public class MyFriendsFragment extends BaseFragment implements UserInfoListView 
                 //mNoDataTitleTv.setText(type == 1 ? "还没有关注的好友？不如去多认识几个朋友！" : "还没收到过关注？不如发个帖求波关注！");
                 //mNoDataToTv.setText(type == 1 ? "去关注" : "去发帖");
             }
-            ToastUtils.showLong(StringUtils.isEmpty(tData.getMsg()) ? "操作失败" : tData.getMsg());
+            Logger.i(StringUtils.isEmpty(tData.getMsg()) ? "操作失败" : tData.getMsg());
         }
     }
 

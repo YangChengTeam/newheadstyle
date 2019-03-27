@@ -8,6 +8,8 @@ public class MessageEvent {
 
     private String friendNames;
 
+    private NoteInfo addNoteInfo;
+
     public String getFriendIds() {
         return friendIds;
     }
@@ -34,5 +36,13 @@ public class MessageEvent {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public NoteInfo getAddNoteInfo() {
+        return addNoteInfo;
+    }
+
+    public void setAddNoteInfo(NoteInfo addNoteInfo) {
+        this.addNoteInfo = addNoteInfo;
     }
 }

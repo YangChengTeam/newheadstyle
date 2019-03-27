@@ -34,4 +34,9 @@ public class UpdateHeadPresenterImp extends BasePresenterImp<IBaseView, UpdateHe
     public void updateHead(String userId, String filePath) {
         uploadPhotoModelImp.updateHead(userId, filePath, this);
     }
+
+    @Override
+    public void updateBackground(String userId, String filePath) {
+        uploadPhotoModelImp.updateBackground(userId, filePath, this);
+    }
 }

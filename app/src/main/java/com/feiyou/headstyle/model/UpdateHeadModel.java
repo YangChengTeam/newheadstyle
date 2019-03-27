@@ -8,4 +8,6 @@ import com.feiyou.headstyle.base.IBaseRequestCallBack;
 
 public interface UpdateHeadModel<T> {
     void updateHead(String userId, String filePath, IBaseRequestCallBack<T> iBaseRequestCallBack);
+
+    void updateBackground(String userId, String filePath, IBaseRequestCallBack<T> iBaseRequestCallBack);
 }

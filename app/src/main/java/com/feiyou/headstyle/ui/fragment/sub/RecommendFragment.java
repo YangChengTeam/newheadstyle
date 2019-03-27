@@ -76,6 +76,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import es.dmoral.toasty.Toasty;
 
 /**
  * Created by myflying on 2018/11/26.
@@ -148,6 +149,11 @@ public class RecommendFragment extends BaseFragment implements NoteDataView, Swi
     @Override
     protected View onCreateView() {
         View root = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_tab_recommend, null);
+
+        if(!EventBus.getDefault().isRegistered(this)){
+            EventBus.getDefault().register(this);
+        }
+
         ButterKnife.bind(this, root);
         initData();
         return root;
@@ -319,6 +325,9 @@ public class RecommendFragment extends BaseFragment implements NoteDataView, Swi
     public void Event(MessageEvent messageEvent) {
         if (messageEvent.getMessage().equals("login_success")) {
             onResume();
+        } else if (messageEvent.getMessage().equals("add_note")) {
+            //发帖后添加到首页
+            noteInfoAdapter.addData(0, messageEvent.getAddNoteInfo());
         } else {
             if (communityType == 2) {
                 topicAdapter.setNewData(App.topicInfoList);
@@ -340,14 +349,8 @@ public class RecommendFragment extends BaseFragment implements NoteDataView, Swi
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-        EventBus.getDefault().register(this);
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
+    public void onDestroy() {
+        super.onDestroy();
         EventBus.getDefault().unregister(this);
     }
 
@@ -379,7 +382,7 @@ public class RecommendFragment extends BaseFragment implements NoteDataView, Swi
                     if (((NoteInfoRet) tData).getData().size() == pageSize) {
                         noteInfoAdapter.loadMoreComplete();
                     } else {
-                        noteInfoAdapter.loadMoreEnd();
+                        noteInfoAdapter.loadMoreEnd(true);
                     }
                 } else {
                     mRecommendListView.setVisibility(View.GONE);
@@ -391,11 +394,18 @@ public class RecommendFragment extends BaseFragment implements NoteDataView, Swi
 
             if (tData instanceof FollowInfoRet) {
                 if (((FollowInfoRet) tData).getData() != null) {
-                    ToastUtils.showLong(((FollowInfoRet) tData).getData().getIsGuan() == 0 ? "已取消" : "已关注");
-                    noteInfoAdapter.getData().get(currentClickIndex).setIsGuan(((FollowInfoRet) tData).getData().getIsGuan());
+                    int isGuan = ((FollowInfoRet) tData).getData().getIsGuan();
+                    Toasty.normal(getActivity(), isGuan == 0 ? "已取消" : "已关注").show();
+                    noteInfoAdapter.getData().get(currentClickIndex).setIsGuan(isGuan);
+                    String gUserId = noteInfoAdapter.getData().get(currentClickIndex).getUserId();
+                    for (NoteInfo noteInfo : noteInfoAdapter.getData()) {
+                        if (noteInfo.getUserId().equals(gUserId)) {
+                            noteInfo.setIsGuan(isGuan);
+                        }
+                    }
                     noteInfoAdapter.notifyDataSetChanged();
                 } else {
-                    ToastUtils.showLong(StringUtils.isEmpty(tData.getMsg()) ? "操作错误" : tData.getMsg());
+                    Toasty.normal(getActivity(), StringUtils.isEmpty(tData.getMsg()) ? "操作错误" : tData.getMsg()).show();
                 }
             }
 

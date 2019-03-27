@@ -169,7 +169,7 @@ public class MyFensFragment extends BaseFragment implements UserInfoListView {
                 if (((UserInfoListRet) tData).getData().size() == pageSize) {
                     myFensListAdapter.loadMoreComplete();
                 } else {
-                    myFensListAdapter.loadMoreEnd();
+                    myFensListAdapter.loadMoreEnd(true);
                 }
             }
             if (tData instanceof FollowInfoRet) {

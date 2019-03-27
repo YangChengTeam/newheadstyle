@@ -64,7 +64,7 @@ public class CommentReplyAdapter extends BaseQuickAdapter<NoteSubComment, BaseVi
             isZanTv.setCompoundDrawablesWithIntrinsicBounds(isZan, null, null, null);
         }
         helper.addOnClickListener(R.id.layout_zan);
-        helper.addOnClickListener(R.id.btn_reply_count);
+        helper.addOnClickListener(R.id.btn_reply_count).addOnClickListener(R.id.iv_user_head);
 
         LinearLayout oldLayout = helper.itemView.findViewById(R.id.layout_old_content);
         if (StringUtils.isEmpty(item.getOldContent())) {

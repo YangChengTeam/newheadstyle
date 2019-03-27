@@ -6,13 +6,13 @@ import java.util.List;
  * Created by myflying on 2018/11/20.
  */
 public class AddNoteRet extends ResultInfo {
-    private Object data;
+    private NoteInfo data;
 
-    public Object getData() {
+    public NoteInfo getData() {
         return data;
     }
 
-    public void setData(Object data) {
+    public void setData(NoteInfo data) {
         this.data = data;
     }
 }

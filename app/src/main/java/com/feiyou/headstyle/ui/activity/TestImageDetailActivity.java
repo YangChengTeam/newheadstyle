@@ -115,6 +115,8 @@ public class TestImageDetailActivity extends BaseFragmentActivity implements Tes
 
     TextView titleTv;
 
+    TestMsgInfo resultMsgInfo;
+
     @Override
     protected int getContextViewId() {
         return R.layout.activity_test_image_detail;
@@ -202,8 +204,10 @@ public class TestImageDetailActivity extends BaseFragmentActivity implements Tes
         if (isOver) {
             isOver = false;
             //再测一次
-            Intent intent = new Intent(this, TestImageDetailActivity.class);
-            intent.putExtra("tid", tid);
+            Intent intent = new Intent(TestImageDetailActivity.this, TestResultActivity.class);
+            intent.putExtra("from_type", 2);
+            intent.putExtra("image_url", resultMsgInfo != null ? resultMsgInfo.getCodeImageUrl() : "");
+            intent.putExtra("nocode_image_url", resultMsgInfo != null ? resultMsgInfo.getResultImageUrl() : "");
             startActivity(intent);
             finish();
         } else {
@@ -224,6 +228,17 @@ public class TestImageDetailActivity extends BaseFragmentActivity implements Tes
         chatListAdapter.addData(testMsgInfo);
 
         mInputLayout.setVisibility(View.VISIBLE);
+
+        if (isShowSex) {
+            mRadioGroup.setVisibility(View.VISIBLE);
+            mInputUserNameLayout.setVisibility(View.GONE);
+            inputStep = 1;
+        } else {
+            mRadioGroup.setVisibility(View.GONE);
+            //显示输入用户姓名
+            mInputUserNameLayout.setVisibility(View.VISIBLE);
+            inputStep = 2;
+        }
 
         chatListAdapter.notifyItemInserted(chatListAdapter.getData().size() - 1);
         mChatListView.scrollToPosition(chatListAdapter.getData().size() - 1);
@@ -265,12 +280,11 @@ public class TestImageDetailActivity extends BaseFragmentActivity implements Tes
             TestResultParams params = new TestResultParams();
             params.setId(tid);
             params.setTestType("2");
-            params.setNickname(userInfo != null ? userInfo.getNickname() : "火星用户");
+            params.setNickname(mInputUserNameEt.getText().toString());
             params.setHeadimg(userInfo != null ? userInfo.getUserimg() : "");
             params.setSex(userInfo != null ? userInfo.getSex() : 1);
             params.setUserId(userInfo != null ? userInfo.getId() : "0");
             testResultInfoPresenterImp.createImage(params);
-
         }
     }
 
@@ -337,27 +351,27 @@ public class TestImageDetailActivity extends BaseFragmentActivity implements Tes
                     TestMsgInfo guideInfo = new TestMsgInfo(((TestDetailInfoRet) tData).getData().getImage(), ((TestDetailInfoRet) tData).getData().getDesc(), TestMsgInfo.TYPE_RECEIVED);
                     chatListAdapter.addData(guideInfo);
                     chatListAdapter.notifyDataSetChanged();
-                    //isShowSex = ((TestDetailInfoRet) tData).getData().getSex() == 1 ? true : false;
-                    isShowSex = true;
+                    isShowSex = ((TestDetailInfoRet) tData).getData().getSex() == 1 ? true : false;
+                    //isShowSex = true;
                 }
             }
             if (tData instanceof TestResultInfoRet) {
                 isOver = true;
                 if (((TestResultInfoRet) tData).getData() != null) {
-                    TestMsgInfo resultInfo = new TestMsgInfo();
-                    resultInfo.setType(TestMsgInfo.TYPE_RECEIVED);
-                    resultInfo.setContent("点击图片查看结果");
-                    resultInfo.setImgUrl("");
-                    resultInfo.setCodeImageUrl(((TestResultInfoRet) tData).getData().getImage());
-                    resultInfo.setResultImageUrl(((TestResultInfoRet) tData).getData().getImageNocode());
-                    chatListAdapter.addData(resultInfo);
+                    resultMsgInfo = new TestMsgInfo();
+                    resultMsgInfo.setType(TestMsgInfo.TYPE_RECEIVED);
+                    resultMsgInfo.setContent("点击图片查看结果");
+                    resultMsgInfo.setImgUrl("");
+                    resultMsgInfo.setCodeImageUrl(((TestResultInfoRet) tData).getData().getImage());
+                    resultMsgInfo.setResultImageUrl(((TestResultInfoRet) tData).getData().getImageNocode());
+                    chatListAdapter.addData(resultMsgInfo);
                     //刷新列表页面
                     chatListAdapter.notifyItemInserted(chatListAdapter.getData().size() - 1);
                     mChatListView.scrollToPosition(chatListAdapter.getData().size() - 1);
 
                     mInputLayout.setVisibility(View.GONE);
                     mCommentLayout.setVisibility(View.VISIBLE);
-                    mCommentTextView.setText("再测一次");
+                    mCommentTextView.setText("查看结果");
 
                     KeyboardUtils.hideSoftInput(this);
                 }

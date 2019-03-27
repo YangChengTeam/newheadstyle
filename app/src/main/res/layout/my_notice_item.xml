@@ -83,7 +83,7 @@
                     android:layout_marginTop="4dp"
                     android:ellipsize="end"
                     android:gravity="left|center"
-                    android:maxLines="1"
+                    android:lines="2"
                     android:text="火星网友发布的内容火星网友发布的内容火星网友发布的内容"
                     android:textColor="@color/tab_normal_color"
                     android:textSize="12dp" />

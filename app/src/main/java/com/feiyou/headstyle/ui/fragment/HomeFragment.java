@@ -264,7 +264,7 @@ public class HomeFragment extends BaseFragment implements MyScrollView.OnScrollL
 //                    }
 //
 //                    if (tData.getData().getImagesList().size() < pageSize) {
-//                        headInfoAdapter.loadMoreEnd();
+//                        headInfoAdapter.loadMoreEnd(true);
 //                    } else {
 //                        headInfoAdapter.loadMoreComplete();
 //                    }

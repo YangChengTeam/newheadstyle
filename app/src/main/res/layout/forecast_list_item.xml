@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="12dp"
+    android:layout_marginBottom="8dp"
     android:background="@drawable/forecast_white_bg"
     android:gravity="left|center"
     android:orientation="vertical">
@@ -10,7 +10,8 @@
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="12dp"
+        android:layout_marginLeft="12dp"
+        android:layout_marginTop="10dp"
         android:gravity="center"
         android:orientation="horizontal">
 
@@ -38,8 +39,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="12dp"
-        android:layout_marginBottom="12dp"
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="6dp"
         android:text="今日必定发财,有桃花运"
         android:textColor="@color/black3"
-        android:textSize="16dp" />
+        android:lineSpacingMultiplier="1.2"
+        android:textSize="13dp" />
 </LinearLayout>

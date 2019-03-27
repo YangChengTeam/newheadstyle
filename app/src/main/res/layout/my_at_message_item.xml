@@ -58,6 +58,7 @@
                 android:id="@+id/iv_note_img"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
+                android:scaleType="centerCrop"
                 android:src="@mipmap/image_def" />
 
             <TextView
@@ -66,10 +67,10 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="12dp"
                 android:ellipsize="end"
-                android:gravity="left|top"
-                android:lineSpacingMultiplier="1.3"
+                android:gravity="left|center"
+                android:lineSpacingMultiplier="1.2"
                 android:maxLines="2"
-                android:minHeight="36dp"
+                android:minHeight="30dp"
                 android:text="大傻蛋发布的帖子标题"
                 android:textColor="@color/black"
                 android:textSize="14dp" />

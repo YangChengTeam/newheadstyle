@@ -1,6 +1,6 @@
 <resources>
-    <string name="app_name">新个性头像</string>
-    <string name="word_read">新个性头像</string>
+    <string name="app_name">个性头像</string>
+    <string name="word_read">个性头像</string>
 
     <string name="button_allow">开启</string>
     <string name="button_deny">拒绝</string>
@@ -47,4 +47,5 @@
     <string name="read_phone">读取手机识别码</string>
 
     <string name="error_over_count">批量上传一次只能选择 %1$d 个文件</string>
+    <string name="about_txt">好看的皮囊千篇一律，有趣的灵魂万里挑一！\n头像君只想说在座的各位...\n果然都是有趣的人...\n如果你想找头像？\n想和头像君吐槽？\n关注我们的官方公众号“头像达人”，头像君等你！</string>
 </resources>

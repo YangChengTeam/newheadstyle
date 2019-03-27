@@ -51,6 +51,7 @@ import com.feiyou.headstyle.presenter.NoteCommentDataPresenterImp;
 import com.feiyou.headstyle.presenter.NoteSubCommentDataPresenterImp;
 import com.feiyou.headstyle.presenter.ReplyCommentPresenterImp;
 import com.feiyou.headstyle.ui.activity.ReportInfoActivity;
+import com.feiyou.headstyle.ui.activity.UserInfoActivity;
 import com.feiyou.headstyle.ui.adapter.CommentAdapter;
 import com.feiyou.headstyle.ui.adapter.CommentReplyAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragment;
@@ -71,6 +72,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import es.dmoral.toasty.Toasty;
 
 /**
  * Created by myflying on 2018/11/26.
@@ -228,6 +230,14 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
         addDateTv = replyView.findViewById(R.id.tv_add_date);
         commentContentTv = replyView.findViewById(R.id.tv_content);
         LinearLayout addMessageLayout = replyView.findViewById(R.id.layout_add_message);
+        topUserHeadImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getActivity(), UserInfoActivity.class);
+                intent.putExtra("user_id", replyTopUserId);
+                startActivity(intent);
+            }
+        });
 
         addMessageLayout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -304,9 +314,39 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
                     return;
                 }
 
+                if (commitReplyDialog != null && !commitReplyDialog.isShowing()) {
+                    commitReplyDialog.show();
+                }
+
                 switchType = 1;
                 currentCommentPos = position;
-                showDialog();
+                commentId = commentAdapter.getData().get(currentCommentPos).getCommentId();
+
+                //设置头部信息
+                NoteItem noteItem = commentAdapter.getData().get(position);
+                replyTopUserId = noteItem.getUserId();
+
+                RequestOptions options = new RequestOptions();
+                options.transform(new GlideRoundTransform(getActivity(), 21));
+                options.error(R.mipmap.head_def);
+                options.placeholder(R.mipmap.head_def);
+
+                mReplyTitleTv.setText(noteItem.getCommentNum() > 0 ? noteItem.getCommentNum() + "条回复" : "暂无回复");
+                Glide.with(getActivity()).load(noteItem.getCommentUserimg()).apply(options).into(topUserHeadImageView);
+                nickNameTv.setText(noteItem.getCommentNickname());
+                addDateTv.setText(TimeUtils.millis2String(noteItem.getAddTime() != null ? noteItem.getAddTime() * 1000 : 0));
+                commentContentTv.setText(Html.fromHtml(noteItem.getCommentContent()));
+                noteSubCommentDataPresenterImp.getNoteSubCommentData(subCurrentPage, App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", commentId, 1);
+
+                zanCountTv.setText(noteItem.getZanNum() + "");
+
+                if (noteItem.getIsZan() == 0) {
+                    zanCountTv.setCompoundDrawablesWithIntrinsicBounds(notZan, null, null, null);
+                } else {
+                    zanCountTv.setCompoundDrawablesWithIntrinsicBounds(isZan, null, null, null);
+                }
+                zanCountTv.setCompoundDrawablePadding(SizeUtils.dp2px(4));
+
             }
         });
 
@@ -329,36 +369,43 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
                 switchType = 1;
                 currentCommentPos = position;
                 commentId = commentAdapter.getData().get(currentCommentPos).getCommentId();
+                int tempCount = commentAdapter.getData().get(currentCommentPos).getListNum();
 
                 if (view.getId() == R.id.btn_reply_count) {
-                    if (commitReplyDialog != null && !commitReplyDialog.isShowing()) {
-                        commitReplyDialog.show();
-                    }
+                    if (tempCount > 0) {
+                        if (commitReplyDialog != null && !commitReplyDialog.isShowing()) {
+                            commitReplyDialog.show();
+                        }
 
-                    //设置头部信息
-                    NoteItem noteItem = commentAdapter.getData().get(position);
-                    replyTopUserId = noteItem.getUserId();
+                        //设置头部信息
+                        NoteItem noteItem = commentAdapter.getData().get(position);
+                        replyTopUserId = noteItem.getUserId();
 
-                    RequestOptions options = new RequestOptions();
-                    options.transform(new GlideRoundTransform(getActivity(), 21));
-                    options.error(R.mipmap.head_def);
-                    options.placeholder(R.mipmap.head_def);
+                        RequestOptions options = new RequestOptions();
+                        options.transform(new GlideRoundTransform(getActivity(), 21));
+                        options.error(R.mipmap.head_def);
+                        options.placeholder(R.mipmap.head_def);
 
-                    mReplyTitleTv.setText(noteItem.getCommentNum() > 0 ? noteItem.getCommentNum() + "条回复" : "暂无回复");
-                    Glide.with(getActivity()).load(noteItem.getCommentUserimg()).apply(options).into(topUserHeadImageView);
-                    nickNameTv.setText(noteItem.getCommentNickname());
-                    addDateTv.setText(TimeUtils.millis2String(noteItem.getAddTime() != null ? noteItem.getAddTime() * 1000 : 0));
-                    commentContentTv.setText(Html.fromHtml(noteItem.getCommentContent()));
-                    noteSubCommentDataPresenterImp.getNoteSubCommentData(subCurrentPage, App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", commentId, 1);
+                        mReplyTitleTv.setText(noteItem.getCommentNum() > 0 ? noteItem.getCommentNum() + "条回复" : "暂无回复");
+                        Glide.with(getActivity()).load(noteItem.getCommentUserimg()).apply(options).into(topUserHeadImageView);
+                        nickNameTv.setText(noteItem.getCommentNickname());
+                        addDateTv.setText(TimeUtils.millis2String(noteItem.getAddTime() != null ? noteItem.getAddTime() * 1000 : 0));
+                        commentContentTv.setText(Html.fromHtml(noteItem.getCommentContent()));
+                        noteSubCommentDataPresenterImp.getNoteSubCommentData(subCurrentPage, App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", commentId, 1);
 
-                    zanCountTv.setText(noteItem.getZanNum() + "");
+                        zanCountTv.setText(noteItem.getZanNum() + "");
 
-                    if (noteItem.getIsZan() == 0) {
-                        zanCountTv.setCompoundDrawablesWithIntrinsicBounds(notZan, null, null, null);
+                        if (noteItem.getIsZan() == 0) {
+                            zanCountTv.setCompoundDrawablesWithIntrinsicBounds(notZan, null, null, null);
+                        } else {
+                            zanCountTv.setCompoundDrawablesWithIntrinsicBounds(isZan, null, null, null);
+                        }
+                        zanCountTv.setCompoundDrawablePadding(SizeUtils.dp2px(4));
                     } else {
-                        zanCountTv.setCompoundDrawablesWithIntrinsicBounds(isZan, null, null, null);
+                        switchType = 1;
+                        currentCommentPos = position;
+                        showDialog();
                     }
-                    zanCountTv.setCompoundDrawablePadding(SizeUtils.dp2px(4));
                 }
 
                 if (view.getId() == R.id.layout_zan) {
@@ -370,6 +417,11 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
                     }
 
                     addZanPresenterImp.addZan(2, App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", commentAdapter.getData().get(position).getUserId(), "", commentId, "", 1);
+                }
+                if (view.getId() == R.id.iv_user_head) {
+                    Intent intent = new Intent(getActivity(), UserInfoActivity.class);
+                    intent.putExtra("user_id", commentAdapter.getData().get(position).getUserId());
+                    startActivity(intent);
                 }
             }
         });
@@ -419,6 +471,12 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
 
                 if (view.getId() == R.id.btn_reply_count) {
                     showDialog();
+                }
+
+                if (view.getId() == R.id.iv_user_head) {
+                    Intent intent = new Intent(getActivity(), UserInfoActivity.class);
+                    intent.putExtra("user_id", commentReplyAdapter.getData().get(position).getRepeatUserId());
+                    startActivity(intent);
                 }
             }
         });
@@ -479,6 +537,10 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
     public void dismissProgress() {
         if (progressDialog != null && progressDialog.isShowing()) {
             progressDialog.dismiss();
+        }
+
+        if (reportDialog != null && reportDialog.isShowing()) {
+            reportDialog.dismiss();
         }
     }
 
@@ -574,13 +636,16 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
             if (tData instanceof FollowInfoRet) {
                 int tempResult = ((FollowInfoRet) tData).getData().getIsGuan();
 
-                ToastUtils.showLong(tempResult == 0 ? "已取消" : "已关注");
+                Toasty.normal(getActivity(), tempResult == 0 ? "已取消" : "已关注").show();
                 mReplyFollowLayout.setBackgroundResource(tempResult == 0 ? R.drawable.into_bg : R.drawable.is_follow_bg);
                 mReplyFollowTv.setTextColor(ContextCompat.getColor(getActivity(), tempResult == 0 ? R.color.tab_select_color : R.color.black2));
                 mReplyFollowTv.setText(tempResult == 0 ? "+关注" : "已关注");
             }
 
         } else {
+
+            Logger.i(StringUtils.isEmpty(tData.getMsg()) ? "操作失败" : tData.getMsg());
+
             if (tData instanceof NoteCommentRet) {
                 mNoDataLayout.setVisibility(View.VISIBLE);
             }
@@ -591,13 +656,12 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
             }
 
             if (tData instanceof FollowInfoRet) {
-                ToastUtils.showLong(StringUtils.isEmpty(tData.getMsg()) ? "操作失败" : tData.getMsg());
+                Toasty.normal(getActivity(), StringUtils.isEmpty(tData.getMsg()) ? "操作失败" : tData.getMsg()).show();
             }
 
             if (tData instanceof ReplyResultInfoRet) {
-                ToastUtils.showLong(StringUtils.isEmpty(tData.getMsg()) ? "操作失败" : tData.getMsg());
+                Toasty.normal(getActivity(), StringUtils.isEmpty(tData.getMsg()) ? "操作失败" : tData.getMsg()).show();
             }
-            Logger.i(StringUtils.isEmpty(tData.getMsg()) ? "操作失败" : tData.getMsg());
         }
     }
 
@@ -605,6 +669,9 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
     public void loadDataError(Throwable throwable) {
         if (progressDialog != null && progressDialog.isShowing()) {
             progressDialog.dismiss();
+        }
+        if (reportDialog != null && reportDialog.isShowing()) {
+            reportDialog.dismiss();
         }
     }
 
@@ -680,7 +747,7 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
                 String tempContent = longClickType == 1 ? commentAdapter.getData().get(currentCommentPos).getCommentContent() : commentReplyAdapter.getData().get(currentReplyPos).getRepeatContent();
                 ClipboardManager cmb = (ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
                 cmb.setText(tempContent); //将内容放入粘贴管理器,在别的地方长按选择"粘贴"即可
-                ToastUtils.showLong("已复制");
+                Toasty.normal(getActivity(), "已复制").show();
                 break;
             case R.id.layout_report:
                 if (reportDialog != null && reportDialog.isShowing()) {

@@ -61,6 +61,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center|right"
                 android:padding="12dp"
+                android:visibility="gone"
                 android:src="@mipmap/edit_done" />
         </FrameLayout>
 

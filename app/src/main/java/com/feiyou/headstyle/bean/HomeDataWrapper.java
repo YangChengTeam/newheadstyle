@@ -4,6 +4,8 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
+import butterknife.BindView;
+
 /**
  * Created by myflying on 2018/12/26.
  */
@@ -25,6 +27,9 @@ public class HomeDataWrapper {
     private List<ArticleInfo> messageList;
 
     private int page;
+
+    @SerializedName("my_notice_num")
+    private int myTotalNum;
 
     public List<BannerInfo> getBannerList() {
         return bannerList;
@@ -72,5 +77,13 @@ public class HomeDataWrapper {
 
     public void setMessageList(List<ArticleInfo> messageList) {
         this.messageList = messageList;
+    }
+
+    public int getMyTotalNum() {
+        return myTotalNum;
+    }
+
+    public void setMyTotalNum(int myTotalNum) {
+        this.myTotalNum = myTotalNum;
     }
 }

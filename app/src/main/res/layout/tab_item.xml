@@ -19,6 +19,5 @@
         android:layout_width="20dp"
         android:layout_height="4dp"
         android:layout_marginTop="4dp"
-        android:background="@drawable/common_red_bg"
-        android:visibility="gone"></View>
+        android:background="@color/white"></View>
 </LinearLayout>

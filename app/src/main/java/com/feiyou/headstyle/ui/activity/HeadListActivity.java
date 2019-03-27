@@ -203,7 +203,7 @@ public class HeadListActivity extends BaseFragmentActivity implements HeadListDa
                     if (((HeadInfoRet) tData).getData().size() == pageSize) {
                         headInfoAdapter.loadMoreComplete();
                     } else {
-                        headInfoAdapter.loadMoreEnd();
+                        headInfoAdapter.loadMoreEnd(true);
                     }
                 } else {
                     mHeadInfoListView.setVisibility(View.GONE);

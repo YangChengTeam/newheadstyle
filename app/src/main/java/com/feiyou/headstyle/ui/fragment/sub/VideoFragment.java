@@ -183,7 +183,7 @@ public class VideoFragment extends BaseFragment implements VideoInfoView, SwipeR
                 if (((VideoInfoRet) tData).getData().getList().size() == pageSize) {
                     videoListAdapter.loadMoreComplete();
                 } else {
-                    videoListAdapter.loadMoreEnd();
+                    videoListAdapter.loadMoreEnd(true);
                 }
             }
         } else {

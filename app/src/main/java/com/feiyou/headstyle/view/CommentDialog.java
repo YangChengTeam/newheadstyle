@@ -168,7 +168,7 @@ public class CommentDialog extends DialogFragment implements MsgEditText.BackLis
                     ids.append(key).append(",");
 
                     //实际传递到后台的内容值
-                    sendContent = sendContent.replace(val.toString(), "<span style='color:#4b79ad;'>" + val + "</span>");
+                    sendContent = sendContent.replace(val.toString(), "<font color='#4b79ad'>" + val + "</font>");
                 }
             }
             tempStr = ids.substring(0, ids.length() - 1);

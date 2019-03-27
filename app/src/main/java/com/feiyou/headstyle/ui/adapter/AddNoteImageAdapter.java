@@ -24,14 +24,17 @@ public class AddNoteImageAdapter extends BaseQuickAdapter<Object, BaseViewHolder
 
     private Context mContext;
 
-    public AddNoteImageAdapter(Context context, List<Object> datas) {
+    private int type;
+
+    public AddNoteImageAdapter(Context context, List<Object> datas,int type) {
         super(R.layout.add_note_image_item, datas);
         this.mContext = context;
+        this.type = type;
     }
 
     @Override
     protected void convert(final BaseViewHolder helper, final Object url) {
-        int tempWidth = (ScreenUtils.getScreenWidth() - SizeUtils.dp2px(24)) / 3;
+        int tempWidth = type == 1 ?(ScreenUtils.getScreenWidth() - SizeUtils.dp2px(24)) / 3 : (ScreenUtils.getScreenWidth() - SizeUtils.dp2px(48)) / 3;
         FrameLayout itemLayout = helper.itemView.findViewById(R.id.layout_item);
         FrameLayout.LayoutParams itemParams = new FrameLayout.LayoutParams(tempWidth, tempWidth);
         itemLayout.setLayoutParams(itemParams);

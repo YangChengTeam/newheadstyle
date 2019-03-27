@@ -196,7 +196,7 @@ public class MyCollectionActivity extends BaseFragmentActivity implements HeadLi
                     if (((HeadInfoRet) tData).getData().size() == pageSize) {
                         headInfoAdapter.loadMoreComplete();
                     } else {
-                        headInfoAdapter.loadMoreEnd();
+                        headInfoAdapter.loadMoreEnd(true);
                     }
                 } else {
                     mHeadInfoListView.setVisibility(View.GONE);

@@ -46,6 +46,9 @@ public interface UserInfoServiceApi {
     @POST("v1.userinfo/userImgupload")
     Observable<UpdateHeadRet> updateHead(@Body MultipartBody multipartBody);
 
+    @POST("v1.userinfo/userBackgroundupload")
+    Observable<UpdateHeadRet> updateBackground(@Body MultipartBody multipartBody);
+
     @POST("v1.userinfo/userInfo")
     Observable<UserInfoRet> getUserInfo(@Body RequestBody requestBody);
 

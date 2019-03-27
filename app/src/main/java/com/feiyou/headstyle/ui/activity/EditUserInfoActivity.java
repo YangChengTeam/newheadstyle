@@ -106,21 +106,6 @@ public class EditUserInfoActivity extends BaseFragmentActivity implements View.O
     @BindView(R.id.tv_sex_label)
     TextView mSexLabelTv;
 
-    @BindView(R.id.photo_list)
-    RecyclerView mPhotoListView;
-
-    @BindView(R.id.layout_wrapper)
-    LinearLayout mWrapperLayout;
-
-    @BindView(R.id.layout_no_photo)
-    LinearLayout mNoPhotoLayout;
-
-    @BindView(R.id.layout_photos)
-    RelativeLayout mPhotosLayout;
-
-    @BindView(R.id.tv_total_count)
-    TextView mTotalCountTv;
-
     @BindView(R.id.et_user_nick_name)
     EditText mUserNickNameInputEt;
 
@@ -152,11 +137,7 @@ public class EditUserInfoActivity extends BaseFragmentActivity implements View.O
 
     LinearLayout cancelPhotoLayout;
 
-    CommonImageAdapter commonImageAdapter;
-
     private UserInfo userInfo;
-
-    private List<Object> photoList;
 
     UserInfoPresenterImp userInfoPresenterImp;
 
@@ -182,6 +163,10 @@ public class EditUserInfoActivity extends BaseFragmentActivity implements View.O
 
     private int nickNameMaxLen = 100;
 
+    private String updateBir;
+
+    private String updateStar;
+
     @Override
     protected int getContextViewId() {
         return R.layout.activity_edit_user_info;
@@ -196,7 +181,6 @@ public class EditUserInfoActivity extends BaseFragmentActivity implements View.O
 
     private void initTopBar() {
         QMUIStatusBarHelper.setStatusBarLightMode(this);
-        mTopBar.setTitle(getResources().getString(R.string.app_name));
         View topSearchView = getLayoutInflater().inflate(R.layout.common_top_config, null);
         topSearchView.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, SizeUtils.dp2px(48)));
 
@@ -234,7 +218,8 @@ public class EditUserInfoActivity extends BaseFragmentActivity implements View.O
                 }
 
                 userInfo.setNickname(mUserNickNameInputEt.getText().toString());
-                userInfo.setBirthday(mBirthdayTv.getText().toString());
+                userInfo.setBirthday(updateBir);
+                userInfo.setStar(updateStar);
                 userInfo.setIntro(mIntroInputEt.getText().toString());
                 userInfoPresenterImp.updateUserInfo(userInfo);
             }
@@ -273,16 +258,6 @@ public class EditUserInfoActivity extends BaseFragmentActivity implements View.O
 
         updateHeadBottomSheetDialog.setContentView(headSelectView);
 
-        commonImageAdapter = new CommonImageAdapter(this, null, 60);
-        mPhotoListView.setLayoutManager(new GridLayoutManager(this, 3));
-        mPhotoListView.setAdapter(commonImageAdapter);
-        commonImageAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
-                Intent intent = new Intent(EditUserInfoActivity.this, PhotoWallActivity.class);
-                startActivity(intent);
-            }
-        });
         updateHeadPresenterImp = new UpdateHeadPresenterImp(this, this);
         userInfoPresenterImp = new UserInfoPresenterImp(this, this);
     }
@@ -295,33 +270,15 @@ public class EditUserInfoActivity extends BaseFragmentActivity implements View.O
 
         if (userInfo != null) {
             mUserNickNameInputEt.setText(userInfo.getNickname());
-            RequestOptions options = new RequestOptions();
+            RequestOptions options = new RequestOptions().skipMemoryCache(true);
             options.transform(new GlideRoundTransform(this, 30));
             Glide.with(this).load(userInfo.getUserimg()).apply(options).into(mUserHeadIv);
             mIntroInputEt.setText(userInfo.getIntro());
-            mBirthdayTv.setText(userInfo.getBirthday() + "  " + userInfo.getStar());
+            String tempStar = StringUtils.isEmpty(userInfo.getStar()) ? "" : userInfo.getStar();
+            mBirthdayTv.setText(StringUtils.isEmpty(userInfo.getBirthday()) ? "" : userInfo.getBirthday() + "  " + tempStar);
             mSexLabelTv.setText(userInfo.getSex() == 1 ? "男" : "女");
-
-            if (userInfo.getImageWall() != null && userInfo.getImageWall().length > 0) {
-                mNoPhotoLayout.setVisibility(View.GONE);
-                mPhotosLayout.setVisibility(View.VISIBLE);
-
-                String[] tempPhotos = userInfo.getImageWall();
-                mTotalCountTv.setText(tempPhotos.length + "张");
-                photoList = new ArrayList<>();
-                for (int i = 0; i < tempPhotos.length; i++) {
-                    photoList.add(tempPhotos[i]);
-                }
-                if (photoList.size() > 3) {
-                    photoList = photoList.subList(0, 3);
-                }
-
-                //获取值后重新设置
-                commonImageAdapter.setNewData(photoList);
-            } else {
-                mNoPhotoLayout.setVisibility(View.VISIBLE);
-                mPhotosLayout.setVisibility(View.GONE);
-            }
+            updateBir = userInfo.getBirthday();
+            updateStar = userInfo.getStar();
         }
     }
 
@@ -378,12 +335,6 @@ public class EditUserInfoActivity extends BaseFragmentActivity implements View.O
         EditUserInfoActivityPermissionsDispatcher.showCameraWithCheck(this);
     }
 
-    @OnClick({R.id.layout_no_photo, R.id.layout_photos})
-    void photoList() {
-        Intent intent = new Intent(EditUserInfoActivity.this, PhotoWallActivity.class);
-        startActivity(intent);
-    }
-
     @OnClick(R.id.layout_sex)
     public void chooseSex() {
         if (userInfo.getSexCanChange() == 0) {
@@ -403,9 +354,11 @@ public class EditUserInfoActivity extends BaseFragmentActivity implements View.O
             @Override
             public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
                 Logger.i("year--->" + year + "---month--->" + (monthOfYear + 1) + "---day--->" + dayOfMonth);
-                String tempDate = year + "-" + (monthOfYear + 1) + "-" + dayOfMonth;
-                String tempStar = date2Constellation(tempDate);
-                mBirthdayTv.setText(tempDate + "  " + tempStar);
+
+                updateBir = year + "-" + (monthOfYear + 1) + "-" + dayOfMonth;
+                updateStar = date2Constellation(updateBir);
+
+                mBirthdayTv.setText(updateBir + "  " + updateStar);
             }
         }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH));
 
@@ -490,6 +443,7 @@ public class EditUserInfoActivity extends BaseFragmentActivity implements View.O
                 userInfo.setNickname(((UserInfoRet) tData).getData().getNickname());
                 userInfo.setIntro(((UserInfoRet) tData).getData().getIntro());
                 userInfo.setBirthday(((UserInfoRet) tData).getData().getBirthday());
+                userInfo.setStar(((UserInfoRet) tData).getData().getStar());
                 userInfo.setSex(((UserInfoRet) tData).getData().getSex());
                 userInfo.setSexCanChange(((UserInfoRet) tData).getData().getSexCanChange());
                 App.getApp().setmUserInfo(userInfo);
@@ -513,8 +467,9 @@ public class EditUserInfoActivity extends BaseFragmentActivity implements View.O
             }
 
         } else {
-            MyToastUtils.showToast(this, 1, "修改失败");
+            //MyToastUtils.showToast(this, 1, "修改失败");
             Logger.i(tData.getMsg() != null ? tData.getMsg() : "操作错误");
+            Toasty.normal(this, tData.getMsg() != null ? tData.getMsg() : "操作错误").show();
         }
     }
 
@@ -524,6 +479,7 @@ public class EditUserInfoActivity extends BaseFragmentActivity implements View.O
         if (progressDialog != null && progressDialog.isShowing()) {
             progressDialog.dismiss();
         }
+        Toasty.normal(this, "操作错误").show();
     }
 
 

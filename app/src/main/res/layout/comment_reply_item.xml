@@ -85,7 +85,7 @@
             android:maxLines="2"
             android:padding="6dp"
             android:text="无聊的网友瞎几把回复的内容"
-            android:textColor="@color/black2"
+            android:textColor="@color/black"
             android:textSize="14dp" />
 
         <LinearLayout
@@ -111,7 +111,7 @@
                 android:layout_height="wrap_content"
                 android:padding="8dp"
                 android:gravity="left|center"
-                android:textColor="@color/tab_normal_color"
+                android:textColor="@color/black2"
                 android:textSize="14dp" />
         </LinearLayout>
 

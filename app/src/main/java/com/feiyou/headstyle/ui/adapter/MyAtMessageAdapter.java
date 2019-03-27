@@ -38,16 +38,19 @@ public class MyAtMessageAdapter extends BaseQuickAdapter<MyAtMessage, BaseViewHo
 
     @Override
     protected void convert(final BaseViewHolder helper, final MyAtMessage item) {
+        String tempAt = StringUtils.isEmpty(item.getContent()) ? "" : item.getContent();
+
         //@的内容
         RequestOptions options = new RequestOptions();
         options.transform(new GlideRoundTransform(mContext, 24));
         Glide.with(mContext).load(item.getUserimg()).apply(options).into((ImageView) helper.getView(R.id.iv_reply_head));
         helper.setText(R.id.tv_reply_nick_name, item.getNickname())
-                .setText(R.id.tv_reply_content, Html.fromHtml(StringUtils.isEmpty(item.getContent()) ? "" : item.getContent()));
+                .setText(R.id.tv_reply_content, Html.fromHtml(tempAt));
 
+        String tempMessageContent = StringUtils.isEmpty(item.getMessageContent()) ? "" : item.getMessageContent();
         //帖子内容
         Glide.with(mContext).load(item.getImage()).into((ImageView) helper.getView(R.id.iv_note_img));
-        helper.setText(R.id.tv_note_title, item.getMessageContent())
+        helper.setText(R.id.tv_note_title, Html.fromHtml(tempMessageContent))
                 .setText(R.id.tv_reply_date, TimeUtils.millis2String(item.getAddTime() != null ? item.getAddTime() * 1000 : 0));
     }
 }

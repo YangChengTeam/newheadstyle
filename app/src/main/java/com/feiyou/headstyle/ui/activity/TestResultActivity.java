@@ -11,6 +11,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -21,12 +22,14 @@ import android.widget.Toast;
 import com.alibaba.fastjson.JSON;
 import com.blankj.utilcode.util.ImageUtils;
 import com.blankj.utilcode.util.PathUtils;
+import com.blankj.utilcode.util.ScreenUtils;
 import com.blankj.utilcode.util.SizeUtils;
 import com.blankj.utilcode.util.StringUtils;
 import com.blankj.utilcode.util.TimeUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.ImageViewTarget;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.chad.library.adapter.base.BaseQuickAdapter;
@@ -77,6 +80,9 @@ public class TestResultActivity extends BaseFragmentActivity implements TestInfo
 
     @BindView(R.id.btn_test_again)
     Button mTestAgainButton;
+
+    @BindView(R.id.tv_more)
+    TextView mMoreTv;
 
     private String imageUrl;
 
@@ -141,9 +147,27 @@ public class TestResultActivity extends BaseFragmentActivity implements TestInfo
         }
 
         if (!StringUtils.isEmpty(noCodeImageUrl)) {
-            RequestOptions options = new RequestOptions();
-            options.transform(new GlideRoundTransform(this, 12));
-            Glide.with(this).load(noCodeImageUrl).into(mTestResultImageView);
+//            RequestOptions options = new RequestOptions();
+//            options.transform(new GlideRoundTransform(this, 12));
+//            Glide.with(this).load(noCodeImageUrl).into(mTestResultImageView);
+
+            Glide.with(this).asBitmap().load(noCodeImageUrl).into(new SimpleTarget<Bitmap>() {
+                @Override
+                public void onResourceReady(Bitmap resource, Transition<? super Bitmap> transition) {
+                    Logger.i("www--->" + resource.getWidth() + "hhh--->" + resource.getHeight());
+
+                    double rw = resource.getWidth();
+                    double rh = resource.getHeight();
+
+                    double oh = ScreenUtils.getScreenHeight() * 0.6;
+                    double temp = rw / rh * oh;
+                    RequestOptions requestOptions = new RequestOptions();
+                    requestOptions.override((int) temp, (int) oh);
+
+                    Glide.with(TestResultActivity.this).load(resource).apply(requestOptions).into(mTestResultImageView);
+                }
+            });
+
         }
 
         if (shareAction == null) {
@@ -198,6 +222,13 @@ public class TestResultActivity extends BaseFragmentActivity implements TestInfo
 
         //推荐列表
         testInfoPresenterImp.getHotAndRecommendList(2);
+    }
+
+    @OnClick(R.id.tv_more)
+    void moreTest() {
+        Intent intent = new Intent(this, MoreTestActivity.class);
+        startActivity(intent);
+        finish();
     }
 
     @OnClick(R.id.btn_share)
@@ -376,6 +407,37 @@ public class TestResultActivity extends BaseFragmentActivity implements TestInfo
     public void dismissShareView() {
         if (shareDialog != null && shareDialog.isShowing()) {
             shareDialog.dismiss();
+        }
+    }
+
+    public class TransformationUtils extends ImageViewTarget<Bitmap> {
+
+        private ImageView target;
+
+        public TransformationUtils(ImageView target) {
+            super(target);
+            this.target = target;
+        }
+
+        @Override
+        protected void setResource(Bitmap resource) {
+            view.setImageBitmap(resource);
+
+            //获取原图的宽高
+            int width = resource.getWidth();
+            int height = resource.getHeight();
+
+            //获取imageView的宽
+            int imageViewWidth = target.getWidth();
+
+            //计算缩放比例
+            float sy = (float) (imageViewWidth * 0.1) / (float) (width * 0.1);
+
+            //计算图片等比例放大后的高
+            int imageViewHeight = (int) (height * sy);
+            ViewGroup.LayoutParams params = target.getLayoutParams();
+            params.height = imageViewHeight;
+            target.setLayoutParams(params);
         }
     }
 }

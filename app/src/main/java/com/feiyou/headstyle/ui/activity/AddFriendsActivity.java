@@ -224,7 +224,7 @@ public class AddFriendsActivity extends BaseFragmentActivity implements UserInfo
                     if (((UserInfoListRet) tData).getData().size() == pageSize) {
                         addFriendsListAdapter.loadMoreComplete();
                     } else {
-                        addFriendsListAdapter.loadMoreEnd();
+                        addFriendsListAdapter.loadMoreEnd(true);
                     }
                 } else {
                     if (searchPage == 1) {
@@ -236,7 +236,7 @@ public class AddFriendsActivity extends BaseFragmentActivity implements UserInfo
                     if (((UserInfoListRet) tData).getData().size() == pageSize) {
                         addFriendsListAdapter.loadMoreComplete();
                     } else {
-                        addFriendsListAdapter.loadMoreEnd();
+                        addFriendsListAdapter.loadMoreEnd(true);
                     }
                 }
             }

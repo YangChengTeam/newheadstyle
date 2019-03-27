@@ -12,6 +12,7 @@ import android.widget.TabHost;
 import android.widget.TabWidget;
 import android.widget.TextView;
 
+import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.ui.adapter.MyCommentFragmentAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragmentActivity;
@@ -27,7 +28,7 @@ import butterknife.OnClick;
 /**
  * Created by myflying on 2018/11/23.
  */
-public class MyMessageActivity extends BaseFragmentActivity implements ViewPager.OnPageChangeListener, TabHost.OnTabChangeListener{
+public class MyMessageActivity extends BaseFragmentActivity implements ViewPager.OnPageChangeListener, TabHost.OnTabChangeListener {
 
     private LayoutInflater layoutInflater;
 
@@ -113,7 +114,27 @@ public class MyMessageActivity extends BaseFragmentActivity implements ViewPager
         View view = layoutInflater.inflate(R.layout.tab_item_view, null);
 
         TextView tabText = view.findViewById(R.id.tv_tab_text);
+        ImageView ivRemind = view.findViewById(R.id.iv_remind);
         tabText.setText(mTextviewArray[index]);
+        switch (index) {
+            case 0:
+                if (App.isRemindComment) {
+                    ivRemind.setVisibility(View.VISIBLE);
+                }
+                break;
+            case 1:
+                if (App.isRemindAt) {
+                    ivRemind.setVisibility(View.VISIBLE);
+                }
+                break;
+            case 2:
+                if (App.isRemindNotice) {
+                    ivRemind.setVisibility(View.VISIBLE);
+                }
+                break;
+            default:
+                break;
+        }
         return view;
     }
 
@@ -131,6 +152,19 @@ public class MyMessageActivity extends BaseFragmentActivity implements ViewPager
         widget.setDescendantFocusability(ViewGroup.FOCUS_BLOCK_DESCENDANTS);
         mTabHost.setCurrentTab(position);
         widget.setDescendantFocusability(oldFocusability);
+        switch (position) {
+            case 0:
+                App.isRemindComment = false;
+                break;
+            case 1:
+                App.isRemindAt = false;
+                break;
+            case 2:
+                App.isRemindNotice = false;
+                break;
+            default:
+                break;
+        }
     }
 
     @Override
@@ -149,13 +183,17 @@ public class MyMessageActivity extends BaseFragmentActivity implements ViewPager
         View layout = mTabHost.getCurrentTabView();
         View lineView = layout.findViewById(R.id.tab_line);
         TextView tabText = layout.findViewById(R.id.tv_tab_text);
+        ImageView ivRemind = layout.findViewById(R.id.iv_remind);
         tabText.setTextColor(ContextCompat.getColor(this, R.color.black));
         tabText.setTextSize(20);
         lineView.setVisibility(View.VISIBLE);
+        ivRemind.setVisibility(View.GONE);
 
         //恢复上一个
         View lastLineView = lastTabView.findViewById(R.id.tab_line);
         TextView lastTabText = lastTabView.findViewById(R.id.tv_tab_text);
+        ImageView lastIv = lastTabView.findViewById(R.id.iv_remind);
+        lastIv.setVisibility(View.GONE);
         lastTabText.setTextColor(ContextCompat.getColor(this, R.color.gray999));
         lastTabText.setTextSize(16);
         lastLineView.setVisibility(View.INVISIBLE);

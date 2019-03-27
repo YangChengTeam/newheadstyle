@@ -128,7 +128,7 @@ public class SystemInfoFragment extends BaseFragment implements SystemInfoView, 
             if (tData.getData().size() == pageSize) {
                 noticeAdapter.loadMoreComplete();
             } else {
-                noticeAdapter.loadMoreEnd();
+                noticeAdapter.loadMoreEnd(true);
             }
         } else {
             noDataLayout.setVisibility(View.VISIBLE);

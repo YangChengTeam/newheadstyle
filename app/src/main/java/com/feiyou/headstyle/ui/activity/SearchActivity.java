@@ -308,7 +308,7 @@ public class SearchActivity extends BaseFragmentActivity implements HotWordDataV
                     if (((HeadInfoRet) tData).getData().size() == pageSize) {
                         headInfoAdapter.loadMoreComplete();
                     } else {
-                        headInfoAdapter.loadMoreEnd();
+                        headInfoAdapter.loadMoreEnd(true);
                     }
                 } else {
                     mHotLayout.setVisibility(View.GONE);

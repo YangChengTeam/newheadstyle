@@ -1,5 +1,6 @@
 package com.feiyou.headstyle.ui.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
@@ -63,12 +64,18 @@ public class AdListActivity extends BaseFragmentActivity {
     }
 
     public void initData() {
+        String openUrl = "http://gx.qqtn.com";
+        Bundle bundle = getIntent().getExtras();
+        if (bundle != null && bundle.getString("open_url") != null) {
+            openUrl = bundle.getString("open_url");
+        }
+
         mAgentWeb = AgentWeb.with(this)
                 .setAgentWebParent(mAdLayout, new LinearLayout.LayoutParams(-1, -1))
                 .useDefaultIndicator()
                 .createAgentWeb()
                 .ready()
-                .go("https://www.jd.com");
+                .go(openUrl);
     }
 
     @Override

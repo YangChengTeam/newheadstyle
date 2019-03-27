@@ -9,9 +9,13 @@ public class SystemInfo {
 
     @SerializedName("add_time")
     private Long addTime;
+
     private String content;
+
     private String nickname;
+
     private int type;
+
     private String userimg;
 
     public Long getAddTime() {

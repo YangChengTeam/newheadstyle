@@ -42,6 +42,14 @@ public class App extends Application {
 
     public TestDetailInfoWrapper testInfo;
 
+    public static boolean isRemindComment;
+
+    public static boolean isRemindAt;
+
+    public static boolean isRemindNotice;
+
+    public static boolean isShowTotalCount;
+
     public App() {
         mInstance = this;
     }

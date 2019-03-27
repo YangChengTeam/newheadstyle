@@ -18,6 +18,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
+import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.bean.HeadInfo;
 import com.feiyou.headstyle.bean.NoteInfo;
@@ -74,9 +75,21 @@ public class NoteInfoAdapter extends BaseQuickAdapter<NoteInfo, BaseViewHolder> 
             helper.setVisible(R.id.layout_follow, true);
             helper.setVisible(R.id.layout_operation, false);
             helper.addOnClickListener(R.id.layout_follow);
+
+            //自己对自己发的贴，隐藏相关操作按钮
+            if (App.getApp().getmUserInfo() != null && App.getApp().getmUserInfo().getId().equals(item.getUserId())){
+                helper.setVisible(R.id.layout_follow, false).setVisible(R.id.layout_operation, false);
+            }else{
+                helper.setVisible(R.id.layout_follow, true).setVisible(R.id.layout_operation, false);
+            }
+            helper.addOnClickListener(R.id.layout_operation);
         } else {
-            helper.setVisible(R.id.layout_follow, false);
-            helper.setVisible(R.id.layout_operation, true);
+            //自己对自己发的贴，隐藏相关操作按钮
+            if (App.getApp().getmUserInfo() != null && App.getApp().getmUserInfo().getId().equals(item.getUserId())){
+                helper.setVisible(R.id.layout_follow, false).setVisible(R.id.layout_operation, true);
+            }else{
+                helper.setVisible(R.id.layout_follow, false).setVisible(R.id.layout_operation, false);
+            }
             helper.addOnClickListener(R.id.layout_operation);
         }
 
@@ -88,7 +101,7 @@ public class NoteInfoAdapter extends BaseQuickAdapter<NoteInfo, BaseViewHolder> 
 
         RequestOptions options = new RequestOptions();
         options.override(SizeUtils.dp2px(36), SizeUtils.dp2px(36));
-        options.placeholder(R.mipmap.image_def);
+        options.placeholder(R.mipmap.head_def);
         options.transform(new RoundedCornersTransformation(SizeUtils.dp2px(18), 0));
         Glide.with(mContext).load(item.getUserimg()).apply(options).into((ImageView) helper.itemView.findViewById(R.id.iv_user_head));
 
