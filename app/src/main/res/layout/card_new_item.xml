@@ -16,9 +16,7 @@
         android:layout_gravity="top|center"
         android:layout_marginTop="8dp"
         android:paddingLeft="1dp"
-        android:paddingRight="1dp"
-        android:scaleType="fitXY"
-        android:src="@mipmap/head_test" />
+        android:paddingRight="1dp" />
 
     <View
         android:layout_width="match_parent"

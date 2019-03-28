@@ -38,6 +38,7 @@ import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.bean.FollowInfoRet;
 import com.feiyou.headstyle.bean.MessageEvent;
 import com.feiyou.headstyle.bean.NoteCommentRet;
+import com.feiyou.headstyle.bean.NoteInfoRet;
 import com.feiyou.headstyle.bean.NoteItem;
 import com.feiyou.headstyle.bean.NoteSubCommentRet;
 import com.feiyou.headstyle.bean.ReplyParams;
@@ -157,7 +158,7 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
 
     private String messageId;
 
-    private int currentPage = 1;
+    private int commentPage = 1;
 
     private int subCurrentPage = 1;
 
@@ -178,6 +179,8 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
     LinearLayout mReportCancelLayout;
 
     private int longClickType = 1;//1,回复的举报,2回复的回复举报
+
+    private int pageSize = 30;
 
     @Override
     protected View onCreateView() {
@@ -282,6 +285,14 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
         commentReplyAdapter = new CommentReplyAdapter(getActivity(), null);
         replyListView.setLayoutManager(new LinearLayoutManager(getActivity()));
         replyListView.setAdapter(commentReplyAdapter);
+
+        commentReplyAdapter.setOnLoadMoreListener(new BaseQuickAdapter.RequestLoadMoreListener() {
+            @Override
+            public void onLoadMoreRequested() {
+                subCurrentPage++;
+                noteSubCommentDataPresenterImp.getNoteSubCommentData(subCurrentPage, App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", commentId, 1);
+            }
+        }, replyListView);
     }
 
     public void initData() {
@@ -303,6 +314,14 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
         mWonderfulListView.setLayoutManager(new LinearLayoutManager(getActivity()));
         commentAdapter = new CommentAdapter(getActivity(), null);
         mWonderfulListView.setAdapter(commentAdapter);
+
+        commentAdapter.setOnLoadMoreListener(new BaseQuickAdapter.RequestLoadMoreListener() {
+            @Override
+            public void onLoadMoreRequested() {
+                commentPage++;
+                noteCommentDataPresenterImp.getNoteDetailData(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", commentPage, messageId, 1);
+            }
+        }, mWonderfulListView);
 
         commentAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
             @Override
@@ -504,7 +523,7 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
         noteCommentDataPresenterImp = new NoteCommentDataPresenterImp(this, getActivity());
         replyCommentPresenterImp = new ReplyCommentPresenterImp(this, getActivity());
         followInfoPresenterImp = new FollowInfoPresenterImp(this, getActivity());
-        noteCommentDataPresenterImp.getNoteDetailData(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", currentPage, messageId, 1);
+        noteCommentDataPresenterImp.getNoteDetailData(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", commentPage, messageId, 1);
     }
 
     public void showDialog() {
@@ -524,7 +543,7 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
                 commentDialog.setAtUserNames(friendIds, names);
             }
         } else {
-            noteCommentDataPresenterImp.getNoteDetailData(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", currentPage, messageId, 1);
+            noteCommentDataPresenterImp.getNoteDetailData(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", commentPage, messageId, 1);
         }
     }
 
@@ -556,10 +575,22 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
         if (tData != null && tData.getCode() == Constants.SUCCESS) {
             if (tData instanceof NoteCommentRet) {
                 if (((NoteCommentRet) tData).getData() != null) {
-                    commentAdapter.setNewData(((NoteCommentRet) tData).getData());
                     mNoDataLayout.setVisibility(View.GONE);
+                    mWonderfulListView.setVisibility(View.VISIBLE);
+                    if (commentPage == 1) {
+                        commentAdapter.setNewData(((NoteCommentRet) tData).getData());
+                    } else {
+                        commentAdapter.addData(((NoteCommentRet) tData).getData());
+                    }
                 } else {
+                    mWonderfulListView.setVisibility(View.GONE);
                     mNoDataLayout.setVisibility(View.VISIBLE);
+                }
+
+                if (((NoteCommentRet) tData).getData().size() == pageSize) {
+                    commentAdapter.loadMoreComplete();
+                } else {
+                    commentAdapter.loadMoreEnd(true);
                 }
             }
 
@@ -567,10 +598,20 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
                 if (((NoteSubCommentRet) tData).getData() != null) {
                     replyListView.setVisibility(View.VISIBLE);
                     mReplyNoDataLayout.setVisibility(View.GONE);
-                    commentReplyAdapter.setNewData(((NoteSubCommentRet) tData).getData());
+                    if (subCurrentPage == 1) {
+                        commentReplyAdapter.setNewData(((NoteSubCommentRet) tData).getData());
+                    } else {
+                        commentReplyAdapter.addData(((NoteSubCommentRet) tData).getData());
+                    }
                 } else {
                     replyListView.setVisibility(View.GONE);
                     mReplyNoDataLayout.setVisibility(View.VISIBLE);
+                }
+
+                if (((NoteSubCommentRet) tData).getData().size() == pageSize) {
+                    commentReplyAdapter.loadMoreComplete();
+                } else {
+                    commentReplyAdapter.loadMoreEnd(true);
                 }
             }
 

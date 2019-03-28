@@ -22,6 +22,7 @@ import com.blankj.utilcode.util.BarUtils;
 import com.blankj.utilcode.util.NetworkUtils;
 import com.blankj.utilcode.util.PathUtils;
 import com.blankj.utilcode.util.SPUtils;
+import com.blankj.utilcode.util.ScreenUtils;
 import com.blankj.utilcode.util.SizeUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.bumptech.glide.Glide;
@@ -222,7 +223,7 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
                 switch (adInfo.getType()) {
                     case 1:
                         Intent intent = new Intent(getActivity(), AdListActivity.class);
-                        intent.putExtra("open_url",adInfo.getJumpPath());
+                        intent.putExtra("open_url", adInfo.getJumpPath());
                         startActivity(intent);
                         break;
                     case 2:
@@ -460,9 +461,10 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
 
                         if (homeDataRet.getAdList() != null && homeDataRet.getAdList().size() > 0) {
                             adInfo = homeDataRet.getAdList().get(0);
-                            RequestOptions options = new RequestOptions().skipMemoryCache(true);
-                            options.transform(new RoundedCornersTransformation(SizeUtils.dp2px(16), 1));
-                            Glide.with(getActivity()).load(homeDataRet.getAdList().get(0).getIco()).apply(options).into(mAdImageView);
+                            RequestOptions adOptions = new RequestOptions().skipMemoryCache(true);
+                            adOptions.transform(new RoundedCornersTransformation(SizeUtils.dp2px(8), 1));
+                            adOptions.override(ScreenUtils.getScreenWidth() - SizeUtils.dp2px(24), SizeUtils.dp2px(83));
+                            Glide.with(getActivity()).load(adInfo.getIco()).apply(adOptions).into(mAdImageView);
                         } else {
                             mAdLayout.setVisibility(View.GONE);
                         }

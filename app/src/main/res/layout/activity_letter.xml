@@ -7,7 +7,7 @@
     android:background="?attr/colorPrimary"
     android:fitsSystemWindows="true"
     android:orientation="vertical"
-    tools:context="com.feiyou.headstyle.ui.activity.MainActivity">
+    tools:context="com.feiyou.headstyle.ui.activity.Main2Activity">
 
     <com.qmuiteam.qmui.widget.QMUITopBar
         android:id="@+id/topbar"

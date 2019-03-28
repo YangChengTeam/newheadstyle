@@ -262,16 +262,22 @@ public class TestImageDetailActivity extends BaseFragmentActivity implements Tes
             //隐藏输入框
             KeyboardUtils.hideSoftInput(this);
 
+            //显示用户输入的内容
             TestMsgInfo inputName = new TestMsgInfo();
             inputName.setType(TestMsgInfo.TYPE_SENT);
             inputName.setImgUrl(userInfo != null ? userInfo.getUserimg() : "");
             inputName.setContent(mInputUserNameEt.getText().toString());
             chatListAdapter.addData(inputName);
 
+            //显示等待提示
+            TestMsgInfo waitInfo = new TestMsgInfo();
+            waitInfo.setType(TestMsgInfo.TYPE_RECEIVED);
+            waitInfo.setContent("正在为您分析结果，请耐心等待几秒...");
+            chatListAdapter.addData(waitInfo);
+
             //刷新列表页面
             chatListAdapter.notifyItemInserted(chatListAdapter.getData().size() - 1);
             mChatListView.scrollToPosition(chatListAdapter.getData().size() - 1);
-
 
             if (progressDialog != null && !progressDialog.isShowing()) {
                 progressDialog.show();
@@ -358,13 +364,21 @@ public class TestImageDetailActivity extends BaseFragmentActivity implements Tes
             if (tData instanceof TestResultInfoRet) {
                 isOver = true;
                 if (((TestResultInfoRet) tData).getData() != null) {
+
+                    //显示模糊的结果图片
                     resultMsgInfo = new TestMsgInfo();
                     resultMsgInfo.setType(TestMsgInfo.TYPE_RECEIVED);
-                    resultMsgInfo.setContent("点击图片查看结果");
                     resultMsgInfo.setImgUrl("");
                     resultMsgInfo.setCodeImageUrl(((TestResultInfoRet) tData).getData().getImage());
                     resultMsgInfo.setResultImageUrl(((TestResultInfoRet) tData).getData().getImageNocode());
                     chatListAdapter.addData(resultMsgInfo);
+
+                    //显示：查看结果提醒
+                    resultMsgInfo = new TestMsgInfo();
+                    resultMsgInfo.setType(TestMsgInfo.TYPE_RECEIVED);
+                    resultMsgInfo.setContent("点击图片查看结果");
+                    chatListAdapter.addData(resultMsgInfo);
+
                     //刷新列表页面
                     chatListAdapter.notifyItemInserted(chatListAdapter.getData().size() - 1);
                     mChatListView.scrollToPosition(chatListAdapter.getData().size() - 1);
@@ -412,6 +426,7 @@ public class TestImageDetailActivity extends BaseFragmentActivity implements Tes
 
         private int getChineseCount(String str) {
             int count = 0;
+
             Pattern p = Pattern.compile(regEx);
             Matcher m = p.matcher(str);
             while (m.find()) {

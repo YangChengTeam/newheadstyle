@@ -438,7 +438,8 @@ public class EditUserInfoActivity extends BaseFragmentActivity implements View.O
 
         if (tData != null && tData.getCode() == Constants.SUCCESS) {
             if (tData instanceof UserInfoRet) {
-                MyToastUtils.showToast(this, 0, "修改成功");
+                //MyToastUtils.showToast(this, 0, "修改成功");
+                Toasty.normal(this, "修改成功").show();
 
                 userInfo.setNickname(((UserInfoRet) tData).getData().getNickname());
                 userInfo.setIntro(((UserInfoRet) tData).getData().getIntro());
@@ -481,7 +482,6 @@ public class EditUserInfoActivity extends BaseFragmentActivity implements View.O
         }
         Toasty.normal(this, "操作错误").show();
     }
-
 
     /**
      * 使用相机

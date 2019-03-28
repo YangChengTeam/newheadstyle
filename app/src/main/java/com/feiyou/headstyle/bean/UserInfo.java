@@ -61,11 +61,17 @@ public class UserInfo {
     @SerializedName("aite_num")
     private int aiteNum;//艾特消息数
 
-    @SerializedName("noticeNum")
+    @SerializedName("notice_num")
     private int noticeNum;//通知消息数
 
     @SerializedName("my_notice_num")
     private int myTotalNum;//我的消息总数
+
+    @SerializedName("follow_num")
+    private int followNum;
+
+    @SerializedName("follower_num")
+    private int followerNum;
 
     private String background;
 
@@ -292,5 +298,21 @@ public class UserInfo {
 
     public void setBackground(String background) {
         this.background = background;
+    }
+
+    public int getFollowNum() {
+        return followNum;
+    }
+
+    public void setFollowNum(int followNum) {
+        this.followNum = followNum;
+    }
+
+    public int getFollowerNum() {
+        return followerNum;
+    }
+
+    public void setFollowerNum(int followerNum) {
+        this.followerNum = followerNum;
     }
 }

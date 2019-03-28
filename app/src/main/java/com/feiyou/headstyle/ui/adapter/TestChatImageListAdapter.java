@@ -43,11 +43,14 @@ public class TestChatImageListAdapter extends BaseQuickAdapter<TestMsgInfo, Base
     @Override
     protected void convert(final BaseViewHolder helper, final TestMsgInfo item) {
 
-        LinearLayout leftImageLayout = helper.itemView.findViewById(R.id.layout_left_img);
+        LinearLayout leftImageLayout = helper.getView(R.id.layout_left_img);
+        LinearLayout leftTxtLayout = helper.getView(R.id.layout_left_text);
 
         switch (item.getType()) {
             case TestMsgInfo.TYPE_RECEIVED:
                 helper.setVisible(R.id.left_layout, true);
+                helper.setVisible(R.id.right_layout, false);
+                leftTxtLayout.setVisibility(View.VISIBLE);
 
                 if (!StringUtils.isEmpty(item.getImgUrl())) {
                     leftImageLayout.setVisibility(View.VISIBLE);
@@ -58,14 +61,13 @@ public class TestChatImageListAdapter extends BaseQuickAdapter<TestMsgInfo, Base
 
                 if (!StringUtils.isEmpty(item.getResultImageUrl())) {
                     helper.setVisible(R.id.layout_left_result, true);
-
+                    leftTxtLayout.setVisibility(View.GONE);
                     RequestOptions options = new RequestOptions();
                     options.transform(new BlurTransformation(15, 1));
                     Glide.with(mContext).load(item.getResultImageUrl()).apply(options).into((ImageView) helper.itemView.findViewById(R.id.iv_left_result));
                     helper.addOnClickListener(R.id.layout_left_result);
                 }
 
-                helper.setVisible(R.id.right_layout, false);
                 helper.setText(R.id.left_msg, item.getContent());
                 break;
             case TestMsgInfo.TYPE_RECEIVED_IMAGE:
@@ -87,33 +89,4 @@ public class TestChatImageListAdapter extends BaseQuickAdapter<TestMsgInfo, Base
 
     }
 
-    private Bitmap rsBlur(Context context, Bitmap source, int radius) {
-
-        Bitmap inputBmp = source;
-        //(1)
-        RenderScript renderScript = RenderScript.create(context);
-
-        // Allocate memory for Renderscript to work with
-        //(2)
-        final Allocation input = Allocation.createFromBitmap(renderScript, inputBmp);
-        final Allocation output = Allocation.createTyped(renderScript, input.getType());
-        //(3)
-        // Load up an instance of the specific script that we want to use.
-        ScriptIntrinsicBlur scriptIntrinsicBlur = ScriptIntrinsicBlur.create(renderScript, Element.U8_4(renderScript));
-        //(4)
-        scriptIntrinsicBlur.setInput(input);
-        //(5)
-        // Set the blur radius
-        scriptIntrinsicBlur.setRadius(radius);
-        //(6)
-        // Start the ScriptIntrinisicBlur
-        scriptIntrinsicBlur.forEach(output);
-        //(7)
-        // Copy the output to the blurred bitmap
-        output.copyTo(inputBmp);
-        //(8)
-        renderScript.destroy();
-
-        return inputBmp;
-    }
 }

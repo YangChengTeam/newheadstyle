@@ -1,7 +1,5 @@
 package com.feiyou.headstyle.ui.fragment;
 
-import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
@@ -12,7 +10,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -37,7 +34,6 @@ import com.feiyou.headstyle.common.Constants;
 import com.feiyou.headstyle.presenter.UserInfoPresenterImp;
 import com.feiyou.headstyle.ui.activity.AboutActivity;
 import com.feiyou.headstyle.ui.activity.FeedBackActivity;
-import com.feiyou.headstyle.ui.activity.MainActivity;
 import com.feiyou.headstyle.ui.activity.MyCollectionActivity;
 import com.feiyou.headstyle.ui.activity.MyFollowActivity;
 import com.feiyou.headstyle.ui.activity.MyMessageActivity;
@@ -49,15 +45,10 @@ import com.feiyou.headstyle.ui.custom.GlideRoundTransform;
 import com.feiyou.headstyle.ui.custom.LoginDialog;
 import com.feiyou.headstyle.view.UserInfoView;
 import com.orhanobut.logger.Logger;
-import com.umeng.socialize.UMAuthListener;
-import com.umeng.socialize.UMShareAPI;
-import com.umeng.socialize.bean.SHARE_MEDIA;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
-
-import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -165,9 +156,9 @@ public class MyFragment extends BaseFragment implements UserInfoView {
             mUserNickNameTv.setText(userInfo.getNickname());
             mUserIdTv.setText("头像号：" + userInfo.getId());
 
-            mFollowTv.setText(userInfo.getGuanNum() + "");
-            mFansCountTv.setText(userInfo.getFenNum() + "");
-            mKeepCountTv.setText(userInfo.getCollectNum() + "");
+            mFollowTv.setText(userInfo.getGuanNum() > 10000 ? userInfo.getGuanNum()/10000 + "万" : userInfo.getGuanNum() + "");
+            mFansCountTv.setText(userInfo.getFenNum() > 10000 ? userInfo.getFenNum()/10000 + "万" : userInfo.getFenNum() + "");
+            mKeepCountTv.setText(userInfo.getCollectNum() > 10000 ? userInfo.getCollectNum()/10000 + "万" : userInfo.getCollectNum() + "");
 
             //如果用户已经登录，重新获取最新的用户信息
             LoginRequest loginRequest = new LoginRequest();
@@ -213,9 +204,9 @@ public class MyFragment extends BaseFragment implements UserInfoView {
                 mUserNickNameTv.setText(userInfo.getNickname());
                 mUserIdTv.setText("头像号：" + userInfo.getId());
 
-                mFollowTv.setText(userInfo.getGuanNum() + "");
-                mFansCountTv.setText(userInfo.getFenNum() + "");
-                mKeepCountTv.setText(userInfo.getCollectNum() + "");
+                mFollowTv.setText(userInfo.getGuanNum() > 10000 ? userInfo.getGuanNum()/10000 + "万" : userInfo.getGuanNum() + "");
+                mFansCountTv.setText(userInfo.getFenNum() > 10000 ? userInfo.getFenNum()/10000 + "万" : userInfo.getFenNum() + "");
+                mKeepCountTv.setText(userInfo.getCollectNum() > 10000 ? userInfo.getCollectNum()/10000 + "万" : userInfo.getCollectNum() + "");
 
                 LoginRequest loginRequest = new LoginRequest();
                 loginRequest.setOpenid(userInfo.getOpenid());//openid全部大写
@@ -368,9 +359,9 @@ public class MyFragment extends BaseFragment implements UserInfoView {
                 mUserNickNameTv.setText(userInfo.getNickname());
                 mUserIdTv.setText("头像号：" + userInfo.getId());
 
-                mFollowTv.setText(userInfo.getGuanNum() + "");
-                mFansCountTv.setText(userInfo.getFenNum() + "");
-                mKeepCountTv.setText(userInfo.getCollectNum() + "");
+                mFollowTv.setText(userInfo.getGuanNum() > 10000 ? userInfo.getGuanNum()/10000 + "万" : userInfo.getGuanNum() + "");
+                mFansCountTv.setText(userInfo.getFenNum() > 10000 ? userInfo.getFenNum()/10000 + "万" : userInfo.getFenNum() + "");
+                mKeepCountTv.setText(userInfo.getCollectNum() > 10000 ? userInfo.getCollectNum()/10000 + "万" : userInfo.getCollectNum() + "");
 
                 //通知消息
                 if (SPUtils.getInstance().getInt(Constants.COMMENT_COUNT, 0) > 0) {

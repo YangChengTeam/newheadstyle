@@ -44,6 +44,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.OnClick;
+import es.dmoral.toasty.Toasty;
 
 /**
  * Created by myflying on 2018/11/23.
@@ -324,7 +325,9 @@ public class PhotoWallActivity extends BaseFragmentActivity implements View.OnCl
         }
 
         if (tData.getCode() == Constants.SUCCESS) {
+
             if (tData.getData() != null && tData.getData().getImageWall() != null && tData.getData().getImageWall().length > 0) {
+                Toasty.normal(this, "上传成功").show();
                 mNoPhotoLayout.setVisibility(View.GONE);
                 mPhotoListView.setVisibility(View.VISIBLE);
                 editTv.setVisibility(View.VISIBLE);
@@ -368,6 +371,7 @@ public class PhotoWallActivity extends BaseFragmentActivity implements View.OnCl
             }
             resetData();
         } else {
+            Toasty.normal(this, "上传失败").show();
             editTv.setVisibility(View.GONE);
             mNoPhotoLayout.setVisibility(View.VISIBLE);
             mPhotoListView.setVisibility(View.GONE);
@@ -376,6 +380,7 @@ public class PhotoWallActivity extends BaseFragmentActivity implements View.OnCl
 
     @Override
     public void loadDataError(Throwable throwable) {
+        Toasty.normal(this, "上传失败").show();
         if (progressDialog != null && progressDialog.isShowing()) {
             progressDialog.dismiss();
         }

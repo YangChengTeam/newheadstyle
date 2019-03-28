@@ -4,16 +4,14 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
-import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.BottomSheetDialog;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.OrientationHelper;
+import android.support.v7.widget.PagerSnapHelper;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,7 +24,6 @@ import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.VideoView;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -40,14 +37,12 @@ import com.blankj.utilcode.util.ToastUtils;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.chad.library.adapter.base.BaseQuickAdapter;
-import com.dingmouren.layoutmanagergroup.viewpager.OnViewPagerListener;
-import com.dingmouren.layoutmanagergroup.viewpager.ViewPagerLayoutManager;
+import com.chad.library.adapter.base.BaseViewHolder;
 import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.bean.AddCollectionRet;
 import com.feiyou.headstyle.bean.FollowInfoRet;
 import com.feiyou.headstyle.bean.MessageEvent;
-import com.feiyou.headstyle.bean.NoteCommentRet;
 import com.feiyou.headstyle.bean.NoteItem;
 import com.feiyou.headstyle.bean.NoteSubCommentRet;
 import com.feiyou.headstyle.bean.ReplyParams;
@@ -55,6 +50,7 @@ import com.feiyou.headstyle.bean.ReplyResultInfoRet;
 import com.feiyou.headstyle.bean.ResultInfo;
 import com.feiyou.headstyle.bean.UserInfo;
 import com.feiyou.headstyle.bean.VideoCommentRet;
+import com.feiyou.headstyle.bean.VideoInfo;
 import com.feiyou.headstyle.bean.VideoInfoRet;
 import com.feiyou.headstyle.bean.ZanResultRet;
 import com.feiyou.headstyle.common.Constants;
@@ -67,7 +63,7 @@ import com.feiyou.headstyle.presenter.VideoCommentPresenterImp;
 import com.feiyou.headstyle.presenter.VideoInfoPresenterImp;
 import com.feiyou.headstyle.ui.adapter.CommentAdapter;
 import com.feiyou.headstyle.ui.adapter.CommentReplyAdapter;
-import com.feiyou.headstyle.ui.adapter.VideoItemAdapter;
+import com.feiyou.headstyle.ui.adapter.VideoItemShowAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragmentActivity;
 import com.feiyou.headstyle.ui.custom.GlideRoundTransform;
 import com.feiyou.headstyle.ui.custom.LoginDialog;
@@ -85,44 +81,53 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.OnClick;
+import cn.jzvd.Jzvd;
+import cn.jzvd.JzvdStd;
 import es.dmoral.toasty.Toasty;
 
 /**
  * Created by myflying on 2018/11/23.
  */
-public class VideoShowActivity extends BaseFragmentActivity implements VideoInfoView, CommentDialog.SendBackListener, View.OnClickListener {
+public class VideoItemShowActivity extends BaseFragmentActivity implements VideoInfoView, CommentDialog.SendBackListener, View.OnClickListener {
 
-    private static final String TAG = "VideoShowActivity";
-
-    @BindView(R.id.layout_video_show)
+    @BindView(R.id.video_item_layout)
     FrameLayout mVideoShowLayout;
+
+    @BindView(R.id.video_list)
+    RecyclerView mVideoListView;
 
     AVLoadingIndicatorView avi;
 
-    @BindView(R.id.recycler)
-    RecyclerView mVideoListView;
+    private List<VideoInfo> urlList;
+
+    private PagerSnapHelper snapHelper;
+
+    private LinearLayoutManager layoutManager;
+
+    //private ListVideoAdapter videoAdapter;
+
+    private VideoInfoPresenterImp videoInfoPresenterImp;
+
+    private int videoPage = 1;
+
+    private int pageSize = 30;
+
+    private int startPosition;
 
     LinearLayout mNoDataLayout;
 
     ImageView mCloseComment;
 
-    private VideoItemAdapter mVideoAdapter;
-
-    private ViewPagerLayoutManager mLayoutManager;
-
-    private VideoInfoPresenterImp videoInfoPresenterImp;
+    VideoItemShowAdapter videoItemShowAdapter;
 
     private VideoCommentPresenterImp videoCommentPresenterImp;
 
     private NoteSubCommentDataPresenterImp noteSubCommentDataPresenterImp;
-
-    private int pageSize = 30;
-
-    private int startPosition;
 
     private boolean isFirstLoad = true;
 
@@ -184,8 +189,6 @@ public class VideoShowActivity extends BaseFragmentActivity implements VideoInfo
 
     LoginDialog loginDialog;
 
-    private int videoPage = 1;
-
     private int commentPage = 1;
 
     private int subCommentPage = 1;
@@ -206,9 +209,13 @@ public class VideoShowActivity extends BaseFragmentActivity implements VideoInfo
 
     private ShareAction shareAction;
 
+    Drawable isCollect = null;
+
+    Drawable notCollect = null;
+
     @Override
     protected int getContextViewId() {
-        return R.layout.activity_video_show;
+        return R.layout.activity_item_video_show;
     }
 
     @Override
@@ -218,7 +225,7 @@ public class VideoShowActivity extends BaseFragmentActivity implements VideoInfo
         initView();
         initCommentPop();
         initReplyView();
-        initListener();
+        addListener();
     }
 
     private void initView() {
@@ -233,6 +240,9 @@ public class VideoShowActivity extends BaseFragmentActivity implements VideoInfo
         }
 
         userInfo = App.getApp().getmUserInfo();
+
+        isCollect = ContextCompat.getDrawable(VideoItemShowActivity.this, R.mipmap.video_is_follow_icon);
+        notCollect = ContextCompat.getDrawable(VideoItemShowActivity.this, R.mipmap.follow_count_icon);
 
         loginDialog = new LoginDialog(this, R.style.login_dialog);
 
@@ -263,10 +273,15 @@ public class VideoShowActivity extends BaseFragmentActivity implements VideoInfo
         isZan = ContextCompat.getDrawable(this, R.mipmap.is_zan);
         notZan = ContextCompat.getDrawable(this, R.mipmap.note_zan);
 
-        mLayoutManager = new ViewPagerLayoutManager(this, OrientationHelper.VERTICAL);
-        mVideoAdapter = new VideoItemAdapter(this, null);
-        mVideoListView.setLayoutManager(mLayoutManager);
-        mVideoListView.setAdapter(mVideoAdapter);
+        //视频
+        urlList = new ArrayList<>();
+        snapHelper = new PagerSnapHelper();
+        snapHelper.attachToRecyclerView(mVideoListView);
+        //videoAdapter = new ListVideoAdapter(urlList);
+        videoItemShowAdapter = new VideoItemShowAdapter(this, null);
+        layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        mVideoListView.setLayoutManager(layoutManager);
+        mVideoListView.setAdapter(videoItemShowAdapter);
 
         addCollectionPresenterImp = new AddCollectionPresenterImp(this, this);
         videoInfoPresenterImp = new VideoInfoPresenterImp(this, this);
@@ -277,7 +292,8 @@ public class VideoShowActivity extends BaseFragmentActivity implements VideoInfo
         followInfoPresenterImp = new FollowInfoPresenterImp(this, this);
 
         videoInfoPresenterImp.getDataList(videoPage);
-        mVideoAdapter.setOnLoadMoreListener(new BaseQuickAdapter.RequestLoadMoreListener() {
+
+        videoItemShowAdapter.setOnLoadMoreListener(new BaseQuickAdapter.RequestLoadMoreListener() {
             @Override
             public void onLoadMoreRequested() {
                 videoPage++;
@@ -285,7 +301,7 @@ public class VideoShowActivity extends BaseFragmentActivity implements VideoInfo
             }
         }, mVideoListView);
 
-        mVideoAdapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
+        videoItemShowAdapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
             @Override
             public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
                 if (!App.getApp().isLogin) {
@@ -297,7 +313,7 @@ public class VideoShowActivity extends BaseFragmentActivity implements VideoInfo
 
                 selectVideoIndex = position;
                 if (view.getId() == R.id.tv_comment_num || view.getId() == R.id.et_video_item) {
-                    currentVideoId = mVideoAdapter.getData().get(position).getId();
+                    currentVideoId = videoItemShowAdapter.getData().get(position).getId();
                     videoCommentPresenterImp.getCommentList(commentPage, currentVideoId, userInfo != null ? userInfo.getId() : "");
                     if (popupWindow != null && !popupWindow.isShowing()) {
                         avi.show();
@@ -309,12 +325,12 @@ public class VideoShowActivity extends BaseFragmentActivity implements VideoInfo
                 }
 
                 if (view.getId() == R.id.btn_is_follow) {
-                    followInfoPresenterImp.addFollow(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", mVideoAdapter.getData().get(position).getUserId());
+                    followInfoPresenterImp.addFollow(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", videoItemShowAdapter.getData().get(position).getUserId());
                 }
 
                 //收藏
                 if (view.getId() == R.id.tv_collect_num) {
-                    addCollectionPresenterImp.addVideoCollection(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", mVideoAdapter.getData().get(position).getId());
+                    addCollectionPresenterImp.addVideoCollection(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", videoItemShowAdapter.getData().get(position).getId());
                 }
 
                 if (view.getId() == R.id.layout_share) {
@@ -324,12 +340,13 @@ public class VideoShowActivity extends BaseFragmentActivity implements VideoInfo
                 }
 
                 if (view.getId() == R.id.iv_user_head) {
-                    Intent intent = new Intent(VideoShowActivity.this, UserInfoActivity.class);
-                    intent.putExtra("user_id", mVideoAdapter.getData().get(selectVideoIndex).getUserId());
+                    Intent intent = new Intent(VideoItemShowActivity.this, UserInfoActivity.class);
+                    intent.putExtra("user_id", videoItemShowAdapter.getData().get(selectVideoIndex).getUserId());
                     startActivity(intent);
                 }
             }
         });
+
     }
 
     //评论窗口
@@ -362,14 +379,6 @@ public class VideoShowActivity extends BaseFragmentActivity implements VideoInfo
             }
         });
 
-        commentAdapter.setOnLoadMoreListener(new BaseQuickAdapter.RequestLoadMoreListener() {
-            @Override
-            public void onLoadMoreRequested() {
-                commentPage++;
-                videoCommentPresenterImp.getCommentList(commentPage, currentVideoId, userInfo != null ? userInfo.getId() : "");
-            }
-        }, commentListView);
-
         commentAdapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
             @Override
             public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
@@ -394,10 +403,10 @@ public class VideoShowActivity extends BaseFragmentActivity implements VideoInfo
                     replyTopUserId = noteItem.getUserId();
 
                     RequestOptions options = new RequestOptions();
-                    options.transform(new GlideRoundTransform(VideoShowActivity.this, 21));
+                    options.transform(new GlideRoundTransform(VideoItemShowActivity.this, 21));
                     options.error(R.mipmap.head_def);
                     options.placeholder(R.mipmap.head_def);
-                    Glide.with(VideoShowActivity.this).load(noteItem.getCommentUserimg()).apply(options).into(topUserHeadImageView);
+                    Glide.with(VideoItemShowActivity.this).load(noteItem.getCommentUserimg()).apply(options).into(topUserHeadImageView);
                     nickNameTv.setText(noteItem.getCommentNickname());
                     addDateTv.setText(TimeUtils.millis2String(noteItem.getAddTime() != null ? noteItem.getAddTime() * 1000 : 0));
                     commentContentTv.setText(Html.fromHtml(noteItem.getCommentContent()));
@@ -550,73 +559,33 @@ public class VideoShowActivity extends BaseFragmentActivity implements VideoInfo
         inputDialog.show(getFragmentManager(), "dialog");
     }
 
-    private void initListener() {
-        mLayoutManager.setOnViewPagerListener(new OnViewPagerListener() {
-
+    private void addListener() {
+        mVideoListView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
-            public void onInitComplete() {
-                playVideo(0);
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+
             }
 
             @Override
-            public void onPageRelease(boolean isNext, int position) {
-                Log.e(TAG, "释放位置:" + position + " 下一页:" + isNext);
-                int index = 0;
-                if (isNext) {
-                    index = 0;
-                } else {
-                    index = 1;
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                switch (newState) {
+                    case RecyclerView.SCROLL_STATE_IDLE://停止滚动
+                        View view = snapHelper.findSnapView(layoutManager);
+                        Jzvd.resetAllVideos();
+                        RecyclerView.ViewHolder viewHolder = recyclerView.getChildViewHolder(view);
+                        if (viewHolder != null && viewHolder instanceof BaseViewHolder) {
+                            JzvdStd jzvdStd = ((BaseViewHolder) viewHolder).getView(R.id.videoplayer);
+                            jzvdStd.startVideo();
+                        }
+                        break;
+                    case RecyclerView.SCROLL_STATE_DRAGGING://拖动
+                        break;
+                    case RecyclerView.SCROLL_STATE_SETTLING://惯性滑动
+                        break;
                 }
-                releaseVideo(index);
-            }
 
-            @Override
-            public void onPageSelected(int position, boolean isBottom) {
-                Log.e(TAG, "选中位置:" + position + "  是否是滑动到底部:" + isBottom);
-                playVideo(0);
-            }
-
-            public void onLayoutComplete() {
-                playVideo(0);
-            }
-
-        });
-    }
-
-    private void playVideo(int position) {
-        View itemView = mVideoListView.getChildAt(0);
-        final VideoView videoView = itemView.findViewById(R.id.video_view);
-        final ImageView imgThumb = itemView.findViewById(R.id.img_thumb);
-        final RelativeLayout rootView = itemView.findViewById(R.id.root_view);
-        final MediaPlayer[] mediaPlayer = new MediaPlayer[1];
-        videoView.start();
-        videoView.setOnInfoListener(new MediaPlayer.OnInfoListener() {
-            @Override
-            public boolean onInfo(MediaPlayer mp, int what, int extra) {
-                mediaPlayer[0] = mp;
-                Log.e(TAG, "onInfo");
-                mp.setLooping(true);
-                imgThumb.animate().alpha(0).setDuration(200).start();
-                return false;
             }
         });
-
-        videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-            @Override
-            public void onPrepared(MediaPlayer mp) {
-                Log.e(TAG, "onPrepared");
-            }
-        });
-    }
-
-    private void releaseVideo(int index) {
-        View itemView = mVideoListView.getChildAt(index);
-        if (itemView != null) {
-            VideoView videoView = itemView.findViewById(R.id.video_view);
-            ImageView imgThumb = itemView.findViewById(R.id.img_thumb);
-            videoView.stopPlayback();
-            imgThumb.animate().alpha(1).start();
-        }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -654,19 +623,19 @@ public class VideoShowActivity extends BaseFragmentActivity implements VideoInfo
                 if (tData.getCode() == Constants.SUCCESS && ((VideoInfoRet) tData).getData().getList() != null) {
                     if (isFirstLoad) {
                         if (startPosition < ((VideoInfoRet) tData).getData().getList().size()) {
-                            mVideoAdapter.setNewData(((VideoInfoRet) tData).getData().getList().subList(startPosition, ((VideoInfoRet) tData).getData().getList().size()));
+                            videoItemShowAdapter.setNewData(((VideoInfoRet) tData).getData().getList().subList(startPosition, ((VideoInfoRet) tData).getData().getList().size()));
                         } else {
-                            mVideoAdapter.setNewData(((VideoInfoRet) tData).getData().getList());
+                            videoItemShowAdapter.setNewData(((VideoInfoRet) tData).getData().getList());
                         }
                         isFirstLoad = false;
                     } else {
-                        mVideoAdapter.addData(((VideoInfoRet) tData).getData().getList());
+                        videoItemShowAdapter.addData(((VideoInfoRet) tData).getData().getList());
                     }
 
                     if (((VideoInfoRet) tData).getData().getList().size() == pageSize) {
-                        mVideoAdapter.loadMoreComplete();
+                        videoItemShowAdapter.loadMoreComplete();
                     } else {
-                        mVideoAdapter.loadMoreEnd(true);
+                        videoItemShowAdapter.loadMoreEnd(true);
                     }
                 }
             }
@@ -675,39 +644,17 @@ public class VideoShowActivity extends BaseFragmentActivity implements VideoInfo
                 if (tData.getCode() == Constants.SUCCESS && ((VideoCommentRet) tData).getData() != null) {
                     mNoDataLayout.setVisibility(View.INVISIBLE);
                     commentListView.setVisibility(View.VISIBLE);
-
-                    if (commentPage == 1) {
-                        commentAdapter.setNewData(((VideoCommentRet) tData).getData());
-                    } else {
-                        commentAdapter.addData(((VideoCommentRet) tData).getData());
-                    }
-
+                    commentAdapter.setNewData(((VideoCommentRet) tData).getData());
                     commentAdapter.notifyDataSetChanged();
                 } else {
                     mNoDataLayout.setVisibility(View.VISIBLE);
                     commentListView.setVisibility(View.INVISIBLE);
                 }
-
-                if (((VideoCommentRet) tData).getData().size() == pageSize) {
-                    commentAdapter.loadMoreComplete();
-                } else {
-                    commentAdapter.loadMoreEnd(true);
-                }
             }
 
             if (tData instanceof NoteSubCommentRet) {
-                if (tData.getCode() == Constants.SUCCESS && ((NoteSubCommentRet) tData).getData() != null) {
-                    if (subCommentPage == 1) {
-                        commentReplyAdapter.setNewData(((NoteSubCommentRet) tData).getData());
-                    } else {
-                        commentReplyAdapter.addData(((NoteSubCommentRet) tData).getData());
-                    }
-
-                    if (((NoteSubCommentRet) tData).getData().size() == pageSize) {
-                        commentReplyAdapter.loadMoreComplete();
-                    } else {
-                        commentReplyAdapter.loadMoreEnd(true);
-                    }
+                if (((NoteSubCommentRet) tData).getData() != null) {
+                    commentReplyAdapter.setNewData(((NoteSubCommentRet) tData).getData());
                 }
             }
 
@@ -765,8 +712,8 @@ public class VideoShowActivity extends BaseFragmentActivity implements VideoInfo
                         mReplyFollowTv.setText(tempResult == 0 ? "+关注" : "已关注");
                     } else {
                         ToastUtils.showLong(tempResult == 0 ? "已取消" : "已关注");
-                        mVideoAdapter.getData().get(selectVideoIndex).setIsGuan(tempResult);
-                        mVideoAdapter.notifyDataSetChanged();
+                        videoItemShowAdapter.getData().get(selectVideoIndex).setIsGuan(tempResult);
+                        videoItemShowAdapter.notifyDataSetChanged();
                     }
                 } else {
                     Toasty.normal(this, StringUtils.isEmpty(tData.getMsg()) ? "回复失败" : tData.getMsg()).show();
@@ -775,7 +722,7 @@ public class VideoShowActivity extends BaseFragmentActivity implements VideoInfo
 
             if (tData instanceof AddCollectionRet) {
 
-                int tempNum = mVideoAdapter.getData().get(selectVideoIndex).getCollectNum();
+                int tempNum = videoItemShowAdapter.getData().get(selectVideoIndex).getCollectNum();
                 if (((AddCollectionRet) tData).getData().getIsCollect() == 0) {
                     Toasty.normal(this, "已取消").show();
                     tempNum = tempNum - 1;
@@ -784,9 +731,9 @@ public class VideoShowActivity extends BaseFragmentActivity implements VideoInfo
                     tempNum = tempNum + 1;
                 }
 
-                mVideoAdapter.getData().get(selectVideoIndex).setCollectNum(tempNum < 0 ? 0 : tempNum);
-                mVideoAdapter.getData().get(selectVideoIndex).setIsCollect(((AddCollectionRet) tData).getData().getIsCollect());
-                mVideoAdapter.notifyItemChanged(selectVideoIndex);
+                videoItemShowAdapter.getData().get(selectVideoIndex).setCollectNum(tempNum < 0 ? 0 : tempNum);
+                videoItemShowAdapter.getData().get(selectVideoIndex).setIsCollect(((AddCollectionRet) tData).getData().getIsCollect());
+                videoItemShowAdapter.notifyItemChanged(selectVideoIndex);
 
                 if (((AddCollectionRet) tData).getData().getIsCollect() == 0) {
                     Toasty.normal(this, "已取消").show();
@@ -886,7 +833,7 @@ public class VideoShowActivity extends BaseFragmentActivity implements VideoInfo
         @Override
         public void onResult(SHARE_MEDIA platform) {
             dismissShareView();
-            Toast.makeText(VideoShowActivity.this, "分享成功", Toast.LENGTH_LONG).show();
+            Toast.makeText(VideoItemShowActivity.this, "分享成功", Toast.LENGTH_LONG).show();
         }
 
         /**
@@ -897,7 +844,7 @@ public class VideoShowActivity extends BaseFragmentActivity implements VideoInfo
         @Override
         public void onError(SHARE_MEDIA platform, Throwable t) {
             dismissShareView();
-            Toast.makeText(VideoShowActivity.this, "分享失败", Toast.LENGTH_LONG).show();
+            Toast.makeText(VideoItemShowActivity.this, "分享失败", Toast.LENGTH_LONG).show();
         }
 
         /**
@@ -907,7 +854,7 @@ public class VideoShowActivity extends BaseFragmentActivity implements VideoInfo
         @Override
         public void onCancel(SHARE_MEDIA platform) {
             dismissShareView();
-            Toast.makeText(VideoShowActivity.this, "取消分享", Toast.LENGTH_LONG).show();
+            Toast.makeText(VideoItemShowActivity.this, "取消分享", Toast.LENGTH_LONG).show();
         }
     };
 
@@ -918,17 +865,17 @@ public class VideoShowActivity extends BaseFragmentActivity implements VideoInfo
         String shareContent = "超级搞笑的沙雕视频集锦来了，你能忍住不笑，算你牛！";
         String shareImageUrl = "";
 
-        if (mVideoAdapter.getData().get(selectVideoIndex) != null) {
-            shareTitle = mVideoAdapter.getData().get(selectVideoIndex).getName();
-            shareContent = mVideoAdapter.getData().get(selectVideoIndex).getName();
-            shareImageUrl = mVideoAdapter.getData().get(selectVideoIndex).getVideoCover();
+        if (videoItemShowAdapter.getData().get(selectVideoIndex) != null) {
+            shareTitle = videoItemShowAdapter.getData().get(selectVideoIndex).getName();
+            shareContent = videoItemShowAdapter.getData().get(selectVideoIndex).getName();
+            shareImageUrl = videoItemShowAdapter.getData().get(selectVideoIndex).getVideoCover();
         }
 
         UMWeb web = new UMWeb("http://gx.qqtn.com");
         if (shareAction != null) {
-            UMImage image = new UMImage(VideoShowActivity.this, R.drawable.app_share);
+            UMImage image = new UMImage(VideoItemShowActivity.this, R.drawable.app_share);
             if (!StringUtils.isEmpty(shareImageUrl)) {
-                image = new UMImage(VideoShowActivity.this, shareImageUrl);
+                image = new UMImage(VideoItemShowActivity.this, shareImageUrl);
                 image.compressStyle = UMImage.CompressStyle.QUALITY;
             }
             web.setTitle(shareTitle);//标题
@@ -971,6 +918,8 @@ public class VideoShowActivity extends BaseFragmentActivity implements VideoInfo
                 startActivity(intent1);
                 finish();
                 break;
+
+
             default:
                 break;
         }

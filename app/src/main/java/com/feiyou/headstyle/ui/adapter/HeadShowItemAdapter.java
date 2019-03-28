@@ -72,9 +72,9 @@ public class HeadShowItemAdapter extends BaseAdapter {
     }
 
     public void remove(int index) {
-        if (index > -1 && index < heads.size()) {
+        if (index > -1 && index <= heads.size()) {
             heads.remove(index);
-            notifyDataSetChanged();
+            //notifyDataSetChanged();
         }
     }
 
@@ -111,9 +111,11 @@ public class HeadShowItemAdapter extends BaseAdapter {
 
         if (showShape == 1) {
             RequestOptions options = new RequestOptions().skipMemoryCache(true);
+            //options.placeholder(R.mipmap.image_def);
             Glide.with(mContext).load(heads.get(position).getImgurl()).apply(options).into(holder.mHeadShowImageView);
         } else {
             RequestOptions options = new RequestOptions().skipMemoryCache(true);
+            //options.placeholder(R.mipmap.image_def);
             options.transform(new GlideRoundTransform(mContext, SizeUtils.dp2px(117)));
             Glide.with(mContext).load(heads.get(position).getImgurl()).apply(options).into(holder.mHeadShowImageView);
         }

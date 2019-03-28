@@ -31,6 +31,7 @@ import com.feiyou.headstyle.bean.VideoInfo;
 import com.feiyou.headstyle.bean.VideoInfoRet;
 import com.feiyou.headstyle.common.Constants;
 import com.feiyou.headstyle.presenter.VideoInfoPresenterImp;
+import com.feiyou.headstyle.ui.activity.VideoItemShowActivity;
 import com.feiyou.headstyle.ui.activity.VideoShowActivity;
 import com.feiyou.headstyle.ui.adapter.VideoListAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragment;
@@ -130,7 +131,7 @@ public class VideoFragment extends BaseFragment implements VideoInfoView, SwipeR
 
                 int jumpPosition = position % pageSize;
 
-                Intent intent = new Intent(getActivity(), VideoShowActivity.class);
+                Intent intent = new Intent(getActivity(), VideoItemShowActivity.class);
                 intent.putExtra("jump_page", jumpPage);
                 intent.putExtra("jump_position", jumpPosition);
                 startActivity(intent);

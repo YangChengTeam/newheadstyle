@@ -52,7 +52,7 @@ public class MyNoticeAdapter extends BaseQuickAdapter<SystemInfo, BaseViewHolder
 
         helper.setText(R.id.tv_notice_nick_name, item.getNickname())
                 .setText(R.id.tv_note_type_content, item.getType() == 1 ? "赞了你的评论" : "关注了你")
-                .setText(R.id.tv_notice_content, Html.fromHtml(item.getContent()))
+                .setText(R.id.tv_notice_content, Html.fromHtml(StringUtils.isEmpty(item.getContent()) ? "" : item.getContent()))
                 .setText(R.id.tv_notice_date, tempDateStr);
     }
 }

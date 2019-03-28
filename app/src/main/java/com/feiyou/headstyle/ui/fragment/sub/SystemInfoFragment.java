@@ -1,5 +1,6 @@
 package com.feiyou.headstyle.ui.fragment.sub;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -17,6 +18,7 @@ import com.feiyou.headstyle.bean.SystemInfoRet;
 import com.feiyou.headstyle.common.Constants;
 import com.feiyou.headstyle.presenter.MyCommentPresenterImp;
 import com.feiyou.headstyle.presenter.SystemInfoPresenterImp;
+import com.feiyou.headstyle.ui.activity.UserInfoActivity;
 import com.feiyou.headstyle.ui.adapter.MyNoticeAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragment;
 import com.feiyou.headstyle.view.SystemInfoView;
@@ -100,6 +102,17 @@ public class SystemInfoFragment extends BaseFragment implements SystemInfoView, 
                 systemInfoPresenterImp.getSystemInfoList(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", 3, currentPage);
             }
         }, mNoticeListView);
+
+        noticeAdapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
+            @Override
+            public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
+//                if (view.getId() == R.id.iv_user_img) {
+//                    Intent intent = new Intent(getActivity(), UserInfoActivity.class);
+//                    intent.putExtra("user_id", "");
+//                    startActivity(intent);
+//                }
+            }
+        });
     }
 
     @Override
