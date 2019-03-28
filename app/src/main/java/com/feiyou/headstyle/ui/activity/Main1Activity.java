@@ -28,6 +28,7 @@ import com.feiyou.headstyle.bean.UserInfo;
 import com.feiyou.headstyle.common.Constants;
 import com.feiyou.headstyle.ui.adapter.MyFragmentAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragmentActivity;
+import com.feiyou.headstyle.ui.custom.PraiseDialog;
 import com.feiyou.headstyle.utils.NotificationUtils;
 import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
@@ -49,7 +50,7 @@ import permissions.dispatcher.RuntimePermissions;
 
 
 @RuntimePermissions
-public class Main1Activity extends BaseFragmentActivity implements ViewPager.OnPageChangeListener, RadioGroup.OnCheckedChangeListener {
+public class Main1Activity extends BaseFragmentActivity implements ViewPager.OnPageChangeListener, RadioGroup.OnCheckedChangeListener,PraiseDialog.PraiseListener {
 
     @BindView(R.id.viewpager)
     ViewPager viewPager;
@@ -65,6 +66,8 @@ public class Main1Activity extends BaseFragmentActivity implements ViewPager.OnP
     private UserInfo userInfo;
 
     private long clickTime = 0;
+
+    PraiseDialog praiseDialog;
 
     @Override
     protected int getContextViewId() {
@@ -118,6 +121,13 @@ public class Main1Activity extends BaseFragmentActivity implements ViewPager.OnP
         viewPager.setAdapter(adapter);
         viewPager.addOnPageChangeListener(this);
         mTabRadioGroup.setOnCheckedChangeListener(this);
+
+        praiseDialog = new PraiseDialog(this,R.style.login_dialog);
+        praiseDialog.setPraiseListener(this);
+
+        if (praiseDialog != null && !praiseDialog.isShowing()) {
+            praiseDialog.show();
+        }
     }
 
     @Override
@@ -234,5 +244,15 @@ public class Main1Activity extends BaseFragmentActivity implements ViewPager.OnP
         } else {
             System.exit(0);
         }
+    }
+
+    @Override
+    public void config() {
+
+    }
+
+    @Override
+    public void cancel() {
+
     }
 }

@@ -52,5 +52,7 @@ public class MyAtMessageAdapter extends BaseQuickAdapter<MyAtMessage, BaseViewHo
         Glide.with(mContext).load(item.getImage()).into((ImageView) helper.getView(R.id.iv_note_img));
         helper.setText(R.id.tv_note_title, Html.fromHtml(tempMessageContent))
                 .setText(R.id.tv_reply_date, TimeUtils.millis2String(item.getAddTime() != null ? item.getAddTime() * 1000 : 0));
+
+        helper.addOnClickListener(R.id.iv_reply_head);
     }
 }

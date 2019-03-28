@@ -277,10 +277,10 @@ public class UserInfoActivity extends BaseFragmentActivity implements UserInfoVi
 
             Glide.with(this).load(userInfo.getUserimg()).apply(options).into(mUserHeadIv);
 
-            mFollowCountTv.setText(userInfo.getGuanNum() + "");
-            mFansCountTv.setText(userInfo.getFenNum() + "");
+            mFollowCountTv.setText(userInfo.getFollowNum() + "");
+            mFansCountTv.setText(userInfo.getFollowerNum() + "");
             mNickNameTv.setText(StringUtils.isEmpty(userInfo.getNickname()) ? "" : userInfo.getNickname());
-            mUserIdTv.setText(userInfo.getId() + "");
+            mUserIdTv.setText(StringUtils.isEmpty(userInfo.getId()) ? "" : userInfo.getId() + "");
             mUserAgeTv.setText(userInfo.getAge() + "岁");
             mUserSignTv.setText(userInfo.getIntro());
             mUserSexIv.setVisibility(userInfo.getSex() > 0 ? View.VISIBLE : View.GONE);
@@ -444,8 +444,8 @@ public class UserInfoActivity extends BaseFragmentActivity implements UserInfoVi
 
                 mFollowCountTv.setText(userInfo.getGuanNum() + "");
                 mFansCountTv.setText(userInfo.getFenNum() + "");
-                mNickNameTv.setText(userInfo.getNickname() + "");
-                mUserIdTv.setText(userInfo.getId() + "");
+                mNickNameTv.setText(StringUtils.isEmpty(userInfo.getNickname()) ? "" : userInfo.getNickname());
+                mUserIdTv.setText(StringUtils.isEmpty(userInfo.getId()) ? "" : userInfo.getId() + "");
                 mUserAgeTv.setText(userInfo.getAge() + "岁");
                 mUserSignTv.setText(userInfo.getIntro());
                 mUserSexIv.setVisibility(userInfo.getSex() > 0 ? View.VISIBLE : View.GONE);

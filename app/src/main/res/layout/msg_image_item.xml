@@ -18,6 +18,7 @@
             android:id="@+id/layout_left_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
             android:orientation="horizontal">
 
             <ImageView
@@ -46,15 +47,15 @@
                     android:id="@+id/left_msg"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:maxWidth="250dp"
                     android:layout_toRightOf="@+id/iv_chat_horn_left"
                     android:background="@drawable/common_test_bg"
                     android:gravity="left|center"
-                    android:lineSpacingMultiplier="1.3"
-                    android:minHeight="30dp"
-                    android:padding="6dp"
+                    android:lineSpacingMultiplier="1.2"
+                    android:maxWidth="250dp"
+                    android:minHeight="32dp"
+                    android:padding="8dp"
                     android:textColor="@color/black"
-                    android:textSize="14dp" />
+                    android:textSize="13dp" />
             </RelativeLayout>
         </LinearLayout>
 
@@ -62,7 +63,7 @@
             android:id="@+id/layout_left_img"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
             android:orientation="horizontal"
             android:visibility="gone">
 
@@ -94,8 +95,7 @@
                     android:layout_toRightOf="@+id/iv_chat_horn_left1"
                     android:background="@color/white"
                     android:padding="6dp"
-                    android:scaleType="fitXY"
-                    android:src="@mipmap/test_detail_def" />
+                    android:scaleType="fitXY"/>
             </RelativeLayout>
         </LinearLayout>
 
@@ -103,7 +103,6 @@
             android:id="@+id/layout_left_result"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
             android:orientation="horizontal"
             android:visibility="gone">
 
@@ -135,11 +134,9 @@
                     android:layout_toRightOf="@+id/iv_chat_horn_left2"
                     android:background="@color/white"
                     android:padding="6dp"
-                    android:scaleType="centerInside"
-                    android:src="@mipmap/test_detail_def" />
+                    android:scaleType="centerInside"/>
             </RelativeLayout>
         </LinearLayout>
-
     </LinearLayout>
 
     <RelativeLayout
@@ -165,11 +162,11 @@
                 android:background="@drawable/common_test_bg"
                 android:gravity="center|right"
                 android:lineSpacingMultiplier="1.3"
-                android:minHeight="30dp"
-                android:padding="6dp"
                 android:maxWidth="250dp"
+                android:minHeight="32dp"
+                android:padding="8dp"
                 android:textColor="@color/black"
-                android:textSize="14dp" />
+                android:textSize="13dp" />
 
             <ImageView
                 android:id="@+id/iv_chat_horn_right"
@@ -185,7 +182,6 @@
             android:id="@+id/iv_user_head"
             android:layout_width="48dp"
             android:layout_height="48dp"
-
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true" />
     </RelativeLayout>

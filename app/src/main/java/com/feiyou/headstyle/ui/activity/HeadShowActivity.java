@@ -188,6 +188,8 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
 
     UMImage defUmImage;
 
+    private boolean pageSizeLastClick;
+
     @Override
     protected int getContextViewId() {
         return R.layout.activity_head_show;
@@ -404,7 +406,7 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
 
         if (fromType == 2) {
             if (startPosition < collectionList.size()) {
-                adapter.addDatas(collectionList.subList(startPosition, collectionList.size() - 1));
+                adapter.addDatas(collectionList.subList(startPosition, collectionList.size()));
             } else {
                 adapter.addDatas(collectionList);
             }
@@ -438,6 +440,9 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
             adapter.setShowShape(showShape);
         }
         adapter.notifyDataSetChanged();
+        ImageView currentIv = swipeView.getSelectedView().findViewById(R.id.iv_show_head);
+        RequestOptions options = new RequestOptions().skipMemoryCache(true);
+        Glide.with(this).load(currentImageUrl).apply(options).into(currentIv);
     }
 
     void circle() {
@@ -447,6 +452,11 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
             adapter.setShowShape(showShape);
         }
         adapter.notifyDataSetChanged();
+
+        ImageView currentIv = swipeView.getSelectedView().findViewById(R.id.iv_show_head);
+        RequestOptions options = new RequestOptions().skipMemoryCache(true);
+        options.transform(new GlideRoundTransform(this, SizeUtils.dp2px(117)));
+        Glide.with(this).load(currentImageUrl).apply(options).into(currentIv);
     }
 
     @OnClick(R.id.layout_share)
@@ -465,7 +475,7 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
             intent.putExtra("image_url", adapter.getHeads().get(0).getImgurl());
             startActivity(intent);
         } else {
-            Toasty.normal(this,"图片加载错误，请重试").show();
+            Toasty.normal(this, "图片加载错误，请重试").show();
         }
     }
 
@@ -479,7 +489,7 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
             if (adapter.getHeads().size() > 0) {
                 addCollectionPresenterImp.addCollection(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", adapter.getHeads().get(0).getId());
             } else {
-                Toasty.normal(this,"系统错误，请重试").show();
+                Toasty.normal(this, "系统错误，请重试").show();
             }
         }
     }
@@ -526,7 +536,7 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
                 MediaScannerConnection.scanFile(HeadShowActivity.this, new String[]{filePath}, null, null);
                 // 最后通知图库更新
                 sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.parse("file://" + filePath)));
-                Toasty.normal(this,loginType == 2 && bottomSheetDialog.isShowing() ? "已保存到相册，打开微信更换头像" : "已保存到相册").show();
+                Toasty.normal(this, loginType == 2 && bottomSheetDialog.isShowing() ? "已保存到相册，打开微信更换头像" : "已保存到相册").show();
             } else {
                 flag = false;
             }
@@ -592,21 +602,20 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
                 }
             }
 
-            if (adapter.getCount() <= 1) {
-                Toasty.normal(this,"已经是最后一张了").show();
+            if (adapter.getCount() == 1) {
+                Logger.i("已经是最后一张了");
             } else {
                 //滑动时,移除最上面一个图片
                 adapter.remove(0);
+            }
 
-                currentImageUrl = adapter.getHeads().get(0).getImgurl();
-
-                if (shareAction != null) {
-                    if (!StringUtils.isEmpty(currentImageUrl)) {
-                        UMImage image = new UMImage(HeadShowActivity.this, currentImageUrl);
-                        shareAction.withMedia(image);
-                    } else {
-                        shareAction.withMedia(defUmImage);
-                    }
+            currentImageUrl = adapter.getHeads() != null && adapter.getHeads().size() > 0 ? adapter.getHeads().get(0).getImgurl() : "";
+            if (shareAction != null) {
+                if (!StringUtils.isEmpty(currentImageUrl)) {
+                    UMImage image = new UMImage(HeadShowActivity.this, currentImageUrl);
+                    shareAction.withMedia(image);
+                } else {
+                    shareAction.withMedia(defUmImage);
                 }
             }
 
@@ -624,21 +633,21 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
             }
 
         } else {
-            if (adapter.getCount() <= 1) {
-                Toasty.normal(this,"已经是最后一张了").show();
+            if (adapter.getCount() == 1) {
+                Logger.i("已经是最后一张了");
+                Toasty.normal(this, "已经是最后一张了").show();
             } else {
                 //滑动时,移除最上面一个图片
                 adapter.remove(0);
+            }
 
-                currentImageUrl = adapter.getHeads().get(0).getImgurl();
-
-                if (shareAction != null) {
-                    if (!StringUtils.isEmpty(currentImageUrl)) {
-                        UMImage image = new UMImage(HeadShowActivity.this, currentImageUrl);
-                        shareAction.withMedia(image);
-                    } else {
-                        shareAction.withMedia(defUmImage);
-                    }
+            currentImageUrl = adapter.getHeads() != null && adapter.getHeads().size() > 0 ? adapter.getHeads().get(0).getImgurl() : "";
+            if (shareAction != null) {
+                if (!StringUtils.isEmpty(currentImageUrl)) {
+                    UMImage image = new UMImage(HeadShowActivity.this, currentImageUrl);
+                    shareAction.withMedia(image);
+                } else {
+                    shareAction.withMedia(defUmImage);
                 }
             }
         }
@@ -685,8 +694,11 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
         if (tData != null && tData.getCode() == Constants.SUCCESS) {
             if (tData instanceof HomeDataRet) {
                 if (isFirstLoad) {
+                    if (startPosition == ((HomeDataRet) tData).getData().getImagesList().size() - 1) {
+                        pageSizeLastClick = true;
+                    }
                     if (startPosition < ((HomeDataRet) tData).getData().getImagesList().size()) {
-                        adapter.addDatas(((HomeDataRet) tData).getData().getImagesList().subList(startPosition, ((HomeDataRet) tData).getData().getImagesList().size() - 1));
+                        adapter.addDatas(((HomeDataRet) tData).getData().getImagesList().subList(startPosition, ((HomeDataRet) tData).getData().getImagesList().size()));
                     } else {
                         adapter.addDatas(((HomeDataRet) tData).getData().getImagesList());
                     }
@@ -716,6 +728,10 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
                     }
 
                 } else {
+                    if (pageSizeLastClick && adapter.getCount() > 0) {
+                        pageSizeLastClick = false;
+                        adapter.remove(0);
+                    }
                     adapter.addDatas(((HomeDataRet) tData).getData().getImagesList());
                 }
 
@@ -725,7 +741,7 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
             if (tData instanceof HeadInfoRet) {
                 if (isFirstLoad) {
                     if (startPosition < ((HeadInfoRet) tData).getData().size()) {
-                        adapter.addDatas(((HeadInfoRet) tData).getData().subList(startPosition, ((HeadInfoRet) tData).getData().size() - 1));
+                        adapter.addDatas(((HeadInfoRet) tData).getData().subList(startPosition, ((HeadInfoRet) tData).getData().size()));
                     } else {
                         adapter.addDatas(((HeadInfoRet) tData).getData());
                     }
@@ -754,6 +770,11 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
                         mKeepTextView.setCompoundDrawablesWithIntrinsicBounds(null, isCollection, null, null);
                     }
                 } else {
+                    if (pageSizeLastClick && adapter.getCount() > 0) {
+                        pageSizeLastClick = false;
+                        adapter.remove(0);
+                    }
+
                     adapter.addDatas(((HeadInfoRet) tData).getData());
                 }
                 adapter.notifyDataSetChanged();
@@ -761,17 +782,17 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
 
             if (tData instanceof AddCollectionRet) {
                 if (((AddCollectionRet) tData).getData().getIsCollect() == 0) {
-                    Toasty.normal(this,"取消收藏").show();
+                    Toasty.normal(this, "取消收藏").show();
                     mKeepTextView.setCompoundDrawablesWithIntrinsicBounds(null, notCollection, null, null);
                 } else {
-                    Toasty.normal(this,"收藏成功").show();
+                    Toasty.normal(this, "收藏成功").show();
                     mKeepTextView.setCompoundDrawablesWithIntrinsicBounds(null, isCollection, null, null);
                 }
             }
 
             if (tData instanceof UpdateHeadRet) {
                 if (!StringUtils.isEmpty(((UpdateHeadRet) tData).getData().getImage())) {
-                    Toasty.normal(this,"设置成功").show();
+                    Toasty.normal(this, "设置成功").show();
                     userInfo.setUserimg(((UpdateHeadRet) tData).getData().getImage());
 
                     App.getApp().setmUserInfo(userInfo);
@@ -782,11 +803,11 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
 
         } else {
             if (tData instanceof AddCollectionRet) {
-                Toasty.normal(this,tData.getMsg() != null ? tData.getMsg() : "操作失败").show();
+                Toasty.normal(this, tData.getMsg() != null ? tData.getMsg() : "操作失败").show();
             }
 
             if (tData instanceof UpdateHeadRet) {
-                Toasty.normal(this,"设置失败").show();
+                Toasty.normal(this, "设置失败").show();
             }
         }
     }

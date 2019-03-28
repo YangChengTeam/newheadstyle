@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="180dp"
+        android:layout_height="220dp"
+        android:layout_gravity="center"
+        android:background="@drawable/common_white_bg">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/layout_btn"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_config_content"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:lineSpacingMultiplier="1.2"
+                android:paddingLeft="12dp"
+                android:paddingRight="12dp"
+                android:paddingBottom="6dp"
+                android:text="头像君跪求您的好评\n快来评论一下吧"
+                android:textColor="@color/black1"
+                android:textSize="13dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layout_btn"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:layout_alignParentBottom="true"
+            android:layout_gravity="bottom"
+            android:layout_marginBottom="12dp"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:id="@+id/layout_config"
+                android:layout_width="130dp"
+                android:layout_height="32dp"
+                android:background="@mipmap/praise_config"
+                android:gravity="center">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="好的，这就去"
+                    android:textColor="@color/white"
+                    android:textSize="13dp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/layout_cancel"
+                android:layout_width="130dp"
+                android:layout_height="32dp"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/refuse_bg"
+                android:gravity="center">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="残忍拒绝"
+                    android:textColor="@color/gray999"
+                    android:textSize="14dp" />
+            </LinearLayout>
+        </LinearLayout>
+    </RelativeLayout>
+
+    <ImageView
+        android:layout_width="284dp"
+        android:layout_height="94dp"
+        android:layout_gravity="top|center"
+        android:src="@mipmap/praise_top" />
+</FrameLayout>

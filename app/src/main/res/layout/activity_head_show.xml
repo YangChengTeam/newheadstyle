@@ -30,6 +30,7 @@
             app:selectedColor="@color/tab_select_color"
             app:selectedTab="0"
             app:strokeRadius="20dp"
+            android:background="@drawable/switch_bg"
             app:strokeWidth="1dp"
             app:switchTabs="@array/switch_tabs"
             app:textSize="14dp" />

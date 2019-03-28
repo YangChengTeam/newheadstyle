@@ -93,8 +93,7 @@
                     android:layout_toRightOf="@+id/iv_chat_horn_left1"
                     android:background="@color/white"
                     android:padding="6dp"
-                    android:scaleType="fitXY"
-                    android:src="@mipmap/test_detail_def" />
+                    android:scaleType="fitXY" />
             </RelativeLayout>
         </LinearLayout>
 

@@ -10,19 +10,15 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
-import com.bumptech.glide.Glide;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.bean.BannerInfo;
 import com.feiyou.headstyle.bean.HeadInfo;
-import com.feiyou.headstyle.bean.HomeDataRet;
 import com.feiyou.headstyle.bean.ResultInfo;
-import com.feiyou.headstyle.common.Constants;
-import com.feiyou.headstyle.common.GlideImageLoader;
 import com.feiyou.headstyle.presenter.HomeDataPresenterImp;
 import com.feiyou.headstyle.ui.activity.Collection2Activity;
-import com.feiyou.headstyle.ui.activity.MainActivity;
+import com.feiyou.headstyle.ui.activity.Main2Activity;
 import com.feiyou.headstyle.ui.adapter.CommunityHeadAdapter;
 import com.feiyou.headstyle.ui.adapter.HeadInfoAdapter;
 import com.feiyou.headstyle.ui.adapter.HeadTypeAdapter;
@@ -45,7 +41,7 @@ import butterknife.OnClick;
  * Created by iflying on 2018/2/6.
  */
 
-public class HomeFragment extends BaseFragment implements MyScrollView.OnScrollListener, MainActivity.IOnFocusListener, HomeDataView {
+public class HomeFragment extends BaseFragment implements MyScrollView.OnScrollListener, HomeDataView {
 
     @BindView(R.id.scroll_view)
     MyScrollView myScrollView;
@@ -208,14 +204,6 @@ public class HomeFragment extends BaseFragment implements MyScrollView.OnScrollL
                 refreshLayout1.removeView(floatLayout);
                 refreshLayout2.addView(floatLayout);
             }
-        }
-    }
-
-    @Override
-    public void onWindowFocusChanged(boolean hasFocus) {
-        Logger.i("onWindowFocusChanged--->");
-        if (hasFocus) {
-            searchLayoutTop = mLineView.getBottom();// 获取line的顶部位置
         }
     }
 

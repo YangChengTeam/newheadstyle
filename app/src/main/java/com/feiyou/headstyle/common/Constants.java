@@ -55,4 +55,8 @@ public class Constants {
     public static final String NOTICE_COUNT = "notice_count";
 
     public static final String TOTAL_COUNT = "total_count";
+
+    public static final String APP_ID = "1107873400";
+
+    public static final String OPEN_ID = "6050141079184468";
 }

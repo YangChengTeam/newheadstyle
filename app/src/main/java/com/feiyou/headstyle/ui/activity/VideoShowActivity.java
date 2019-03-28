@@ -47,6 +47,7 @@ import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.bean.AddCollectionRet;
 import com.feiyou.headstyle.bean.FollowInfoRet;
 import com.feiyou.headstyle.bean.MessageEvent;
+import com.feiyou.headstyle.bean.NoteCommentRet;
 import com.feiyou.headstyle.bean.NoteItem;
 import com.feiyou.headstyle.bean.NoteSubCommentRet;
 import com.feiyou.headstyle.bean.ReplyParams;
@@ -361,6 +362,14 @@ public class VideoShowActivity extends BaseFragmentActivity implements VideoInfo
             }
         });
 
+        commentAdapter.setOnLoadMoreListener(new BaseQuickAdapter.RequestLoadMoreListener() {
+            @Override
+            public void onLoadMoreRequested() {
+                commentPage++;
+                videoCommentPresenterImp.getCommentList(commentPage, currentVideoId, userInfo != null ? userInfo.getId() : "");
+            }
+        }, commentListView);
+
         commentAdapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
             @Override
             public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
@@ -645,7 +654,7 @@ public class VideoShowActivity extends BaseFragmentActivity implements VideoInfo
                 if (tData.getCode() == Constants.SUCCESS && ((VideoInfoRet) tData).getData().getList() != null) {
                     if (isFirstLoad) {
                         if (startPosition < ((VideoInfoRet) tData).getData().getList().size()) {
-                            mVideoAdapter.setNewData(((VideoInfoRet) tData).getData().getList().subList(startPosition, ((VideoInfoRet) tData).getData().getList().size() - 1));
+                            mVideoAdapter.setNewData(((VideoInfoRet) tData).getData().getList().subList(startPosition, ((VideoInfoRet) tData).getData().getList().size()));
                         } else {
                             mVideoAdapter.setNewData(((VideoInfoRet) tData).getData().getList());
                         }
@@ -666,17 +675,39 @@ public class VideoShowActivity extends BaseFragmentActivity implements VideoInfo
                 if (tData.getCode() == Constants.SUCCESS && ((VideoCommentRet) tData).getData() != null) {
                     mNoDataLayout.setVisibility(View.INVISIBLE);
                     commentListView.setVisibility(View.VISIBLE);
-                    commentAdapter.setNewData(((VideoCommentRet) tData).getData());
+
+                    if (commentPage == 1) {
+                        commentAdapter.setNewData(((VideoCommentRet) tData).getData());
+                    } else {
+                        commentAdapter.addData(((VideoCommentRet) tData).getData());
+                    }
+
                     commentAdapter.notifyDataSetChanged();
                 } else {
                     mNoDataLayout.setVisibility(View.VISIBLE);
                     commentListView.setVisibility(View.INVISIBLE);
                 }
+
+                if (((VideoCommentRet) tData).getData().size() == pageSize) {
+                    commentAdapter.loadMoreComplete();
+                } else {
+                    commentAdapter.loadMoreEnd(true);
+                }
             }
 
             if (tData instanceof NoteSubCommentRet) {
-                if (((NoteSubCommentRet) tData).getData() != null) {
-                    commentReplyAdapter.setNewData(((NoteSubCommentRet) tData).getData());
+                if (tData.getCode() == Constants.SUCCESS && ((NoteSubCommentRet) tData).getData() != null) {
+                    if (subCommentPage == 1) {
+                        commentReplyAdapter.setNewData(((NoteSubCommentRet) tData).getData());
+                    } else {
+                        commentReplyAdapter.addData(((NoteSubCommentRet) tData).getData());
+                    }
+
+                    if (((NoteSubCommentRet) tData).getData().size() == pageSize) {
+                        commentReplyAdapter.loadMoreComplete();
+                    } else {
+                        commentReplyAdapter.loadMoreEnd(true);
+                    }
                 }
             }
 
