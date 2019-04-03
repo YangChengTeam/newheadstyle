@@ -30,6 +30,7 @@ import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.bean.FollowInfoRet;
+import com.feiyou.headstyle.bean.MessageEvent;
 import com.feiyou.headstyle.bean.NoteInfo;
 import com.feiyou.headstyle.bean.NoteTypeRet;
 import com.feiyou.headstyle.bean.NoteTypeWrapper;
@@ -55,6 +56,10 @@ import com.umeng.socialize.media.UMImage;
 import com.umeng.socialize.media.UMWeb;
 import com.wang.avi.AVLoadingIndicatorView;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -66,6 +71,8 @@ import es.dmoral.toasty.Toasty;
  * Created by myflying on 2018/11/28.
  */
 public class CommunityType1Activity extends BaseFragmentActivity implements NoteTypeView, View.OnClickListener, SwipeRefreshLayout.OnRefreshListener {
+
+    private final static int REQUEST_CODE = 1; // 返回的结果码
 
     @BindView(R.id.app_bar_layout)
     AppBarLayout appBarLayout;
@@ -160,6 +167,8 @@ public class CommunityType1Activity extends BaseFragmentActivity implements Note
 
     BottomSheetDialog normalShareDialog;
 
+    private int topicDefIndex = -1;
+
     @Override
     protected int getContextViewId() {
         return R.layout.activity_community_type1;
@@ -168,6 +177,7 @@ public class CommunityType1Activity extends BaseFragmentActivity implements Note
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        EventBus.getDefault().register(this);
         initShareDialog();
         initData();
     }
@@ -210,6 +220,15 @@ public class CommunityType1Activity extends BaseFragmentActivity implements Note
     }
 
     public void initData() {
+        Bundle bundle = getIntent().getExtras();
+        if (bundle != null) {
+            topicDefIndex = bundle.getInt("topic_index", -1);
+        }
+
+        if (bundle != null && bundle.getString("topic_id") != null) {
+            topicId = bundle.getString("topic_id");
+        }
+
         mRefreshLayout.setOnRefreshListener(this);
         //设置进度View样式的大小，只有两个值DEFAULT和LARGE
         //设置进度View下拉的起始点和结束点，scale 是指设置是否需要放大或者缩小动画
@@ -223,12 +242,6 @@ public class CommunityType1Activity extends BaseFragmentActivity implements Note
         mRefreshLayout.setDistanceToTriggerSync(200);
         //如果child是自己自定义的view，可以通过这个回调，告诉mSwipeRefreshLayoutchild是否可以滑动
         mRefreshLayout.setOnChildScrollUpCallback(null);
-
-        Bundle bundle = getIntent().getExtras();
-
-        if (bundle != null && bundle.getString("topic_id") != null) {
-            topicId = bundle.getString("topic_id");
-        }
 
         loginDialog = new LoginDialog(this, R.style.login_dialog);
         if (shareAction == null) {
@@ -300,7 +313,7 @@ public class CommunityType1Activity extends BaseFragmentActivity implements Note
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 int topRowVerticalPosition = (recyclerView == null || recyclerView.getChildCount() == 0) ? 0 : recyclerView.getChildAt(0).getTop();
-                //mRefreshLayout.setEnabled(topRowVerticalPosition >= 0);
+                mRefreshLayout.setEnabled(topRowVerticalPosition >= 0);
             }
 
             @Override
@@ -322,6 +335,9 @@ public class CommunityType1Activity extends BaseFragmentActivity implements Note
         }
 
         Intent intent = new Intent(this, PushNoteActivity.class);
+        intent.putExtra("from_note_type", 2);
+        intent.putExtra("topic_index", topicDefIndex);
+        intent.putExtra("topic_id", topicId);
         startActivity(intent);
     }
 
@@ -623,6 +639,24 @@ public class CommunityType1Activity extends BaseFragmentActivity implements Note
                 break;
             default:
                 break;
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault().unregister(this);
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void Event(MessageEvent messageEvent) {
+        if (messageEvent.getMessage().equals("add_note_type")) {
+            //发帖后添加到首页
+            //noteInfoAdapter.addData(0, messageEvent.getAddNoteInfo());
+            //mCommunityTypeListView.scrollToPosition(0);
+            topicId = messageEvent.getTopicId();
+            currentPage = 1;
+            noteTypePresenterImp.getNoteTypeData(topicId, currentPage, 1, App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "");
         }
     }
 

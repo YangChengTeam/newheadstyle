@@ -1,5 +1,6 @@
 package com.feiyou.headstyle.ui.fragment.sub;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
@@ -26,6 +27,8 @@ import com.feiyou.headstyle.common.Constants;
 import com.feiyou.headstyle.presenter.FollowInfoPresenterImp;
 import com.feiyou.headstyle.presenter.UserInfoListPresenterImp;
 import com.feiyou.headstyle.ui.activity.MyFollowActivity;
+import com.feiyou.headstyle.ui.activity.PushNoteActivity;
+import com.feiyou.headstyle.ui.activity.UserInfoActivity;
 import com.feiyou.headstyle.ui.adapter.MyFensListAdapter;
 import com.feiyou.headstyle.ui.adapter.MyFriendsListAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragment;
@@ -41,6 +44,8 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
+import es.dmoral.toasty.Toasty;
 
 /**
  * Created by myflying on 2018/11/26.
@@ -127,6 +132,11 @@ public class MyFensFragment extends BaseFragment implements UserInfoListView {
                     currentPosition = position;
                     followInfoPresenterImp.addFollow(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", myFensListAdapter.getData().get(position).getId());
                 }
+                if (view.getId() == R.id.iv_user_head) {
+                    Intent intent = new Intent(getActivity(), UserInfoActivity.class);
+                    intent.putExtra("user_id", myFensListAdapter.getData().get(position).getId());
+                    startActivity(intent);
+                }
             }
         });
 
@@ -138,6 +148,12 @@ public class MyFensFragment extends BaseFragment implements UserInfoListView {
         if (messageEvent.getMessage().equals("load_friend_list")) {
             userInfoListPresenterImp.getMyGuanFenList(currentPage, userInfo != null ? userInfo.getId() : "", isMyInfo ? userInfo.getId() : intoUserId, 2);
         }
+    }
+
+    @OnClick(R.id.tv_no_data)
+    void sendNote() {
+        Intent intent = new Intent(getActivity(), PushNoteActivity.class);
+        startActivity(intent);
     }
 
     @Override
@@ -176,20 +192,23 @@ public class MyFensFragment extends BaseFragment implements UserInfoListView {
                 int tempResult = ((FollowInfoRet) tData).getData().getIsGuan();
 
                 if (tempResult == 0) {
-                    MyToastUtils.showToast(getActivity(), 1, "已取消");
+                    Toasty.normal(getActivity(), "已取消").show();
                 } else {
-                    MyToastUtils.showToast(getActivity(), 0, "关注成功");
+                    Toasty.normal(getActivity(), "已关注").show();
                 }
+
                 userInfoListPresenterImp.getMyGuanFenList(currentPage, userInfo != null ? userInfo.getId() : "", isMyInfo ? userInfo.getId() : intoUserId, 2);
             }
         } else {
             if (tData instanceof UserInfoListRet) {
-                mFriendsListView.setVisibility(View.GONE);
-                mNoDataLayout.setVisibility(View.VISIBLE);
+                if (currentPage == 1) {
+                    mFriendsListView.setVisibility(View.GONE);
+                    mNoDataLayout.setVisibility(View.VISIBLE);
+                }
                 //mNoDataTitleTv.setText(type == 1 ? "还没有关注的好友？不如去多认识几个朋友！" : "还没收到过关注？不如发个帖求波关注！");
                 //mNoDataToTv.setText(type == 1 ? "去关注" : "去发帖");
             }
-            ToastUtils.showLong(StringUtils.isEmpty(tData.getMsg()) ? "操作失败" : tData.getMsg());
+            Logger.i(StringUtils.isEmpty(tData.getMsg()) ? "操作失败" : tData.getMsg());
         }
     }
 

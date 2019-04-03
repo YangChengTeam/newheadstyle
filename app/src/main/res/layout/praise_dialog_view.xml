@@ -26,7 +26,7 @@
                 android:paddingLeft="12dp"
                 android:paddingRight="12dp"
                 android:paddingBottom="6dp"
-                android:text="头像君跪求您的好评\n快来评论一下吧"
+                android:text="hi~觉得好用就给个好评\n鼓励支持下啦~"
                 android:textColor="@color/black1"
                 android:textSize="13dp" />
         </LinearLayout>
@@ -52,7 +52,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="好的，这就去"
+                    android:text="鼓励一下"
                     android:textColor="@color/white"
                     android:textSize="13dp" />
             </LinearLayout>
@@ -69,7 +69,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="残忍拒绝"
+                    android:text="继续逛逛"
                     android:textColor="@color/gray999"
                     android:textSize="14dp" />
             </LinearLayout>

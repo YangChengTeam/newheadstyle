@@ -36,10 +36,11 @@ public class VideoInfoModelImp extends BaseModel implements VideoInfoModel<Video
     }
 
     @Override
-    public void getDataList(int page, IBaseRequestCallBack<VideoInfoRet> iBaseRequestCallBack) {
+    public void getDataList(int page, String uid,IBaseRequestCallBack<VideoInfoRet> iBaseRequestCallBack) {
         JSONObject params = new JSONObject();
         try {
             params.put("page", page + "");
+            params.put("user_id", uid);
         } catch (JSONException e) {
             e.printStackTrace();
         }

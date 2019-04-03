@@ -12,32 +12,28 @@ import android.text.InputFilter;
 import android.text.Spanned;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.blankj.utilcode.util.SPUtils;
 import com.blankj.utilcode.util.SizeUtils;
 import com.blankj.utilcode.util.StringUtils;
-import com.blankj.utilcode.util.ToastUtils;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
-import com.feiyou.headstyle.base.IBaseView;
 import com.feiyou.headstyle.bean.AddNoteRet;
 import com.feiyou.headstyle.bean.MessageEvent;
-import com.feiyou.headstyle.bean.ResultInfo;
 import com.feiyou.headstyle.common.Constants;
 import com.feiyou.headstyle.presenter.AddNotePresenterImp;
 import com.feiyou.headstyle.ui.adapter.AddNoteImageAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragmentActivity;
 import com.feiyou.headstyle.ui.custom.Glide4Engine;
 import com.feiyou.headstyle.ui.custom.MsgEditText;
-import com.feiyou.headstyle.utils.MyToastUtils;
 import com.feiyou.headstyle.view.AddNoteView;
+import com.jakewharton.rxbinding.view.RxView;
 import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 import com.qmuiteam.qmui.widget.QMUITopBar;
@@ -46,18 +42,19 @@ import com.zhihu.matisse.MimeType;
 
 import org.greenrobot.eventbus.EventBus;
 
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import butterknife.BindView;
 import butterknife.OnClick;
 import es.dmoral.toasty.Toasty;
+import rx.functions.Action1;
 
 /**
  * Created by myflying on 2018/11/23.
@@ -107,8 +104,6 @@ public class PushNoteActivity extends BaseFragmentActivity implements AddNoteVie
 
     AddNotePresenterImp addNotePresenterImp;
 
-    private ProgressDialog progressDialog = null;
-
     private Map<String, String> friendsMap;
 
     private StringBuffer ids;
@@ -127,6 +122,12 @@ public class PushNoteActivity extends BaseFragmentActivity implements AddNoteVie
 
     //最大输入长度
     final int maxInputLength = 500;
+
+    private int fromNoteType = 1;
+
+    private int topicDefIndex = -1;
+
+    private ProgressDialog progressDialog = null;
 
     @Override
     protected int getContextViewId() {
@@ -160,14 +161,30 @@ public class PushNoteActivity extends BaseFragmentActivity implements AddNoteVie
         InputFilter[] filters = {new NameLengthFilter(maxInputLength)};
         mInputNoteEditText.setFilters(filters);
 
-        mAddNoteBtn.setOnClickListener(new View.OnClickListener() {
+        Bundle bundle = getIntent().getExtras();
+        if (bundle != null && !StringUtils.isEmpty(bundle.getString("file_path"))) {
+            tempFilePath = bundle.getString("file_path");
+        }
+
+        if (bundle != null) {
+            topicDefIndex = bundle.getInt("topic_index", -1);
+        }
+
+        if (bundle != null) {
+            fromNoteType = bundle.getInt("from_note_type", 1);
+        }
+
+        //发布
+        RxView.clicks(mAddNoteBtn).throttleFirst(300, TimeUnit.MILLISECONDS).subscribe(new Action1<Void>() {
             @Override
-            public void onClick(View view) {
+            public void call(Void aVoid) {
                 String tempInputContent = mInputNoteEditText.getText().toString();
                 if (StringUtils.isEmpty(tempInputContent)) {
                     Toasty.normal(PushNoteActivity.this, "你还没有输入内容哦").show();
                     return;
                 }
+
+                Logger.i("send input --->" + mInputNoteEditText.getText());
 
                 List<Object> tempList = addNoteImageAdapter.getData();
                 List<String> result = new ArrayList<>();
@@ -189,9 +206,6 @@ public class PushNoteActivity extends BaseFragmentActivity implements AddNoteVie
                 }
 
                 String tempIds = setFriendIds(tempInputContent);
-                if (progressDialog != null && !progressDialog.isShowing()) {
-                    progressDialog.show();
-                }
 
                 //TODO,此方法有问题
                 Logger.i("sendContent--->" + sendContent);
@@ -199,9 +213,19 @@ public class PushNoteActivity extends BaseFragmentActivity implements AddNoteVie
             }
         });
 
-        Bundle bundle = getIntent().getExtras();
-        if (bundle != null && !StringUtils.isEmpty(bundle.getString("file_path"))) {
-            tempFilePath = bundle.getString("file_path");
+        notAddTopicDw = ContextCompat.getDrawable(this, R.mipmap.not_add_note_topic);
+        isAddTopicDw = ContextCompat.getDrawable(this, R.mipmap.is_add_topic_icon);
+
+        friendsMap = new HashMap<>();
+        ids = new StringBuffer("");
+
+        //设置默认值
+        if (topicDefIndex > -1) {
+            mTopicTv.setCompoundDrawablesWithIntrinsicBounds(isAddTopicDw, null, null, null);
+            mTopicTv.setTextColor(ContextCompat.getColor(this, R.color.tab_select_color));
+            topicSelectIndex = topicDefIndex;
+            topicId = bundle.getString("topic_id");
+            mTopicTv.setText(App.topicInfoList.get(topicDefIndex).getName());
         }
 
         List<Object> list = new ArrayList<>();
@@ -211,7 +235,7 @@ public class PushNoteActivity extends BaseFragmentActivity implements AddNoteVie
         }
         list.add(R.mipmap.add_my_photo);
 
-        addNoteImageAdapter = new AddNoteImageAdapter(this, list,1);
+        addNoteImageAdapter = new AddNoteImageAdapter(this, list, 1);
         mNoteImageListView.setLayoutManager(new GridLayoutManager(this, 3));
         mNoteImageListView.setAdapter(addNoteImageAdapter);
         addNoteImageAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
@@ -245,14 +269,9 @@ public class PushNoteActivity extends BaseFragmentActivity implements AddNoteVie
     }
 
     public void initData() {
-        notAddTopicDw = ContextCompat.getDrawable(this, R.mipmap.not_add_note_topic);
-        isAddTopicDw = ContextCompat.getDrawable(this, R.mipmap.is_add_topic_icon);
-
-        friendsMap = new HashMap<>();
-        ids = new StringBuffer("");
-
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("正在发布");
+        progressDialog.setCanceledOnTouchOutside(false);
 
         addNotePresenterImp = new AddNotePresenterImp(this, this);
     }
@@ -383,7 +402,9 @@ public class PushNoteActivity extends BaseFragmentActivity implements AddNoteVie
 
     @Override
     public void showProgress() {
-
+        if (progressDialog != null && !progressDialog.isShowing()) {
+            progressDialog.show();
+        }
     }
 
     @Override
@@ -403,11 +424,31 @@ public class PushNoteActivity extends BaseFragmentActivity implements AddNoteVie
 
         if (tData.getCode() == Constants.SUCCESS) {
             if (tData.getData() != null) {
-                MessageEvent addMessage = new MessageEvent("add_note");
-                addMessage.setAddNoteInfo(tData.getData());
-                EventBus.getDefault().post(addMessage);
+                //发帖完成，可以弹出打分
+                SPUtils.getInstance().put(Constants.IS_OPEN_SCORE, true);
+                if (fromNoteType == 1) {
+                    MessageEvent addMessage = new MessageEvent("add_note");
+                    addMessage.setAddNoteInfo(tData.getData());
+                    EventBus.getDefault().post(addMessage);
+                    finish();
+                }
+
+                if (fromNoteType == 2) {
+                    MessageEvent addMessage = new MessageEvent("add_note_type");
+                    addMessage.setTopicId(topicId);
+                    EventBus.getDefault().post(addMessage);
+                    finish();
+                }
+
+                if (fromNoteType == 3) {
+                    Intent intent = new Intent(this, Main1Activity.class);
+                    intent.putExtra("home_index", 1);
+                    startActivity(intent);
+                    //App.getApp().setTempAddNoteInfo(tData.getData());
+                    finish();
+                }
             }
-            finish();
+
         } else {
             Toasty.normal(this, StringUtils.isEmpty(tData.getMsg()) ? "发帖失败" : tData.getMsg()).show();
         }

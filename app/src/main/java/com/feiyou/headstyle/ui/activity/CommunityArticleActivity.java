@@ -112,6 +112,9 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
     @BindView(R.id.iv_user_head)
     ImageView mUserHeadImageView;
 
+    @BindView(R.id.iv_system_user)
+    ImageView mSystemUserIv;
+
     @BindView(R.id.tv_user_nick_name)
     TextView mNickNameTextView;
 
@@ -358,6 +361,9 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
 
     public static String getNewContent(String htmltext) {
         try {
+            if (!StringUtils.isEmpty(htmltext)) {
+                htmltext = htmltext.replace("\n", "<br>");
+            }
             Document doc = Jsoup.parse(htmltext);
             Elements elements = doc.getElementsByTag("img");
             for (Element element : elements) {
@@ -413,6 +419,12 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
                 options.placeholder(R.mipmap.head_def).error(R.mipmap.head_def);
                 Glide.with(this).load(currentNoteInfo.getUserimg()).apply(options).into(mUserHeadImageView);
 
+                if (currentNoteInfo.getUserId().equals("1")) {
+                    mSystemUserIv.setVisibility(View.VISIBLE);
+                } else {
+                    mSystemUserIv.setVisibility(View.GONE);
+                }
+
                 mNickNameTextView.setText(currentNoteInfo.getNickname());
                 mTopicNameTextView.setText(currentNoteInfo.getName());
                 mAddDateTextView.setText(TimeUtils.millis2String(currentNoteInfo.getAddTime() != null ? currentNoteInfo.getAddTime() * 1000 : 0));
@@ -425,7 +437,7 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
                 mWebViewLayout.addView(mWebView);
 
                 mMessageCountTextView.setText(commentNum > 0 ? commentNum + "" : "");
-                mZanCountTextView.setText(currentNoteInfo.getZanNum() + "");
+                mZanCountTextView.setText(currentNoteInfo.getZanNum() > 0 ? currentNoteInfo.getZanNum() + "" : "0");
 
                 if (currentNoteInfo.getIsZan() == 0) {
                     mZanCountTextView.setCompoundDrawablesWithIntrinsicBounds(notZan, null, null, null);

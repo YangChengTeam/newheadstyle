@@ -59,7 +59,7 @@
             android:name=".ui.activity.SplashActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
             android:screenOrientation="portrait"
-            android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+            android:theme="@style/AppTransparentTheme"
             android:windowSoftInputMode="stateHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -195,7 +195,7 @@
             android:value="57ccc92867e58e1e9e000763" />
         <meta-data
             android:name="UMENG_CHANNEL"
-            android:value="LONGPENG" />
+            android:value="qqtn" />
 
         <meta-data
             android:name="android.max_aspect"

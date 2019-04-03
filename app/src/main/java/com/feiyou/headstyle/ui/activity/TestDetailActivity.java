@@ -128,6 +128,7 @@ public class TestDetailActivity extends BaseFragmentActivity implements TestDeta
 
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("正在提交");
+        progressDialog.setCanceledOnTouchOutside(false);
 
         chatListAdapter = new TestChatListAdapter(this, null);
         mChatListView.setLayoutManager(new LinearLayoutManager(this));
@@ -160,6 +161,7 @@ public class TestDetailActivity extends BaseFragmentActivity implements TestDeta
         } else {
             mCommentLayout.setVisibility(View.GONE);
             TestMsgInfo startInfo = new TestMsgInfo("", "开始测试", TestMsgInfo.TYPE_SENT);
+            startInfo.setImgUrl(userInfo != null ? userInfo.getUserimg() : "");
             chatListAdapter.addData(startInfo);
             chatListAdapter.notifyItemInserted(chatListAdapter.getData().size() - 1);
             mChatListView.scrollToPosition(chatListAdapter.getData().size() - 1);
@@ -184,6 +186,7 @@ public class TestDetailActivity extends BaseFragmentActivity implements TestDeta
             //回复选择的答案
             TestMsgInfo answerInfo = new TestMsgInfo();
             answerInfo.setType(TestMsgInfo.TYPE_SENT);
+            answerInfo.setImgUrl(userInfo != null ? userInfo.getUserimg() : "");
             answerInfo.setContent(answerName);
             chatListAdapter.addData(answerInfo);
 
@@ -210,6 +213,7 @@ public class TestDetailActivity extends BaseFragmentActivity implements TestDeta
             //回复选择的答案
             TestMsgInfo answerInfo = new TestMsgInfo();
             answerInfo.setType(TestMsgInfo.TYPE_SENT);
+            answerInfo.setImgUrl(userInfo != null ? userInfo.getUserimg() : "");
             answerInfo.setContent(answerName);
             chatListAdapter.addData(answerInfo);
 

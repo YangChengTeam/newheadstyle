@@ -10,6 +10,10 @@ public class MessageEvent {
 
     private NoteInfo addNoteInfo;
 
+    private String topicId;
+
+    private int pageIndex;
+
     public String getFriendIds() {
         return friendIds;
     }
@@ -44,5 +48,21 @@ public class MessageEvent {
 
     public void setAddNoteInfo(NoteInfo addNoteInfo) {
         this.addNoteInfo = addNoteInfo;
+    }
+
+    public String getTopicId() {
+        return topicId;
+    }
+
+    public void setTopicId(String topicId) {
+        this.topicId = topicId;
+    }
+
+    public int getPageIndex() {
+        return pageIndex;
+    }
+
+    public void setPageIndex(int pageIndex) {
+        this.pageIndex = pageIndex;
     }
 }

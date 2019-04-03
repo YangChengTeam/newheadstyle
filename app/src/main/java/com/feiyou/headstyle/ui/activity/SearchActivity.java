@@ -191,7 +191,7 @@ public class SearchActivity extends BaseFragmentActivity implements HotWordDataV
     }
 
     @Override
-    protected void onResume() {
+    public void onResume() {
         super.onResume();
 
         String tempHistory = SPUtils.getInstance().getString(Constants.SEARCH_HISTORY);
@@ -317,15 +317,18 @@ public class SearchActivity extends BaseFragmentActivity implements HotWordDataV
                 }
             }
         } else {
-            mHotLayout.setVisibility(View.GONE);
-            mResultLayout.setVisibility(View.GONE);
-            mNoDataLayout.setVisibility(View.VISIBLE);
+            headInfoAdapter.loadMoreEnd(true);
+            if (currentPage == 1) {
+                mHotLayout.setVisibility(View.GONE);
+                mResultLayout.setVisibility(View.GONE);
+                mNoDataLayout.setVisibility(View.VISIBLE);
+            }
         }
     }
 
     @Override
     public void loadDataError(Throwable throwable) {
-
+        headInfoAdapter.loadMoreEnd(true);
     }
 
     @Override

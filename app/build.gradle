@@ -8,8 +8,8 @@ android {
         applicationId "com.feiyou.headstyle"
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode 48
-        versionName "4.0"
+        versionCode 50
+        versionName "4.0.2"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         ndk {
             abiFilters "armeabi-v7a"
@@ -116,4 +116,8 @@ dependencies {
     implementation 'me.yuqirong:cardswipelayout:1.0.0'
     implementation 'cn.jzvd:jiaozivideoplayer:7.0_preview'
     implementation files('libs/GDTUnionSDK.4.24.894.min.jar')
+
+    implementation 'com.jakewharton.rxbinding:rxbinding:+'
+    implementation 'com.jakewharton.rxbinding:rxbinding-appcompat-v7:+'
+    implementation 'com.jakewharton.rxbinding:rxbinding-design:+'
 }

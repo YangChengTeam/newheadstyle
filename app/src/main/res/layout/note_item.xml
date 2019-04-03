@@ -27,18 +27,33 @@
             android:layout_width="match_parent"
             android:layout_height="50dp">
 
-            <ImageView
-                android:id="@+id/iv_user_head"
+            <FrameLayout
+                android:id="@+id/layout_head"
                 android:layout_width="36dp"
                 android:layout_height="36dp"
-                android:layout_centerVertical="true" />
+                android:layout_centerVertical="true">
+
+                <ImageView
+                    android:id="@+id/iv_user_head"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:src="@mipmap/head_def"/>
+
+                <ImageView
+                    android:id="@+id/iv_system_user"
+                    android:layout_width="12dp"
+                    android:layout_height="12dp"
+                    android:layout_gravity="right|bottom"
+                    android:visibility="gone"
+                    android:src="@mipmap/system_user_icon" />
+            </FrameLayout>
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_centerVertical="true"
                 android:layout_marginLeft="12dp"
-                android:layout_toRightOf="@+id/iv_user_head"
+                android:layout_toRightOf="@+id/layout_head"
                 android:gravity="left|center"
                 android:orientation="vertical">
 

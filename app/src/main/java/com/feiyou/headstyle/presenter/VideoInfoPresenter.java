@@ -5,5 +5,5 @@ package com.feiyou.headstyle.presenter;
  */
 
 public interface VideoInfoPresenter {
-    void getDataList(int page);
+    void getDataList(int page,String uid);
 }

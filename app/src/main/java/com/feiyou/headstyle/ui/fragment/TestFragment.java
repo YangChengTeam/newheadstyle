@@ -165,7 +165,7 @@ public class TestFragment extends BaseFragment implements TestInfoView, View.OnC
 
                 if (position == 1) {
                     openDialog.setTitle("打开提示");
-                    openDialog.setContent("即将打开\"gif在线制作\"小程序");
+                    openDialog.setContent("即将打开\"头像达人\"小程序");
                     openDialog.show();
                 }
             }
@@ -300,7 +300,7 @@ public class TestFragment extends BaseFragment implements TestInfoView, View.OnC
         String appId = "wxd1112ca9a216aeda"; // 填应用AppId
         IWXAPI api = WXAPIFactory.createWXAPI(getActivity(), appId);
         WXLaunchMiniProgram.Req req = new WXLaunchMiniProgram.Req();
-        req.userName = "gh_066fa13db09f"; // 填小程序原始idx
+        req.userName = "gh_c7bbf594c99b\n"; // 填小程序原始idx
         req.miniprogramType = WXLaunchMiniProgram.Req.MINIPTOGRAM_TYPE_RELEASE;// 可选打开 开发版，体验版和正式版
         api.sendReq(req);
     }

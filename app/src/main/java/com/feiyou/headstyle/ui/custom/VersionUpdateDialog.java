@@ -2,6 +2,7 @@ package com.feiyou.headstyle.ui.custom;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -21,9 +22,27 @@ public class VersionUpdateDialog extends Dialog implements View.OnClickListener 
 
     Button mUpdateVersionBtn;
 
+    LinearLayout closeLayout;
+
     ImageView mCloseImageView;
 
-    private UpdateListener listener;
+    private String versionCode;
+
+    private String versionContent;
+
+    private int isForceUpdate;//0:不强制，1：强制
+
+    public interface UpdateListener {
+        void update();
+
+        void updateCancel();
+    }
+
+    public UpdateListener updateListener;
+
+    public void setUpdateListener(UpdateListener updateListener) {
+        this.updateListener = updateListener;
+    }
 
     public VersionUpdateDialog(Context context) {
         super(context);
@@ -35,10 +54,16 @@ public class VersionUpdateDialog extends Dialog implements View.OnClickListener 
         this.mContext = context;
     }
 
-    public VersionUpdateDialog(Context context, int themeResId, UpdateListener listener) {
-        super(context, themeResId);
-        this.mContext = context;
-        this.listener = listener;
+    public void setVersionCode(String versionCode) {
+        this.versionCode = versionCode;
+    }
+
+    public void setIsForceUpdate(int isForceUpdate) {
+        this.isForceUpdate = isForceUpdate;
+    }
+
+    public void setVersionContent(String versionContent) {
+        this.versionContent = versionContent;
     }
 
     @Override
@@ -54,31 +79,33 @@ public class VersionUpdateDialog extends Dialog implements View.OnClickListener 
         mContentTv = findViewById(R.id.tv_content);
         mUpdateVersionBtn = findViewById(R.id.btn_update_version);
         mCloseImageView = findViewById(R.id.iv_close);
+        closeLayout = findViewById(R.id.layout_close);
 
-        mVersionCodeTv.setOnClickListener(this);
-        mContentTv.setOnClickListener(this);
+        mVersionCodeTv.setText(versionCode);
+        mContentTv.setText(versionContent);
+
         mUpdateVersionBtn.setOnClickListener(this);
         mCloseImageView.setOnClickListener(this);
-
-        setCanceledOnTouchOutside(true);
+        closeLayout.setVisibility(isForceUpdate == 1 ? View.GONE : View.VISIBLE);
+        setCanceledOnTouchOutside(isForceUpdate == 1 ? false : true);
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_update_version:
-                if (listener != null) {
-                    listener.update(this);
-                }
+                updateListener.update();
                 this.dismiss();
                 break;
             case R.id.iv_close:
+                updateListener.updateCancel();
                 this.dismiss();
                 break;
         }
     }
 
-    public interface UpdateListener {
-        void update(Dialog dialog);
+    @Override
+    public void setOnKeyListener(DialogInterface.OnKeyListener onKeyListener) {
+        super.setOnKeyListener(onKeyListener);
     }
 }

@@ -34,6 +34,8 @@ import org.greenrobot.eventbus.EventBus;
 
 import java.util.Map;
 
+import es.dmoral.toasty.Toasty;
+
 public class LoginDialog extends Dialog implements View.OnClickListener, UserInfoView {
 
     private Context mContext;
@@ -139,6 +141,9 @@ public class LoginDialog extends Dialog implements View.OnClickListener, UserInf
         } else {
             //ToastUtils.showLong(StringUtils.isEmpty(tData.getMsg()) ? "登录失败" : tData.getMsg());
             Logger.i(StringUtils.isEmpty(tData.getMsg()) ? "登录失败" : tData.getMsg());
+            if (progressDialog != null && progressDialog.isShowing()) {
+                progressDialog.dismiss();
+            }
         }
     }
 
@@ -194,7 +199,11 @@ public class LoginDialog extends Dialog implements View.OnClickListener, UserInf
          */
         @Override
         public void onError(SHARE_MEDIA platform, int action, Throwable t) {
-            Toast.makeText(mContext, "授权失败：" + t.getMessage(), Toast.LENGTH_LONG).show();
+            //Toast.makeText(mContext, "授权失败：" + t.getMessage(), Toast.LENGTH_LONG).show();
+            Toasty.normal(mContext, "授权失败").show();
+            if (progressDialog != null && progressDialog.isShowing()) {
+                progressDialog.dismiss();
+            }
         }
 
         /**
@@ -204,7 +213,10 @@ public class LoginDialog extends Dialog implements View.OnClickListener, UserInf
          */
         @Override
         public void onCancel(SHARE_MEDIA platform, int action) {
-            Toast.makeText(mContext, "授权取消了", Toast.LENGTH_LONG).show();
+            Toasty.normal(mContext, "授权取消").show();
+            if (progressDialog != null && progressDialog.isShowing()) {
+                progressDialog.dismiss();
+            }
         }
     };
 

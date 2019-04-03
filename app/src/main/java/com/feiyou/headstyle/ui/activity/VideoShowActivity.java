@@ -89,6 +89,8 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.OnClick;
+import cn.jzvd.Jzvd;
+import cn.jzvd.JzvdStd;
 import es.dmoral.toasty.Toasty;
 
 /**
@@ -276,12 +278,12 @@ public class VideoShowActivity extends BaseFragmentActivity implements VideoInfo
         addZanPresenterImp = new AddZanPresenterImp(this, this);
         followInfoPresenterImp = new FollowInfoPresenterImp(this, this);
 
-        videoInfoPresenterImp.getDataList(videoPage);
+        videoInfoPresenterImp.getDataList(videoPage,userInfo != null ? userInfo.getId() : "");
         mVideoAdapter.setOnLoadMoreListener(new BaseQuickAdapter.RequestLoadMoreListener() {
             @Override
             public void onLoadMoreRequested() {
                 videoPage++;
-                videoInfoPresenterImp.getDataList(videoPage);
+                videoInfoPresenterImp.getDataList(videoPage,userInfo != null ? userInfo.getId() : "");
             }
         }, mVideoListView);
 
@@ -809,7 +811,25 @@ public class VideoShowActivity extends BaseFragmentActivity implements VideoInfo
 
     @Override
     public void onBackPressed() {
+        if (Jzvd.backPress()) {
+            return;
+        }
         popBackStack();
+    }
+
+//    @Override
+//    public void onBackPressed() {
+//        if (Jzvd.backPress()) {
+//            return;
+//        }
+//        super.onBackPressed();
+//    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        Jzvd.resetAllVideos();
+        JzvdStd.resetAllVideos();
     }
 
     @Override
@@ -866,6 +886,7 @@ public class VideoShowActivity extends BaseFragmentActivity implements VideoInfo
     protected void onDestroy() {
         super.onDestroy();
         EventBus.getDefault().unregister(this);
+        JzvdStd.resetAllVideos();
     }
 
 

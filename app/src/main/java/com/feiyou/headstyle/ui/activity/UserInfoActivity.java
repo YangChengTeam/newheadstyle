@@ -23,6 +23,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -44,12 +45,16 @@ import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.GlideApp;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.bean.CollectInfoRet;
+import com.feiyou.headstyle.bean.NoteInfo;
 import com.feiyou.headstyle.bean.NoteInfoRet;
+import com.feiyou.headstyle.bean.PhotoInfo;
 import com.feiyou.headstyle.bean.ResultInfo;
 import com.feiyou.headstyle.bean.UpdateHeadRet;
 import com.feiyou.headstyle.bean.UserInfo;
 import com.feiyou.headstyle.bean.UserInfoRet;
+import com.feiyou.headstyle.bean.ZanResultRet;
 import com.feiyou.headstyle.common.Constants;
+import com.feiyou.headstyle.presenter.AddZanPresenterImp;
 import com.feiyou.headstyle.presenter.CollectDataPresenterImp;
 import com.feiyou.headstyle.presenter.DeleteNotePresenterImp;
 import com.feiyou.headstyle.presenter.NoteDataPresenterImp;
@@ -70,6 +75,12 @@ import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 import com.qmuiteam.qmui.widget.QMUICollapsingTopBarLayout;
 import com.qmuiteam.qmui.widget.QMUITopBar;
+import com.umeng.socialize.ShareAction;
+import com.umeng.socialize.UMShareAPI;
+import com.umeng.socialize.UMShareListener;
+import com.umeng.socialize.bean.SHARE_MEDIA;
+import com.umeng.socialize.media.UMImage;
+import com.umeng.socialize.media.UMWeb;
 import com.wang.avi.AVLoadingIndicatorView;
 import com.zhihu.matisse.Matisse;
 import com.zhihu.matisse.MimeType;
@@ -159,10 +170,6 @@ public class UserInfoActivity extends BaseFragmentActivity implements UserInfoVi
 
     NoteInfoAdapter noteInfoAdapter;
 
-    private int currentPage = 1;
-
-    private int pageSize = 20;
-
     BottomSheetDialog bottomSheetDialog;
 
     CommonImageAdapter commonImageAdapter;
@@ -211,6 +218,14 @@ public class UserInfoActivity extends BaseFragmentActivity implements UserInfoVi
 
     private int currentItemPos = -1;
 
+    private AddZanPresenterImp addZanPresenterImp;
+
+    BottomSheetDialog shareDialog;
+
+    private ShareAction shareAction;
+
+    private ArrayList<String> lastPhoneList;
+
     @Override
     protected int getContextViewId() {
         return R.layout.activity_user_info;
@@ -251,9 +266,20 @@ public class UserInfoActivity extends BaseFragmentActivity implements UserInfoVi
     }
 
     public void initData() {
+        userInfo = App.getApp().getmUserInfo();
+        lastPhoneList = new ArrayList<>();
+
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
             isMyInfo = bundle.getBoolean("is_my_info", false);
+        }
+
+        if (bundle != null && !StringUtils.isEmpty(bundle.getString("user_id"))) {
+            userId = bundle.getString("user_id");
+        }
+
+        if (userInfo != null && userInfo.getId().equals(userId)) {
+            isMyInfo = true;
         }
 
         progressDialog = new ProgressDialog(this);
@@ -263,7 +289,7 @@ public class UserInfoActivity extends BaseFragmentActivity implements UserInfoVi
         configDialog.setConfigListener(this);
 
         //设置白色边框的图片
-        options = new RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL);
+        options = new RequestOptions().skipMemoryCache(true);
         options.placeholder(R.mipmap.head_def);
         options.transform(new GlideCircleTransformWithBorder(this, 2, ContextCompat.getColor(this, R.color.white)));
 
@@ -272,7 +298,7 @@ public class UserInfoActivity extends BaseFragmentActivity implements UserInfoVi
         mPhotoListView.setAdapter(commonImageAdapter);
 
         if (isMyInfo) {
-            userInfo = App.getApp().getmUserInfo();
+
             userId = userInfo.getId();
 
             Glide.with(this).load(userInfo.getUserimg()).apply(options).into(mUserHeadIv);
@@ -292,8 +318,12 @@ public class UserInfoActivity extends BaseFragmentActivity implements UserInfoVi
                 mPhotoLayout.setVisibility(View.VISIBLE);
                 String[] tempPhotos = userInfo.getImageWall();
                 photoList = new ArrayList<>();
+                if (lastPhoneList != null && lastPhoneList.size() > 0) {
+                    lastPhoneList.clear();
+                }
                 for (int i = 0; i < tempPhotos.length; i++) {
                     photoList.add(tempPhotos[i]);
+                    lastPhoneList.add(tempPhotos[i]);
                 }
                 if (photoList.size() > 4) {
                     photoList = photoList.subList(0, 4);
@@ -309,9 +339,29 @@ public class UserInfoActivity extends BaseFragmentActivity implements UserInfoVi
             }
         }
 
+        if (shareAction == null) {
+            shareAction = new ShareAction(this);
+            shareAction.setCallback(shareListener);//回调监听器
+        }
+
+        shareDialog = new BottomSheetDialog(this);
+        View shareView = LayoutInflater.from(this).inflate(R.layout.share_dialog_view, null);
+        ImageView mCloseImageView = shareView.findViewById(R.id.iv_close_share);
+        LinearLayout weixinLayout = shareView.findViewById(R.id.layout_weixin);
+        LinearLayout circleLayout = shareView.findViewById(R.id.layout_circle);
+        LinearLayout qqLayout = shareView.findViewById(R.id.layout_qq_friends);
+        LinearLayout qzoneLayout = shareView.findViewById(R.id.layout_qzone);
+        weixinLayout.setOnClickListener(this);
+        circleLayout.setOnClickListener(this);
+        qqLayout.setOnClickListener(this);
+        qzoneLayout.setOnClickListener(this);
+        mCloseImageView.setOnClickListener(this);
+        shareDialog.setContentView(shareView);
+
         userInfoPresenterImp = new UserInfoPresenterImp(this, this);
         updateHeadPresenterImp = new UpdateHeadPresenterImp(this, this);
         deleteNotePresenterImp = new DeleteNotePresenterImp(this, this);
+        addZanPresenterImp = new AddZanPresenterImp(this, this);
 
         mGuanFenLayout.setVisibility(isMyInfo ? View.INVISIBLE : View.VISIBLE);
 
@@ -343,6 +393,8 @@ public class UserInfoActivity extends BaseFragmentActivity implements UserInfoVi
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
                 Intent intent = new Intent(UserInfoActivity.this, PhotoWallActivity.class);
+                intent.putStringArrayListExtra("user_image_list", lastPhoneList);
+                intent.putExtra("is_my_info", isMyInfo);
                 startActivity(intent);
             }
         });
@@ -355,25 +407,30 @@ public class UserInfoActivity extends BaseFragmentActivity implements UserInfoVi
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
                 Intent intent = new Intent(UserInfoActivity.this, CommunityArticleActivity.class);
+                intent.putExtra("msg_id", noteInfoAdapter.getData().get(position).getId());
                 startActivity(intent);
             }
         });
 
-        noteInfoAdapter.setOnLoadMoreListener(new BaseQuickAdapter.RequestLoadMoreListener() {
-            @Override
-            public void onLoadMoreRequested() {
-                currentPage++;
-                userInfoPresenterImp.getUserInfo(App.getApp().getmUserInfo().getId(), userId);
-            }
-        }, mNoteListView);
-
         noteInfoAdapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
             @Override
             public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
+                currentItemPos = position;
                 if (view.getId() == R.id.layout_operation) {
-                    currentItemPos = position;
                     if (bottomSheetDialog != null && !bottomSheetDialog.isShowing()) {
                         bottomSheetDialog.show();
+                    }
+                }
+
+                if (view.getId() == R.id.layout_item_zan) {
+                    String messageId = noteInfoAdapter.getData().get(position).getId();
+                    addZanPresenterImp.addZan(1, App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", noteInfoAdapter.getData().get(position).getUserId(), messageId, "", "", 1);
+                }
+
+                //分享
+                if (view.getId() == R.id.layout_note_share) {
+                    if (shareDialog != null && !shareDialog.isShowing()) {
+                        shareDialog.show();
                     }
                 }
             }
@@ -416,7 +473,16 @@ public class UserInfoActivity extends BaseFragmentActivity implements UserInfoVi
     @OnClick(R.id.layout_photos)
     void photoWall() {
         Intent intent = new Intent(UserInfoActivity.this, PhotoWallActivity.class);
+        intent.putStringArrayListExtra("user_image_list", lastPhoneList);
+        intent.putExtra("is_my_info", isMyInfo);
         startActivity(intent);
+    }
+
+    @OnClick(R.id.tv_send_note)
+    void sendNote() {
+        Intent intent = new Intent(this, PushNoteActivity.class);
+        startActivity(intent);
+        finish();
     }
 
     @Override
@@ -442,8 +508,8 @@ public class UserInfoActivity extends BaseFragmentActivity implements UserInfoVi
 
                 Glide.with(this).load(userInfo.getUserimg()).apply(options).into(mUserHeadIv);
 
-                mFollowCountTv.setText(userInfo.getGuanNum() + "");
-                mFansCountTv.setText(userInfo.getFenNum() + "");
+                mFollowCountTv.setText(userInfo.getFollowNum() + "");
+                mFansCountTv.setText(userInfo.getFollowerNum() + "");
                 mNickNameTv.setText(StringUtils.isEmpty(userInfo.getNickname()) ? "" : userInfo.getNickname());
                 mUserIdTv.setText(StringUtils.isEmpty(userInfo.getId()) ? "" : userInfo.getId() + "");
                 mUserAgeTv.setText(userInfo.getAge() + "岁");
@@ -455,6 +521,20 @@ public class UserInfoActivity extends BaseFragmentActivity implements UserInfoVi
 
                 if (userInfo.getImageWall() != null && userInfo.getImageWall().length > 0) {
                     mPhotoLayout.setVisibility(View.VISIBLE);
+                    if (lastPhoneList != null && lastPhoneList.size() > 0) {
+                        lastPhoneList.clear();
+                    }
+                    String[] tempPhotos = userInfo.getImageWall();
+                    photoList = new ArrayList<>();
+                    for (int i = 0; i < tempPhotos.length; i++) {
+                        photoList.add(tempPhotos[i]);
+                        lastPhoneList.add(tempPhotos[i]);
+                    }
+                    if (photoList.size() > 4) {
+                        photoList = photoList.subList(0, 4);
+                    }
+                    //TODO
+                    commonImageAdapter.setNewData(photoList);
                 } else {
                     mPhotoLayout.setVisibility(View.GONE);
                 }
@@ -462,17 +542,8 @@ public class UserInfoActivity extends BaseFragmentActivity implements UserInfoVi
                 if (userInfo.getNoteList() != null && userInfo.getNoteList().size() > 0) {
                     mNoDataLayout.setVisibility(View.GONE);
                     mNoteListView.setVisibility(View.VISIBLE);
-                    if (currentPage == 1) {
-                        noteInfoAdapter.setNewData(userInfo.getNoteList());
-                    } else {
-                        noteInfoAdapter.addData(userInfo.getNoteList());
-                    }
 
-                    if (userInfo.getNoteList().size() == pageSize) {
-                        noteInfoAdapter.loadMoreComplete();
-                    } else {
-                        noteInfoAdapter.loadMoreEnd(true);
-                    }
+                    noteInfoAdapter.setNewData(userInfo.getNoteList());
                 } else {
                     mNoDataLayout.setVisibility(View.VISIBLE);
                     mNoteListView.setVisibility(View.GONE);
@@ -514,9 +585,21 @@ public class UserInfoActivity extends BaseFragmentActivity implements UserInfoVi
 
             if (isMakeDelete) {
                 ToastUtils.showLong("删除成功");
-                currentPage = 1;
                 isMakeDelete = false;
                 userInfoPresenterImp.getUserInfo(App.getApp().getmUserInfo().getId(), userId);
+            }
+
+            if (tData instanceof ZanResultRet) {
+                int tempNum = noteInfoAdapter.getData().get(currentItemPos).getZanNum();
+                if (((ZanResultRet) tData).getData().getIsZan() == 0) {
+                    tempNum = tempNum - 1;
+                } else {
+                    tempNum = tempNum + 1;
+                }
+
+                noteInfoAdapter.getData().get(currentItemPos).setZanNum(tempNum);
+                noteInfoAdapter.getData().get(currentItemPos).setIsZan(((ZanResultRet) tData).getData().getIsZan());
+                noteInfoAdapter.notifyDataSetChanged();
             }
         } else {
             ToastUtils.showLong(StringUtils.isEmpty(tData.getMsg()) ? "操作错误" : tData.getMsg());
@@ -567,7 +650,7 @@ public class UserInfoActivity extends BaseFragmentActivity implements UserInfoVi
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
+        UMShareAPI.get(this).onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK) {
             switch (requestCode) {
                 case TAKE_BIG_PICTURE:
@@ -575,14 +658,14 @@ public class UserInfoActivity extends BaseFragmentActivity implements UserInfoVi
                         ToastUtils.showLong("数据异常，请重试");
                         break;
                     }
-                    cropImageUri(imageUri, 1080, 390, CROP_SMALL_PICTURE);
+                    cropImageUri(imageUri, 1080, 549, CROP_SMALL_PICTURE);
                     break;
                 case REQUEST_CODE_CHOOSE:
                     Logger.i(JSONObject.toJSONString(Matisse.obtainPathResult(data)));
                     if (Matisse.obtainResult(data) != null && Matisse.obtainResult(data).size() > 0) {
                         outputImage = new File(PathUtils.getExternalAppPicturesPath(), TimeUtils.getNowMills() + ".png");
                         imageUri = Uri.fromFile(outputImage);
-                        cropImageUri(Matisse.obtainResult(data).get(0), 1080, 390, CROP_SMALL_PICTURE);
+                        cropImageUri(Matisse.obtainResult(data).get(0), 1080, 549, CROP_SMALL_PICTURE);
                     }
                     break;
                 case CROP_SMALL_PICTURE:
@@ -609,8 +692,8 @@ public class UserInfoActivity extends BaseFragmentActivity implements UserInfoVi
         //是否裁剪
         intent.putExtra("crop", "true");
         //设置xy的裁剪比例
-        intent.putExtra("aspectX", 36);
-        intent.putExtra("aspectY", 13);
+        intent.putExtra("aspectX", 120);
+        intent.putExtra("aspectY", 61);
         //设置输出的宽高
         intent.putExtra("outputX", outputX);
         intent.putExtra("outputY", outputY);
@@ -632,12 +715,34 @@ public class UserInfoActivity extends BaseFragmentActivity implements UserInfoVi
     @Override
     public void onClick(View view) {
 
+        if (shareDialog != null && shareDialog.isShowing()) {
+            shareDialog.dismiss();
+        }
+
         if (updateBgDialog != null && updateBgDialog.isShowing()) {
             updateBgDialog.dismiss();
         }
 
         if (updateHeadBottomSheetDialog != null && updateHeadBottomSheetDialog.isShowing()) {
             updateHeadBottomSheetDialog.dismiss();
+        }
+
+        String shareContent = "快来试试炫酷的头像吧";
+        UMImage image = new UMImage(this, R.drawable.app_share);
+        if (currentItemPos > -1 && noteInfoAdapter.getData() != null) {
+            NoteInfo tempNoteInfo = noteInfoAdapter.getData().get(currentItemPos);
+            shareContent = StringUtils.isEmpty(tempNoteInfo.getContent()) ? "快来试试炫酷的头像吧" : tempNoteInfo.getContent();
+            if (tempNoteInfo.getImageArr() != null && tempNoteInfo.getImageArr().length > 0) {
+                image = new UMImage(this, tempNoteInfo.getImageArr()[0]);
+                image.compressStyle = UMImage.CompressStyle.QUALITY;
+            }
+        }
+
+        UMWeb web = new UMWeb("http://gx.qqtn.com");
+        if (shareAction != null) {
+            web.setTitle(shareContent);//标题
+            web.setThumb(image);  //缩略图
+            web.setDescription(shareContent);//描述
         }
 
         switch (view.getId()) {
@@ -684,7 +789,22 @@ public class UserInfoActivity extends BaseFragmentActivity implements UserInfoVi
                 if (configDialog != null && !configDialog.isShowing()) {
                     configDialog.show();
                 }
+                break;
 
+            case R.id.iv_close_share:
+                dismissShareView();
+                break;
+            case R.id.layout_weixin:
+                shareAction.withMedia(web).setPlatform(SHARE_MEDIA.WEIXIN).share();
+                break;
+            case R.id.layout_circle:
+                shareAction.withMedia(web).setPlatform(SHARE_MEDIA.WEIXIN_CIRCLE).share();
+                break;
+            case R.id.layout_qq:
+                shareAction.withMedia(web).setPlatform(SHARE_MEDIA.QQ).share();
+                break;
+            case R.id.layout_qzone:
+                shareAction.withMedia(web).setPlatform(SHARE_MEDIA.QZONE).share();
                 break;
             default:
                 break;
@@ -701,6 +821,58 @@ public class UserInfoActivity extends BaseFragmentActivity implements UserInfoVi
     public void cancel() {
         if (configDialog != null && configDialog.isShowing()) {
             configDialog.dismiss();
+        }
+    }
+
+    private UMShareListener shareListener = new UMShareListener() {
+        /**
+         * @descrption 分享开始的回调
+         * @param platform 平台类型
+         */
+        @Override
+        public void onStart(SHARE_MEDIA platform) {
+
+        }
+
+        /**
+         * @descrption 分享成功的回调
+         * @param platform 平台类型
+         */
+        @Override
+        public void onResult(SHARE_MEDIA platform) {
+            dismissShareView();
+            Toast.makeText(UserInfoActivity.this, "分享成功", Toast.LENGTH_LONG).show();
+        }
+
+        /**
+         * @descrption 分享失败的回调
+         * @param platform 平台类型
+         * @param t 错误原因
+         */
+        @Override
+        public void onError(SHARE_MEDIA platform, Throwable t) {
+            dismissShareView();
+            Toast.makeText(UserInfoActivity.this, "分享失败", Toast.LENGTH_LONG).show();
+        }
+
+        /**
+         * @descrption 分享取消的回调
+         * @param platform 平台类型
+         */
+        @Override
+        public void onCancel(SHARE_MEDIA platform) {
+            dismissShareView();
+            Toast.makeText(UserInfoActivity.this, "取消分享", Toast.LENGTH_LONG).show();
+        }
+    };
+
+
+    /**
+     * 关闭分享窗口
+     */
+    public void dismissShareView() {
+        if (bottomSheetDialog != null && bottomSheetDialog.isShowing()) {
+            bottomSheetDialog.dismiss();
         }
     }
 }

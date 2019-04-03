@@ -156,8 +156,10 @@ public class MyAtMessageFragment extends BaseFragment implements MyAtMessageView
                 myAtMessageAdapter.loadMoreEnd(true);
             }
         } else {
-            noDataLayout.setVisibility(View.VISIBLE);
-            mAtMessageListView.setVisibility(View.GONE);
+            if (currentPage == 1) {
+                noDataLayout.setVisibility(View.VISIBLE);
+                mAtMessageListView.setVisibility(View.GONE);
+            }
         }
     }
 

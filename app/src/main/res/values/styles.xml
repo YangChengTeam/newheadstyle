@@ -26,6 +26,13 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
+    <style name="AppTransparentTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowFullscreen">true</item>
+    </style>
+
     <style name="transparentText" parent="TextAppearance.AppCompat.Small">
         <item name="android:textColor">#00000000</item>
     </style>
@@ -61,13 +68,13 @@
     </style>
 
     <!--<style name="AppBottomSheetDialogTheme"-->
-        <!--parent="Theme.Design.Light.BottomSheetDialog">-->
-        <!--<item name="bottomSheetStyle">@style/AppModalStyle</item>-->
+    <!--parent="Theme.Design.Light.BottomSheetDialog">-->
+    <!--<item name="bottomSheetStyle">@style/AppModalStyle</item>-->
     <!--</style>-->
 
     <!--<style name="AppModalStyle"-->
-        <!--parent="Widget.Design.BottomSheet.Modal">-->
-        <!--<item name="behavior_peekHeight">@dimen/custom_peek_height</item>-->
+    <!--parent="Widget.Design.BottomSheet.Modal">-->
+    <!--<item name="behavior_peekHeight">@dimen/custom_peek_height</item>-->
     <!--</style>-->
     <!-- 自定义控件风格-->
 

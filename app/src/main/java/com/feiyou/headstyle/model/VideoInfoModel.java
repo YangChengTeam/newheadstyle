@@ -7,5 +7,5 @@ import com.feiyou.headstyle.base.IBaseRequestCallBack;
  */
 
 public interface VideoInfoModel<T> {
-    void getDataList(int page, IBaseRequestCallBack<T> iBaseRequestCallBack);
+    void getDataList(int page, String uid,IBaseRequestCallBack<T> iBaseRequestCallBack);
 }

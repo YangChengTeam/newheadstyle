@@ -18,6 +18,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.blankj.utilcode.util.AppUtils;
 import com.blankj.utilcode.util.BarUtils;
 import com.blankj.utilcode.util.NetworkUtils;
 import com.blankj.utilcode.util.PathUtils;
@@ -39,6 +40,7 @@ import com.feiyou.headstyle.bean.ResultInfo;
 import com.feiyou.headstyle.common.Constants;
 import com.feiyou.headstyle.common.GlideImageLoader;
 import com.feiyou.headstyle.presenter.HomeDataPresenterImp;
+import com.feiyou.headstyle.presenter.RecordInfoPresenterImp;
 import com.feiyou.headstyle.ui.activity.AdListActivity;
 import com.feiyou.headstyle.ui.activity.Collection2Activity;
 import com.feiyou.headstyle.ui.activity.CommunityArticleActivity;
@@ -125,6 +127,8 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
     private int searchLayoutTop;
 
     private HomeDataPresenterImp homeDataPresenterImp;
+
+    private RecordInfoPresenterImp recordInfoPresenterImp;
 
     private int randomPage = -1;
 
@@ -214,6 +218,7 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
         openDialog = new OpenDialog(getActivity(), R.style.login_dialog);
         openDialog.setConfigListener(this);
 
+        recordInfoPresenterImp = new RecordInfoPresenterImp(this, getActivity());
         //广告模块
         LinearLayout adLayout = topView.findViewById(R.id.layout_ad);
         adLayout.setOnClickListener(new View.OnClickListener() {
@@ -222,6 +227,7 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
                 clickType = 2;
                 switch (adInfo.getType()) {
                     case 1:
+                        addRecord();
                         Intent intent = new Intent(getActivity(), AdListActivity.class);
                         intent.putExtra("open_url", adInfo.getJumpPath());
                         startActivity(intent);
@@ -234,7 +240,7 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
                                 openDialog.setTitle("温馨提示");
                                 openDialog.setContent("当前是移动网络，是否继续下载？");
                             } else {
-                                openDialog.setTitle("下载提示");
+                                openDialog.setTitle("打开提示");
                                 openDialog.setContent("即将下载" + adInfo.getName());
                             }
                             openDialog.show();
@@ -469,6 +475,15 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
                             mAdLayout.setVisibility(View.GONE);
                         }
 
+                        if (homeDataRet.getBannerList() != null && homeDataRet.getBannerList().size() > 0) {
+                            bannerInfos = homeDataRet.getBannerList();
+                            List<String> urls = new ArrayList<>();
+                            for (int i = 0; i < bannerInfos.size(); i++) {
+                                urls.add(bannerInfos.get(i).getIco());
+                            }
+                            //设置图片加载器
+                            mBanner.setImageLoader(new GlideImageLoader()).setImages(urls).start();
+                        }
                     }
 
                     if (SPUtils.getInstance().getInt(Constants.TOTAL_COUNT, 0) > 0) {
@@ -477,16 +492,6 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
                         }
                     }
                     SPUtils.getInstance().put(Constants.TOTAL_COUNT, homeDataRet.getMyTotalNum());
-
-                    if (homeDataRet.getBannerList() != null && homeDataRet.getBannerList().size() > 0) {
-                        bannerInfos = homeDataRet.getBannerList();
-                        List<String> urls = new ArrayList<>();
-                        for (int i = 0; i < bannerInfos.size(); i++) {
-                            urls.add(bannerInfos.get(i).getIco());
-                        }
-                        //设置图片加载器
-                        mBanner.setImageLoader(new GlideImageLoader()).setImages(urls).start();
-                    }
 
                     if (homeDataRet.getImagesList() != null && homeDataRet.getImagesList().size() > 0) {
                         if (isFirstLoad || isChange.equals("1")) {
@@ -510,8 +515,10 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
                 }
             }
         } else {
-            mNoDataLayout.setVisibility(View.VISIBLE);
-            mHeadInfoListView.setVisibility(View.GONE);
+            if (currentPage == 1) {
+                mNoDataLayout.setVisibility(View.VISIBLE);
+                mHeadInfoListView.setVisibility(View.GONE);
+            }
         }
     }
 
@@ -530,12 +537,15 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
         }
     }
 
+    public void addRecord() {
+        recordInfoPresenterImp.adClickInfo(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", adInfo.getId());
+    }
+
     @Override
     public void loadDataError(Throwable throwable) {
         avi.hide();
         mRefreshLayout.setRefreshing(false);
     }
-
 
     @Override
     public void onRefresh() {
@@ -544,6 +554,8 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
 
     @Override
     public void config() {
+        addRecord();
+
         String appId = "wxd1112ca9a216aeda"; // 填应用AppId
         IWXAPI api = WXAPIFactory.createWXAPI(getActivity(), appId);
 
@@ -625,7 +637,8 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
                     @Override
                     protected void completed(BaseDownloadTask task) {
                         ToastUtils.showLong("下载完成");
-                        install(filePath);
+                        //install(filePath);
+                        AppUtils.installApp(filePath);
                     }
 
                     @Override
@@ -659,4 +672,6 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
         }
         startActivity(intent);
     }
+
+
 }

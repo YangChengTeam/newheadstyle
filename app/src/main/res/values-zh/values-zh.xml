@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">新个性头像</string>
-    <string name="word_read">新个性头像</string>
+    <string name="app_name">个性头像</string>
+    <string name="word_read">个性头像</string>
 
     <string name="button_allow">开启</string>
     <string name="button_deny">拒绝</string>

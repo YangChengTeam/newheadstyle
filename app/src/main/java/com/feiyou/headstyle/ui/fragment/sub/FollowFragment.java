@@ -131,6 +131,7 @@ public class FollowFragment extends BaseFragment implements NoteDataView, SwipeR
         return root;
     }
 
+
     public void initData() {
         mRefreshLayout.setOnRefreshListener(this);
         //设置进度View样式的大小，只有两个值DEFAULT和LARGE
@@ -145,8 +146,6 @@ public class FollowFragment extends BaseFragment implements NoteDataView, SwipeR
         mRefreshLayout.setDistanceToTriggerSync(200);
         //如果child是自己自定义的view，可以通过这个回调，告诉mSwipeRefreshLayoutchild是否可以滑动
         mRefreshLayout.setOnChildScrollUpCallback(null);
-
-        userInfo = App.getApp().getmUserInfo();
 
         Bundle bundle = getArguments();
         if (bundle != null && bundle.getInt("community_type") > 0) {
@@ -229,7 +228,6 @@ public class FollowFragment extends BaseFragment implements NoteDataView, SwipeR
         followInfoPresenterImp = new FollowInfoPresenterImp(this, getActivity());
         addZanPresenterImp = new AddZanPresenterImp(this, getActivity());
 
-        noteDataPresenterImp.getNoteData(currentPage, 1, userInfo != null ? userInfo.getId() : "");
     }
 
     @Override
@@ -238,6 +236,9 @@ public class FollowFragment extends BaseFragment implements NoteDataView, SwipeR
         if (loginDialog != null && loginDialog.isShowing()) {
             loginDialog.dismiss();
         }
+
+        userInfo = App.getApp().getmUserInfo();
+        noteDataPresenterImp.getNoteData(currentPage, 1, userInfo != null ? userInfo.getId() : "");
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -261,6 +262,12 @@ public class FollowFragment extends BaseFragment implements NoteDataView, SwipeR
         }
 
         Intent intent = new Intent(getActivity(), PushNoteActivity.class);
+        startActivity(intent);
+    }
+
+    @OnClick(R.id.tv_follow_user)
+    void addFriends() {
+        Intent intent = new Intent(getActivity(), AddFriendsActivity.class);
         startActivity(intent);
     }
 
@@ -288,6 +295,7 @@ public class FollowFragment extends BaseFragment implements NoteDataView, SwipeR
 
     @Override
     public void loadDataSuccess(ResultInfo tData) {
+        Logger.i("follow list --->" + JSON.toJSONString(tData));
         avi.hide();
         mRefreshLayout.setRefreshing(false);
         if (tData != null && tData.getCode() == Constants.SUCCESS) {
@@ -304,7 +312,7 @@ public class FollowFragment extends BaseFragment implements NoteDataView, SwipeR
                     if (((NoteInfoRet) tData).getData().size() == pageSize) {
                         noteInfoAdapter.loadMoreComplete();
                     } else {
-                        noteInfoAdapter.loadMoreEnd(true);
+                        noteInfoAdapter.loadMoreEnd();
                     }
                 } else {
                     mRecommendListView.setVisibility(View.GONE);
@@ -346,9 +354,12 @@ public class FollowFragment extends BaseFragment implements NoteDataView, SwipeR
 
         } else {
             if (tData instanceof NoteInfoRet) {
-                mRecommendListView.setVisibility(View.GONE);
-                noDataLayout.setVisibility(View.VISIBLE);
-                mNoDataTiltTv.setText(communityType == 1 ? "暂无数据" : "还没有关注任何人");
+                noteInfoAdapter.loadMoreEnd(true);
+                if (currentPage == 1) {
+                    mRecommendListView.setVisibility(View.GONE);
+                    noDataLayout.setVisibility(View.VISIBLE);
+                    mNoDataTiltTv.setText(communityType == 1 ? "暂无数据" : "还没有关注任何人");
+                }
             }
 
             if (tData instanceof FollowInfoRet) {

@@ -15,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.blankj.utilcode.util.SizeUtils;
 import com.blankj.utilcode.util.StringUtils;
@@ -23,10 +24,13 @@ import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.bean.HeadType;
+import com.feiyou.headstyle.bean.NoteInfo;
 import com.feiyou.headstyle.bean.NoteInfoRet;
 import com.feiyou.headstyle.bean.ResultInfo;
 import com.feiyou.headstyle.bean.UserInfo;
+import com.feiyou.headstyle.bean.ZanResultRet;
 import com.feiyou.headstyle.common.Constants;
+import com.feiyou.headstyle.presenter.AddZanPresenterImp;
 import com.feiyou.headstyle.presenter.DeleteNotePresenterImp;
 import com.feiyou.headstyle.presenter.NoteDataPresenterImp;
 import com.feiyou.headstyle.ui.adapter.MoreHeadTypeAdapter;
@@ -38,6 +42,11 @@ import com.feiyou.headstyle.view.NoteDataView;
 import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 import com.qmuiteam.qmui.widget.QMUITopBar;
+import com.umeng.socialize.ShareAction;
+import com.umeng.socialize.UMShareListener;
+import com.umeng.socialize.bean.SHARE_MEDIA;
+import com.umeng.socialize.media.UMImage;
+import com.umeng.socialize.media.UMWeb;
 import com.wang.avi.AVLoadingIndicatorView;
 
 import java.util.ArrayList;
@@ -94,6 +103,12 @@ public class MyNoteActivity extends BaseFragmentActivity implements NoteDataView
 
     private boolean isMakeDelete;
 
+    private AddZanPresenterImp addZanPresenterImp;
+
+    BottomSheetDialog shareDialog;
+
+    private ShareAction shareAction;
+
     @Override
     protected int getContextViewId() {
         return R.layout.activity_my_note;
@@ -143,6 +158,26 @@ public class MyNoteActivity extends BaseFragmentActivity implements NoteDataView
 
         userInfo = App.getApp().getmUserInfo();
 
+        if (shareAction == null) {
+            shareAction = new ShareAction(this);
+            shareAction.setCallback(shareListener);//回调监听器
+        }
+
+        shareDialog = new BottomSheetDialog(this);
+        View shareView = LayoutInflater.from(this).inflate(R.layout.share_dialog_view, null);
+        ImageView mCloseImageView = shareView.findViewById(R.id.iv_close_share);
+        LinearLayout weixinLayout = shareView.findViewById(R.id.layout_weixin);
+        LinearLayout circleLayout = shareView.findViewById(R.id.layout_circle);
+        LinearLayout qqLayout = shareView.findViewById(R.id.layout_qq_friends);
+        LinearLayout qzoneLayout = shareView.findViewById(R.id.layout_qzone);
+        weixinLayout.setOnClickListener(this);
+        circleLayout.setOnClickListener(this);
+        qqLayout.setOnClickListener(this);
+        qzoneLayout.setOnClickListener(this);
+        mCloseImageView.setOnClickListener(this);
+        shareDialog.setContentView(shareView);
+
+
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("正在删除");
 
@@ -158,6 +193,7 @@ public class MyNoteActivity extends BaseFragmentActivity implements NoteDataView
         deleteNotePresenterImp = new DeleteNotePresenterImp(this, this);
         noteInfoAdapter = new NoteInfoAdapter(this, null, 2);
         mNoteListView.setLayoutManager(new LinearLayoutManager(this));
+        addZanPresenterImp = new AddZanPresenterImp(this, this);
         mNoteListView.setAdapter(noteInfoAdapter);
         //mNoteListView.addItemDecoration(new NormalDecoration(ContextCompat.getColor(this, R.color.line_color), SizeUtils.dp2px(8)));
         noteInfoAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
@@ -180,8 +216,9 @@ public class MyNoteActivity extends BaseFragmentActivity implements NoteDataView
         noteInfoAdapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
             @Override
             public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
+                currentItemPos = position;
+
                 if (view.getId() == R.id.layout_operation) {
-                    currentItemPos = position;
                     if (bottomSheetDialog != null && !bottomSheetDialog.isShowing()) {
                         bottomSheetDialog.show();
                     }
@@ -190,6 +227,18 @@ public class MyNoteActivity extends BaseFragmentActivity implements NoteDataView
                     Intent intent = new Intent(MyNoteActivity.this, UserInfoActivity.class);
                     intent.putExtra("user_id", userInfo != null ? userInfo.getId() : "");
                     startActivity(intent);
+                }
+
+                if (view.getId() == R.id.layout_item_zan) {
+                    String messageId = noteInfoAdapter.getData().get(position).getId();
+                    addZanPresenterImp.addZan(1, App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", noteInfoAdapter.getData().get(position).getUserId(), messageId, "", "", 1);
+                }
+
+                //分享
+                if (view.getId() == R.id.layout_note_share) {
+                    if (shareDialog != null && !shareDialog.isShowing()) {
+                        shareDialog.show();
+                    }
                 }
             }
         });
@@ -209,7 +258,7 @@ public class MyNoteActivity extends BaseFragmentActivity implements NoteDataView
     }
 
     @Override
-    protected void onResume() {
+    public void onResume() {
         super.onResume();
         noteDataPresenterImp.getMyNoteList(currentPage, userInfo != null ? userInfo.getId() : "");
     }
@@ -270,6 +319,19 @@ public class MyNoteActivity extends BaseFragmentActivity implements NoteDataView
                 }
             }
 
+            if (tData instanceof ZanResultRet) {
+                int tempNum = noteInfoAdapter.getData().get(currentItemPos).getZanNum();
+                if (((ZanResultRet) tData).getData().getIsZan() == 0) {
+                    tempNum = tempNum - 1;
+                } else {
+                    tempNum = tempNum + 1;
+                }
+
+                noteInfoAdapter.getData().get(currentItemPos).setZanNum(tempNum);
+                noteInfoAdapter.getData().get(currentItemPos).setIsZan(((ZanResultRet) tData).getData().getIsZan());
+                noteInfoAdapter.notifyDataSetChanged();
+            }
+
             if (isMakeDelete) {
                 ToastUtils.showLong("删除成功");
                 currentPage = 1;
@@ -305,6 +367,29 @@ public class MyNoteActivity extends BaseFragmentActivity implements NoteDataView
 
     @Override
     public void onClick(View view) {
+
+        if (shareDialog != null && shareDialog.isShowing()) {
+            shareDialog.dismiss();
+        }
+
+        String shareContent = "快来试试炫酷的头像吧";
+        UMImage image = new UMImage(this, R.drawable.app_share);
+        if (currentItemPos > -1 && noteInfoAdapter.getData() != null) {
+            NoteInfo tempNoteInfo = noteInfoAdapter.getData().get(currentItemPos);
+            shareContent = StringUtils.isEmpty(tempNoteInfo.getContent()) ? "快来试试炫酷的头像吧" : tempNoteInfo.getContent();
+            if (tempNoteInfo.getImageArr() != null && tempNoteInfo.getImageArr().length > 0) {
+                image = new UMImage(this, tempNoteInfo.getImageArr()[0]);
+                image.compressStyle = UMImage.CompressStyle.QUALITY;
+            }
+        }
+
+        UMWeb web = new UMWeb("http://gx.qqtn.com");
+        if (shareAction != null) {
+            web.setTitle(shareContent);//标题
+            web.setThumb(image);  //缩略图
+            web.setDescription(shareContent);//描述
+        }
+
         switch (view.getId()) {
             case R.id.layout_cancel:
                 if (bottomSheetDialog != null && bottomSheetDialog.isShowing()) {
@@ -319,7 +404,21 @@ public class MyNoteActivity extends BaseFragmentActivity implements NoteDataView
                 if (configDialog != null && !configDialog.isShowing()) {
                     configDialog.show();
                 }
-
+                break;
+            case R.id.iv_close_share:
+                dismissShareView();
+                break;
+            case R.id.layout_weixin:
+                shareAction.withMedia(web).setPlatform(SHARE_MEDIA.WEIXIN).share();
+                break;
+            case R.id.layout_circle:
+                shareAction.withMedia(web).setPlatform(SHARE_MEDIA.WEIXIN_CIRCLE).share();
+                break;
+            case R.id.layout_qq:
+                shareAction.withMedia(web).setPlatform(SHARE_MEDIA.QQ).share();
+                break;
+            case R.id.layout_qzone:
+                shareAction.withMedia(web).setPlatform(SHARE_MEDIA.QZONE).share();
                 break;
             default:
                 break;
@@ -336,6 +435,58 @@ public class MyNoteActivity extends BaseFragmentActivity implements NoteDataView
     public void cancel() {
         if (configDialog != null && configDialog.isShowing()) {
             configDialog.dismiss();
+        }
+    }
+
+    private UMShareListener shareListener = new UMShareListener() {
+        /**
+         * @descrption 分享开始的回调
+         * @param platform 平台类型
+         */
+        @Override
+        public void onStart(SHARE_MEDIA platform) {
+
+        }
+
+        /**
+         * @descrption 分享成功的回调
+         * @param platform 平台类型
+         */
+        @Override
+        public void onResult(SHARE_MEDIA platform) {
+            dismissShareView();
+            Toast.makeText(MyNoteActivity.this, "分享成功", Toast.LENGTH_LONG).show();
+        }
+
+        /**
+         * @descrption 分享失败的回调
+         * @param platform 平台类型
+         * @param t 错误原因
+         */
+        @Override
+        public void onError(SHARE_MEDIA platform, Throwable t) {
+            dismissShareView();
+            Toast.makeText(MyNoteActivity.this, "分享失败", Toast.LENGTH_LONG).show();
+        }
+
+        /**
+         * @descrption 分享取消的回调
+         * @param platform 平台类型
+         */
+        @Override
+        public void onCancel(SHARE_MEDIA platform) {
+            dismissShareView();
+            Toast.makeText(MyNoteActivity.this, "取消分享", Toast.LENGTH_LONG).show();
+        }
+    };
+
+
+    /**
+     * 关闭分享窗口
+     */
+    public void dismissShareView() {
+        if (bottomSheetDialog != null && bottomSheetDialog.isShowing()) {
+            bottomSheetDialog.dismiss();
         }
     }
 }

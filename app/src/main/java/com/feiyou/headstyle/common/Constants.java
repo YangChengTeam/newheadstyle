@@ -1,5 +1,7 @@
 package com.feiyou.headstyle.common;
 
+import com.google.android.exoplayer2.util.ParsableNalUnitBitArray;
+
 /**
  * 描述：
  */
@@ -29,6 +31,7 @@ public class Constants {
             "WlpSEzppPlucQCFxdMHh7vwVQvSVfaPZk1uVc99Q94CMRAlagAmHqXpLB6JrozBb" +
             "ZbLEeYBPkKaGMg==";
 
+    public static final String APP_PACKAGE_NAME = "com.feiyou.headstyle";
 
     public static final String BASE_URL = "http://ytx.wk2.com/api/";
 
@@ -59,4 +62,11 @@ public class Constants {
     public static final String APP_ID = "1107873400";
 
     public static final String OPEN_ID = "6050141079184468";
+
+    public static final String OPEN_STATE = "open_state";
+
+    public static final String SCORE_CLOSE_TIME = "score_close_time";
+
+    public static final String IS_OPEN_SCORE = "is_open_score";
+
 }

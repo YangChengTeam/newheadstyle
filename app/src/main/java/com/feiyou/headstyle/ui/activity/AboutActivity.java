@@ -13,6 +13,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.blankj.utilcode.util.AppUtils;
 import com.blankj.utilcode.util.SizeUtils;
 import com.blankj.utilcode.util.StringUtils;
 import com.feiyou.headstyle.R;
@@ -42,6 +43,9 @@ public class AboutActivity extends BaseFragmentActivity implements View.OnClickL
     QMUITopBar mTopBar;
 
     ImageView mBackImageView;
+
+    @BindView(R.id.tv_version_name)
+    TextView mVersionNameTv;
 
     private UMShareAPI mShareAPI = null;
 
@@ -93,6 +97,8 @@ public class AboutActivity extends BaseFragmentActivity implements View.OnClickL
         qzoneLayout.setOnClickListener(this);
         closeIv.setOnClickListener(this);
         shareDialog.setContentView(shareView);
+
+        mVersionNameTv.setText("当前版本：" + AppUtils.getAppVersionName());
 
         if (shareAction == null) {
             shareAction = new ShareAction(this);

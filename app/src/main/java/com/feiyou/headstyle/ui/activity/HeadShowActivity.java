@@ -50,6 +50,7 @@ import com.feiyou.headstyle.bean.ResultInfo;
 import com.feiyou.headstyle.bean.UpdateHeadRet;
 import com.feiyou.headstyle.bean.UserInfo;
 import com.feiyou.headstyle.common.Constants;
+import com.feiyou.headstyle.presenter.RecordInfoPresenterImp;
 import com.feiyou.headstyle.presenter.UpdateHeadPresenterImp;
 import com.feiyou.headstyle.ui.custom.GlideRoundTransform;
 import com.feiyou.headstyle.ui.custom.qqhead.BaseUIListener;
@@ -162,6 +163,8 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
 
     private String currentImageUrl;
 
+    private String imageId = "";
+
     private String filePath;
 
     BottomSheetDialog bottomSheetDialog;
@@ -189,6 +192,12 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
     UMImage defUmImage;
 
     private boolean pageSizeLastClick;
+
+    private boolean isLastImage;
+
+    private HeadInfo lastHeadInfo;
+
+    private RecordInfoPresenterImp recordInfoPresenterImp;
 
     @Override
     protected int getContextViewId() {
@@ -395,6 +404,7 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
         homeDataPresenterImp = new HomeDataPresenterImp(this, this);
         headListDataPresenterImp = new HeadListDataPresenterImp(this, this);
         addCollectionPresenterImp = new AddCollectionPresenterImp(this, this);
+        recordInfoPresenterImp = new RecordInfoPresenterImp(this, this);
 
         if (fromType == 1) {
             if (StringUtils.isEmpty(tagId)) {
@@ -411,6 +421,7 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
                 adapter.addDatas(collectionList);
             }
             currentImageUrl = adapter.getHeads().get(0).getImgurl();
+            imageId = adapter.getHeads().get(0).getId();
         }
 
         if (fromType == 3) {
@@ -431,6 +442,10 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
                 }
             }
         });
+    }
+
+    public void addHeadRecord() {
+        recordInfoPresenterImp.headSetInfo(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", imageId);
     }
 
     void square() {
@@ -582,6 +597,12 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
 
     @Override
     public void removeFirstObjectInAdapter() {
+        if (isLastImage) {
+            adapter.addItemData(lastHeadInfo);
+            adapter.notifyDataSetChanged();
+            Toasty.normal(this, "已经是最后一张了").show();
+            return;
+        }
         if (fromType != 2) {
             if (adapter.getCount() < 6) {
                 currentPage++;
@@ -602,14 +623,19 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
                 }
             }
 
+            //滑动时,移除最上面一个图片
+            adapter.remove(0);
+
+            Logger.i("last count--->" + adapter.getCount());
+
             if (adapter.getCount() == 1) {
+                isLastImage = true;
+                lastHeadInfo = adapter.getHeads().get(0);
                 Logger.i("已经是最后一张了");
-            } else {
-                //滑动时,移除最上面一个图片
-                adapter.remove(0);
             }
 
             currentImageUrl = adapter.getHeads() != null && adapter.getHeads().size() > 0 ? adapter.getHeads().get(0).getImgurl() : "";
+            imageId = adapter.getHeads().get(0).getId();
             if (shareAction != null) {
                 if (!StringUtils.isEmpty(currentImageUrl)) {
                     UMImage image = new UMImage(HeadShowActivity.this, currentImageUrl);
@@ -633,15 +659,17 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
             }
 
         } else {
+            //滑动时,移除最上面一个图片
+            adapter.remove(0);
+            Logger.i("last count--->" + adapter.getCount());
             if (adapter.getCount() == 1) {
+                isLastImage = true;
+                lastHeadInfo = adapter.getHeads().get(0);
                 Logger.i("已经是最后一张了");
-                Toasty.normal(this, "已经是最后一张了").show();
-            } else {
-                //滑动时,移除最上面一个图片
-                adapter.remove(0);
             }
 
             currentImageUrl = adapter.getHeads() != null && adapter.getHeads().size() > 0 ? adapter.getHeads().get(0).getImgurl() : "";
+            imageId = adapter.getHeads().get(0).getId();
             if (shareAction != null) {
                 if (!StringUtils.isEmpty(currentImageUrl)) {
                     UMImage image = new UMImage(HeadShowActivity.this, currentImageUrl);
@@ -711,7 +739,7 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
                             mKeepTextView.setCompoundDrawablesWithIntrinsicBounds(null, isCollection, null, null);
                         }
                         currentImageUrl = adapter.getHeads().get(0).getImgurl();
-
+                        imageId = adapter.getHeads().get(0).getId();
                         if (shareAction != null) {
                             if (!StringUtils.isEmpty(currentImageUrl)) {
                                 UMImage image = new UMImage(HeadShowActivity.this, currentImageUrl);
@@ -755,7 +783,7 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
                         }
 
                         currentImageUrl = adapter.getHeads().get(0).getImgurl();
-
+                        imageId = adapter.getHeads().get(0).getId();
                         if (shareAction != null) {
                             if (!StringUtils.isEmpty(currentImageUrl)) {
                                 UMImage image = new UMImage(HeadShowActivity.this, currentImageUrl);
@@ -787,6 +815,9 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
                 } else {
                     Toasty.normal(this, "收藏成功").show();
                     mKeepTextView.setCompoundDrawablesWithIntrinsicBounds(null, isCollection, null, null);
+
+                    //收藏成功，可以弹出打分
+                    SPUtils.getInstance().put(Constants.IS_OPEN_SCORE, true);
                 }
             }
 
@@ -794,6 +825,10 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
                 if (!StringUtils.isEmpty(((UpdateHeadRet) tData).getData().getImage())) {
                     Toasty.normal(this, "设置成功").show();
                     userInfo.setUserimg(((UpdateHeadRet) tData).getData().getImage());
+
+                    //头像设置完成，可以弹出打分
+                    SPUtils.getInstance().put(Constants.IS_OPEN_SCORE, true);
+                    addHeadRecord();
 
                     App.getApp().setmUserInfo(userInfo);
                     App.getApp().setLogin(true);
@@ -927,6 +962,9 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         UMShareAPI.get(this).onActivityResult(requestCode, resultCode, data);
+        //头像设置完成，可以弹出打分
+        SPUtils.getInstance().put(Constants.IS_OPEN_SCORE, true);
+        addHeadRecord();
     }
 
     @Override

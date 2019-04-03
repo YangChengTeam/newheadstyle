@@ -9,12 +9,14 @@ import android.widget.LinearLayout;
 
 import com.blankj.utilcode.util.StringUtils;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.bean.AnswerInfo;
 import com.feiyou.headstyle.bean.StickerTypeInfo;
 import com.feiyou.headstyle.bean.TestMsgInfo;
+import com.feiyou.headstyle.ui.custom.GlideRoundTransform;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -101,6 +103,10 @@ public class TestChatListAdapter extends BaseQuickAdapter<TestMsgInfo, BaseViewH
                 helper.setVisible(R.id.left_layout, false);
                 helper.setVisible(R.id.right_layout, true);
                 helper.setText(R.id.right_msg, item.getContent());
+
+                RequestOptions options = new RequestOptions();
+                options.transform(new GlideRoundTransform(mContext, 24));
+                Glide.with(mContext).load(item.getImgUrl()).apply(options).into((ImageView) helper.getView(R.id.iv_user_head));
                 break;
             default:
                 break;

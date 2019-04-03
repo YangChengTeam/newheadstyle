@@ -43,6 +43,10 @@ import com.feiyou.headstyle.ui.activity.UserInfoActivity;
 import com.feiyou.headstyle.ui.base.BaseFragment;
 import com.feiyou.headstyle.ui.custom.GlideRoundTransform;
 import com.feiyou.headstyle.ui.custom.LoginDialog;
+import com.feiyou.headstyle.ui.custom.PraiseDialog;
+import com.feiyou.headstyle.ui.custom.WeiXinFollowDialog;
+import com.feiyou.headstyle.utils.AppUtils;
+import com.feiyou.headstyle.utils.GoToScoreUtils;
 import com.feiyou.headstyle.view.UserInfoView;
 import com.orhanobut.logger.Logger;
 
@@ -53,11 +57,12 @@ import org.greenrobot.eventbus.ThreadMode;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import es.dmoral.toasty.Toasty;
 
 /**
  * Created by myflying on 2019/1/24.
  */
-public class MyFragment extends BaseFragment implements UserInfoView {
+public class MyFragment extends BaseFragment implements UserInfoView, PraiseDialog.PraiseListener {
 
     @BindView(R.id.layout_my_info_top)
     RelativeLayout mMyInfoTopLayout;
@@ -92,6 +97,10 @@ public class MyFragment extends BaseFragment implements UserInfoView {
 
     private UserInfoPresenterImp userInfoPresenterImp;
 
+    PraiseDialog praiseDialog;
+
+    private boolean isRunResume;
+
     @Override
     protected View onCreateView() {
         View root = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_my, null);
@@ -101,6 +110,8 @@ public class MyFragment extends BaseFragment implements UserInfoView {
     }
 
     public void initViews() {
+        praiseDialog = new PraiseDialog(getActivity(), R.style.login_dialog);
+        praiseDialog.setPraiseListener(this);
 
         mUserIdTv.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
@@ -133,8 +144,24 @@ public class MyFragment extends BaseFragment implements UserInfoView {
     @Override
     public void onResume() {
         super.onResume();
+        isRunResume = true;
+        Logger.i("myfragment info onResume --->");
+        loadMyInfo();
+    }
 
-        Logger.i("my fragment onResume --->");
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+
+        if (getContext() != null && isVisibleToUser) {
+            Logger.i("myfragment info isVisible --->");
+            loadMyInfo();
+        }
+    }
+
+    //每次进入页面时加载数据，主要是请求是否有新的消息
+    public void loadMyInfo() {
+        isRunResume = false;
 
         if (App.isShowTotalCount) {
             mMyRemindIv.setVisibility(View.VISIBLE);
@@ -149,16 +176,16 @@ public class MyFragment extends BaseFragment implements UserInfoView {
         }
 
         if (userInfo != null) {
-            RequestOptions options = new RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL);
+            RequestOptions options = new RequestOptions().skipMemoryCache(true);
             options.placeholder(R.mipmap.head_def);
             options.transform(new GlideRoundTransform(getActivity(), 30));
             Glide.with(getActivity()).load(userInfo.getUserimg()).apply(options).into(mUserHeadImageView);
             mUserNickNameTv.setText(userInfo.getNickname());
             mUserIdTv.setText("头像号：" + userInfo.getId());
 
-            mFollowTv.setText(userInfo.getGuanNum() > 10000 ? userInfo.getGuanNum()/10000 + "万" : userInfo.getGuanNum() + "");
-            mFansCountTv.setText(userInfo.getFenNum() > 10000 ? userInfo.getFenNum()/10000 + "万" : userInfo.getFenNum() + "");
-            mKeepCountTv.setText(userInfo.getCollectNum() > 10000 ? userInfo.getCollectNum()/10000 + "万" : userInfo.getCollectNum() + "");
+            mFollowTv.setText(userInfo.getGuanNum() > 10000 ? userInfo.getGuanNum() / 10000 + "万" : userInfo.getGuanNum() + "");
+            mFansCountTv.setText(userInfo.getFenNum() > 10000 ? userInfo.getFenNum() / 10000 + "万" : userInfo.getFenNum() + "");
+            mKeepCountTv.setText(userInfo.getCollectNum() > 10000 ? userInfo.getCollectNum() / 10000 + "万" : userInfo.getCollectNum() + "");
 
             //如果用户已经登录，重新获取最新的用户信息
             LoginRequest loginRequest = new LoginRequest();
@@ -184,11 +211,12 @@ public class MyFragment extends BaseFragment implements UserInfoView {
         if (loginDialog != null && loginDialog.isShowing()) {
             loginDialog.dismiss();
         }
-
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void Event(MessageEvent messageEvent) {
+        Logger.i("MyFragment messageEvent--->" + messageEvent.getMessage());
+
         if (messageEvent.getMessage().equals("login_success")) {
             if (!StringUtils.isEmpty(SPUtils.getInstance().getString(Constants.USER_INFO))) {
                 Logger.i(SPUtils.getInstance().getString(Constants.USER_INFO));
@@ -204,9 +232,9 @@ public class MyFragment extends BaseFragment implements UserInfoView {
                 mUserNickNameTv.setText(userInfo.getNickname());
                 mUserIdTv.setText("头像号：" + userInfo.getId());
 
-                mFollowTv.setText(userInfo.getGuanNum() > 10000 ? userInfo.getGuanNum()/10000 + "万" : userInfo.getGuanNum() + "");
-                mFansCountTv.setText(userInfo.getFenNum() > 10000 ? userInfo.getFenNum()/10000 + "万" : userInfo.getFenNum() + "");
-                mKeepCountTv.setText(userInfo.getCollectNum() > 10000 ? userInfo.getCollectNum()/10000 + "万" : userInfo.getCollectNum() + "");
+                mFollowTv.setText(userInfo.getGuanNum() > 10000 ? userInfo.getGuanNum() / 10000 + "万" : userInfo.getGuanNum() + "");
+                mFansCountTv.setText(userInfo.getFenNum() > 10000 ? userInfo.getFenNum() / 10000 + "万" : userInfo.getFenNum() + "");
+                mKeepCountTv.setText(userInfo.getCollectNum() > 10000 ? userInfo.getCollectNum() / 10000 + "万" : userInfo.getCollectNum() + "");
 
                 LoginRequest loginRequest = new LoginRequest();
                 loginRequest.setOpenid(userInfo.getOpenid());//openid全部大写
@@ -265,6 +293,24 @@ public class MyFragment extends BaseFragment implements UserInfoView {
     @OnClick(R.id.layout_feed_back)
     public void feedBack() {
         startActivity(7);
+    }
+
+    @OnClick(R.id.layout_weixin_code)
+    public void followWeiXin() {
+        if (!AppUtils.appInstalled(getActivity(), "com.tencent.mm")) {
+            Toasty.normal(getActivity(), "你还未安装微信").show();
+            return;
+        }
+
+        WeiXinFollowDialog weiXinFollowDialog = new WeiXinFollowDialog(getActivity());
+        weiXinFollowDialog.showChargeDialog(weiXinFollowDialog);
+    }
+
+    @OnClick(R.id.layout_add_score)
+    public void addScore() {
+        if (praiseDialog != null && !praiseDialog.isShowing()) {
+            praiseDialog.show();
+        }
     }
 
     void startActivity(int type) {
@@ -359,9 +405,9 @@ public class MyFragment extends BaseFragment implements UserInfoView {
                 mUserNickNameTv.setText(userInfo.getNickname());
                 mUserIdTv.setText("头像号：" + userInfo.getId());
 
-                mFollowTv.setText(userInfo.getGuanNum() > 10000 ? userInfo.getGuanNum()/10000 + "万" : userInfo.getGuanNum() + "");
-                mFansCountTv.setText(userInfo.getFenNum() > 10000 ? userInfo.getFenNum()/10000 + "万" : userInfo.getFenNum() + "");
-                mKeepCountTv.setText(userInfo.getCollectNum() > 10000 ? userInfo.getCollectNum()/10000 + "万" : userInfo.getCollectNum() + "");
+                mFollowTv.setText(userInfo.getGuanNum() > 10000 ? userInfo.getGuanNum() / 10000 + "万" : userInfo.getGuanNum() + "");
+                mFansCountTv.setText(userInfo.getFenNum() > 10000 ? userInfo.getFenNum() / 10000 + "万" : userInfo.getFenNum() + "");
+                mKeepCountTv.setText(userInfo.getCollectNum() > 10000 ? userInfo.getCollectNum() / 10000 + "万" : userInfo.getCollectNum() + "");
 
                 //通知消息
                 if (SPUtils.getInstance().getInt(Constants.COMMENT_COUNT, 0) > 0) {
@@ -374,6 +420,7 @@ public class MyFragment extends BaseFragment implements UserInfoView {
                         App.isRemindAt = true;
                     }
                 }
+
                 if (SPUtils.getInstance().getInt(Constants.NOTICE_COUNT, 0) > 0) {
                     if (userInfo.getNoticeNum() > SPUtils.getInstance().getInt(Constants.NOTICE_COUNT, 0)) {
                         App.isRemindNotice = true;
@@ -399,5 +446,20 @@ public class MyFragment extends BaseFragment implements UserInfoView {
     @Override
     public void loadDataError(Throwable throwable) {
 
+    }
+
+    @Override
+    public void config() {
+        if (praiseDialog != null && praiseDialog.isShowing()) {
+            praiseDialog.dismiss();
+        }
+        GoToScoreUtils.goToMarket(getActivity(), Constants.APP_PACKAGE_NAME);
+    }
+
+    @Override
+    public void cancel() {
+        if (praiseDialog != null && praiseDialog.isShowing()) {
+            praiseDialog.dismiss();
+        }
     }
 }

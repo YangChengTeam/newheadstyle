@@ -38,12 +38,14 @@ import com.feiyou.headstyle.presenter.TestResultInfoPresenterImp;
 import com.feiyou.headstyle.ui.adapter.TestChatImageListAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragmentActivity;
 import com.feiyou.headstyle.view.TestDetailInfoView;
+import com.jakewharton.rxbinding.view.RxView;
 import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 import com.qmuiteam.qmui.widget.QMUITopBar;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -51,6 +53,7 @@ import java.util.regex.Pattern;
 import butterknife.BindView;
 import butterknife.OnClick;
 import es.dmoral.toasty.Toasty;
+import rx.functions.Action1;
 
 /**
  * Created by myflying on 2019/2/20.
@@ -156,6 +159,7 @@ public class TestImageDetailActivity extends BaseFragmentActivity implements Tes
 
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("正在提交");
+        progressDialog.setCanceledOnTouchOutside(false);
 
         chatListAdapter = new TestChatImageListAdapter(this, null);
         mChatListView.setLayoutManager(new LinearLayoutManager(this));
@@ -196,7 +200,18 @@ public class TestImageDetailActivity extends BaseFragmentActivity implements Tes
         testDetailInfoPresenterImp = new TestDetailInfoPresenterImp(this, this);
         testResultInfoPresenterImp = new TestResultInfoPresenterImp(this, this);
 
+
+        //发布
+        RxView.clicks(mConfigLayout).throttleFirst(300, TimeUnit.MILLISECONDS).subscribe(new Action1<Void>() {
+            @Override
+            public void call(Void aVoid) {
+                config();
+            }
+        });
+
         testDetailInfoPresenterImp.getTestDetail(tid, 2);
+
+
     }
 
     @OnClick(R.id.layout_comment)
@@ -374,10 +389,10 @@ public class TestImageDetailActivity extends BaseFragmentActivity implements Tes
                     chatListAdapter.addData(resultMsgInfo);
 
                     //显示：查看结果提醒
-                    resultMsgInfo = new TestMsgInfo();
-                    resultMsgInfo.setType(TestMsgInfo.TYPE_RECEIVED);
-                    resultMsgInfo.setContent("点击图片查看结果");
-                    chatListAdapter.addData(resultMsgInfo);
+                    TestMsgInfo lastResultInfo = new TestMsgInfo();
+                    lastResultInfo.setType(TestMsgInfo.TYPE_RECEIVED);
+                    lastResultInfo.setContent("点击图片查看结果");
+                    chatListAdapter.addData(lastResultInfo);
 
                     //刷新列表页面
                     chatListAdapter.notifyItemInserted(chatListAdapter.getData().size() - 1);

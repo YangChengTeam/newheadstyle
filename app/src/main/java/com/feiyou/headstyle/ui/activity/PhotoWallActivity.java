@@ -62,6 +62,9 @@ public class PhotoWallActivity extends BaseFragmentActivity implements View.OnCl
     @BindView(R.id.photo_list)
     RecyclerView mPhotoListView;
 
+    @BindView(R.id.layout_btn)
+    LinearLayout mBtnLayout;
+
     @BindView(R.id.btn_upload)
     Button mUploadButton;
 
@@ -88,6 +91,8 @@ public class PhotoWallActivity extends BaseFragmentActivity implements View.OnCl
 
     private ProgressDialog progressDialog = null;
 
+    private boolean isMyInfo;
+
     @Override
     protected int getContextViewId() {
         return R.layout.activity_photo_wall;
@@ -101,6 +106,21 @@ public class PhotoWallActivity extends BaseFragmentActivity implements View.OnCl
     }
 
     private void initTopBar() {
+        Bundle bundle = getIntent().getExtras();
+        photoList = new ArrayList<>();
+        if (bundle != null) {
+            isMyInfo = bundle.getBoolean("is_my_info", false);
+
+            if (bundle.getStringArrayList("user_image_list") != null && !isMyInfo) {
+                ArrayList<String> userImageList = bundle.getStringArrayList("user_image_list");
+                for (int i = 0; i < userImageList.size(); i++) {
+                    PhotoInfo photoInfo = new PhotoInfo();
+                    photoInfo.setUrl(userImageList.get(i));
+                    photoList.add(photoInfo);
+                }
+            }
+        }
+
         QMUIStatusBarHelper.setStatusBarLightMode(this);
         View topSearchView = getLayoutInflater().inflate(R.layout.common_top_config, null);
         topSearchView.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, SizeUtils.dp2px(48)));
@@ -109,7 +129,7 @@ public class PhotoWallActivity extends BaseFragmentActivity implements View.OnCl
         editTv = topSearchView.findViewById(R.id.tv_config);
         titleTv.setText("照片墙");
         editTv.setText(isEdit ? "取消" : "编辑");
-
+        editTv.setVisibility(isMyInfo ? View.VISIBLE : View.GONE);
         mTopBar.setCenterView(topSearchView);
         mBackImageView = topSearchView.findViewById(R.id.iv_back);
         mBackImageView.setOnClickListener(new View.OnClickListener() {
@@ -133,66 +153,74 @@ public class PhotoWallActivity extends BaseFragmentActivity implements View.OnCl
     }
 
     public void initData() {
-        photoList = new ArrayList<>();
+        mBtnLayout.setVisibility(isMyInfo ? View.VISIBLE : View.GONE);
 
-        if (!StringUtils.isEmpty(SPUtils.getInstance().getString(Constants.USER_INFO))) {
-            Logger.i(SPUtils.getInstance().getString(Constants.USER_INFO));
-            userInfo = JSON.parseObject(SPUtils.getInstance().getString(Constants.USER_INFO), new TypeReference<UserInfo>() {
-            });
-        }
-
-        if (userInfo != null && userInfo.getImageWall() != null && userInfo.getImageWall().length > 0) {
-            mNoPhotoLayout.setVisibility(View.GONE);
-            mPhotoListView.setVisibility(View.VISIBLE);
-
-            String[] tempPhotos = userInfo.getImageWall();
-            for (int i = 0; i < tempPhotos.length; i++) {
-                PhotoInfo photoInfo = new PhotoInfo();
-                photoInfo.setUrl(tempPhotos[i]);
-                photoList.add(photoInfo);
+        if (isMyInfo) {
+            if (!StringUtils.isEmpty(SPUtils.getInstance().getString(Constants.USER_INFO))) {
+                Logger.i(SPUtils.getInstance().getString(Constants.USER_INFO));
+                userInfo = JSON.parseObject(SPUtils.getInstance().getString(Constants.USER_INFO), new TypeReference<UserInfo>() {
+                });
             }
-        } else {
-            mNoPhotoLayout.setVisibility(View.VISIBLE);
-            mPhotoListView.setVisibility(View.GONE);
-            editTv.setVisibility(View.GONE);
-        }
 
-        //单词最多选择上传3张
-        maxTotal = (totalCount - photoList.size()) > 3 ? 3 : totalCount - photoList.size();
+            if (userInfo != null && userInfo.getImageWall() != null && userInfo.getImageWall().length > 0) {
+                mNoPhotoLayout.setVisibility(View.GONE);
+                mPhotoListView.setVisibility(View.VISIBLE);
 
-        if (maxTotal == 0) {
-            mUploadButton.setVisibility(View.GONE);
-        } else {
-            mUploadButton.setVisibility(View.VISIBLE);
-        }
+                String[] tempPhotos = userInfo.getImageWall();
+                for (int i = 0; i < tempPhotos.length; i++) {
+                    PhotoInfo photoInfo = new PhotoInfo();
+                    photoInfo.setUrl(tempPhotos[i]);
+                    photoList.add(photoInfo);
+                }
+            } else {
+                mNoPhotoLayout.setVisibility(View.VISIBLE);
+                mPhotoListView.setVisibility(View.GONE);
+                editTv.setVisibility(View.GONE);
+            }
 
-        progressDialog = new ProgressDialog(this);
+            //单词最多选择上传3张
+            maxTotal = (totalCount - photoList.size()) > 3 ? 3 : totalCount - photoList.size();
 
-        uploadPhotoPresenterImp = new UploadPhotoPresenterImp(this, this);
+            if (maxTotal == 0) {
+                mUploadButton.setVisibility(View.GONE);
+            } else {
+                mUploadButton.setVisibility(View.VISIBLE);
+            }
 
-        photoWallAdapter = new PhotoWallAdapter(this, photoList);
-        mPhotoListView.setLayoutManager(new GridLayoutManager(this, 3));
-        mPhotoListView.setAdapter(photoWallAdapter);
-        photoWallAdapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
-            @Override
-            public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
+            progressDialog = new ProgressDialog(this);
 
-                if (view.getId() == R.id.iv_choose) {
+            uploadPhotoPresenterImp = new UploadPhotoPresenterImp(this, this);
 
-                    boolean temp = !photoWallAdapter.getData().get(position).isSelected();
-                    photoWallAdapter.getData().get(position).setSelected(temp);
-                    photoWallAdapter.notifyDataSetChanged();
+            photoWallAdapter = new PhotoWallAdapter(this, photoList);
+            mPhotoListView.setLayoutManager(new GridLayoutManager(this, 3));
+            mPhotoListView.setAdapter(photoWallAdapter);
+            photoWallAdapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
+                @Override
+                public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
 
-                    if (!StringUtils.isEmpty(selectItemStr())) {
-                        mDeleteLayout.setBackgroundResource(R.drawable.common_red_bg);
-                    } else {
-                        mDeleteLayout.setBackgroundResource(R.drawable.common_gray_bg);
+                    if (view.getId() == R.id.iv_choose) {
+
+                        boolean temp = !photoWallAdapter.getData().get(position).isSelected();
+                        photoWallAdapter.getData().get(position).setSelected(temp);
+                        photoWallAdapter.notifyDataSetChanged();
+
+                        if (!StringUtils.isEmpty(selectItemStr())) {
+                            mDeleteLayout.setBackgroundResource(R.drawable.common_red_bg);
+                        } else {
+                            mDeleteLayout.setBackgroundResource(R.drawable.common_gray_bg);
+                        }
                     }
                 }
-            }
-        });
+            });
 
-        photoWallAdapter.setOpenEdit(isEdit);
+            photoWallAdapter.setOpenEdit(isEdit);
+        } else {
+            mNoPhotoLayout.setVisibility(View.GONE);
+            mPhotoListView.setVisibility(View.VISIBLE);
+            photoWallAdapter = new PhotoWallAdapter(this, photoList);
+            mPhotoListView.setLayoutManager(new GridLayoutManager(this, 3));
+            mPhotoListView.setAdapter(photoWallAdapter);
+        }
     }
 
     @OnClick(R.id.btn_upload)
@@ -376,6 +404,7 @@ public class PhotoWallActivity extends BaseFragmentActivity implements View.OnCl
             mNoPhotoLayout.setVisibility(View.VISIBLE);
             mPhotoListView.setVisibility(View.GONE);
         }
+
     }
 
     @Override

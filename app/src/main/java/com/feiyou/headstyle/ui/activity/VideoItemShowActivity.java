@@ -157,6 +157,8 @@ public class VideoItemShowActivity extends BaseFragmentActivity implements Video
 
     private RecyclerView replyListView;
 
+    private LinearLayout replyNoDataLayout;
+
     BottomSheetDialog commitReplyDialog;
 
     private CommentReplyAdapter commentReplyAdapter;
@@ -291,13 +293,13 @@ public class VideoItemShowActivity extends BaseFragmentActivity implements Video
         addZanPresenterImp = new AddZanPresenterImp(this, this);
         followInfoPresenterImp = new FollowInfoPresenterImp(this, this);
 
-        videoInfoPresenterImp.getDataList(videoPage);
+        videoInfoPresenterImp.getDataList(videoPage, userInfo != null ? userInfo.getId() : "");
 
         videoItemShowAdapter.setOnLoadMoreListener(new BaseQuickAdapter.RequestLoadMoreListener() {
             @Override
             public void onLoadMoreRequested() {
                 videoPage++;
-                videoInfoPresenterImp.getDataList(videoPage);
+                videoInfoPresenterImp.getDataList(videoPage, userInfo != null ? userInfo.getId() : "");
             }
         }, mVideoListView);
 
@@ -440,7 +442,7 @@ public class VideoItemShowActivity extends BaseFragmentActivity implements Video
 
         replyView = LayoutInflater.from(this).inflate(R.layout.comment_reply_view, null);
         replyListView = replyView.findViewById(R.id.rv_reply_list);
-
+        replyNoDataLayout = replyView.findViewById(R.id.reply_layout_no_data);
         LinearLayout contentLayout = replyView.findViewById(R.id.layout_content);
         LinearLayout bottomLayout = replyView.findViewById(R.id.layout_reply_bottom);
         replyFollowLayout = replyView.findViewById(R.id.reply_is_follow);
@@ -495,18 +497,12 @@ public class VideoItemShowActivity extends BaseFragmentActivity implements Video
         addDateTv = replyView.findViewById(R.id.tv_add_date);
         commentContentTv = replyView.findViewById(R.id.tv_content);
 
-        RelativeLayout.LayoutParams contentParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-        int contentMarginHeight = BarUtils.getNavBarHeight() + SizeUtils.dp2px(62);
-        contentParams.setMargins(0, SizeUtils.dp2px(49), 0, contentMarginHeight);
-        contentLayout.setLayoutParams(contentParams);
 
         RelativeLayout.LayoutParams bottomParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, SizeUtils.dp2px(49));
-        //int tempHeight = ScreenUtils.getScreenHeight() - BarUtils.getNavBarHeight() - BarUtils.getStatusBarHeight() - SizeUtils.dp2px(49);
-        bottomParams.setMargins(0, 0, 0, BarUtils.getNavBarHeight() - BarUtils.getStatusBarHeight());
         bottomParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
         bottomLayout.setLayoutParams(bottomParams);
 
-        replyView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ScreenUtils.getScreenHeight()));
+        //replyView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ScreenUtils.getScreenHeight()));
         commitReplyDialog.setContentView(replyView);
 
         //setPeekHeight,设置弹出窗口的高度为全屏的状态.
@@ -551,6 +547,15 @@ public class VideoItemShowActivity extends BaseFragmentActivity implements Video
             }
         });
 
+        commentReplyAdapter.setOnLoadMoreListener(new BaseQuickAdapter.RequestLoadMoreListener() {
+            @Override
+            public void onLoadMoreRequested() {
+                if (commentReplyAdapter.getData().size() >= pageSize) {
+                    subCommentPage++;
+                    noteSubCommentDataPresenterImp.getNoteSubCommentData(subCommentPage, userInfo != null ? userInfo.getId() : "", commentId, 2);
+                }
+            }
+        }, replyListView);
     }
 
     public void showInputDialog() {
@@ -654,7 +659,24 @@ public class VideoItemShowActivity extends BaseFragmentActivity implements Video
 
             if (tData instanceof NoteSubCommentRet) {
                 if (((NoteSubCommentRet) tData).getData() != null) {
-                    commentReplyAdapter.setNewData(((NoteSubCommentRet) tData).getData());
+                    replyNoDataLayout.setVisibility(View.GONE);
+                    replyListView.setVisibility(View.VISIBLE);
+                    BottomSheetBehavior mBehavior = BottomSheetBehavior.from((View) replyView.getParent());
+                    mBehavior.setPeekHeight(ScreenUtils.getScreenHeight() - BarUtils.getStatusBarHeight());
+                    if (subCommentPage == 1) {
+                        commentReplyAdapter.setNewData(((NoteSubCommentRet) tData).getData());
+                    } else {
+                        commentReplyAdapter.addData(((NoteSubCommentRet) tData).getData());
+                    }
+                } else {
+                    replyNoDataLayout.setVisibility(View.VISIBLE);
+                    replyListView.setVisibility(View.GONE);
+                }
+
+                if (((NoteSubCommentRet) tData).getData().size() == pageSize) {
+                    commentReplyAdapter.loadMoreComplete();
+                } else {
+                    commentReplyAdapter.loadMoreEnd(true);
                 }
             }
 
@@ -721,25 +743,28 @@ public class VideoItemShowActivity extends BaseFragmentActivity implements Video
             }
 
             if (tData instanceof AddCollectionRet) {
-
                 int tempNum = videoItemShowAdapter.getData().get(selectVideoIndex).getCollectNum();
-                if (((AddCollectionRet) tData).getData().getIsCollect() == 0) {
-                    Toasty.normal(this, "已取消").show();
-                    tempNum = tempNum - 1;
-                } else {
-                    Toasty.normal(this, "已收藏").show();
-                    tempNum = tempNum + 1;
-                }
+                RecyclerView.ViewHolder viewHolder = mVideoListView.findViewHolderForAdapterPosition(selectVideoIndex);
+                if (viewHolder != null && viewHolder instanceof BaseViewHolder) {
+                    BaseViewHolder itemHolder = (BaseViewHolder) viewHolder;
+                    TextView isCollectTv = itemHolder.getView(R.id.tv_collect_num);
 
-                videoItemShowAdapter.getData().get(selectVideoIndex).setCollectNum(tempNum < 0 ? 0 : tempNum);
-                videoItemShowAdapter.getData().get(selectVideoIndex).setIsCollect(((AddCollectionRet) tData).getData().getIsCollect());
-                videoItemShowAdapter.notifyItemChanged(selectVideoIndex);
-
-                if (((AddCollectionRet) tData).getData().getIsCollect() == 0) {
-                    Toasty.normal(this, "已取消").show();
-                } else {
-                    Toasty.normal(this, "已收藏").show();
+                    if (((AddCollectionRet) tData).getData().getIsCollect() == 0) {
+                        isCollectTv.setCompoundDrawablesWithIntrinsicBounds(notCollect, null, null, null);
+                        tempNum = tempNum - 1;
+                        Toasty.normal(this, "已取消").show();
+                    } else {
+                        isCollectTv.setCompoundDrawablesWithIntrinsicBounds(isCollect, null, null, null);
+                        tempNum = tempNum + 1;
+                        Toasty.normal(this, "已收藏").show();
+                    }
+                    videoItemShowAdapter.getData().get(selectVideoIndex).setCollectNum(tempNum < 0 ? 0 : tempNum);
+                    isCollectTv.setText(tempNum < 0 ? "0" : tempNum + "");
                 }
+            }
+        } else {
+            if (tData instanceof NoteSubCommentRet) {
+                commentReplyAdapter.loadMoreEnd(true);
             }
         }
     }
@@ -747,6 +772,12 @@ public class VideoItemShowActivity extends BaseFragmentActivity implements Video
     @Override
     public void loadDataError(Throwable throwable) {
 
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        Jzvd.resetAllVideos();
     }
 
     @OnClick(R.id.iv_back)

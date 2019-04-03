@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.design.widget.BottomSheetDialog;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -41,7 +42,9 @@ import com.feiyou.headstyle.presenter.TestInfoPresenterImp;
 import com.feiyou.headstyle.ui.adapter.TestInfoAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragmentActivity;
 import com.feiyou.headstyle.ui.custom.GlideRoundTransform;
+import com.feiyou.headstyle.ui.custom.NormalDecoration;
 import com.feiyou.headstyle.view.TestInfoView;
+import com.jakewharton.rxbinding.view.RxView;
 import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 import com.qmuiteam.qmui.widget.QMUITopBar;
@@ -52,9 +55,11 @@ import com.umeng.socialize.media.UMImage;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.OnClick;
+import rx.functions.Action1;
 
 /**
  * Created by myflying on 2018/11/23.
@@ -200,6 +205,7 @@ public class TestResultActivity extends BaseFragmentActivity implements TestInfo
         testInfoPresenterImp = new TestInfoPresenterImp(this, this);
         testInfoAdapter = new TestInfoAdapter(this, null);
         mRecommendListView.setLayoutManager(new LinearLayoutManager(this));
+        mRecommendListView.addItemDecoration(new NormalDecoration(ContextCompat.getColor(this, R.color.line_color), 1));
         mRecommendListView.setAdapter(testInfoAdapter);
         testInfoAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
             @Override
@@ -218,7 +224,13 @@ public class TestResultActivity extends BaseFragmentActivity implements TestInfo
                 }
             }
         });
-
+        //发布
+        RxView.clicks(mSaveButton).throttleFirst(300, TimeUnit.MILLISECONDS).subscribe(new Action1<Void>() {
+            @Override
+            public void call(Void aVoid) {
+                save();
+            }
+        });
 
         //推荐列表
         testInfoPresenterImp.getHotAndRecommendList(2);
@@ -238,7 +250,7 @@ public class TestResultActivity extends BaseFragmentActivity implements TestInfo
         }
     }
 
-    @OnClick(R.id.btn_save)
+    //保存图片
     void save() {
         Glide.with(this).asBitmap().load(imageUrl).into(new SimpleTarget<Bitmap>() {
             @Override

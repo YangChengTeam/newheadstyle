@@ -13,12 +13,15 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
+import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.bean.NoteItem;
 import com.feiyou.headstyle.ui.custom.GlideRoundTransform;
 import com.feiyou.headstyle.ui.custom.RoundedCornersTransformation;
+import com.feiyou.headstyle.utils.MyTimeUtil;
 import com.orhanobut.logger.Logger;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -52,10 +55,13 @@ public class CommentAdapter extends BaseQuickAdapter<NoteItem, BaseViewHolder> {
             options.transform(new RoundedCornersTransformation(SizeUtils.dp2px(18), 0));
             Glide.with(mContext).load(item.getCommentUserimg()).apply(options).into((ImageView) helper.itemView.findViewById(R.id.iv_user_head));
 
+            Date currentDate = TimeUtils.millis2Date(item.getCommentTime() != null ? item.getCommentTime() * 1000 : 0);
+            String tempDateStr = MyTimeUtil.isOutMouth(currentDate) ? TimeUtils.millis2String(item.getCommentTime() != null ? item.getCommentTime() * 1000 : 0) : MyTimeUtil.getTimeFormatText(currentDate);
+
             helper.setText(R.id.tv_nick_name, item.getCommentNickname())
-                    .setText(R.id.tv_comment_date, TimeUtils.millis2String(item.getAddTime() != null ? item.getAddTime() * 1000 : 0))
-                    .setText(R.id.tv_comment_content, Html.fromHtml(item.getCommentContent()))
-                    .setText(R.id.tv_is_zan, item.getZanNum() + "");
+                    .setText(R.id.tv_comment_date, tempDateStr)
+                    .setText(R.id.tv_comment_content, Html.fromHtml(item.getCommentContent().replace("\n","<br>")))
+                    .setText(R.id.tv_is_zan, item.getZanNum() < 0 ? "0" : item.getZanNum() + "");
 
             TextView isZanTv = helper.itemView.findViewById(R.id.tv_is_zan);
             Drawable isZan = ContextCompat.getDrawable(mContext, R.mipmap.is_zan);
@@ -71,6 +77,12 @@ public class CommentAdapter extends BaseQuickAdapter<NoteItem, BaseViewHolder> {
 
             helper.setText(R.id.btn_reply_count, item.getListNum() > 0 ? item.getListNum() + "条回复>" : "回复");
             helper.addOnClickListener(R.id.btn_reply_count).addOnClickListener(R.id.iv_user_head);
+
+            if (item.getUserId().equals("1")) {
+                helper.setVisible(R.id.iv_system_user, true);
+            } else {
+                helper.setVisible(R.id.iv_system_user, false);
+            }
         }
     }
 }

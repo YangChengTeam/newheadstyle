@@ -6,7 +6,8 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="250dp"
+        android:layout_height="wrap_content"
+        android:minHeight="250dp"
         android:orientation="vertical">
 
         <LinearLayout
@@ -50,9 +51,11 @@
                 android:layout_alignParentTop="true"
                 android:layout_marginTop="6dp"
                 android:ellipsize="end"
-                android:gravity="center"
+                android:gravity="left|center"
                 android:maxLines="4"
-                android:text="@string/version_update_txt" />
+                android:text="@string/version_update_txt"
+                android:textColor="@color/black1"
+                android:textSize="14dp" />
 
             <Button
                 android:id="@+id/btn_update_version"
@@ -60,6 +63,7 @@
                 android:layout_height="30dp"
                 android:layout_alignParentBottom="true"
                 android:layout_marginBottom="16dp"
+                android:layout_marginTop="12dp"
                 android:background="@mipmap/update_btn_bg"
                 android:text="立即更新"
                 android:textColor="@color/white"
@@ -69,6 +73,7 @@
 
 
     <LinearLayout
+        android:id="@+id/layout_close"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="18dp"

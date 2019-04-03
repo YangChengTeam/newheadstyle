@@ -39,6 +39,9 @@ public class NoteItem {
     @SerializedName("is_zan")
     private int isZan;
 
+    @SerializedName("comment_time")
+    private Long commentTime;
+
     public Long getAddTime() {
         return addTime;
     }
@@ -117,5 +120,13 @@ public class NoteItem {
 
     public void setIsZan(int isZan) {
         this.isZan = isZan;
+    }
+
+    public Long getCommentTime() {
+        return commentTime;
+    }
+
+    public void setCommentTime(Long commentTime) {
+        this.commentTime = commentTime;
     }
 }

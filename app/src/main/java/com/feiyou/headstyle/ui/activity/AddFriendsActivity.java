@@ -19,6 +19,7 @@ import com.blankj.utilcode.util.SizeUtils;
 import com.blankj.utilcode.util.StringUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.chad.library.adapter.base.BaseQuickAdapter;
+import com.chad.library.adapter.base.BaseViewHolder;
 import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.bean.FollowInfoRet;
@@ -242,21 +243,27 @@ public class AddFriendsActivity extends BaseFragmentActivity implements UserInfo
             }
             if (tData instanceof FollowInfoRet) {
                 int tempResult = ((FollowInfoRet) tData).getData().getIsGuan();
-                //ToastUtils.showLong(tempResult == 0 ? "已取消" : "已关注");
 
-//                if (tempResult == 0) {
-//                    MyToastUtils.showToast(this, 1, "已取消");
-//                } else {
-//                    MyToastUtils.showToast(this, 0, "关注成功");
-//                }
+                RecyclerView.ViewHolder viewHolder = mFriendsListView.findViewHolderForAdapterPosition(currentPosition);
+                if (viewHolder != null && viewHolder instanceof BaseViewHolder) {
+                    BaseViewHolder itemHolder = (BaseViewHolder) viewHolder;
 
+                    LinearLayout followLayout = itemHolder.getView(R.id.layout_follow);
+                    TextView followTv = itemHolder.getView(R.id.tv_follow_txt);
+                    followLayout.setBackgroundResource(tempResult == 1 ? R.drawable.square_is_follow_bg : R.drawable.square_into_bg);
+                    followTv.setTextColor(ContextCompat.getColor(this, tempResult == 1 ? R.color.is_follow_color : R.color.tab_select_color));
+                    followTv.setText(tempResult == 1 ? "已关注" : "+关注");
+                }
+
+                addFriendsListAdapter.getData().get(currentPosition).setIsAllGuan(tempResult);
                 addFriendsListAdapter.getData().get(currentPosition).setFollow(tempResult == 0 ? false : true);
-                addFriendsListAdapter.notifyItemChanged(currentPosition);
             }
         } else {
             if (tData instanceof UserInfoListRet) {
-                mFriendsListView.setVisibility(View.GONE);
-                mNoDataLayout.setVisibility(View.VISIBLE);
+                if (currentPage == 1) {
+                    mFriendsListView.setVisibility(View.GONE);
+                    mNoDataLayout.setVisibility(View.VISIBLE);
+                }
             }
             ToastUtils.showLong(StringUtils.isEmpty(tData.getMsg()) ? "操作失败" : tData.getMsg());
         }

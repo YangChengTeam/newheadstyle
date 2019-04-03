@@ -122,6 +122,8 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
 
     ImageView topUserHeadImageView;
 
+    ImageView topSystemUserIv;
+
     TextView nickNameTv;
 
     TextView addDateTv;
@@ -229,6 +231,7 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
         //顶部个人的回复信息
         mReplyTitleTv = replyView.findViewById(R.id.tv_reply_title);
         topUserHeadImageView = replyView.findViewById(R.id.iv_user_head);
+        topSystemUserIv = replyView.findViewById(R.id.iv_system_user);
         nickNameTv = replyView.findViewById(R.id.tv_user_nick_name);
         addDateTv = replyView.findViewById(R.id.tv_add_date);
         commentContentTv = replyView.findViewById(R.id.tv_content);
@@ -289,8 +292,10 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
         commentReplyAdapter.setOnLoadMoreListener(new BaseQuickAdapter.RequestLoadMoreListener() {
             @Override
             public void onLoadMoreRequested() {
-                subCurrentPage++;
-                noteSubCommentDataPresenterImp.getNoteSubCommentData(subCurrentPage, App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", commentId, 1);
+                if (commentReplyAdapter.getData().size() >= pageSize) {
+                    subCurrentPage++;
+                    noteSubCommentDataPresenterImp.getNoteSubCommentData(subCurrentPage, App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", commentId, 1);
+                }
             }
         }, replyListView);
     }
@@ -338,6 +343,7 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
                 }
 
                 switchType = 1;
+                subCurrentPage = 1;
                 currentCommentPos = position;
                 commentId = commentAdapter.getData().get(currentCommentPos).getCommentId();
 
@@ -350,8 +356,15 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
                 options.error(R.mipmap.head_def);
                 options.placeholder(R.mipmap.head_def);
 
-                mReplyTitleTv.setText(noteItem.getCommentNum() > 0 ? noteItem.getCommentNum() + "条回复" : "暂无回复");
+                mReplyTitleTv.setText(noteItem.getListNum() > 0 ? noteItem.getListNum() + "条回复" : "暂无回复");
                 Glide.with(getActivity()).load(noteItem.getCommentUserimg()).apply(options).into(topUserHeadImageView);
+
+                if (noteItem.getUserId().equals("1")) {
+                    topSystemUserIv.setVisibility(View.VISIBLE);
+                } else {
+                    topSystemUserIv.setVisibility(View.GONE);
+                }
+
                 nickNameTv.setText(noteItem.getCommentNickname());
                 addDateTv.setText(TimeUtils.millis2String(noteItem.getAddTime() != null ? noteItem.getAddTime() * 1000 : 0));
                 commentContentTv.setText(Html.fromHtml(noteItem.getCommentContent()));
@@ -386,6 +399,7 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
             public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
 
                 switchType = 1;
+                subCurrentPage = 1;
                 currentCommentPos = position;
                 commentId = commentAdapter.getData().get(currentCommentPos).getCommentId();
                 int tempCount = commentAdapter.getData().get(currentCommentPos).getListNum();
@@ -405,11 +419,11 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
                         options.error(R.mipmap.head_def);
                         options.placeholder(R.mipmap.head_def);
 
-                        mReplyTitleTv.setText(noteItem.getCommentNum() > 0 ? noteItem.getCommentNum() + "条回复" : "暂无回复");
+                        mReplyTitleTv.setText(noteItem.getListNum() > 0 ? noteItem.getListNum() + "条回复" : "暂无回复");
                         Glide.with(getActivity()).load(noteItem.getCommentUserimg()).apply(options).into(topUserHeadImageView);
                         nickNameTv.setText(noteItem.getCommentNickname());
                         addDateTv.setText(TimeUtils.millis2String(noteItem.getAddTime() != null ? noteItem.getAddTime() * 1000 : 0));
-                        commentContentTv.setText(Html.fromHtml(noteItem.getCommentContent()));
+                        commentContentTv.setText(Html.fromHtml(noteItem.getCommentContent().replace("\n", "<br>")));
                         noteSubCommentDataPresenterImp.getNoteSubCommentData(subCurrentPage, App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", commentId, 1);
 
                         zanCountTv.setText(noteItem.getZanNum() + "");
@@ -578,10 +592,12 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
                     mNoDataLayout.setVisibility(View.GONE);
                     mWonderfulListView.setVisibility(View.VISIBLE);
                     if (commentPage == 1) {
+                        commentAdapter.getData().clear();
                         commentAdapter.setNewData(((NoteCommentRet) tData).getData());
                     } else {
                         commentAdapter.addData(((NoteCommentRet) tData).getData());
                     }
+                    commentAdapter.notifyDataSetChanged();
                 } else {
                     mWonderfulListView.setVisibility(View.GONE);
                     mNoDataLayout.setVisibility(View.VISIBLE);
@@ -596,13 +612,18 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
 
             if (tData instanceof NoteSubCommentRet) {
                 if (((NoteSubCommentRet) tData).getData() != null) {
-                    replyListView.setVisibility(View.VISIBLE);
                     mReplyNoDataLayout.setVisibility(View.GONE);
+                    replyListView.setVisibility(View.VISIBLE);
+                    //setPeekHeight,设置弹出窗口的高度为全屏的状态.
+                    BottomSheetBehavior mBehavior = BottomSheetBehavior.from((View) replyView.getParent());
+                    mBehavior.setPeekHeight(ScreenUtils.getScreenHeight() - BarUtils.getStatusBarHeight());
+
                     if (subCurrentPage == 1) {
                         commentReplyAdapter.setNewData(((NoteSubCommentRet) tData).getData());
                     } else {
                         commentReplyAdapter.addData(((NoteSubCommentRet) tData).getData());
                     }
+
                 } else {
                     replyListView.setVisibility(View.GONE);
                     mReplyNoDataLayout.setVisibility(View.VISIBLE);
@@ -692,8 +713,10 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
             }
 
             if (tData instanceof NoteSubCommentRet) {
-                replyListView.setVisibility(View.GONE);
-                mReplyNoDataLayout.setVisibility(View.VISIBLE);
+                if (subCurrentPage == 1) {
+                    replyListView.setVisibility(View.GONE);
+                    mReplyNoDataLayout.setVisibility(View.VISIBLE);
+                }
             }
 
             if (tData instanceof FollowInfoRet) {

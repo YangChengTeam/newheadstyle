@@ -233,6 +233,7 @@ public class EditUserInfoActivity extends BaseFragmentActivity implements View.O
 
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("正在保存");
+        progressDialog.setCanceledOnTouchOutside(false);
 
         bottomSheetDialog = new BottomSheetDialog(this);
         updateHeadBottomSheetDialog = new BottomSheetDialog(this);
@@ -263,7 +264,7 @@ public class EditUserInfoActivity extends BaseFragmentActivity implements View.O
     }
 
     @Override
-    protected void onResume() {
+    public void onResume() {
         super.onResume();
 
         userInfo = App.getApp().getmUserInfo();

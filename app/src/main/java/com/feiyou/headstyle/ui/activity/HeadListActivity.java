@@ -211,8 +211,10 @@ public class HeadListActivity extends BaseFragmentActivity implements HeadListDa
                 }
             }
         } else {
-            mHeadInfoListView.setVisibility(View.GONE);
-            mNoDataLayout.setVisibility(View.VISIBLE);
+            if (currentPage == 1) {
+                mHeadInfoListView.setVisibility(View.GONE);
+                mNoDataLayout.setVisibility(View.VISIBLE);
+            }
             Logger.i(StringUtils.isEmpty(tData.getMsg()) ? "加载失败" : tData.getMsg());
         }
     }

@@ -109,7 +109,11 @@ public class MyCommentFragment extends BaseFragment implements MyCommentView, Sw
             public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
                 if (view.getId() == R.id.iv_reply_head) {
                     Intent intent = new Intent(getActivity(), UserInfoActivity.class);
-                    intent.putExtra("user_id", myCommentAdapter.getData().get(position).getUserId());
+                    intent.putExtra("user_id", myCommentAdapter.getData().get(position).getRepeatUserId());
+                    startActivity(intent);
+                } else {
+                    Intent intent = new Intent(getActivity(), CommunityArticleActivity.class);
+                    intent.putExtra("msg_id", myCommentAdapter.getData().get(position).getMessageId());
                     startActivity(intent);
                 }
             }
@@ -159,8 +163,10 @@ public class MyCommentFragment extends BaseFragment implements MyCommentView, Sw
         } else {
             avi.hide();
             mRefreshLayout.setRefreshing(false);
-            noDataLayout.setVisibility(View.VISIBLE);
-            mCommentListView.setVisibility(View.GONE);
+            if (currentPage == 1) {
+                noDataLayout.setVisibility(View.VISIBLE);
+                mCommentListView.setVisibility(View.GONE);
+            }
         }
     }
 

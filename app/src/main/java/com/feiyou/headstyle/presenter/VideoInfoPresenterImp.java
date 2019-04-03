@@ -31,7 +31,7 @@ public class VideoInfoPresenterImp extends BasePresenterImp<VideoInfoView, Video
     }
 
     @Override
-    public void getDataList(int page) {
-        videoInfoModelImp.getDataList(page, this);
+    public void getDataList(int page,String uid) {
+        videoInfoModelImp.getDataList(page,uid, this);
     }
 }

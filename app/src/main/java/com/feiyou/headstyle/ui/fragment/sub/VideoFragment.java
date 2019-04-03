@@ -17,6 +17,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.VideoView;
 
 import com.alibaba.fastjson.JSONObject;
@@ -25,8 +26,10 @@ import com.blankj.utilcode.util.ToastUtils;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.dingmouren.layoutmanagergroup.viewpager.OnViewPagerListener;
 import com.dingmouren.layoutmanagergroup.viewpager.ViewPagerLayoutManager;
+import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.bean.ResultInfo;
+import com.feiyou.headstyle.bean.UserInfo;
 import com.feiyou.headstyle.bean.VideoInfo;
 import com.feiyou.headstyle.bean.VideoInfoRet;
 import com.feiyou.headstyle.common.Constants;
@@ -60,6 +63,9 @@ public class VideoFragment extends BaseFragment implements VideoInfoView, SwipeR
     @BindView(R.id.layout_no_data)
     LinearLayout noDataLayout;
 
+    @BindView(R.id.tv_reload)
+    TextView mTvReload;
+
     @BindView(R.id.avi)
     AVLoadingIndicatorView avi;
 
@@ -74,6 +80,8 @@ public class VideoFragment extends BaseFragment implements VideoInfoView, SwipeR
     private int pageSize = 30;
 
     private int clickPage;
+
+    private UserInfo userInfo;
 
     public static VideoFragment getInstance() {
         return new VideoFragment();
@@ -115,6 +123,7 @@ public class VideoFragment extends BaseFragment implements VideoInfoView, SwipeR
                 int topRowVerticalPosition = (recyclerView == null || recyclerView.getChildCount() == 0) ? 0 : recyclerView.getChildAt(0).getTop();
                 mRefreshLayout.setEnabled(topRowVerticalPosition >= 0);
             }
+
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
@@ -138,14 +147,25 @@ public class VideoFragment extends BaseFragment implements VideoInfoView, SwipeR
             }
         });
 
-        videoInfoPresenterImp.getDataList(currentPage);
         videoListAdapter.setOnLoadMoreListener(new BaseQuickAdapter.RequestLoadMoreListener() {
             @Override
             public void onLoadMoreRequested() {
                 currentPage++;
-                videoInfoPresenterImp.getDataList(currentPage);
+                videoInfoPresenterImp.getDataList(currentPage, userInfo != null ? userInfo.getId() : "");
             }
         }, mVideoListView);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        userInfo = App.getApp().getmUserInfo();
+        videoInfoPresenterImp.getDataList(currentPage, userInfo != null ? userInfo.getId() : "");
+    }
+
+    @OnClick(R.id.tv_reload)
+    void reload() {
+        onRefresh();
     }
 
     @Override
@@ -188,8 +208,10 @@ public class VideoFragment extends BaseFragment implements VideoInfoView, SwipeR
                 }
             }
         } else {
-            mVideoListView.setVisibility(View.GONE);
-            noDataLayout.setVisibility(View.VISIBLE);
+            if (currentPage == 1) {
+                mVideoListView.setVisibility(View.GONE);
+                noDataLayout.setVisibility(View.VISIBLE);
+            }
         }
     }
 
@@ -203,6 +225,6 @@ public class VideoFragment extends BaseFragment implements VideoInfoView, SwipeR
     public void onRefresh() {
         mRefreshLayout.setRefreshing(true);
         currentPage = 0;
-        videoInfoPresenterImp.getDataList(currentPage);
+        videoInfoPresenterImp.getDataList(currentPage,userInfo != null ? userInfo.getId() : "");
     }
 }

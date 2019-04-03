@@ -68,6 +68,12 @@ public class MyCommentAdapter extends BaseQuickAdapter<MyCommentInfo, BaseViewHo
             olgTv.setMovementMethod(LinkMovementMethod.getInstance());//不设置 没有点击事件
             olgTv.setHighlightColor(Color.TRANSPARENT); //设置点击后的颜色为透明
         }
-        helper.addOnClickListener(R.id.iv_reply_head);
+        helper.addOnClickListener(R.id.iv_reply_head).addOnClickListener(R.id.tv_reply_content).addOnClickListener(R.id.tv_old_content);
+
+        if (item.getUserId().equals("1")) {
+            helper.setVisible(R.id.iv_system_user, true);
+        } else {
+            helper.setVisible(R.id.iv_system_user, false);
+        }
     }
 }

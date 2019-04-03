@@ -219,6 +219,7 @@ public class RecommendFragment extends BaseFragment implements NoteDataView, Swi
                 public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
                     Intent intent = new Intent(getActivity(), CommunityType1Activity.class);
                     intent.putExtra("topic_id", topicAdapter.getData().get(position).getId());
+                    intent.putExtra("topic_index",position);
                     startActivity(intent);
                 }
             });
@@ -424,9 +425,11 @@ public class RecommendFragment extends BaseFragment implements NoteDataView, Swi
 
         } else {
             if (tData instanceof NoteInfoRet) {
-                mRecommendListView.setVisibility(View.GONE);
-                noDataLayout.setVisibility(View.VISIBLE);
-                mNoDataTiltTv.setText(communityType == 1 ? "暂无数据" : "还没有关注任何人");
+                if (currentPage == 1) {
+                    mRecommendListView.setVisibility(View.GONE);
+                    noDataLayout.setVisibility(View.VISIBLE);
+                    mNoDataTiltTv.setText(communityType == 1 ? "暂无数据" : "还没有关注任何人");
+                }
             }
 
             if (tData instanceof FollowInfoRet) {

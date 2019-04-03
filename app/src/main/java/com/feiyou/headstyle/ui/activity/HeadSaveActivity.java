@@ -22,6 +22,7 @@ import com.blankj.utilcode.util.ToastUtils;
 import com.bumptech.glide.Glide;
 import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
+import com.feiyou.headstyle.bean.MessageEvent;
 import com.feiyou.headstyle.bean.ResultInfo;
 import com.feiyou.headstyle.bean.UpdateHeadRet;
 import com.feiyou.headstyle.bean.UserInfo;
@@ -42,6 +43,10 @@ import com.umeng.socialize.UMShareAPI;
 import com.umeng.socialize.UMShareListener;
 import com.umeng.socialize.bean.SHARE_MEDIA;
 import com.umeng.socialize.media.UMImage;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.File;
 import java.util.Map;
@@ -211,11 +216,11 @@ public class HeadSaveActivity extends BaseFragmentActivity implements HeadListDa
         if (shareAction == null) {
             shareAction = new ShareAction(this);
             shareAction.setCallback(shareListener);//回调监听器
-            if(StringUtils.isEmpty(tempFilePath)){
+            if (StringUtils.isEmpty(tempFilePath)) {
                 UMImage image = new UMImage(HeadSaveActivity.this, R.drawable.app_share);
                 image.setThumb(image);
                 shareAction.withMedia(image);
-            }else{
+            } else {
                 UMImage image = new UMImage(HeadSaveActivity.this, new File(tempFilePath));
                 image.setThumb(image);
                 shareAction.withMedia(image);
@@ -256,7 +261,7 @@ public class HeadSaveActivity extends BaseFragmentActivity implements HeadListDa
 
     @OnClick(R.id.layout_home)
     void home() {
-        Intent intent = new Intent(this, Main2Activity.class);
+        Intent intent = new Intent(this, Main1Activity.class);
         startActivity(intent);
     }
 
@@ -268,6 +273,7 @@ public class HeadSaveActivity extends BaseFragmentActivity implements HeadListDa
             }
         } else {
             Intent intent = new Intent(this, PushNoteActivity.class);
+            intent.putExtra("from_note_type", 3);
             intent.putExtra("file_path", tempFilePath);
             startActivity(intent);
         }
@@ -459,4 +465,5 @@ public class HeadSaveActivity extends BaseFragmentActivity implements HeadListDa
             bottomSheetDialog.dismiss();
         }
     }
+
 }

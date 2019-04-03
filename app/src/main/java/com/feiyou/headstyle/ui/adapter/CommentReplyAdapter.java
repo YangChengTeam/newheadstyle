@@ -20,12 +20,15 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
+import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.bean.NoteSubComment;
 import com.feiyou.headstyle.ui.custom.GlideRoundTransform;
+import com.feiyou.headstyle.utils.MyTimeUtil;
 import com.feiyou.headstyle.view.MyClickText;
 import com.orhanobut.logger.Logger;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -48,10 +51,13 @@ public class CommentReplyAdapter extends BaseQuickAdapter<NoteSubComment, BaseVi
         options.placeholder(R.mipmap.image_def);
         Glide.with(mContext).load(item.getRepeatUserimg()).apply(options).into((ImageView) helper.itemView.findViewById(R.id.iv_user_head));
 
+        Date currentDate = TimeUtils.millis2Date(item.getAddTime() != null ? item.getAddTime() * 1000 : 0);
+        String tempDateStr = MyTimeUtil.isOutMouth(currentDate) ? TimeUtils.millis2String(item.getAddTime() != null ? item.getAddTime() * 1000 : 0) : MyTimeUtil.getTimeFormatText(currentDate);
+
         helper.setText(R.id.tv_nick_name, item.getRepeatNickname())
-                .setText(R.id.tv_comment_date, TimeUtils.millis2String(item.getAddTime() != null ? item.getAddTime() * 1000 : 0))
+                .setText(R.id.tv_comment_date, tempDateStr)
                 .setText(R.id.btn_reply_count, "回复")
-                .setText(R.id.tv_comment_content, Html.fromHtml(item.getRepeatContent()))
+                .setText(R.id.tv_comment_content, StringUtils.isEmpty(item.getRepeatContent()) ? "" : Html.fromHtml(item.getRepeatContent().replace("\n", "<br>")))
                 .setText(R.id.tv_is_zan, item.getZanNum() + "");
 
         TextView isZanTv = helper.itemView.findViewById(R.id.tv_is_zan);
@@ -78,13 +84,19 @@ public class CommentReplyAdapter extends BaseQuickAdapter<NoteSubComment, BaseVi
 
             TextView replyTv = helper.itemView.findViewById(R.id.tv_old_content);
             if (!StringUtils.isEmpty(item.getOldNickname())) {
-                SpannableString tempStr = new SpannableString(item.getOldNickname() + "：" + item.getOldContent());
+                SpannableString tempStr = new SpannableString(item.getOldNickname() + "：" + item.getOldContent().replace("\n", "<br>"));
                 tempStr.setSpan(new MyClickText(mContext), 0, item.getOldNickname().length() + 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                 //当然这里也可以通过setSpan来设置哪些位置的文本哪些颜色
                 replyTv.setText(tempStr);
                 replyTv.setMovementMethod(LinkMovementMethod.getInstance());//不设置 没有点击事件
                 replyTv.setHighlightColor(Color.TRANSPARENT); //设置点击后的颜色为透明
             }
+        }
+
+        if (item.getRepeatUserId().equals("1")) {
+            helper.setVisible(R.id.iv_system_user, true);
+        } else {
+            helper.setVisible(R.id.iv_system_user, false);
         }
     }
 }

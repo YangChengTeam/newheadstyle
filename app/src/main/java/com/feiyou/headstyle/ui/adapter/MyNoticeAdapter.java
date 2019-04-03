@@ -54,5 +54,11 @@ public class MyNoticeAdapter extends BaseQuickAdapter<SystemInfo, BaseViewHolder
                 .setText(R.id.tv_note_type_content, item.getType() == 1 ? "赞了你的评论" : "关注了你")
                 .setText(R.id.tv_notice_content, Html.fromHtml(StringUtils.isEmpty(item.getContent()) ? "" : item.getContent()))
                 .setText(R.id.tv_notice_date, tempDateStr);
+
+        if (item.getType() == 3) {
+            helper.setVisible(R.id.iv_system_user, true);
+        } else {
+            helper.setVisible(R.id.iv_system_user, false);
+        }
     }
 }

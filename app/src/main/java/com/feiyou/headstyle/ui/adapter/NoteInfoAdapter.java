@@ -55,12 +55,12 @@ public class NoteInfoAdapter extends BaseQuickAdapter<NoteInfo, BaseViewHolder> 
         helper.setText(R.id.tv_nick_name, item.getNickname())
                 .setText(R.id.tv_topic_name, item.getName())
                 .setText(R.id.tv_note_date, tempDateStr)
-                .setText(R.id.tv_message_count, item.getCommentNum() + "")
-                .setText(R.id.tv_zan_count, item.getZanNum() + "");
+                .setText(R.id.tv_message_count, item.getCommentNum() < 0 ? "0" : item.getCommentNum() + "")
+                .setText(R.id.tv_zan_count, item.getZanNum() < 0 ? "0" : item.getZanNum() + "");
 
 
         TextView contentTv = helper.getView(R.id.tv_note_content);
-        contentTv.setText(Html.fromHtml(StringUtils.isEmpty(item.getContent()) ? "" : item.getContent()));
+        contentTv.setText(Html.fromHtml(StringUtils.isEmpty(item.getContent()) ? "" : item.getContent().replace("\n","<br>")));
 
         TextView isZanTv = helper.itemView.findViewById(R.id.tv_zan_count);
         Drawable isZan = ContextCompat.getDrawable(mContext, R.mipmap.is_zan);
@@ -77,17 +77,17 @@ public class NoteInfoAdapter extends BaseQuickAdapter<NoteInfo, BaseViewHolder> 
             helper.addOnClickListener(R.id.layout_follow);
 
             //自己对自己发的贴，隐藏相关操作按钮
-            if (App.getApp().getmUserInfo() != null && App.getApp().getmUserInfo().getId().equals(item.getUserId())){
+            if (App.getApp().getmUserInfo() != null && App.getApp().getmUserInfo().getId().equals(item.getUserId())) {
                 helper.setVisible(R.id.layout_follow, false).setVisible(R.id.layout_operation, false);
-            }else{
+            } else {
                 helper.setVisible(R.id.layout_follow, true).setVisible(R.id.layout_operation, false);
             }
             helper.addOnClickListener(R.id.layout_operation);
         } else {
             //自己对自己发的贴，隐藏相关操作按钮
-            if (App.getApp().getmUserInfo() != null && App.getApp().getmUserInfo().getId().equals(item.getUserId())){
+            if (App.getApp().getmUserInfo() != null && App.getApp().getmUserInfo().getId().equals(item.getUserId())) {
                 helper.setVisible(R.id.layout_follow, false).setVisible(R.id.layout_operation, true);
-            }else{
+            } else {
                 helper.setVisible(R.id.layout_follow, false).setVisible(R.id.layout_operation, false);
             }
             helper.addOnClickListener(R.id.layout_operation);
@@ -130,5 +130,10 @@ public class NoteInfoAdapter extends BaseQuickAdapter<NoteInfo, BaseViewHolder> 
             }
         });
 
+        if (item.getUserId().equals("1")) {
+            helper.setVisible(R.id.iv_system_user, true);
+        } else {
+            helper.setVisible(R.id.iv_system_user, false);
+        }
     }
 }

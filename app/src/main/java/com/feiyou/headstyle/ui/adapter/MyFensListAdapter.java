@@ -65,6 +65,6 @@ public class MyFensListAdapter extends BaseQuickAdapter<UserInfo, BaseViewHolder
         }
         helper.setText(R.id.tv_follow_txt, followStr);
 
-        helper.addOnClickListener(R.id.layout_follow);
+        helper.addOnClickListener(R.id.layout_follow).addOnClickListener(R.id.iv_user_head);
     }
 }

@@ -108,7 +108,7 @@ public class BindPhoneActivity extends BaseFragmentActivity implements UserInfoV
     }
 
     @Override
-    protected void onResume() {
+    public void onResume() {
         super.onResume();
         eventHandler = new EventHandler() {
             public void afterEvent(int event, int result, Object data) {

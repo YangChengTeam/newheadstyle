@@ -223,11 +223,13 @@ public class StarDetailActivity extends BaseFragmentActivity implements Forecast
     @OnClick(R.id.layout_save_poster)
     void savePoster() {
         if (StringUtils.isEmpty(uniqid) || userInfo == null) {
-            ToastUtils.showLong("无法生存，请稍后重试");
+            ToastUtils.showLong("无法生成，请稍后重试");
             return;
         }
 
+        isShare = false;
         if (progressDialog != null && !progressDialog.isShowing()) {
+            progressDialog.setMessage("正在保存");
             progressDialog.show();
         }
 

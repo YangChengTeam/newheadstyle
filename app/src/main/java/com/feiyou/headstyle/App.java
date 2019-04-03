@@ -5,6 +5,7 @@ import android.content.Context;
 
 import com.blankj.utilcode.util.Utils;
 import com.bumptech.glide.Glide;
+import com.feiyou.headstyle.bean.NoteInfo;
 import com.feiyou.headstyle.bean.TestDetailInfoWrapper;
 import com.feiyou.headstyle.bean.TestInfo;
 import com.feiyou.headstyle.bean.TopicInfo;
@@ -102,4 +103,5 @@ public class App extends Application {
     public void setTestInfo(TestDetailInfoWrapper testInfo) {
         this.testInfo = testInfo;
     }
+
 }

@@ -144,8 +144,10 @@ public class SystemInfoFragment extends BaseFragment implements SystemInfoView, 
                 noticeAdapter.loadMoreEnd(true);
             }
         } else {
-            noDataLayout.setVisibility(View.VISIBLE);
-            mNoticeListView.setVisibility(View.GONE);
+            if (currentPage == 1) {
+                noDataLayout.setVisibility(View.VISIBLE);
+                mNoticeListView.setVisibility(View.GONE);
+            }
         }
     }
 

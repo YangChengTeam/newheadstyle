@@ -54,5 +54,11 @@ public class MyAtMessageAdapter extends BaseQuickAdapter<MyAtMessage, BaseViewHo
                 .setText(R.id.tv_reply_date, TimeUtils.millis2String(item.getAddTime() != null ? item.getAddTime() * 1000 : 0));
 
         helper.addOnClickListener(R.id.iv_reply_head);
+
+        if (item.getUserId().equals("1")) {
+            helper.setVisible(R.id.iv_system_user, true);
+        } else {
+            helper.setVisible(R.id.iv_system_user, false);
+        }
     }
 }
