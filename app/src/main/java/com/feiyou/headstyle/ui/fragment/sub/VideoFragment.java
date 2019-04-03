@@ -75,7 +75,7 @@ public class VideoFragment extends BaseFragment implements VideoInfoView, SwipeR
 
     private int randomPage;
 
-    private int currentPage;
+    //private int currentPage;
 
     private int pageSize = 30;
 
@@ -83,19 +83,28 @@ public class VideoFragment extends BaseFragment implements VideoInfoView, SwipeR
 
     private UserInfo userInfo;
 
+    private View rootView;
+
+    private boolean isVisible;
+
     public static VideoFragment getInstance() {
         return new VideoFragment();
     }
 
     @Override
     protected View onCreateView() {
-        View root = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_tab_video, null);
-        ButterKnife.bind(this, root);
-        initViews();
-        return root;
+        if (rootView == null) {
+            rootView = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_tab_video, null);
+            ButterKnife.bind(this, rootView);
+            initViews();
+        }
+        return rootView;
     }
 
     public void initViews() {
+        Logger.i("video info init view--->");
+        userInfo = App.getApp().getmUserInfo();
+
 
         mRefreshLayout.setOnRefreshListener(this);
         //设置进度View样式的大小，只有两个值DEFAULT和LARGE
@@ -150,17 +159,30 @@ public class VideoFragment extends BaseFragment implements VideoInfoView, SwipeR
         videoListAdapter.setOnLoadMoreListener(new BaseQuickAdapter.RequestLoadMoreListener() {
             @Override
             public void onLoadMoreRequested() {
-                currentPage++;
-                videoInfoPresenterImp.getDataList(currentPage, userInfo != null ? userInfo.getId() : "");
+                //currentPage++;
+                videoInfoPresenterImp.getDataList(0, userInfo != null ? userInfo.getId() : "");
             }
         }, mVideoListView);
+
+        videoInfoPresenterImp.getDataList(0, userInfo != null ? userInfo.getId() : "");
+
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        userInfo = App.getApp().getmUserInfo();
-        videoInfoPresenterImp.getDataList(currentPage, userInfo != null ? userInfo.getId() : "");
+        Logger.i("video info onresume--->");
+    }
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        Logger.i("video info isVisible --->" + isVisibleToUser);
+        isVisible = isVisibleToUser;
+
+        if (getContext() != null && isVisibleToUser) {
+            //Logger.i("video info isVisible --->");
+        }
     }
 
     @OnClick(R.id.tv_reload)
@@ -188,18 +210,16 @@ public class VideoFragment extends BaseFragment implements VideoInfoView, SwipeR
             mVideoListView.setVisibility(View.VISIBLE);
             noDataLayout.setVisibility(View.GONE);
             if (tData instanceof VideoInfoRet) {
-                if (currentPage == 0) {
-                    randomPage = ((VideoInfoRet) tData).getData().getPage();
-                    currentPage = randomPage;
 
-                    if (((VideoInfoRet) tData).getData().getList() != null) {
-                        videoListAdapter.setNewData(((VideoInfoRet) tData).getData().getList());
-                    }
+                if (videoListAdapter.getData() == null || videoListAdapter.getData().size() == 0) {
+                    videoListAdapter.setNewData(((VideoInfoRet) tData).getData().getList());
+
+                    App.getApp().setVideoList(((VideoInfoRet) tData).getData().getList());
                 } else {
-                    if (((VideoInfoRet) tData).getData().getList() != null) {
-                        videoListAdapter.addData(((VideoInfoRet) tData).getData().getList());
-                    }
+                    videoListAdapter.addData(((VideoInfoRet) tData).getData().getList());
+                    App.getApp().getVideoList().addAll(((VideoInfoRet) tData).getData().getList());
                 }
+                videoListAdapter.notifyDataSetChanged();
 
                 if (((VideoInfoRet) tData).getData().getList().size() == pageSize) {
                     videoListAdapter.loadMoreComplete();
@@ -208,10 +228,8 @@ public class VideoFragment extends BaseFragment implements VideoInfoView, SwipeR
                 }
             }
         } else {
-            if (currentPage == 1) {
-                mVideoListView.setVisibility(View.GONE);
-                noDataLayout.setVisibility(View.VISIBLE);
-            }
+            mVideoListView.setVisibility(View.GONE);
+            noDataLayout.setVisibility(View.VISIBLE);
         }
     }
 
@@ -223,8 +241,9 @@ public class VideoFragment extends BaseFragment implements VideoInfoView, SwipeR
 
     @Override
     public void onRefresh() {
+        App.getApp().getVideoList().clear();
         mRefreshLayout.setRefreshing(true);
-        currentPage = 0;
-        videoInfoPresenterImp.getDataList(currentPage,userInfo != null ? userInfo.getId() : "");
+
+        videoInfoPresenterImp.getDataList(0, userInfo != null ? userInfo.getId() : "");
     }
 }

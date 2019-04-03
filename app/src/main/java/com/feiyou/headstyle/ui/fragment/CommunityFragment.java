@@ -112,7 +112,6 @@ public class CommunityFragment extends BaseFragment implements ViewPager.OnPageC
 
         mTabHost.setOnTabChangedListener(this);
         viewPager.addOnPageChangeListener(this);
-
         //设置默认值
         View firstView = mTabHost.getCurrentTabView();
         lastTabView = firstView;

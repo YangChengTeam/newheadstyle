@@ -7,7 +7,7 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="245dp">
+        android:layout_height="230dp">
 
         <FrameLayout
             android:layout_width="match_parent"
@@ -90,7 +90,7 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="80dp"
+            android:layout_height="65dp"
             android:layout_alignParentBottom="true"
             android:layout_marginLeft="24dp"
             android:layout_marginRight="24dp"
@@ -193,7 +193,7 @@
         <RelativeLayout
             android:id="@+id/layout_my_message"
             android:layout_width="match_parent"
-            android:layout_height="48dp">
+            android:layout_height="42dp">
 
             <ImageView
                 android:id="@+id/iv_message"
@@ -241,7 +241,7 @@
         <RelativeLayout
             android:id="@+id/layout_my_note"
             android:layout_width="match_parent"
-            android:layout_height="48dp">
+            android:layout_height="42dp">
 
             <ImageView
                 android:id="@+id/iv_note"
@@ -283,7 +283,7 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="48dp">
+            android:layout_height="42dp">
 
             <ImageView
                 android:id="@+id/iv_about_us"
@@ -319,7 +319,7 @@
         <RelativeLayout
             android:id="@+id/layout_add_score"
             android:layout_width="match_parent"
-            android:layout_height="48dp">
+            android:layout_height="42dp">
 
             <ImageView
                 android:id="@+id/iv_score"
@@ -360,7 +360,7 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="48dp">
+            android:layout_height="42dp">
 
             <ImageView
                 android:id="@+id/iv_weixin_code"
@@ -396,7 +396,7 @@
         <RelativeLayout
             android:id="@+id/layout_feed_back"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
+            android:layout_height="42dp"
             android:background="@drawable/common_white_bg">
 
             <ImageView

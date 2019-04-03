@@ -280,7 +280,7 @@ public class VideoItemShowActivity extends BaseFragmentActivity implements Video
         snapHelper = new PagerSnapHelper();
         snapHelper.attachToRecyclerView(mVideoListView);
         //videoAdapter = new ListVideoAdapter(urlList);
-        videoItemShowAdapter = new VideoItemShowAdapter(this, null);
+        videoItemShowAdapter = new VideoItemShowAdapter(this, App.getApp().getVideoList());
         layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         mVideoListView.setLayoutManager(layoutManager);
         mVideoListView.setAdapter(videoItemShowAdapter);
@@ -293,15 +293,15 @@ public class VideoItemShowActivity extends BaseFragmentActivity implements Video
         addZanPresenterImp = new AddZanPresenterImp(this, this);
         followInfoPresenterImp = new FollowInfoPresenterImp(this, this);
 
-        videoInfoPresenterImp.getDataList(videoPage, userInfo != null ? userInfo.getId() : "");
+        //videoInfoPresenterImp.getDataList(videoPage, userInfo != null ? userInfo.getId() : "");
 
-        videoItemShowAdapter.setOnLoadMoreListener(new BaseQuickAdapter.RequestLoadMoreListener() {
-            @Override
-            public void onLoadMoreRequested() {
-                videoPage++;
-                videoInfoPresenterImp.getDataList(videoPage, userInfo != null ? userInfo.getId() : "");
-            }
-        }, mVideoListView);
+//        videoItemShowAdapter.setOnLoadMoreListener(new BaseQuickAdapter.RequestLoadMoreListener() {
+//            @Override
+//            public void onLoadMoreRequested() {
+//                videoPage++;
+//                videoInfoPresenterImp.getDataList(videoPage, userInfo != null ? userInfo.getId() : "");
+//            }
+//        }, mVideoListView);
 
         videoItemShowAdapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
             @Override

@@ -48,6 +48,15 @@
                 android:text="暂无数据"
                 android:textColor="@color/search_number_def"
                 android:textSize="16dp" />
+
+            <TextView
+                android:id="@+id/tv_follow_user"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:text="去关注 >"
+                android:textColor="@color/colorPrimary"
+                android:textSize="14dp" />
         </LinearLayout>
     </FrameLayout>
 </LinearLayout>

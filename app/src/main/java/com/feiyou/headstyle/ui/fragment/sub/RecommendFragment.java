@@ -3,7 +3,6 @@ package com.feiyou.headstyle.ui.fragment.sub;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.design.widget.BottomSheetDialog;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -21,9 +20,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.ajguan.library.EasyRefreshLayout;
-import com.ajguan.library.LoadModel;
-import com.ajguan.library.view.SimpleLoadMoreView;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.blankj.utilcode.util.SPUtils;
@@ -85,10 +81,10 @@ import es.dmoral.toasty.Toasty;
 /**
  * Created by myflying on 2018/11/26.
  */
-public class RecommendFragment extends BaseFragment implements NoteDataView, View.OnClickListener {
+public class RecommendFragment extends BaseFragment implements NoteDataView, SwipeRefreshLayout.OnRefreshListener, View.OnClickListener {
 
-    @BindView(R.id.easylayout)
-    EasyRefreshLayout easyRefreshLayout;
+    @BindView(R.id.swipe_refresh)
+    SwipeRefreshLayout mRefreshLayout;
 
     @BindView(R.id.recommend_list)
     RecyclerView mRecommendListView;
@@ -138,8 +134,6 @@ public class RecommendFragment extends BaseFragment implements NoteDataView, Vie
 
     BottomSheetDialog bottomSheetDialog;
 
-    private View topRefreshView;
-
     public static RecommendFragment getInstance() {
         return new RecommendFragment();
     }
@@ -156,7 +150,7 @@ public class RecommendFragment extends BaseFragment implements NoteDataView, Vie
     protected View onCreateView() {
         View root = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_tab_recommend, null);
 
-        if (!EventBus.getDefault().isRegistered(this)) {
+        if(!EventBus.getDefault().isRegistered(this)){
             EventBus.getDefault().register(this);
         }
 
@@ -166,6 +160,19 @@ public class RecommendFragment extends BaseFragment implements NoteDataView, Vie
     }
 
     public void initData() {
+        mRefreshLayout.setOnRefreshListener(this);
+        //设置进度View样式的大小，只有两个值DEFAULT和LARGE
+        //设置进度View下拉的起始点和结束点，scale 是指设置是否需要放大或者缩小动画
+        mRefreshLayout.setProgressViewOffset(true, -0, 200);
+        //设置进度View下拉的结束点，scale 是指设置是否需要放大或者缩小动画
+        mRefreshLayout.setProgressViewEndTarget(true, 180);
+        //设置进度View的组合颜色，在手指上下滑时使用第一个颜色，在刷新中，会一个个颜色进行切换
+        mRefreshLayout.setColorSchemeColors(ContextCompat.getColor(getActivity(), R.color.colorPrimary), Color.RED, Color.YELLOW, Color.BLUE);
+
+        //设置触发刷新的距离
+        mRefreshLayout.setDistanceToTriggerSync(200);
+        //如果child是自己自定义的view，可以通过这个回调，告诉mSwipeRefreshLayoutchild是否可以滑动
+        mRefreshLayout.setOnChildScrollUpCallback(null);
 
         if (shareAction == null) {
             shareAction = new ShareAction(getActivity());
@@ -212,16 +219,16 @@ public class RecommendFragment extends BaseFragment implements NoteDataView, Vie
                 public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
                     Intent intent = new Intent(getActivity(), CommunityType1Activity.class);
                     intent.putExtra("topic_id", topicAdapter.getData().get(position).getId());
-                    intent.putExtra("topic_index", position);
+                    intent.putExtra("topic_index",position);
                     startActivity(intent);
                 }
             });
             noteInfoAdapter.setHeaderView(topView);
         }
 
-        CoordinatorLayout.LayoutParams listParams = new CoordinatorLayout.LayoutParams(CoordinatorLayout.LayoutParams.MATCH_PARENT, CoordinatorLayout.LayoutParams.MATCH_PARENT);
+        FrameLayout.LayoutParams listParams = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
         listParams.setMargins(0, 0, 0, SizeUtils.dp2px(48));
-        easyRefreshLayout.setLayoutParams(listParams);
+        mRefreshLayout.setLayoutParams(listParams);
 
         noteInfoAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
             @Override
@@ -276,26 +283,21 @@ public class RecommendFragment extends BaseFragment implements NoteDataView, Vie
             }
         }, mRecommendListView);
 
-        easyRefreshLayout.addEasyEvent(new EasyRefreshLayout.EasyEvent() {
+        mRecommendListView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
-            public void onLoadMore() {
-                //none
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                int topRowVerticalPosition = (recyclerView == null || recyclerView.getChildCount() == 0) ? 0 : recyclerView.getChildAt(0).getTop();
+
+                Logger.i("recomment height--->" + topRowVerticalPosition);
+
+                mRefreshLayout.setEnabled(topRowVerticalPosition >= 0);
             }
 
             @Override
-            public void onRefreshing() {
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        onRefresh();
-                    }
-                }, 200);
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
             }
         });
-
-        topRefreshView = LayoutInflater.from(getActivity()).inflate(R.layout.refresh_top_view, null);
-        easyRefreshLayout.setRefreshHeadView(topRefreshView);
-        easyRefreshLayout.setLoadMoreModel(LoadModel.NONE);
 
         loginDialog = new LoginDialog(getActivity(), R.style.login_dialog);
         noteDataPresenterImp = new NoteDataPresenterImp(this, getActivity());
@@ -360,15 +362,13 @@ public class RecommendFragment extends BaseFragment implements NoteDataView, Vie
 
     @Override
     public void dismissProgress() {
-        easyRefreshLayout.refreshComplete();
-        easyRefreshLayout.loadMoreComplete();
+        mRefreshLayout.setRefreshing(false);
     }
 
     @Override
     public void loadDataSuccess(ResultInfo tData) {
         avi.hide();
-        easyRefreshLayout.refreshComplete();
-        easyRefreshLayout.loadMoreComplete();
+        mRefreshLayout.setRefreshing(false);
         if (tData != null && tData.getCode() == Constants.SUCCESS) {
             if (tData instanceof NoteInfoRet) {
                 if (((NoteInfoRet) tData).getData() != null && ((NoteInfoRet) tData).getData().size() > 0) {
@@ -444,12 +444,12 @@ public class RecommendFragment extends BaseFragment implements NoteDataView, Vie
     @Override
     public void loadDataError(Throwable throwable) {
         avi.hide();
-        easyRefreshLayout.refreshComplete();
-        easyRefreshLayout.loadMoreComplete();
+        mRefreshLayout.setRefreshing(false);
     }
 
-    //TODO
+    @Override
     public void onRefresh() {
+        mRefreshLayout.setRefreshing(true);
         currentPage = 1;
         noteDataPresenterImp.getNoteData(currentPage, 2, userInfo != null ? userInfo.getId() : "");
     }

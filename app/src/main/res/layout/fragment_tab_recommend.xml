@@ -6,18 +6,22 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.ajguan.library.EasyRefreshLayout
-        android:id="@+id/easylayout"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/tab_bg_color">
+        android:layout_height="match_parent">
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/recommend_list"
+        <android.support.v4.widget.SwipeRefreshLayout
+            android:id="@+id/swipe_refresh"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_centerHorizontal="true"
-            android:overScrollMode="never"></android.support.v7.widget.RecyclerView>
+            android:layout_height="match_parent">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recommend_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_centerHorizontal="true"
+                android:overScrollMode="never"></android.support.v7.widget.RecyclerView>
+        </android.support.v4.widget.SwipeRefreshLayout>
 
         <com.wang.avi.AVLoadingIndicatorView
             android:id="@+id/avi"
@@ -60,7 +64,7 @@
                 android:textColor="@color/colorPrimary"
                 android:textSize="14dp" />
         </LinearLayout>
-    </com.ajguan.library.EasyRefreshLayout>
+    </FrameLayout>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"

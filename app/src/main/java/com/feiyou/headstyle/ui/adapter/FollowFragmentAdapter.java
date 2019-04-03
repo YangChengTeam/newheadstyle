@@ -5,11 +5,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.view.ViewGroup;
 
-import com.feiyou.headstyle.ui.fragment.sub.FollowFragment;
-import com.feiyou.headstyle.ui.fragment.sub.MyFriendsFragment;
-import com.feiyou.headstyle.ui.fragment.sub.RecommendFragment;
-import com.feiyou.headstyle.ui.fragment.sub.VideoFragment;
-
 
 public class FollowFragmentAdapter extends FragmentPagerAdapter {
 

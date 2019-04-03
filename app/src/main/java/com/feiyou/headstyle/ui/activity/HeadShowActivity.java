@@ -415,6 +415,12 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
         }
 
         if (fromType == 2) {
+            if (startPosition == collectionList.size() - 1) {
+                pageSizeLastClick = true;
+                isLastImage = true;
+                lastHeadInfo = collectionList.get(0);
+            }
+
             if (startPosition < collectionList.size()) {
                 adapter.addDatas(collectionList.subList(startPosition, collectionList.size()));
             } else {
@@ -628,24 +634,25 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
 
             Logger.i("last count--->" + adapter.getCount());
 
-            if (adapter.getCount() == 1) {
+            if (adapter.getCount() == 1 && fromType > 1) {
                 isLastImage = true;
                 lastHeadInfo = adapter.getHeads().get(0);
                 Logger.i("已经是最后一张了");
             }
 
-            currentImageUrl = adapter.getHeads() != null && adapter.getHeads().size() > 0 ? adapter.getHeads().get(0).getImgurl() : "";
-            imageId = adapter.getHeads().get(0).getId();
-            if (shareAction != null) {
-                if (!StringUtils.isEmpty(currentImageUrl)) {
-                    UMImage image = new UMImage(HeadShowActivity.this, currentImageUrl);
-                    shareAction.withMedia(image);
-                } else {
-                    shareAction.withMedia(defUmImage);
-                }
-            }
-
             if (adapter.getHeads().size() > 0) {
+
+                currentImageUrl = adapter.getHeads() != null && adapter.getHeads().size() > 0 ? adapter.getHeads().get(0).getImgurl() : "";
+                imageId = adapter.getHeads().get(0).getId();
+                if (shareAction != null) {
+                    if (!StringUtils.isEmpty(currentImageUrl)) {
+                        UMImage image = new UMImage(HeadShowActivity.this, currentImageUrl);
+                        shareAction.withMedia(image);
+                    } else {
+                        shareAction.withMedia(defUmImage);
+                    }
+                }
+
                 if (adapter.getHeads().get(0).getIsCollect() == 0) {
                     mKeepTextView.setCompoundDrawablesWithIntrinsicBounds(null, notCollection, null, null);
                 } else {
@@ -668,14 +675,16 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
                 Logger.i("已经是最后一张了");
             }
 
-            currentImageUrl = adapter.getHeads() != null && adapter.getHeads().size() > 0 ? adapter.getHeads().get(0).getImgurl() : "";
-            imageId = adapter.getHeads().get(0).getId();
-            if (shareAction != null) {
-                if (!StringUtils.isEmpty(currentImageUrl)) {
-                    UMImage image = new UMImage(HeadShowActivity.this, currentImageUrl);
-                    shareAction.withMedia(image);
-                } else {
-                    shareAction.withMedia(defUmImage);
+            if (adapter.getHeads().size() > 0) {
+                currentImageUrl = adapter.getHeads().get(0).getImgurl();
+                imageId = adapter.getHeads().get(0).getId();
+                if (shareAction != null) {
+                    if (!StringUtils.isEmpty(currentImageUrl)) {
+                        UMImage image = new UMImage(HeadShowActivity.this, currentImageUrl);
+                        shareAction.withMedia(image);
+                    } else {
+                        shareAction.withMedia(defUmImage);
+                    }
                 }
             }
         }
@@ -724,6 +733,8 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
                 if (isFirstLoad) {
                     if (startPosition == ((HomeDataRet) tData).getData().getImagesList().size() - 1) {
                         pageSizeLastClick = true;
+                        isLastImage = true;
+                        lastHeadInfo = ((HomeDataRet) tData).getData().getImagesList().get(0);
                     }
                     if (startPosition < ((HomeDataRet) tData).getData().getImagesList().size()) {
                         adapter.addDatas(((HomeDataRet) tData).getData().getImagesList().subList(startPosition, ((HomeDataRet) tData).getData().getImagesList().size()));

@@ -10,6 +10,7 @@ import com.feiyou.headstyle.bean.TestDetailInfoWrapper;
 import com.feiyou.headstyle.bean.TestInfo;
 import com.feiyou.headstyle.bean.TopicInfo;
 import com.feiyou.headstyle.bean.UserInfo;
+import com.feiyou.headstyle.bean.VideoInfo;
 import com.feiyou.headstyle.utils.AppContextUtil;
 import com.mob.MobSDK;
 import com.umeng.commonsdk.UMConfigure;
@@ -50,6 +51,8 @@ public class App extends Application {
     public static boolean isRemindNotice;
 
     public static boolean isShowTotalCount;
+
+    private List<VideoInfo> videoList;
 
     public App() {
         mInstance = this;
@@ -104,4 +107,11 @@ public class App extends Application {
         this.testInfo = testInfo;
     }
 
+    public List<VideoInfo> getVideoList() {
+        return videoList;
+    }
+
+    public void setVideoList(List<VideoInfo> videoList) {
+        this.videoList = videoList;
+    }
 }
