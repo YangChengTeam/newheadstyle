@@ -51,7 +51,7 @@ public class MyNoticeAdapter extends BaseQuickAdapter<SystemInfo, BaseViewHolder
         String tempDateStr = MyTimeUtil.isOutMouth(currentDate) ? TimeUtils.millis2String(item.getAddTime() != null ? item.getAddTime() * 1000 : 0) : MyTimeUtil.getTimeFormatText(currentDate);
 
         helper.setText(R.id.tv_notice_nick_name, item.getNickname())
-                .setText(R.id.tv_note_type_content, item.getType() == 1 ? "赞了你的评论" : "关注了你")
+                .setText(R.id.tv_note_type_content, item.getType() == 3 ? "" : item.getType() == 1 ? "赞了你的评论" : "关注了你")
                 .setText(R.id.tv_notice_content, Html.fromHtml(StringUtils.isEmpty(item.getContent()) ? "" : item.getContent()))
                 .setText(R.id.tv_notice_date, tempDateStr);
 
