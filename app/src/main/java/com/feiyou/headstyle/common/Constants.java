@@ -51,6 +51,10 @@ public class Constants {
 
     public static final String SHOW_SHAPE = "show_shape";
 
+    public static final String GUAN_NUM = "guan_num";
+
+    public static final String FEN_NUM = "fen_num";
+
     public static final String COMMENT_COUNT = "comment_count";
 
     public static final String AT_COUNT = "at_count";

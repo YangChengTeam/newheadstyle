@@ -34,8 +34,8 @@
                     android:id="@+id/top_bg_layout"
                     android:layout_width="match_parent"
                     android:layout_height="183dp"
-                    android:orientation="vertical"
-                    android:layout_gravity="top|center"></LinearLayout>
+                    android:layout_gravity="top|center"
+                    android:orientation="vertical"></LinearLayout>
 
                 <FrameLayout
                     android:layout_width="match_parent"
@@ -131,9 +131,9 @@
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginLeft="30dp"
+                            android:layout_marginLeft="12dp"
                             android:layout_marginTop="6dp"
-                            android:layout_marginRight="30dp"
+                            android:layout_marginRight="16dp"
                             android:layout_marginBottom="6dp"
                             android:gravity="left|center"
                             android:orientation="horizontal">
@@ -157,9 +157,9 @@
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginLeft="30dp"
+                            android:layout_marginLeft="12dp"
                             android:layout_marginTop="6dp"
-                            android:layout_marginRight="30dp"
+                            android:layout_marginRight="16dp"
                             android:layout_marginBottom="6dp"
                             android:gravity="left|center"
                             android:orientation="horizontal">
@@ -200,9 +200,9 @@
                             android:id="@+id/layout_sign"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginLeft="30dp"
+                            android:layout_marginLeft="12dp"
                             android:layout_marginTop="6dp"
-                            android:layout_marginRight="30dp"
+                            android:layout_marginRight="16dp"
                             android:layout_marginBottom="6dp"
                             android:gravity="left|center"
                             android:orientation="horizontal">
@@ -214,25 +214,40 @@
                                 android:textColor="@color/gray999"
                                 android:textSize="14dp" />
 
-                            <TextView
+                            <!--<TextView-->
+                            <!--android:id="@+id/tv_user_sign"-->
+                            <!--android:layout_width="0dp"-->
+                            <!--android:layout_height="wrap_content"-->
+                            <!--android:layout_weight="1"-->
+                            <!--android:ellipsize="end"-->
+                            <!--android:maxLines="2"-->
+                            <!--android:text=""-->
+                            <!--android:textColor="@color/black1"-->
+                            <!--android:textSize="14dp" />-->
+
+                            <com.lcodecore.extextview.ExpandTextView
                                 android:id="@+id/tv_user_sign"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:ellipsize="end"
-                                android:maxLines="2"
-                                android:text=""
                                 android:textColor="@color/black1"
-                                android:textSize="14dp" />
+                                android:textSize="14sp"
+                                app:arrowAlign="bottom"
+                                app:arrowPadding="2dp"
+                                app:arrowPosition="right"
+                                app:collapseDrawable="@mipmap/right_down"
+                                app:expandDrawable="@mipmap/right_up"
+                                app:maxCollapsedLines="2" />
+
                         </LinearLayout>
 
                         <RelativeLayout
                             android:id="@+id/layout_photos"
                             android:layout_width="match_parent"
                             android:layout_height="36dp"
-                            android:layout_marginLeft="30dp"
+                            android:layout_marginLeft="12dp"
                             android:layout_marginTop="6dp"
-                            android:layout_marginRight="30dp"
+                            android:layout_marginRight="16dp"
                             android:layout_marginBottom="6dp"
                             android:layout_weight="1"
                             android:gravity="left|center">

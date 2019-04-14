@@ -1,5 +1,6 @@
 package com.feiyou.headstyle.ui.activity;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.media.MediaScannerConnection;
@@ -107,6 +108,8 @@ public class TestResultActivity extends BaseFragmentActivity implements TestInfo
 
     private int fromType = 1;
 
+    private ProgressDialog progressDialog = null;
+
     @Override
     protected int getContextViewId() {
         return R.layout.activity_test_result;
@@ -150,6 +153,10 @@ public class TestResultActivity extends BaseFragmentActivity implements TestInfo
         if (bundle != null && bundle.getString("nocode_image_url") != null) {
             noCodeImageUrl = bundle.getString("nocode_image_url");
         }
+
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("正在保存");
+        progressDialog.setCanceledOnTouchOutside(false);
 
         if (!StringUtils.isEmpty(noCodeImageUrl)) {
 //            RequestOptions options = new RequestOptions();
@@ -224,10 +231,14 @@ public class TestResultActivity extends BaseFragmentActivity implements TestInfo
                 }
             }
         });
-        //发布
+
+        //保存海报
         RxView.clicks(mSaveButton).throttleFirst(300, TimeUnit.MILLISECONDS).subscribe(new Action1<Void>() {
             @Override
             public void call(Void aVoid) {
+                if (progressDialog != null && !progressDialog.isShowing()) {
+                    progressDialog.show();
+                }
                 save();
             }
         });
@@ -261,6 +272,9 @@ public class TestResultActivity extends BaseFragmentActivity implements TestInfo
                 boolean isSave = ImageUtils.save(resource, filePath, Bitmap.CompressFormat.JPEG);
                 if (isSave) {
                     saveImageToGallery();
+                }
+                if (progressDialog != null && progressDialog.isShowing()) {
+                    progressDialog.dismiss();
                 }
             }
         });

@@ -26,6 +26,9 @@ public class HomeDataWrapper {
     @SerializedName("message_list")
     private List<ArticleInfo> messageList;
 
+    @SerializedName("suspend_ad")
+    private AdInfo suspendAdInfo;
+
     private int page;
 
     @SerializedName("my_notice_num")
@@ -85,5 +88,13 @@ public class HomeDataWrapper {
 
     public void setMyTotalNum(int myTotalNum) {
         this.myTotalNum = myTotalNum;
+    }
+
+    public AdInfo getSuspendAdInfo() {
+        return suspendAdInfo;
+    }
+
+    public void setSuspendAdInfo(AdInfo suspendAdInfo) {
+        this.suspendAdInfo = suspendAdInfo;
     }
 }

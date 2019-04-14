@@ -2,10 +2,12 @@ package com.feiyou.headstyle.bean;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
+
 /**
  * Created by myflying on 2018/12/26.
  */
-public class VideoInfo {
+public class VideoInfo implements Serializable {
 
     private String id;
     @SerializedName("intro")

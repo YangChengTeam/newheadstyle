@@ -88,6 +88,12 @@ public class MyFragment extends BaseFragment implements UserInfoView, PraiseDial
     @BindView(R.id.tv_keep_count)
     TextView mKeepCountTv;
 
+    @BindView(R.id.iv_guan_remind)
+    ImageView mGuanRemindIv;
+
+    @BindView(R.id.iv_fen_remind)
+    ImageView mFenRemindIv;
+
     @BindView(R.id.iv_my_remind)
     ImageView mMyRemindIv;
 
@@ -165,6 +171,14 @@ public class MyFragment extends BaseFragment implements UserInfoView, PraiseDial
 
         if (App.isShowTotalCount) {
             mMyRemindIv.setVisibility(View.VISIBLE);
+        }
+
+        if (App.isShowGuan) {
+            //mGuanRemindIv.setVisibility(View.VISIBLE);
+        }
+
+        if (App.isShowFen) {
+            mFenRemindIv.setVisibility(View.VISIBLE);
         }
 
         if (!StringUtils.isEmpty(SPUtils.getInstance().getString(Constants.USER_INFO))) {
@@ -323,11 +337,20 @@ public class MyFragment extends BaseFragment implements UserInfoView, PraiseDial
                     intent = new Intent(getActivity(), MyFollowActivity.class);
                     intent.putExtra("type", 0);
                     intent.putExtra("is_my_info", true);
+
+                    if (mGuanRemindIv.getVisibility() == View.VISIBLE) {
+                        mGuanRemindIv.setVisibility(View.GONE);
+                        App.isShowGuan = false;
+                    }
                     break;
                 case 2:
                     intent = new Intent(getActivity(), MyFollowActivity.class);
                     intent.putExtra("type", 1);
                     intent.putExtra("is_my_info", true);
+                    if (mFenRemindIv.getVisibility() == View.VISIBLE) {
+                        mFenRemindIv.setVisibility(View.GONE);
+                        App.isShowFen = false;
+                    }
                     break;
                 case 3:
                     intent = new Intent(getActivity(), SettingActivity.class);
@@ -409,12 +432,29 @@ public class MyFragment extends BaseFragment implements UserInfoView, PraiseDial
                 mFansCountTv.setText(userInfo.getFenNum() > 10000 ? userInfo.getFenNum() / 10000 + "万" : userInfo.getFenNum() + "");
                 mKeepCountTv.setText(userInfo.getCollectNum() > 10000 ? userInfo.getCollectNum() / 10000 + "万" : userInfo.getCollectNum() + "");
 
+                //关注
+                if (SPUtils.getInstance().getInt(Constants.GUAN_NUM, 0) >= 0) {
+                    if (userInfo.getGuanNum() > SPUtils.getInstance().getInt(Constants.GUAN_NUM, 0)) {
+                        App.isShowGuan = true;
+                        //mGuanRemindIv.setVisibility(View.VISIBLE);
+                    }
+                }
+
+                //粉丝
+                if (SPUtils.getInstance().getInt(Constants.FEN_NUM, 0) >= 0) {
+                    if (userInfo.getFenNum() > SPUtils.getInstance().getInt(Constants.FEN_NUM, 0)) {
+                        App.isShowFen = true;
+                        mFenRemindIv.setVisibility(View.VISIBLE);
+                    }
+                }
+
                 //通知消息
                 if (SPUtils.getInstance().getInt(Constants.COMMENT_COUNT, 0) > 0) {
                     if (userInfo.getCommentNum() > SPUtils.getInstance().getInt(Constants.COMMENT_COUNT, 0)) {
                         App.isRemindComment = true;
                     }
                 }
+
                 if (SPUtils.getInstance().getInt(Constants.AT_COUNT, 0) > 0) {
                     if (userInfo.getAiteNum() > SPUtils.getInstance().getInt(Constants.AT_COUNT, 0)) {
                         App.isRemindAt = true;
@@ -432,7 +472,9 @@ public class MyFragment extends BaseFragment implements UserInfoView, PraiseDial
                         mMyRemindIv.setVisibility(View.VISIBLE);
                     }
                 }
-
+                SPUtils.getInstance().put(Constants.GUAN_NUM, userInfo.getGuanNum());
+                SPUtils.getInstance().put(Constants.FEN_NUM, userInfo.getFenNum());
+                SPUtils.getInstance().put(Constants.COMMENT_COUNT, userInfo.getCommentNum());
                 SPUtils.getInstance().put(Constants.COMMENT_COUNT, userInfo.getCommentNum());
                 SPUtils.getInstance().put(Constants.AT_COUNT, userInfo.getAiteNum());
                 SPUtils.getInstance().put(Constants.NOTICE_COUNT, userInfo.getNoticeNum());

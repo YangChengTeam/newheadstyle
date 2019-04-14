@@ -60,7 +60,7 @@ public class NoteInfoAdapter extends BaseQuickAdapter<NoteInfo, BaseViewHolder> 
 
 
         TextView contentTv = helper.getView(R.id.tv_note_content);
-        contentTv.setText(Html.fromHtml(StringUtils.isEmpty(item.getContent()) ? "" : item.getContent().replace("\n","<br>")));
+        contentTv.setText(Html.fromHtml(StringUtils.isEmpty(item.getContent()) ? "" : item.getContent().replace("\n", "<br>")));
 
         TextView isZanTv = helper.itemView.findViewById(R.id.tv_zan_count);
         Drawable isZan = ContextCompat.getDrawable(mContext, R.mipmap.is_zan);

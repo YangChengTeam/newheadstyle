@@ -110,6 +110,8 @@ public class TestImageDetailActivity extends BaseFragmentActivity implements Tes
 
     private String selectSexValue;
 
+    private int selectSexKey;
+
     private int inputStep = 1; //1表示在选择性别，2表示在输入姓名
 
     private String tid;
@@ -170,9 +172,11 @@ public class TestImageDetailActivity extends BaseFragmentActivity implements Tes
             public void onCheckedChanged(RadioGroup radioGroup, int checkId) {
                 if (checkId == R.id.rb_sex_boy) {
                     selectSexValue = "男";
+                    selectSexKey = 0;
                 }
                 if (checkId == R.id.rb_sex_girl) {
                     selectSexValue = "女";
+                    selectSexKey = 1;
                 }
             }
         });
@@ -303,7 +307,7 @@ public class TestImageDetailActivity extends BaseFragmentActivity implements Tes
             params.setTestType("2");
             params.setNickname(mInputUserNameEt.getText().toString());
             params.setHeadimg(userInfo != null ? userInfo.getUserimg() : "");
-            params.setSex(userInfo != null ? userInfo.getSex() : 1);
+            params.setSex(selectSexKey);
             params.setUserId(userInfo != null ? userInfo.getId() : "0");
             testResultInfoPresenterImp.createImage(params);
         }

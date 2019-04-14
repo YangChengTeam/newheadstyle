@@ -11,7 +11,6 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -41,7 +40,7 @@ import com.feiyou.headstyle.common.Constants;
 import com.feiyou.headstyle.common.GlideImageLoader;
 import com.feiyou.headstyle.presenter.HomeDataPresenterImp;
 import com.feiyou.headstyle.presenter.RecordInfoPresenterImp;
-import com.feiyou.headstyle.ui.activity.AdListActivity;
+import com.feiyou.headstyle.ui.activity.AdActivity;
 import com.feiyou.headstyle.ui.activity.Collection2Activity;
 import com.feiyou.headstyle.ui.activity.CommunityArticleActivity;
 import com.feiyou.headstyle.ui.activity.HeadListActivity;
@@ -51,12 +50,10 @@ import com.feiyou.headstyle.ui.activity.SearchActivity;
 import com.feiyou.headstyle.ui.adapter.HeadInfoAdapter;
 import com.feiyou.headstyle.ui.adapter.HeadTypeAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragment;
-import com.feiyou.headstyle.ui.custom.ConfigDialog;
 import com.feiyou.headstyle.ui.custom.OpenDialog;
 import com.feiyou.headstyle.ui.custom.RoundedCornersTransformation;
 import com.feiyou.headstyle.view.HomeDataView;
 import com.liulishuo.filedownloader.BaseDownloadTask;
-import com.liulishuo.filedownloader.DownloadTask;
 import com.liulishuo.filedownloader.FileDownloadListener;
 import com.liulishuo.filedownloader.FileDownloader;
 import com.orhanobut.logger.Logger;
@@ -228,7 +225,7 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
                 switch (adInfo.getType()) {
                     case 1:
                         addRecord();
-                        Intent intent = new Intent(getActivity(), AdListActivity.class);
+                        Intent intent = new Intent(getActivity(), AdActivity.class);
                         intent.putExtra("open_url", adInfo.getJumpPath());
                         startActivity(intent);
                         break;
@@ -452,7 +449,8 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
                 homeDataRet = ((HomeDataRet) tData).getData();
                 if (homeDataRet != null) {
                     currentPage = homeDataRet.getPage();
-
+                    //设置悬浮广告
+                    App.getApp().setSuspendInfo(homeDataRet.getSuspendAdInfo());
                     //刷新或者第一次加载时，需要重新获取随机数
                     if (isFirstLoad || isChange.equals("1")) {
                         randomPage = currentPage;

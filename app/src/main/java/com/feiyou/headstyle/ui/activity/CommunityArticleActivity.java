@@ -47,6 +47,7 @@ import com.feiyou.headstyle.bean.NoteInfoDetailRet;
 import com.feiyou.headstyle.bean.ReplyParams;
 import com.feiyou.headstyle.bean.ReplyResultInfoRet;
 import com.feiyou.headstyle.bean.ResultInfo;
+import com.feiyou.headstyle.bean.UserInfo;
 import com.feiyou.headstyle.bean.ZanResultRet;
 import com.feiyou.headstyle.common.Constants;
 import com.feiyou.headstyle.presenter.AddZanPresenterImp;
@@ -200,6 +201,10 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
 
     private boolean isFromStick;
 
+    private UserInfo userInfo;
+
+    private boolean isMyNote;
+
     @Override
     protected int getContextViewId() {
         return R.layout.activity_article_detail;
@@ -245,7 +250,7 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
         if (bundle != null) {
             isFromStick = bundle.getBoolean("if_from_stick", false);
         }
-
+        userInfo = App.getApp().getmUserInfo();
         FragmentManager manager = getSupportFragmentManager();
         FragmentTransaction transaction = manager.beginTransaction();
         transaction.add(R.id.layout_fragment, WonderfulFragment.newInstance(messageId));
@@ -276,7 +281,7 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
 
         replyCommentPresenterImp = new ReplyCommentPresenterImp(this, this);
 
-        noteInfoDetailDataPresenterImp.getNoteInfoDetailData(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", messageId);
+        noteInfoDetailDataPresenterImp.getNoteInfoDetailData(userInfo != null ? userInfo.getId() : "", messageId);
 
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("回复中");
@@ -297,6 +302,13 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
 
     @OnClick(R.id.iv_user_head)
     public void currentUserInfo() {
+        if (!App.getApp().isLogin) {
+            if (loginDialog != null && !loginDialog.isShowing()) {
+                loginDialog.show();
+            }
+            return;
+        }
+
         if (currentNoteInfo != null) {
             Intent intent = new Intent(this, UserInfoActivity.class);
             intent.putExtra("user_id", currentNoteInfo.getUserId());
@@ -313,7 +325,7 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
             return;
         }
 
-        followInfoPresenterImp.addFollow(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", currentNoteInfo != null ? currentNoteInfo.getUserId() : "");
+        followInfoPresenterImp.addFollow(userInfo != null ? userInfo.getId() : "", currentNoteInfo != null ? currentNoteInfo.getUserId() : "");
     }
 
     @OnClick(R.id.layout_message_count)
@@ -337,7 +349,7 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
             return;
         }
 
-        addZanPresenterImp.addZan(1, App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", currentNoteInfo.getUserId(), messageId, "", "", 1);
+        addZanPresenterImp.addZan(1, userInfo != null ? userInfo.getId() : "", currentNoteInfo.getUserId(), messageId, "", "", 1);
     }
 
 
@@ -474,7 +486,9 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
                 mFollowTv.setText(tempResult == 0 ? "+关注" : "已关注");
 
                 //自己对自己发的贴，隐藏相关操作按钮
-                if (App.getApp().getmUserInfo() != null && App.getApp().getmUserInfo().getId().equals(currentNoteInfo.getUserId())) {
+                if (userInfo != null && userInfo.getId().equals(currentNoteInfo.getUserId())) {
+                    isMyNote = true;
+                    mReportLayout.setVisibility(View.GONE);
                     mFollowLayout.setVisibility(View.GONE);
                     mFollowTv.setVisibility(View.GONE);
                 }
@@ -540,7 +554,7 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
         replyParams.setModelType(1);
         replyParams.setType(1);
         replyParams.setContent(content);
-        replyParams.setRepeatUserId(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "");
+        replyParams.setRepeatUserId(userInfo != null ? userInfo.getId() : "");
         replyParams.setMessageId(messageId);
         replyParams.setAtUserIds(userIds);
 
@@ -605,7 +619,7 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
     @Override
     public void onClick(View view) {
 
-        String shareContent = StringUtils.isEmpty(currentNoteInfo.getContent()) ? "快来试试炫酷的头像吧" : currentNoteInfo.getContent();
+        String shareContent = currentNoteInfo != null ? StringUtils.isEmpty(currentNoteInfo.getContent()) ? "快来试试炫酷的头像吧" : currentNoteInfo.getContent() : "";
         String shareTitle = "一位神秘人士对你发出邀请";
         if (isFromStick) {
             shareContent = "这里的老哥老姐个个都是人才，说话又好听，我超喜欢这里...";

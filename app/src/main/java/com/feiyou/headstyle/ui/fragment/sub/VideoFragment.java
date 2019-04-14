@@ -28,6 +28,7 @@ import com.dingmouren.layoutmanagergroup.viewpager.OnViewPagerListener;
 import com.dingmouren.layoutmanagergroup.viewpager.ViewPagerLayoutManager;
 import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
+import com.feiyou.headstyle.bean.MessageEvent;
 import com.feiyou.headstyle.bean.ResultInfo;
 import com.feiyou.headstyle.bean.UserInfo;
 import com.feiyou.headstyle.bean.VideoInfo;
@@ -41,6 +42,10 @@ import com.feiyou.headstyle.ui.base.BaseFragment;
 import com.feiyou.headstyle.view.VideoInfoView;
 import com.orhanobut.logger.Logger;
 import com.wang.avi.AVLoadingIndicatorView;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -75,17 +80,13 @@ public class VideoFragment extends BaseFragment implements VideoInfoView, SwipeR
 
     private int randomPage;
 
-    //private int currentPage;
-
     private int pageSize = 30;
-
-    private int clickPage;
 
     private UserInfo userInfo;
 
     private View rootView;
 
-    private boolean isVisible;
+    private int currentPage = 1;
 
     public static VideoFragment getInstance() {
         return new VideoFragment();
@@ -104,7 +105,6 @@ public class VideoFragment extends BaseFragment implements VideoInfoView, SwipeR
     public void initViews() {
         Logger.i("video info init view--->");
         userInfo = App.getApp().getmUserInfo();
-
 
         mRefreshLayout.setOnRefreshListener(this);
         //设置进度View样式的大小，只有两个值DEFAULT和LARGE
@@ -159,30 +159,12 @@ public class VideoFragment extends BaseFragment implements VideoInfoView, SwipeR
         videoListAdapter.setOnLoadMoreListener(new BaseQuickAdapter.RequestLoadMoreListener() {
             @Override
             public void onLoadMoreRequested() {
-                //currentPage++;
-                videoInfoPresenterImp.getDataList(0, userInfo != null ? userInfo.getId() : "");
+                currentPage++;
+                videoInfoPresenterImp.getDataList(currentPage, userInfo != null ? userInfo.getId() : "");
             }
         }, mVideoListView);
 
-        videoInfoPresenterImp.getDataList(0, userInfo != null ? userInfo.getId() : "");
-
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        Logger.i("video info onresume--->");
-    }
-
-    @Override
-    public void setUserVisibleHint(boolean isVisibleToUser) {
-        super.setUserVisibleHint(isVisibleToUser);
-        Logger.i("video info isVisible --->" + isVisibleToUser);
-        isVisible = isVisibleToUser;
-
-        if (getContext() != null && isVisibleToUser) {
-            //Logger.i("video info isVisible --->");
-        }
+        videoInfoPresenterImp.getDataList(currentPage, userInfo != null ? userInfo.getId() : "");
     }
 
     @OnClick(R.id.tv_reload)
@@ -205,21 +187,23 @@ public class VideoFragment extends BaseFragment implements VideoInfoView, SwipeR
     public void loadDataSuccess(ResultInfo tData) {
         avi.hide();
         mRefreshLayout.setRefreshing(false);
-        Logger.i(JSONObject.toJSONString(tData));
+
         if (tData != null && tData.getCode() == Constants.SUCCESS) {
             mVideoListView.setVisibility(View.VISIBLE);
             noDataLayout.setVisibility(View.GONE);
             if (tData instanceof VideoInfoRet) {
+                if (currentPage == 0) {
+                    randomPage = ((VideoInfoRet) tData).getData().getPage();
+                    currentPage = randomPage;
 
-                if (videoListAdapter.getData() == null || videoListAdapter.getData().size() == 0) {
-                    videoListAdapter.setNewData(((VideoInfoRet) tData).getData().getList());
-
-                    App.getApp().setVideoList(((VideoInfoRet) tData).getData().getList());
+                    if (((VideoInfoRet) tData).getData().getList() != null) {
+                        videoListAdapter.setNewData(((VideoInfoRet) tData).getData().getList());
+                    }
                 } else {
-                    videoListAdapter.addData(((VideoInfoRet) tData).getData().getList());
-                    App.getApp().getVideoList().addAll(((VideoInfoRet) tData).getData().getList());
+                    if (((VideoInfoRet) tData).getData().getList() != null) {
+                        videoListAdapter.addData(((VideoInfoRet) tData).getData().getList());
+                    }
                 }
-                videoListAdapter.notifyDataSetChanged();
 
                 if (((VideoInfoRet) tData).getData().getList().size() == pageSize) {
                     videoListAdapter.loadMoreComplete();
@@ -228,8 +212,10 @@ public class VideoFragment extends BaseFragment implements VideoInfoView, SwipeR
                 }
             }
         } else {
-            mVideoListView.setVisibility(View.GONE);
-            noDataLayout.setVisibility(View.VISIBLE);
+            if (currentPage == 1) {
+                mVideoListView.setVisibility(View.GONE);
+                noDataLayout.setVisibility(View.VISIBLE);
+            }
         }
     }
 
@@ -241,9 +227,9 @@ public class VideoFragment extends BaseFragment implements VideoInfoView, SwipeR
 
     @Override
     public void onRefresh() {
-        App.getApp().getVideoList().clear();
         mRefreshLayout.setRefreshing(true);
-
-        videoInfoPresenterImp.getDataList(0, userInfo != null ? userInfo.getId() : "");
+        currentPage = 0;
+        videoInfoPresenterImp.getDataList(currentPage, userInfo != null ? userInfo.getId() : "");
     }
+
 }

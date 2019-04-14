@@ -79,22 +79,27 @@ public class CreateFragment extends BaseFragment {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == TAKE_PHOTO_REQUEST_CODE) {
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                if (chooseType == 1) {
-                    takeCamera();
+            if (grantResults != null && grantResults.length > 0) {
+                if (grantResults != null && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    if (chooseType == 1) {
+                        takeCamera();
+                    } else {
+                        Matisse.from(this)
+                                .choose(MimeType.ofImage())
+                                .countable(true)
+                                .maxSelectable(1)
+                                .restrictOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED)
+                                .thumbnailScale(0.85f)
+                                .imageEngine(new Glide4Engine())
+                                .forResult(REQUEST_CODE_CHOOSE);
+                    }
                 } else {
-                    Matisse.from(this)
-                            .choose(MimeType.ofImage())
-                            .countable(true)
-                            .maxSelectable(1)
-                            .restrictOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED)
-                            .thumbnailScale(0.85f)
-                            .imageEngine(new Glide4Engine())
-                            .forResult(REQUEST_CODE_CHOOSE);
+                    ToastUtils.showLong("没有相机权限，请在设置中打开");
                 }
-            } else {
+            }else {
                 ToastUtils.showLong("没有相机权限，请在设置中打开");
             }
+
         }
     }
 

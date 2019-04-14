@@ -47,6 +47,8 @@ import com.liulishuo.filedownloader.FileDownloader;
 import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 import com.qmuiteam.qmui.widget.QMUITopBar;
+import com.umeng.socialize.UMShareAPI;
+import com.umeng.socialize.bean.SHARE_MEDIA;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -117,6 +119,8 @@ public class SettingActivity extends BaseFragmentActivity implements VersionView
 
     BaseDownloadTask task;
 
+    private UMShareAPI mShareAPI = null;
+
     @Override
     protected int getContextViewId() {
         return R.layout.activity_setting;
@@ -148,6 +152,8 @@ public class SettingActivity extends BaseFragmentActivity implements VersionView
     }
 
     public void initData() {
+        mShareAPI = UMShareAPI.get(this);
+
         configDialog = new ConfigDialog(this, R.style.login_dialog, 1, "确认退出吗?", "请你确认是否退出当前账号，退出后无法获取更多消息哦!");
         configDialog.setConfigListener(this);
 
@@ -281,6 +287,9 @@ public class SettingActivity extends BaseFragmentActivity implements VersionView
 
     @Override
     public void config() {
+        mShareAPI.deleteOauth(this, SHARE_MEDIA.QQ, null);
+        mShareAPI.deleteOauth(this, SHARE_MEDIA.WEIXIN, null);
+
         App.getApp().setmUserInfo(null);
         App.getApp().setLogin(false);
         //移除存储的对象

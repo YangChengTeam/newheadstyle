@@ -1,6 +1,7 @@
 package com.feiyou.headstyle.ui.fragment;
 
 import android.content.Intent;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTabHost;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
@@ -26,6 +27,7 @@ import com.feiyou.headstyle.ui.activity.AddFriendsActivity;
 import com.feiyou.headstyle.ui.adapter.SubFragmentAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragment;
 import com.feiyou.headstyle.ui.custom.LoginDialog;
+import com.feiyou.headstyle.ui.custom.MyFragmentTabHost;
 import com.feiyou.headstyle.ui.fragment.sub.FollowFragment;
 import com.feiyou.headstyle.ui.fragment.sub.RecommendFragment;
 import com.feiyou.headstyle.ui.fragment.sub.VideoFragment;
@@ -34,6 +36,9 @@ import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 
 import org.greenrobot.eventbus.EventBus;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -49,7 +54,7 @@ public class CommunityFragment extends BaseFragment implements ViewPager.OnPageC
     RelativeLayout recommendTopLayout;
 
     @BindView(android.R.id.tabhost)
-    FragmentTabHost mTabHost;
+    MyFragmentTabHost mTabHost;
 
     @BindView(R.id.view_pager)
     ViewPager viewPager;
@@ -71,6 +76,8 @@ public class CommunityFragment extends BaseFragment implements ViewPager.OnPageC
     private TopicDataPresenterImp topicDataPresenterImp;
 
     LoginDialog loginDialog;
+
+    List<Fragment> fragments;
 
     /**
      * onCreateView
@@ -101,11 +108,16 @@ public class CommunityFragment extends BaseFragment implements ViewPager.OnPageC
         //得到fragment的个数
         int count = fragmentArray.length;
 
+        fragments = new ArrayList<>();
+        fragments.add(FollowFragment.newInstance(1));
+        fragments.add(RecommendFragment.newInstance(2));
+        fragments.add(new VideoFragment());
+
         for (int i = 0; i < count; i++) {
             //为每一个Tab按钮设置图标、文字和内容
             TabHost.TabSpec tabSpec = mTabHost.newTabSpec(getResources().getString(mTextviewArray[i])).setIndicator(getTabItemView(i));
             //将Tab按钮添加进Tab选项卡中
-            mTabHost.addTab(tabSpec, fragmentArray[i], null);
+            mTabHost.addTab(tabSpec, fragments.get(i), null);
         }
 
         setCurrentTab(1);
@@ -128,7 +140,9 @@ public class CommunityFragment extends BaseFragment implements ViewPager.OnPageC
 
     private void initTabs() {
         // 这里的添加顺序对 tab 页的先后顺序有影响
-        viewPager.setAdapter(new SubFragmentAdapter(getChildFragmentManager()));
+
+
+        viewPager.setAdapter(new SubFragmentAdapter(getChildFragmentManager(), fragments));
         mTabHost.getTabWidget().setDividerDrawable(null);
         viewPager.setCurrentItem(1);
     }

@@ -1,5 +1,7 @@
 package com.feiyou.headstyle.bean;
 
+import java.util.List;
+
 public class MessageEvent {
 
     private String message;
@@ -13,6 +15,8 @@ public class MessageEvent {
     private String topicId;
 
     private int pageIndex;
+
+    private List<VideoInfo> videoInfoList;
 
     public String getFriendIds() {
         return friendIds;
@@ -64,5 +68,13 @@ public class MessageEvent {
 
     public void setPageIndex(int pageIndex) {
         this.pageIndex = pageIndex;
+    }
+
+    public List<VideoInfo> getVideoInfoList() {
+        return videoInfoList;
+    }
+
+    public void setVideoInfoList(List<VideoInfo> videoInfoList) {
+        this.videoInfoList = videoInfoList;
     }
 }

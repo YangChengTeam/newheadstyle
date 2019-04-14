@@ -27,10 +27,10 @@
             android:id="@+id/switch_type_btn"
             android:layout_width="150dp"
             android:layout_height="40dp"
+            android:background="@drawable/switch_bg"
             app:selectedColor="@color/tab_select_color"
             app:selectedTab="0"
             app:strokeRadius="20dp"
-            android:background="@drawable/switch_bg"
             app:strokeWidth="1dp"
             app:switchTabs="@array/switch_tabs"
             app:textSize="14dp" />
@@ -55,6 +55,29 @@
     </LinearLayout>
 
     <FrameLayout
+        android:id="@+id/layout_float_ad"
+        android:layout_width="100dp"
+        android:layout_height="80dp"
+        android:layout_above="@+id/layout_operation"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="6dp"
+        android:visibility="gone">
+
+        <ImageView
+            android:id="@+id/float_iv"
+            android:layout_width="80dp"
+            android:layout_height="80dp" />
+
+        <ImageView
+            android:id="@+id/iv_float_close"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:layout_gravity="top|right"
+            android:src="@mipmap/weixin_dialog_close"/>
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/layout_operation"
         android:layout_width="match_parent"
         android:layout_height="62dp"
         android:layout_alignParentBottom="true">

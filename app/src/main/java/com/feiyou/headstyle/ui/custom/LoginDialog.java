@@ -71,6 +71,7 @@ public class LoginDialog extends Dialog implements View.OnClickListener, UserInf
         setCanceledOnTouchOutside(false);
 
         mShareAPI = UMShareAPI.get(mContext);
+
         userInfoPresenterImp = new UserInfoPresenterImp(this, mContext);
         progressDialog = new ProgressDialog(mContext);
         progressDialog.setMessage("正在登录");

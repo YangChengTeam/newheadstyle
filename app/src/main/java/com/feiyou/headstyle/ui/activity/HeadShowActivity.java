@@ -1,6 +1,5 @@
 package com.feiyou.headstyle.ui.activity;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -17,6 +16,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -26,14 +26,12 @@ import android.widget.Toast;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
-import com.blankj.utilcode.util.DeviceUtils;
 import com.blankj.utilcode.util.ImageUtils;
 import com.blankj.utilcode.util.PathUtils;
 import com.blankj.utilcode.util.SPUtils;
 import com.blankj.utilcode.util.SizeUtils;
 import com.blankj.utilcode.util.StringUtils;
 import com.blankj.utilcode.util.TimeUtils;
-import com.blankj.utilcode.util.ToastUtils;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.SimpleTarget;
@@ -44,23 +42,21 @@ import com.feiyou.headstyle.bean.AddCollectionRet;
 import com.feiyou.headstyle.bean.HeadInfo;
 import com.feiyou.headstyle.bean.HeadInfoRet;
 import com.feiyou.headstyle.bean.HomeDataRet;
-import com.feiyou.headstyle.bean.LoginRequest;
 import com.feiyou.headstyle.bean.MessageEvent;
 import com.feiyou.headstyle.bean.ResultInfo;
 import com.feiyou.headstyle.bean.UpdateHeadRet;
 import com.feiyou.headstyle.bean.UserInfo;
 import com.feiyou.headstyle.common.Constants;
-import com.feiyou.headstyle.presenter.RecordInfoPresenterImp;
-import com.feiyou.headstyle.presenter.UpdateHeadPresenterImp;
-import com.feiyou.headstyle.ui.custom.GlideRoundTransform;
-import com.feiyou.headstyle.ui.custom.qqhead.BaseUIListener;
-
 import com.feiyou.headstyle.presenter.AddCollectionPresenterImp;
 import com.feiyou.headstyle.presenter.HeadListDataPresenterImp;
 import com.feiyou.headstyle.presenter.HomeDataPresenterImp;
+import com.feiyou.headstyle.presenter.RecordInfoPresenterImp;
+import com.feiyou.headstyle.presenter.UpdateHeadPresenterImp;
 import com.feiyou.headstyle.ui.adapter.HeadShowItemAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragmentActivity;
+import com.feiyou.headstyle.ui.custom.GlideRoundTransform;
 import com.feiyou.headstyle.ui.custom.LoginDialog;
+import com.feiyou.headstyle.ui.custom.qqhead.BaseUIListener;
 import com.feiyou.headstyle.ui.fragment.StickerFragment;
 import com.feiyou.headstyle.view.HeadListDataView;
 import com.feiyou.headstyle.view.flingswipe.SwipeFlingAdapterView;
@@ -75,7 +71,6 @@ import com.umeng.socialize.UMShareAPI;
 import com.umeng.socialize.UMShareListener;
 import com.umeng.socialize.bean.SHARE_MEDIA;
 import com.umeng.socialize.media.UMImage;
-import com.umeng.socialize.media.UMWeb;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -122,6 +117,15 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
 
     @BindView(R.id.swipe_view)
     SwipeFlingAdapterView swipeView;
+
+    @BindView(R.id.layout_float_ad)
+    FrameLayout mAdLayout;
+
+    @BindView(R.id.float_iv)
+    ImageView floatGifImage;
+
+    @BindView(R.id.iv_float_close)
+    ImageView mCloseFloat;
 
     TextView mTitleTv;
 
@@ -381,6 +385,13 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
             });
         }
 
+        if (App.getApp().getSuspendInfo() != null && !StringUtils.isEmpty(App.getApp().getSuspendInfo().getId()) && App.getApp().isShowFloatAd()) {
+            mAdLayout.setVisibility(View.VISIBLE);
+            Glide.with(this).load(App.getApp().getSuspendInfo().getIco()).into(floatGifImage);
+        } else {
+            mAdLayout.setVisibility(View.GONE);
+        }
+
         Logger.i("head show page--->" + currentPage + "---head start position--->" + startPosition);
 
         isCollection = ContextCompat.getDrawable(this, R.mipmap.is_keep);
@@ -448,6 +459,20 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
                 }
             }
         });
+    }
+
+    @OnClick(R.id.float_iv)
+    void floatAd() {
+        Intent intent = new Intent(this, AdActivity.class);
+        intent.putExtra("ad_title", App.getApp().getSuspendInfo() != null ? App.getApp().getSuspendInfo().getName() : "精选推荐");
+        intent.putExtra("open_url", App.getApp().getSuspendInfo() != null ? App.getApp().getSuspendInfo().getJumpPath() : "http://gx.qqtn.com");
+        startActivity(intent);
+    }
+
+    @OnClick(R.id.iv_float_close)
+    void closeFloat() {
+        mAdLayout.setVisibility(View.GONE);
+        App.getApp().setShowFloatAd(false);
     }
 
     public void addHeadRecord() {
@@ -771,6 +796,15 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
                         pageSizeLastClick = false;
                         adapter.remove(0);
                     }
+
+                    if (fromType == 4) {
+                        if (startPosition == ((HomeDataRet) tData).getData().getImagesList().size() - 1) {
+                            pageSizeLastClick = true;
+                            isLastImage = true;
+                            lastHeadInfo = ((HomeDataRet) tData).getData().getImagesList().get(0);
+                        }
+                    }
+
                     adapter.addDatas(((HomeDataRet) tData).getData().getImagesList());
                 }
 
@@ -779,6 +813,12 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
 
             if (tData instanceof HeadInfoRet) {
                 if (isFirstLoad) {
+                    if (startPosition == ((HeadInfoRet) tData).getData().size() - 1) {
+                        pageSizeLastClick = true;
+                        isLastImage = true;
+                        lastHeadInfo = ((HeadInfoRet) tData).getData().get(0);
+                    }
+
                     if (startPosition < ((HeadInfoRet) tData).getData().size()) {
                         adapter.addDatas(((HeadInfoRet) tData).getData().subList(startPosition, ((HeadInfoRet) tData).getData().size()));
                     } else {
@@ -814,6 +854,13 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
                         adapter.remove(0);
                     }
 
+                    if (fromType == 4) {
+                        if (startPosition == ((HeadInfoRet) tData).getData().size() - 1) {
+                            pageSizeLastClick = true;
+                            isLastImage = true;
+                            lastHeadInfo = ((HeadInfoRet) tData).getData().get(0);
+                        }
+                    }
                     adapter.addDatas(((HeadInfoRet) tData).getData());
                 }
                 adapter.notifyDataSetChanged();

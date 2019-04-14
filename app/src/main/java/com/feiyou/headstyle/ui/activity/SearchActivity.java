@@ -249,15 +249,15 @@ public class SearchActivity extends BaseFragmentActivity implements HotWordDataV
 
     @OnClick(R.id.tv_cancel)
     public void cancelSearch() {
-        finish();
-//        if (StringUtils.isEmpty(mHotWordEditText.getText())) {
-//            finish();
-//        } else {
-//            mHotLayout.setVisibility(View.VISIBLE);
-//            mResultLayout.setVisibility(View.GONE);
-//            mNoDataLayout.setVisibility(View.GONE);
-//            onResume();
-//        }
+        if (StringUtils.isEmpty(mHotWordEditText.getText())) {
+            finish();
+        } else {
+            mHotWordEditText.setText("");
+            mHotLayout.setVisibility(View.VISIBLE);
+            mResultLayout.setVisibility(View.GONE);
+            mNoDataLayout.setVisibility(View.GONE);
+            onResume();
+        }
     }
 
     @OnClick(R.id.layout_clear)
@@ -271,7 +271,15 @@ public class SearchActivity extends BaseFragmentActivity implements HotWordDataV
 
     @Override
     public void onBackPressed() {
-        popBackStack();
+        if (StringUtils.isEmpty(mHotWordEditText.getText())) {
+            popBackStack();
+        } else {
+            mHotWordEditText.setText("");
+            mHotLayout.setVisibility(View.VISIBLE);
+            mResultLayout.setVisibility(View.GONE);
+            mNoDataLayout.setVisibility(View.GONE);
+            onResume();
+        }
     }
 
     @Override
@@ -288,12 +296,15 @@ public class SearchActivity extends BaseFragmentActivity implements HotWordDataV
     public void loadDataSuccess(ResultInfo tData) {
         Logger.i(JSONObject.toJSONString(tData));
         dismissDialog();
+
         if (tData.getCode() == Constants.SUCCESS && tData != null) {
 
             if (tData instanceof SearchHotWordRet) {
                 searchHotWordAdapter.addData(((SearchHotWordRet) tData).getData());
             }
-
+            if (!StringUtils.isEmpty(mHotWordEditText.getText())) {
+                mHotWordEditText.setSelection(mHotWordEditText.getText().length());
+            }
             if (tData instanceof HeadInfoRet) {
                 if (((HeadInfoRet) tData).getData() != null && ((HeadInfoRet) tData).getData().size() > 0) {
                     mHotLayout.setVisibility(View.GONE);

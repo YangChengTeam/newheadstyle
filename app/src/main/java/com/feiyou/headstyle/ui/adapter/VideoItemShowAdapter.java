@@ -54,10 +54,6 @@ public class VideoItemShowAdapter extends BaseQuickAdapter<VideoInfo, BaseViewHo
         headOptions.transform(new GlideRoundTransform(mContext, SizeUtils.dp2px(10)));
         Glide.with(mContext).load(item.getUserHeadImg()).apply(headOptions).into((ImageView) helper.itemView.findViewById(R.id.iv_user_head));
 
-        helper.setBackgroundRes(R.id.btn_is_follow, item.getIsGuan() == 0 ? R.drawable.follow_bg : R.drawable.is_follow_bg);
-        helper.setTextColor(R.id.btn_is_follow, ContextCompat.getColor(mContext, item.getIsGuan() == 0 ? R.color.white : R.color.is_follow_color));
-        helper.setText(R.id.btn_is_follow, item.getIsGuan() == 0 ? "+关注" : "已关注");
-
         helper.addOnClickListener(R.id.btn_is_follow).addOnClickListener(R.id.et_video_item);
 
         Drawable isCollect = ContextCompat.getDrawable(mContext, R.mipmap.video_is_follow_icon);

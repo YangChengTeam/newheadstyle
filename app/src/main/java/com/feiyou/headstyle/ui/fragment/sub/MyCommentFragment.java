@@ -23,6 +23,7 @@ import com.feiyou.headstyle.presenter.MyCommentPresenterImp;
 import com.feiyou.headstyle.presenter.VideoInfoPresenterImp;
 import com.feiyou.headstyle.ui.activity.CommunityArticleActivity;
 import com.feiyou.headstyle.ui.activity.UserInfoActivity;
+import com.feiyou.headstyle.ui.activity.VideoItemShowActivity;
 import com.feiyou.headstyle.ui.activity.VideoShowActivity;
 import com.feiyou.headstyle.ui.adapter.MyCommentAdapter;
 import com.feiyou.headstyle.ui.adapter.VideoListAdapter;
@@ -112,9 +113,18 @@ public class MyCommentFragment extends BaseFragment implements MyCommentView, Sw
                     intent.putExtra("user_id", myCommentAdapter.getData().get(position).getRepeatUserId());
                     startActivity(intent);
                 } else {
-                    Intent intent = new Intent(getActivity(), CommunityArticleActivity.class);
-                    intent.putExtra("msg_id", myCommentAdapter.getData().get(position).getMessageId());
-                    startActivity(intent);
+                    int type = myCommentAdapter.getData().get(position).getType();
+                    if (type > 3) {
+                        Intent intent = new Intent(getActivity(), VideoItemShowActivity.class);
+                        intent.putExtra("jump_video", myCommentAdapter.getData().get(position).getVideoInfo());
+                        intent.putExtra("jump_page", 0);
+                        intent.putExtra("jump_position", 0);
+                        startActivity(intent);
+                    } else {
+                        Intent intent = new Intent(getActivity(), CommunityArticleActivity.class);
+                        intent.putExtra("msg_id", myCommentAdapter.getData().get(position).getMessageId());
+                        startActivity(intent);
+                    }
                 }
             }
         });

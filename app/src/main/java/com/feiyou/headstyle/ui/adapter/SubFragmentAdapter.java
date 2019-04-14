@@ -11,13 +11,16 @@ import com.feiyou.headstyle.ui.fragment.sub.FollowFragment;
 import com.feiyou.headstyle.ui.fragment.sub.RecommendFragment;
 import com.feiyou.headstyle.ui.fragment.sub.VideoFragment;
 
+import java.util.List;
+
 
 public class SubFragmentAdapter extends FragmentPagerAdapter {
 
-    private final Fragment[] FRAGMENTS = new Fragment[]{FollowFragment.newInstance(1), RecommendFragment.newInstance(2), new VideoFragment()};
+    private List<Fragment> FRAGMENTS;
 
-    public SubFragmentAdapter(FragmentManager fragmentManager) {
+    public SubFragmentAdapter(FragmentManager fragmentManager,List<Fragment> fragments) {
         super(fragmentManager);
+        this.FRAGMENTS = fragments;
     }
 
     /**
@@ -27,7 +30,7 @@ public class SubFragmentAdapter extends FragmentPagerAdapter {
      */
     @Override
     public Fragment getItem(int position) {
-        return FRAGMENTS[position];
+        return FRAGMENTS.get(position);
     }
 
     /**
@@ -35,11 +38,11 @@ public class SubFragmentAdapter extends FragmentPagerAdapter {
      */
     @Override
     public int getCount() {
-        return FRAGMENTS.length;
+        return FRAGMENTS.size();
     }
 
-    @Override
-    public void destroyItem(ViewGroup container, int position, Object object) {
+    //@Override
+    //public void destroyItem(ViewGroup container, int position, Object object) {
         //super.destroyItem(container, position, object);
-    }
+    //}
 }

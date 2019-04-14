@@ -106,14 +106,28 @@
                 android:gravity="center"
                 android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/tv_follow_count"
+                <LinearLayout
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="0"
-                    android:textColor="@color/black"
-                    android:textSize="22dp"
-                    android:textStyle="bold" />
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/tv_follow_count"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textColor="@color/black"
+                        android:textSize="22dp"
+                        android:textStyle="bold" />
+
+                    <ImageView
+                        android:id="@+id/iv_guan_remind"
+                        android:layout_width="10dp"
+                        android:layout_height="10dp"
+                        android:layout_gravity="right|top"
+                        android:src="@mipmap/message_remind_icon"
+                        android:visibility="gone" />
+                </LinearLayout>
+
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -133,14 +147,29 @@
                 android:gravity="center"
                 android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/tv_fans_count"
+                <LinearLayout
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="0"
-                    android:textColor="@color/black"
-                    android:textSize="22dp"
-                    android:textStyle="bold" />
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/tv_fans_count"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="0"
+                        android:textColor="@color/black"
+                        android:textSize="22dp"
+                        android:textStyle="bold" />
+
+                    <ImageView
+                        android:id="@+id/iv_fen_remind"
+                        android:layout_width="10dp"
+                        android:layout_height="10dp"
+                        android:layout_gravity="right|top"
+                        android:layout_marginTop="4dp"
+                        android:src="@mipmap/message_remind_icon"
+                        android:visibility="gone" />
+                </LinearLayout>
 
                 <TextView
                     android:layout_width="wrap_content"

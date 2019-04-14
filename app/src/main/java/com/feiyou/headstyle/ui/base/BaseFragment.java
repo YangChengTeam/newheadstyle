@@ -62,10 +62,10 @@ public abstract class BaseFragment extends Fragment {
             if (this.isAttachedToActivity()) {
                 baseFragmentActivity.startFragment(fragment);
             } else {
-                Log.e("BaseFragment", "fragment not attached:" + this);
+                Log.e("VideoBaseFragment", "fragment not attached:" + this);
             }
         } else {
-            Log.e("BaseFragment", "startFragment null:" + this);
+            Log.e("VideoBaseFragment", "startFragment null:" + this);
         }
     }
 

@@ -5,6 +5,7 @@ import android.content.Context;
 
 import com.blankj.utilcode.util.Utils;
 import com.bumptech.glide.Glide;
+import com.feiyou.headstyle.bean.AdInfo;
 import com.feiyou.headstyle.bean.NoteInfo;
 import com.feiyou.headstyle.bean.TestDetailInfoWrapper;
 import com.feiyou.headstyle.bean.TestInfo;
@@ -44,6 +45,10 @@ public class App extends Application {
 
     public TestDetailInfoWrapper testInfo;
 
+    public static boolean isShowGuan;
+
+    public static boolean isShowFen;
+
     public static boolean isRemindComment;
 
     public static boolean isRemindAt;
@@ -52,7 +57,9 @@ public class App extends Application {
 
     public static boolean isShowTotalCount;
 
-    private List<VideoInfo> videoList;
+    public AdInfo suspendInfo;//悬浮广告
+
+    public boolean showFloatAd = true;
 
     public App() {
         mInstance = this;
@@ -107,11 +114,19 @@ public class App extends Application {
         this.testInfo = testInfo;
     }
 
-    public List<VideoInfo> getVideoList() {
-        return videoList;
+    public AdInfo getSuspendInfo() {
+        return suspendInfo;
     }
 
-    public void setVideoList(List<VideoInfo> videoList) {
-        this.videoList = videoList;
+    public void setSuspendInfo(AdInfo suspendInfo) {
+        this.suspendInfo = suspendInfo;
+    }
+
+    public boolean isShowFloatAd() {
+        return showFloatAd;
+    }
+
+    public void setShowFloatAd(boolean showFloatAd) {
+        this.showFloatAd = showFloatAd;
     }
 }

@@ -27,7 +27,7 @@ public final class MyAppGlideModule extends AppGlideModule {
         //设置解码格式
         /*在 Glide v3， 默认的 DecodeFormat 是 DecodeFormat.PREFER_RGB_565，它将使用 [Bitmap.Config.RGB_565]，除非图片包含或可能包含透明像素。对于给定的图片尺寸，RGB_565 只使用 [Bitmap.Config.ARGB_8888] 一半的内存，但对于特定的图片有明显的画质问题，包括条纹(banding)和着色(tinting)。
         为了避免RGB_565的画质问题，Glide 现在默认使用 ARGB_8888。结果是，图片质量变高了，但内存使用也增加了。*/
-        builder.setDefaultRequestOptions(new RequestOptions().format(DecodeFormat.PREFER_RGB_565));
+        builder.setDefaultRequestOptions(new RequestOptions().format(DecodeFormat.PREFER_ARGB_8888));
 
         //默认请求选项【不太习惯，还是每个请求重复使用吧】
         /*builder.setDefaultRequestOptions(

@@ -7,6 +7,9 @@ import com.google.gson.annotations.SerializedName;
  */
 public class MyCommentInfo {
 
+    @SerializedName("vedio_info")
+    private VideoInfo videoInfo;
+
     @SerializedName("add_time")
     private Long addTime;
 
@@ -122,5 +125,13 @@ public class MyCommentInfo {
 
     public void setType(int type) {
         this.type = type;
+    }
+
+    public VideoInfo getVideoInfo() {
+        return videoInfo;
+    }
+
+    public void setVideoInfo(VideoInfo videoInfo) {
+        this.videoInfo = videoInfo;
     }
 }

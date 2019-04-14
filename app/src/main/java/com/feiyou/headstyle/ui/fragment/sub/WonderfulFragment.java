@@ -12,10 +12,8 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -29,7 +27,6 @@ import com.blankj.utilcode.util.ScreenUtils;
 import com.blankj.utilcode.util.SizeUtils;
 import com.blankj.utilcode.util.StringUtils;
 import com.blankj.utilcode.util.TimeUtils;
-import com.blankj.utilcode.util.ToastUtils;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.chad.library.adapter.base.BaseQuickAdapter;
@@ -38,7 +35,6 @@ import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.bean.FollowInfoRet;
 import com.feiyou.headstyle.bean.MessageEvent;
 import com.feiyou.headstyle.bean.NoteCommentRet;
-import com.feiyou.headstyle.bean.NoteInfoRet;
 import com.feiyou.headstyle.bean.NoteItem;
 import com.feiyou.headstyle.bean.NoteSubCommentRet;
 import com.feiyou.headstyle.bean.ReplyParams;
@@ -58,7 +54,6 @@ import com.feiyou.headstyle.ui.adapter.CommentReplyAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragment;
 import com.feiyou.headstyle.ui.custom.GlideRoundTransform;
 import com.feiyou.headstyle.ui.custom.LoginDialog;
-import com.feiyou.headstyle.utils.StatusBarUtil;
 import com.feiyou.headstyle.view.CommentDialog;
 import com.feiyou.headstyle.view.NoteCommentDataView;
 import com.orhanobut.logger.Logger;
@@ -67,12 +62,10 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 import es.dmoral.toasty.Toasty;
 
 /**
@@ -167,6 +160,8 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
     LoginDialog loginDialog;
 
     private String replyTopUserId;
+
+    private String replyTopCommentId;
 
     public final static String MASK_STR = "@";
 
@@ -350,7 +345,7 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
                 //设置头部信息
                 NoteItem noteItem = commentAdapter.getData().get(position);
                 replyTopUserId = noteItem.getUserId();
-
+                replyTopCommentId = noteItem.getCommentId();
                 RequestOptions options = new RequestOptions();
                 options.transform(new GlideRoundTransform(getActivity(), 21));
                 options.error(R.mipmap.head_def);
@@ -398,6 +393,13 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
             @Override
             public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
 
+                if (!App.getApp().isLogin) {
+                    if (loginDialog != null && !loginDialog.isShowing()) {
+                        loginDialog.show();
+                    }
+                    return;
+                }
+
                 switchType = 1;
                 subCurrentPage = 1;
                 currentCommentPos = position;
@@ -413,6 +415,7 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
                         //设置头部信息
                         NoteItem noteItem = commentAdapter.getData().get(position);
                         replyTopUserId = noteItem.getUserId();
+                        replyTopCommentId = noteItem.getCommentId();
 
                         RequestOptions options = new RequestOptions();
                         options.transform(new GlideRoundTransform(getActivity(), 21));
@@ -757,6 +760,7 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
             replyParams.setContent(content);
             replyParams.setRepeatUserId(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "");
             replyParams.setCommentId(commentId);
+            replyParams.setMessageId(messageId);
             replyParams.setRepeatCommentUserId(repeatCommentUserId);
             replyParams.setAtUserIds(userIds);
 
@@ -780,6 +784,8 @@ public class WonderfulFragment extends BaseFragment implements NoteCommentDataVi
             replyParams.setContent(content);
             replyParams.setRepeatUserId(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "");
             replyParams.setRepeatId(repeatId);
+            replyParams.setMessageId(messageId);
+            replyParams.setCommentId(replyTopCommentId);
             replyParams.setRepeatCommentUserId(repeatCommentUserId);
             replyParams.setAtUserIds(userIds);
             replyCommentPresenterImp.addReplyInfo(replyParams);

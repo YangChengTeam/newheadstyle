@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -14,6 +13,7 @@
         android:background="@color/my_info_bg_color"></View>
 
     <LinearLayout
+        android:id="@+id/note_item_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="12dp"
@@ -163,12 +163,13 @@
                 android:layout_height="match_parent"
                 android:layout_marginRight="12dp"
                 android:layout_weight="1"
-                android:gravity="center"
+                android:gravity="left|center"
                 android:orientation="horizontal">
 
                 <ImageView
                     android:layout_width="16dp"
                     android:layout_height="16dp"
+                    android:layout_marginLeft="12dp"
                     android:src="@mipmap/note_share" />
 
                 <TextView
@@ -206,9 +207,9 @@
                 android:id="@+id/layout_item_zan"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_marginLeft="12dp"
+                android:layout_marginRight="12dp"
                 android:layout_weight="1"
-                android:gravity="center"
+                android:gravity="right|center"
                 android:orientation="horizontal">
 
                 <TextView

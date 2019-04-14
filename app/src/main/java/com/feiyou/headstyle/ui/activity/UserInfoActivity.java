@@ -62,6 +62,7 @@ import com.feiyou.headstyle.presenter.UpdateHeadPresenterImp;
 import com.feiyou.headstyle.presenter.UserInfoPresenterImp;
 import com.feiyou.headstyle.ui.adapter.CommonImageAdapter;
 import com.feiyou.headstyle.ui.adapter.HeadInfoAdapter;
+import com.feiyou.headstyle.ui.adapter.MyNoteInfoAdapter;
 import com.feiyou.headstyle.ui.adapter.NoteInfoAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragmentActivity;
 import com.feiyou.headstyle.ui.custom.ConfigDialog;
@@ -71,6 +72,7 @@ import com.feiyou.headstyle.ui.custom.GlideRoundTransform;
 import com.feiyou.headstyle.view.CollectDataView;
 import com.feiyou.headstyle.view.NoteDataView;
 import com.feiyou.headstyle.view.UserInfoView;
+import com.lcodecore.extextview.ExpandTextView;
 import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 import com.qmuiteam.qmui.widget.QMUICollapsingTopBarLayout;
@@ -155,7 +157,7 @@ public class UserInfoActivity extends BaseFragmentActivity implements UserInfoVi
     TextView mUserStarTv;
 
     @BindView(R.id.tv_user_sign)
-    TextView mUserSignTv;
+    ExpandTextView mUserSignTv;
 
     @BindView(R.id.layout_sign)
     LinearLayout mSignLayout;
@@ -168,7 +170,7 @@ public class UserInfoActivity extends BaseFragmentActivity implements UserInfoVi
 
     ImageView mBackImageView;
 
-    NoteInfoAdapter noteInfoAdapter;
+    MyNoteInfoAdapter noteInfoAdapter;
 
     BottomSheetDialog bottomSheetDialog;
 
@@ -267,6 +269,7 @@ public class UserInfoActivity extends BaseFragmentActivity implements UserInfoVi
 
     public void initData() {
         userInfo = App.getApp().getmUserInfo();
+
         lastPhoneList = new ArrayList<>();
 
         Bundle bundle = getIntent().getExtras();
@@ -399,7 +402,7 @@ public class UserInfoActivity extends BaseFragmentActivity implements UserInfoVi
             }
         });
 
-        noteInfoAdapter = new NoteInfoAdapter(this, null, 2);
+        noteInfoAdapter = new MyNoteInfoAdapter(this, null, 2);
         mNoteListView.setLayoutManager(new LinearLayoutManager(this));
         mNoteListView.setAdapter(noteInfoAdapter);
         //mNoteListView.addItemDecoration(new NormalDecoration(ContextCompat.getColor(this, R.color.line_color), SizeUtils.dp2px(8)));
@@ -424,7 +427,7 @@ public class UserInfoActivity extends BaseFragmentActivity implements UserInfoVi
 
                 if (view.getId() == R.id.layout_item_zan) {
                     String messageId = noteInfoAdapter.getData().get(position).getId();
-                    addZanPresenterImp.addZan(1, App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", noteInfoAdapter.getData().get(position).getUserId(), messageId, "", "", 1);
+                    addZanPresenterImp.addZan(1, userInfo != null ? userInfo.getId() : "", noteInfoAdapter.getData().get(position).getUserId(), messageId, "", "", 1);
                 }
 
                 //分享
@@ -435,7 +438,8 @@ public class UserInfoActivity extends BaseFragmentActivity implements UserInfoVi
                 }
             }
         });
-        userInfoPresenterImp.getUserInfo(App.getApp().getmUserInfo().getId(), userId);
+
+        userInfoPresenterImp.getUserInfo(userInfo != null ? userInfo.getId() : "", userId);
     }
 
     public void initPhotoView() {
@@ -556,7 +560,14 @@ public class UserInfoActivity extends BaseFragmentActivity implements UserInfoVi
                 if (StringUtils.isEmpty(userInfo.getBackground())) {
                     mTopBgLayout.setBackgroundResource(R.mipmap.user_info_top_bg);
                 } else {
-                    Glide.with(this).asBitmap().load(userInfo.getBackground()).into(new SimpleTarget<Bitmap>() {
+
+                    double tempWidth = (double) ScreenUtils.getScreenWidth();
+                    double tempHeight = tempWidth / ((double) 1080 / (double) 549);
+                    Logger.i("bg width --->" + tempWidth + "---" + tempHeight);
+
+                    RequestOptions options = new RequestOptions();
+                    options.override((int) tempWidth, (int) tempHeight);
+                    Glide.with(this).asBitmap().load(userInfo.getBackground()).apply(options).into(new SimpleTarget<Bitmap>() {
                         @Override
                         public void onResourceReady(Bitmap resource, Transition<? super Bitmap> transition) {
                             mTopBgLayout.setBackground(new BitmapDrawable(getResources(), resource));
@@ -573,20 +584,29 @@ public class UserInfoActivity extends BaseFragmentActivity implements UserInfoVi
                     SPUtils.getInstance().put(Constants.USER_INFO, JSONObject.toJSONString(userInfo));
                     if (StringUtils.isEmpty(userInfo.getBackground())) {
                         mTopBgLayout.setBackgroundResource(R.mipmap.user_info_top_bg);
+                    } else {
+                        double tempWidth = (double) ScreenUtils.getScreenWidth();
+                        double tempHeight = tempWidth / ((double) 1080 / (double) 549);
+                        Logger.i("bg width --->" + tempWidth + "---" + tempHeight);
+
+                        RequestOptions options = new RequestOptions();
+                        options.override((int) tempWidth, (int) tempHeight);
+
+                        Glide.with(this).asBitmap().load(userInfo.getBackground()).apply(options).into(new SimpleTarget<Bitmap>() {
+                            @Override
+                            public void onResourceReady(Bitmap resource, Transition<? super Bitmap> transition) {
+                                mTopBgLayout.setBackground(new BitmapDrawable(getResources(), resource));
+                            }
+                        });
                     }
-                    Glide.with(this).asBitmap().load(userInfo.getBackground()).into(new SimpleTarget<Bitmap>() {
-                        @Override
-                        public void onResourceReady(Bitmap resource, Transition<? super Bitmap> transition) {
-                            mTopBgLayout.setBackground(new BitmapDrawable(getResources(), resource));
-                        }
-                    });
+
                 }
             }
 
             if (isMakeDelete) {
                 ToastUtils.showLong("删除成功");
                 isMakeDelete = false;
-                userInfoPresenterImp.getUserInfo(App.getApp().getmUserInfo().getId(), userId);
+                userInfoPresenterImp.getUserInfo(userInfo != null ? userInfo.getId() : "", userId);
             }
 
             if (tData instanceof ZanResultRet) {
@@ -651,6 +671,8 @@ public class UserInfoActivity extends BaseFragmentActivity implements UserInfoVi
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         UMShareAPI.get(this).onActivityResult(requestCode, resultCode, data);
+        double tempWidth = (double) ScreenUtils.getScreenWidth();
+        double tempHeight = tempWidth / ((double) 1080 / (double) 549);
         if (resultCode == RESULT_OK) {
             switch (requestCode) {
                 case TAKE_BIG_PICTURE:
@@ -658,14 +680,15 @@ public class UserInfoActivity extends BaseFragmentActivity implements UserInfoVi
                         ToastUtils.showLong("数据异常，请重试");
                         break;
                     }
-                    cropImageUri(imageUri, 1080, 549, CROP_SMALL_PICTURE);
+                    cropImageUri(imageUri, (int)tempWidth, (int)tempHeight, CROP_SMALL_PICTURE);
                     break;
                 case REQUEST_CODE_CHOOSE:
                     Logger.i(JSONObject.toJSONString(Matisse.obtainPathResult(data)));
                     if (Matisse.obtainResult(data) != null && Matisse.obtainResult(data).size() > 0) {
                         outputImage = new File(PathUtils.getExternalAppPicturesPath(), TimeUtils.getNowMills() + ".png");
                         imageUri = Uri.fromFile(outputImage);
-                        cropImageUri(Matisse.obtainResult(data).get(0), 1080, 549, CROP_SMALL_PICTURE);
+
+                        cropImageUri(Matisse.obtainResult(data).get(0), (int)tempWidth, (int)tempHeight, CROP_SMALL_PICTURE);
                     }
                     break;
                 case CROP_SMALL_PICTURE:
@@ -698,7 +721,7 @@ public class UserInfoActivity extends BaseFragmentActivity implements UserInfoVi
         intent.putExtra("outputX", outputX);
         intent.putExtra("outputY", outputY);
         //是否缩放
-        intent.putExtra("scale", false);
+        intent.putExtra("scale", true);
         //输入图片的Uri，指定以后，可以在这个uri获得图片
         intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
         //是否返回图片数据，可以不用，直接用uri就可以了
@@ -813,6 +836,7 @@ public class UserInfoActivity extends BaseFragmentActivity implements UserInfoVi
 
     @Override
     public void config() {
+        Logger.i("delete config --->");
         isMakeDelete = true;
         deleteNotePresenterImp.deleteNote(userInfo != null ? userInfo.getId() : "", noteInfoAdapter.getData().get(currentItemPos).getId());
     }
