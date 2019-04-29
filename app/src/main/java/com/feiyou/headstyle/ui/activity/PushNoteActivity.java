@@ -10,6 +10,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.InputFilter;
 import android.text.Spanned;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -18,6 +19,7 @@ import android.widget.TextView;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.blankj.utilcode.util.PathUtils;
 import com.blankj.utilcode.util.SPUtils;
 import com.blankj.utilcode.util.SizeUtils;
 import com.blankj.utilcode.util.StringUtils;
@@ -42,6 +44,7 @@ import com.zhihu.matisse.MimeType;
 
 import org.greenrobot.eventbus.EventBus;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -55,6 +58,9 @@ import butterknife.BindView;
 import butterknife.OnClick;
 import es.dmoral.toasty.Toasty;
 import rx.functions.Action1;
+import top.zibin.luban.CompressionPredicate;
+import top.zibin.luban.Luban;
+import top.zibin.luban.OnCompressListener;
 
 /**
  * Created by myflying on 2018/11/23.
@@ -338,28 +344,58 @@ public class PushNoteActivity extends BaseFragmentActivity implements AddNoteVie
                     if (Matisse.obtainPathResult(data) != null && Matisse.obtainPathResult(data).size() > 0) {
 
                         List<String> tempList = Matisse.obtainPathResult(data);
+
                         List<Object> result = new ArrayList<>();
-                        for (int i = 0; i < tempList.size(); i++) {
-                            result.add(tempList.get(i));
-                        }
+//                        for (int i = 0; i < tempList.size(); i++) {
+//                            result.add(tempList.get(i));
+//                        }
 
-                        //剩余可选的数量
-                        maxTotal = maxTotal - result.size();
+                        Luban.with(PushNoteActivity.this)
+                                .load(tempList)
+                                .ignoreBy(2000)
+                                .setTargetDir(PathUtils.getExternalPicturesPath())
+                                .filter(new CompressionPredicate() {
+                                    @Override
+                                    public boolean apply(String path) {
+                                        return !(TextUtils.isEmpty(path) || path.toLowerCase().endsWith(".gif"));
+                                    }
+                                })
+                                .setCompressListener(new OnCompressListener() {
+                                    @Override
+                                    public void onStart() {
+                                        // TODO 压缩开始前调用，可以在方法内启动 loading UI
+                                    }
 
-                        if (addNoteImageAdapter.getData().size() > 1) {
-                            addNoteImageAdapter.remove(addNoteImageAdapter.getData().size() - 1);
-                            addNoteImageAdapter.addData(result);
-                        } else {
-                            addNoteImageAdapter.setNewData(result);
-                        }
+                                    @Override
+                                    public void onSuccess(File file) {
+                                        // TODO 压缩成功后调用，返回压缩后的图片文件
+                                        Logger.i("compress file path--->" + file.getAbsolutePath());
+                                        result.add(file.getAbsolutePath());
 
-                        //不够9张时，增加+号
-                        if (addNoteImageAdapter.getData().size() < 9) {
-                            addNoteImageAdapter.addData(R.mipmap.add_my_photo);
-                        }
+                                        if (result != null && result.size() == tempList.size()) {
+                                            //剩余可选的数量
+                                            maxTotal = maxTotal - result.size();
+                                            if (addNoteImageAdapter.getData().size() > 1) {
+                                                addNoteImageAdapter.remove(addNoteImageAdapter.getData().size() - 1);
+                                                addNoteImageAdapter.addData(result);
+                                            } else {
+                                                addNoteImageAdapter.setNewData(result);
+                                            }
+
+                                            //不够9张时，增加+号
+                                            if (addNoteImageAdapter.getData().size() < 9) {
+                                                addNoteImageAdapter.addData(R.mipmap.add_my_photo);
+                                            }
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onError(Throwable e) {
+                                        // TODO 当压缩过程出现问题时调用
+                                    }
+                                }).launch();
                     }
                     break;
-
             }
         }
 

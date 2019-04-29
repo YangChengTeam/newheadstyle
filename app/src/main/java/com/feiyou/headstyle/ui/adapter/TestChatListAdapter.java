@@ -4,9 +4,11 @@ import android.content.Context;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
+import com.blankj.utilcode.util.SizeUtils;
 import com.blankj.utilcode.util.StringUtils;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
@@ -37,7 +39,7 @@ public class TestChatListAdapter extends BaseQuickAdapter<TestMsgInfo, BaseViewH
     }
 
     public interface AnswerItemClick {
-        void answerClick(int pos,String itemValue);
+        void answerClick(int pos, String itemValue);
     }
 
     public AnswerItemClick answerItemClick;
@@ -48,6 +50,15 @@ public class TestChatListAdapter extends BaseQuickAdapter<TestMsgInfo, BaseViewH
 
     @Override
     protected void convert(final BaseViewHolder helper, final TestMsgInfo item) {
+
+        if ((helper.getAdapterPosition() + 1) % 2 == 0) {
+            LinearLayout.LayoutParams itemParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, SizeUtils.dp2px(60));
+            helper.itemView.setLayoutParams(itemParams);
+        } else {
+            LinearLayout.LayoutParams itemParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            itemParams.setMargins(0, 00, 0, SizeUtils.dp2px(10));
+            helper.itemView.setLayoutParams(itemParams);
+        }
 
         LinearLayout leftImageLayout = helper.itemView.findViewById(R.id.layout_left_img);
 
@@ -81,10 +92,12 @@ public class TestChatListAdapter extends BaseQuickAdapter<TestMsgInfo, BaseViewH
                     answerAdapter.setOnItemClickListener(new OnItemClickListener() {
                         @Override
                         public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
-                            answerAdapter.getData().get(position).setSelected(true);
-                            answerAdapter.notifyItemChanged(position);
-
-                            answerItemClick.answerClick(position,answerAdapter.getItem(position).getAnswerName());
+                            if (item.isClickable()) {
+                                answerAdapter.getData().get(position).setSelected(true);
+                                answerAdapter.notifyItemChanged(position);
+                                item.setClickable(false);
+                                answerItemClick.answerClick(position, answerAdapter.getItem(position).getAnswerName());
+                            }
                         }
                     });
                 }

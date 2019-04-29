@@ -17,6 +17,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.alibaba.fastjson.JSON;
 import com.blankj.utilcode.util.AppUtils;
 import com.blankj.utilcode.util.BarUtils;
 import com.blankj.utilcode.util.NetworkUtils;
@@ -222,34 +223,36 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
             @Override
             public void onClick(View view) {
                 clickType = 2;
-                switch (adInfo.getType()) {
-                    case 1:
-                        addRecord();
-                        Intent intent = new Intent(getActivity(), AdActivity.class);
-                        intent.putExtra("open_url", adInfo.getJumpPath());
-                        startActivity(intent);
-                        break;
-                    case 2:
-                        if (task != null && task.isRunning()) {
-                            Toasty.normal(getActivity(), "正在下载打开请稍后...").show();
-                        } else {
-                            if (NetworkUtils.isMobileData()) {
-                                openDialog.setTitle("温馨提示");
-                                openDialog.setContent("当前是移动网络，是否继续下载？");
+                if (adInfo != null) {
+                    switch (adInfo.getType()) {
+                        case 1:
+                            addRecord();
+                            Intent intent = new Intent(getActivity(), AdActivity.class);
+                            intent.putExtra("open_url", adInfo.getJumpPath());
+                            startActivity(intent);
+                            break;
+                        case 2:
+                            if (task != null && task.isRunning()) {
+                                Toasty.normal(getActivity(), "正在下载打开请稍后...").show();
                             } else {
-                                openDialog.setTitle("打开提示");
-                                openDialog.setContent("即将下载" + adInfo.getName());
+                                if (NetworkUtils.isMobileData()) {
+                                    openDialog.setTitle("温馨提示");
+                                    openDialog.setContent("当前是移动网络，是否继续下载？");
+                                } else {
+                                    openDialog.setTitle("打开提示");
+                                    openDialog.setContent("即将下载" + adInfo.getName());
+                                }
+                                openDialog.show();
                             }
+                            break;
+                        case 3:
+                            openDialog.setTitle("打开提示");
+                            openDialog.setContent("即将打开\"" + adInfo.getName() + "\"小程序");
                             openDialog.show();
-                        }
-                        break;
-                    case 3:
-                        openDialog.setTitle("打开提示");
-                        openDialog.setContent("即将打开\"" + adInfo.getName() + "\"小程序");
-                        openDialog.show();
-                        break;
-                    default:
-                        break;
+                            break;
+                        default:
+                            break;
+                    }
                 }
             }
         });
@@ -449,12 +452,15 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
                 homeDataRet = ((HomeDataRet) tData).getData();
                 if (homeDataRet != null) {
                     currentPage = homeDataRet.getPage();
-                    //设置悬浮广告
-                    App.getApp().setSuspendInfo(homeDataRet.getSuspendAdInfo());
+
                     //刷新或者第一次加载时，需要重新获取随机数
                     if (isFirstLoad || isChange.equals("1")) {
                         randomPage = currentPage;
                         Logger.i("random page--->" + randomPage);
+
+                        //设置悬浮广告
+                        Logger.i("setting ad--->" + JSON.toJSONString(homeDataRet.getSuspendAdInfo()));
+                        App.getApp().setSuspendInfo(homeDataRet.getSuspendAdInfo());
                     }
 
                     if (isFirstLoad) {

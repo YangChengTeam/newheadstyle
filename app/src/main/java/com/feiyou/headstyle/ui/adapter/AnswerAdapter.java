@@ -18,7 +18,7 @@ import java.util.List;
 public class AnswerAdapter extends BaseQuickAdapter<AnswerInfo, BaseViewHolder> {
 
     private Context mContext;
-
+    
     public AnswerAdapter(Context context, List<AnswerInfo> datas) {
         super(R.layout.answer_item, datas);
         this.mContext = context;

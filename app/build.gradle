@@ -8,8 +8,8 @@ android {
         applicationId "com.feiyou.headstyle"
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode 51
-        versionName "4.0.3"
+        versionCode 53
+        versionName "4.0.5"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         ndk {
             abiFilters "armeabi-v7a"
@@ -124,4 +124,6 @@ dependencies {
     implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.+'
 
     implementation 'com.lcodecorex:extextview:1.0.2'
+
+    implementation 'top.zibin:Luban:1.1.8'
 }

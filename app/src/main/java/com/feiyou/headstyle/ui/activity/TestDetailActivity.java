@@ -3,6 +3,7 @@ package com.feiyou.headstyle.ui.activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -34,6 +35,7 @@ import com.feiyou.headstyle.ui.adapter.MsgAdapter;
 import com.feiyou.headstyle.ui.adapter.StickerTypeAdapter;
 import com.feiyou.headstyle.ui.adapter.TestChatListAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragmentActivity;
+import com.feiyou.headstyle.ui.custom.NormalDecoration;
 import com.feiyou.headstyle.view.TestDetailInfoView;
 import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
@@ -132,6 +134,7 @@ public class TestDetailActivity extends BaseFragmentActivity implements TestDeta
 
         chatListAdapter = new TestChatListAdapter(this, null);
         mChatListView.setLayoutManager(new LinearLayoutManager(this));
+        //mChatListView.addItemDecoration(new NormalDecoration(ContextCompat.getColor(this,R.color.set_app_head_color),10));
         mChatListView.setAdapter(chatListAdapter);
         chatListAdapter.setAnswerItemClick(this);
 
@@ -192,20 +195,30 @@ public class TestDetailActivity extends BaseFragmentActivity implements TestDeta
 
             //回复答案后继续下一题
             if (jump != null) {
-                if (jump.get(currentSubjectIndex).getJumpType() != 2) {
-                    currentSubjectIndex = Integer.parseInt(jump.get(currentSubjectIndex).getJumpQuestion()[pos]) - 1;
-                    Logger.i("currentSubjectIndex--->" + currentSubjectIndex);
+                //if (jump.get(currentSubjectIndex).getJumpType() != 2) {
 
-                    if (currentSubjectIndex < question.size()) {
-                        showSubject();
+                    //要跳转的题目为空，则认为是没有题目了
+                    if(StringUtils.isEmpty(jump.get(currentSubjectIndex).getJumpQuestion()[pos])){
+                        isLastSubject = true;
+
+                        selectResultIndex = jump.get(currentSubjectIndex).getJumpAnswer()[pos];
+                        mCommentLayout.setVisibility(View.VISIBLE);
+                        mCommentTextView.setText("提交");
+                    }else{
+                        currentSubjectIndex = Integer.parseInt(jump.get(currentSubjectIndex).getJumpQuestion()[pos]) - 1;
+                        Logger.i("currentSubjectIndex--->" + currentSubjectIndex);
+
+                        if (currentSubjectIndex < question.size()) {
+                            showSubject();
+                        }
                     }
-                } else {
-                    isLastSubject = true;
-
-                    selectResultIndex = jump.get(currentSubjectIndex).getJumpAnswer()[pos];
-                    mCommentLayout.setVisibility(View.VISIBLE);
-                    mCommentTextView.setText("提交");
-                }
+//                } else {
+//                    isLastSubject = true;
+//
+//                    selectResultIndex = jump.get(currentSubjectIndex).getJumpAnswer()[pos];
+//                    mCommentLayout.setVisibility(View.VISIBLE);
+//                    mCommentTextView.setText("提交");
+//                }
             }
         } else {
             selectResultIndex = jump.get(currentSubjectIndex).getJumpAnswer()[pos];

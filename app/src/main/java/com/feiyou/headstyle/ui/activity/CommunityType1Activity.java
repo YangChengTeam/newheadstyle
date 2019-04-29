@@ -549,7 +549,11 @@ public class CommunityType1Activity extends BaseFragmentActivity implements Note
     public void onClick(View view) {
         String shareTitle = "一位神秘人士对你发出邀请";
         String shareContent = "这里的老哥老姐个个都是人才，说话又好听，我超喜欢这里...";
-        String tempStr = StringUtils.isEmpty(noteInfoAdapter.getData().get(currentClickIndex).getContent()) ? "一位神秘人士对你发出邀请" : noteInfoAdapter.getData().get(currentClickIndex).getContent();
+        String tempStr = "一位神秘人士对你发出邀请";
+        if(noteInfoAdapter.getData() != null && noteInfoAdapter.getData().size() > 0){
+            tempStr = StringUtils.isEmpty(noteInfoAdapter.getData().get(currentClickIndex).getContent()) ? "一位神秘人士对你发出邀请" : noteInfoAdapter.getData().get(currentClickIndex).getContent();
+        }
+
         UMWeb web = new UMWeb("http://gx.qqtn.com");
         if (shareAction != null) {
             UMImage image = new UMImage(CommunityType1Activity.this, R.drawable.app_share);

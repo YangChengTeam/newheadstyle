@@ -463,10 +463,14 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
 
     @OnClick(R.id.float_iv)
     void floatAd() {
+        String aid = App.getApp().getSuspendInfo() != null ? App.getApp().getSuspendInfo().getId() : "";
+        recordInfoPresenterImp.adClickInfo(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", aid);
+
         Intent intent = new Intent(this, AdActivity.class);
         intent.putExtra("ad_title", App.getApp().getSuspendInfo() != null ? App.getApp().getSuspendInfo().getName() : "精选推荐");
         intent.putExtra("open_url", App.getApp().getSuspendInfo() != null ? App.getApp().getSuspendInfo().getJumpPath() : "http://gx.qqtn.com");
         startActivity(intent);
+
     }
 
     @OnClick(R.id.iv_float_close)

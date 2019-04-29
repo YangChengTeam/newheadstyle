@@ -2,8 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:padding="10dp">
+    android:orientation="horizontal">
 
     <LinearLayout
         android:id="@+id/left_layout"
@@ -62,7 +61,6 @@
             android:id="@+id/layout_left_img"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
             android:orientation="horizontal"
             android:visibility="gone">
 
@@ -102,8 +100,6 @@
             android:id="@+id/layout_answer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"
             android:orientation="horizontal"
             android:visibility="gone">
 
