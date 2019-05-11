@@ -25,6 +25,7 @@ import com.blankj.utilcode.util.PathUtils;
 import com.blankj.utilcode.util.SPUtils;
 import com.blankj.utilcode.util.ScreenUtils;
 import com.blankj.utilcode.util.SizeUtils;
+import com.blankj.utilcode.util.StringUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
@@ -79,7 +80,7 @@ import es.dmoral.toasty.Toasty;
 /**
  * Created by myflying on 2019/1/3.
  */
-public class Home1Fragment extends BaseFragment implements HomeDataView, View.OnClickListener, SwipeRefreshLayout.OnRefreshListener, OpenDialog.ConfigListener {
+public class Home1Fragment extends BaseFragment implements HomeDataView, View.OnClickListener, SwipeRefreshLayout.OnRefreshListener, OpenDialog.ConfigListener, CardWindowFragment.AdDismissListener {
 
     LinearLayout mSearchLayout;
 
@@ -99,6 +100,9 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
 
     @BindView(R.id.layout_no_data)
     LinearLayout mNoDataLayout;
+
+    @BindView(R.id.tv_reload)
+    TextView mReloadTv;
 
     Banner mBanner;
 
@@ -159,6 +163,10 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
     private int clickType = 1;//1：banner，2：广告
 
     BaseDownloadTask task;
+
+    CardWindowFragment cardWindowFragment;
+
+    AdInfo openAdInfo;
 
     @Override
     protected View onCreateView() {
@@ -226,7 +234,7 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
                 if (adInfo != null) {
                     switch (adInfo.getType()) {
                         case 1:
-                            addRecord();
+                            addRecord(adInfo.getId());
                             Intent intent = new Intent(getActivity(), AdActivity.class);
                             intent.putExtra("open_url", adInfo.getJumpPath());
                             startActivity(intent);
@@ -380,6 +388,13 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
         }, mHeadInfoListView);
 
         homeDataPresenterImp.getData(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", "", "", "", 0);
+
+        if (cardWindowFragment == null) {
+            cardWindowFragment = new CardWindowFragment();
+        }
+
+        cardWindowFragment.setAdDismissListener(this);
+
     }
 
     public void initBanner() {
@@ -403,6 +418,27 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
                     openDialog.setContent("是否打开\"" + bannerInfo.getName() + "\"小程序?");
                     openDialog.show();
                 }
+                if (bannerInfo.getType() == 4) {
+                    addRecord(bannerInfo.getAdId());
+                    Intent intent = new Intent(getActivity(), AdActivity.class);
+                    intent.putExtra("ad_title",bannerInfo.getName());
+                    intent.putExtra("open_url", bannerInfo.getJumpPath());
+                    startActivity(intent);
+                }
+                if (bannerInfo.getType() == 5) {
+                    if (task != null && task.isRunning()) {
+                        Toasty.normal(getActivity(), "正在下载打开请稍后...").show();
+                    } else {
+                        if (NetworkUtils.isMobileData()) {
+                            openDialog.setTitle("温馨提示");
+                            openDialog.setContent("当前是移动网络，是否继续下载？");
+                        } else {
+                            openDialog.setTitle("打开提示");
+                            openDialog.setContent("即将下载" + bannerInfo.getName());
+                        }
+                        openDialog.show();
+                    }
+                }
             }
         });
     }
@@ -411,6 +447,15 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
     void refresh() {
         mRefreshLayout.setRefreshing(true);
         isFirstLoad = false;
+        isChange = "1";
+        homeDataPresenterImp.getData(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", "", "", isChange, 0);
+        gridLayoutManager.scrollToPosition(0);
+    }
+
+    @OnClick(R.id.tv_reload)
+    void reLoad() {
+        mRefreshLayout.setRefreshing(true);
+        isFirstLoad = true;
         isChange = "1";
         homeDataPresenterImp.getData(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", "", "", isChange, 0);
         gridLayoutManager.scrollToPosition(0);
@@ -461,9 +506,19 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
                         //设置悬浮广告
                         Logger.i("setting ad--->" + JSON.toJSONString(homeDataRet.getSuspendAdInfo()));
                         App.getApp().setSuspendInfo(homeDataRet.getSuspendAdInfo());
+
+                        openAdInfo = homeDataRet.getOpenAdInfo();
+                        App.getApp().setMessageAdInfo(homeDataRet.getMessageAdInfo());
                     }
 
                     if (isFirstLoad) {
+                        if (openAdInfo != null && SPUtils.getInstance().getBoolean("show_ad_window", true)) {
+                            cardWindowFragment.setPopImageUrl(openAdInfo.getIco());
+                            cardWindowFragment.setJumpPath(openAdInfo.getJumpPath());
+                            cardWindowFragment.setAdTitle(openAdInfo.getName());
+                            cardWindowFragment.show(getActivity().getFragmentManager(), "card_dialog");
+                        }
+
                         //此处的信息，只需要设置一次
                         if (homeDataRet.getCategoryInfoList() != null && homeDataRet.getCategoryInfoList().size() > 0) {
                             headTypeAdapter.setNewData(homeDataRet.getCategoryInfoList());
@@ -519,7 +574,7 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
                 }
             }
         } else {
-            if (currentPage == 1) {
+            if (isFirstLoad) {
                 mNoDataLayout.setVisibility(View.VISIBLE);
                 mHeadInfoListView.setVisibility(View.GONE);
             }
@@ -541,14 +596,18 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
         }
     }
 
-    public void addRecord() {
-        recordInfoPresenterImp.adClickInfo(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", adInfo.getId());
+    public void addRecord(String aid) {
+        recordInfoPresenterImp.adClickInfo(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", aid);
     }
 
     @Override
     public void loadDataError(Throwable throwable) {
         avi.hide();
         mRefreshLayout.setRefreshing(false);
+        if (isFirstLoad) {
+            mNoDataLayout.setVisibility(View.VISIBLE);
+            mHeadInfoListView.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -557,8 +616,7 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
     }
 
     @Override
-    public void config() {
-        addRecord();
+    public void openConfig() {
 
         String appId = "wxd1112ca9a216aeda"; // 填应用AppId
         IWXAPI api = WXAPIFactory.createWXAPI(getActivity(), appId);
@@ -582,10 +640,12 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
                     break;
             }
         }
+
         if (clickType == 2) {
+            addRecord(adInfo.getId());
+
             switch (adInfo.getType()) {
                 case 1:
-
                     break;
                 case 2:
                     downAppFile("http://zs.qqtn.com/zbsq/Apk/tnzbsq_LIURENJUN1.apk");
@@ -604,7 +664,7 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
     }
 
     @Override
-    public void cancel() {
+    public void openCancel() {
         if (openDialog != null && openDialog.isShowing()) {
             openDialog.dismiss();
         }
@@ -674,8 +734,15 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
         } else {
             intent.setDataAndType(Uri.fromFile(apkFile), "application/vnd.android.package-archive");
         }
+
         startActivity(intent);
     }
 
-
+    @Override
+    public void adClick() {
+        Logger.i("open ad click--->");
+        if (openAdInfo != null && !StringUtils.isEmpty(openAdInfo.getId())) {
+            addRecord(openAdInfo.getId());
+        }
+    }
 }

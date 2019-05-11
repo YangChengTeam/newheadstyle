@@ -1,9 +1,11 @@
 package com.feiyou.headstyle.model;
 
 import android.content.Context;
+import android.provider.Settings;
 
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
+import com.blankj.utilcode.util.PhoneUtils;
 import com.feiyou.headstyle.api.NoteDataServiceApi;
 import com.feiyou.headstyle.api.RecordServiceApi;
 import com.feiyou.headstyle.base.BaseModel;
@@ -82,11 +84,16 @@ public class RecordInfoModelImp extends BaseModel implements RecordInfoModel<Rec
     public void adClickInfo(String uid, String aid, IBaseRequestCallBack<RecordInfoRet> iBaseRequestCallBack) {
         JSONObject params = new JSONObject();
         try {
+            //String uuid = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
             params.put("ad_id", aid);
             params.put("user_id", uid);
+            params.put("imeil", PhoneUtils.getDeviceId());
         } catch (JSONException e) {
             e.printStackTrace();
+        } catch (SecurityException e) {
+            e.printStackTrace();
         }
+
         RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), params.toString());
 
         mCompositeSubscription.add(recordServiceApi.adClickInfo(requestBody)  //将subscribe添加到subscription，用于注销subscribe

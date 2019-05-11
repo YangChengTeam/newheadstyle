@@ -52,7 +52,12 @@ public class NoteInfoAdapter extends BaseQuickAdapter<NoteInfo, BaseViewHolder> 
         Date currentDate = TimeUtils.millis2Date(item.getCommentTime() != null ? item.getCommentTime() * 1000 : 0);
         String tempDateStr = MyTimeUtil.isOutMouth(currentDate) ? TimeUtils.millis2String(item.getCommentTime() != null ? item.getCommentTime() * 1000 : 0) : MyTimeUtil.getTimeFormatText(currentDate);
 
-        helper.setText(R.id.tv_nick_name, item.getNickname())
+        String nickName = "火星用户";
+        if (!StringUtils.isEmpty(item.getNickname())) {
+            nickName = item.getNickname().replace("\r", "").replace("\n", "");
+        }
+
+        helper.setText(R.id.tv_nick_name, nickName)
                 .setText(R.id.tv_topic_name, item.getName())
                 .setText(R.id.tv_note_date, tempDateStr)
                 .setText(R.id.tv_message_count, item.getCommentNum() < 0 ? "0" : item.getCommentNum() + "")

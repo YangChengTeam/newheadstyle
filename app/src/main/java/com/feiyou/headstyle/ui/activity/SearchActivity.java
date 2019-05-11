@@ -18,7 +18,10 @@ import android.widget.TextView;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
+import com.blankj.utilcode.util.AppUtils;
 import com.blankj.utilcode.util.KeyboardUtils;
+import com.blankj.utilcode.util.NetworkUtils;
+import com.blankj.utilcode.util.PathUtils;
 import com.blankj.utilcode.util.SPUtils;
 import com.blankj.utilcode.util.SizeUtils;
 import com.blankj.utilcode.util.StringUtils;
@@ -35,23 +38,32 @@ import com.feiyou.headstyle.bean.SearchHotWordRet;
 import com.feiyou.headstyle.common.Constants;
 import com.feiyou.headstyle.presenter.HeadListDataPresenterImp;
 import com.feiyou.headstyle.presenter.HotWordDataPresenterImp;
+import com.feiyou.headstyle.presenter.RecordInfoPresenterImp;
 import com.feiyou.headstyle.ui.adapter.HeadInfoAdapter;
 import com.feiyou.headstyle.ui.adapter.SearchHistoryAdapter;
 import com.feiyou.headstyle.ui.adapter.SearchHotWordAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragmentActivity;
 import com.feiyou.headstyle.ui.custom.ConfigDialog;
+import com.feiyou.headstyle.ui.custom.OpenDialog;
 import com.feiyou.headstyle.view.HotWordDataView;
+import com.liulishuo.filedownloader.BaseDownloadTask;
+import com.liulishuo.filedownloader.FileDownloadListener;
+import com.liulishuo.filedownloader.FileDownloader;
 import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
+import com.tencent.mm.opensdk.modelbiz.WXLaunchMiniProgram;
+import com.tencent.mm.opensdk.openapi.IWXAPI;
+import com.tencent.mm.opensdk.openapi.WXAPIFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.OnClick;
+import es.dmoral.toasty.Toasty;
 
 
-public class SearchActivity extends BaseFragmentActivity implements HotWordDataView, ConfigDialog.ConfigListener {
+public class SearchActivity extends BaseFragmentActivity implements HotWordDataView, ConfigDialog.ConfigListener, OpenDialog.ConfigListener {
 
     @BindView(R.id.layout_top)
     LinearLayout mTopLayout;
@@ -93,6 +105,8 @@ public class SearchActivity extends BaseFragmentActivity implements HotWordDataV
 
     HeadListDataPresenterImp headListDataPresenterImp;
 
+    private RecordInfoPresenterImp recordInfoPresenterImp;
+
     private int currentPage = 1;
 
     private int pageSize = 30;
@@ -102,6 +116,14 @@ public class SearchActivity extends BaseFragmentActivity implements HotWordDataV
     ConfigDialog configDialog;
 
     private String mKeyWord;
+
+    OpenDialog openDialog;
+
+    BaseDownloadTask task;
+
+    private int openType = 1; //下载APP, 2 打开小程序
+
+    private SearchHotWord searchHotWord;
 
     @Override
     protected int getContextViewId() {
@@ -120,6 +142,9 @@ public class SearchActivity extends BaseFragmentActivity implements HotWordDataV
     }
 
     public void initData() {
+        openDialog = new OpenDialog(this, R.style.login_dialog);
+        openDialog.setConfigListener(this);
+
         configDialog = new ConfigDialog(this, R.style.login_dialog, 1, "确认清除吗?", "请你确认是否清除搜索记录？");
         configDialog.setConfigListener(this);
 
@@ -134,7 +159,42 @@ public class SearchActivity extends BaseFragmentActivity implements HotWordDataV
         searchHotWordAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
-                startSearch(searchHotWordAdapter.getData().get(position).getName());
+                searchHotWord = searchHotWordAdapter.getData().get(position);
+                switch (searchHotWord.getType()) {
+                    case 1:
+                        startSearch(searchHotWordAdapter.getData().get(position).getName());
+                        break;
+                    case 2:
+                        if (task != null && task.isRunning()) {
+                            Toasty.normal(SearchActivity.this, "正在下载打开请稍后...").show();
+                        } else {
+                            openType = 1;
+                            if (NetworkUtils.isMobileData()) {
+                                openDialog.setTitle("温馨提示");
+                                openDialog.setContent("当前是移动网络，是否继续下载？");
+                            } else {
+                                openDialog.setTitle("打开提示");
+                                openDialog.setContent("即将下载" + searchHotWord.getName());
+                            }
+                            openDialog.show();
+                        }
+                        break;
+                    case 3:
+                        openType = 2;
+                        openDialog.setTitle("打开提示");
+                        openDialog.setContent("即将打开\"" + searchHotWord.getName() + "\"小程序");
+                        openDialog.show();
+                        break;
+                    case 4:
+                        addRecord(searchHotWord.getAdId());
+                        Intent intent = new Intent(SearchActivity.this, AdActivity.class);
+                        intent.putExtra("open_url", searchHotWord.getJumpPath());
+                        intent.putExtra("ad_title", searchHotWord.getName());
+                        startActivity(intent);
+                        break;
+                    default:
+                        break;
+                }
             }
         });
 
@@ -187,6 +247,7 @@ public class SearchActivity extends BaseFragmentActivity implements HotWordDataV
         //请求数据
         headListDataPresenterImp = new HeadListDataPresenterImp(this, this);
         hotWordDataPresenterImp = new HotWordDataPresenterImp(this, this);
+        recordInfoPresenterImp = new RecordInfoPresenterImp(this, this);
         hotWordDataPresenterImp.getTagData();
     }
 
@@ -344,6 +405,7 @@ public class SearchActivity extends BaseFragmentActivity implements HotWordDataV
 
     @Override
     public void config() {
+        historySearchList.clear();
         SPUtils.getInstance().put(Constants.SEARCH_HISTORY, "");
         searchHistoryAdapter.setNewData(null);
     }
@@ -353,5 +415,85 @@ public class SearchActivity extends BaseFragmentActivity implements HotWordDataV
         if (configDialog != null && configDialog.isShowing()) {
             configDialog.dismiss();
         }
+    }
+
+    @Override
+    public void openConfig() {
+        if (openType == 1) {
+            downAppFile(searchHotWord.getJumpPath());
+        }
+
+        if (openType == 2) {
+            String appId = "wxd1112ca9a216aeda"; // 填应用AppId
+            IWXAPI api = WXAPIFactory.createWXAPI(this, appId);
+            WXLaunchMiniProgram.Req req = new WXLaunchMiniProgram.Req();
+            req.userName = searchHotWord.getOriginId(); // 填小程序原始id
+            req.path = searchHotWord.getJumpPath(); //拉起小程序页面的可带参路径，不填默认拉起小程序首页
+            req.miniprogramType = WXLaunchMiniProgram.Req.MINIPTOGRAM_TYPE_RELEASE;// 可选打开 开发版，体验版和正式版
+            api.sendReq(req);
+        }
+
+    }
+
+    @Override
+    public void openCancel() {
+        if (openDialog != null && openDialog.isShowing()) {
+            openDialog.dismiss();
+        }
+    }
+
+    public void downAppFile(String downUrl) {
+        final String filePath = PathUtils.getExternalAppFilesPath() + "/temp_app.apk";
+        Logger.i("down app path --->" + filePath);
+
+        task = FileDownloader.getImpl().create(downUrl)
+                .setPath(filePath)
+                .setListener(new FileDownloadListener() {
+                    @Override
+                    protected void pending(BaseDownloadTask task, int soFarBytes, int totalBytes) {
+                        Toasty.normal(SearchActivity.this, "正在下载打开请稍后...").show();
+                    }
+
+                    @Override
+                    protected void connected(BaseDownloadTask task, String etag, boolean isContinue, int soFarBytes, int totalBytes) {
+                    }
+
+                    @Override
+                    protected void progress(BaseDownloadTask task, int soFarBytes, int totalBytes) {
+                    }
+
+                    @Override
+                    protected void blockComplete(BaseDownloadTask task) {
+                    }
+
+                    @Override
+                    protected void retry(final BaseDownloadTask task, final Throwable ex, final int retryingTimes, final int soFarBytes) {
+                    }
+
+                    @Override
+                    protected void completed(BaseDownloadTask task) {
+                        ToastUtils.showLong("下载完成");
+                        //install(filePath);
+                        AppUtils.installApp(filePath);
+                    }
+
+                    @Override
+                    protected void paused(BaseDownloadTask task, int soFarBytes, int totalBytes) {
+                    }
+
+                    @Override
+                    protected void error(BaseDownloadTask task, Throwable e) {
+                    }
+
+                    @Override
+                    protected void warn(BaseDownloadTask task) {
+                    }
+                });
+
+        task.start();
+    }
+
+    public void addRecord(String aid) {
+        recordInfoPresenterImp.adClickInfo(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", aid);
     }
 }

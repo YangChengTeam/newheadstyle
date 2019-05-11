@@ -116,6 +116,8 @@ public class FollowFragment extends BaseFragment implements NoteDataView, SwipeR
 
     private int communityType = 2;
 
+    private int errorType = 1;
+
     public static FollowFragment newInstance(int type) {
         FollowFragment fragment = new FollowFragment();
         Bundle bundle = new Bundle();
@@ -268,8 +270,14 @@ public class FollowFragment extends BaseFragment implements NoteDataView, SwipeR
 
     @OnClick(R.id.tv_follow_user)
     void addFriends() {
-        Intent intent = new Intent(getActivity(), AddFriendsActivity.class);
-        startActivity(intent);
+        if (errorType == 1) {
+            Intent intent = new Intent(getActivity(), AddFriendsActivity.class);
+            startActivity(intent);
+        } else {
+            noDataLayout.setVisibility(View.GONE);
+            avi.show();
+            onRefresh();
+        }
     }
 
     @Override
@@ -296,6 +304,7 @@ public class FollowFragment extends BaseFragment implements NoteDataView, SwipeR
 
     @Override
     public void loadDataSuccess(ResultInfo tData) {
+        errorType = 1;
         Logger.i("follow list --->" + JSON.toJSONString(tData));
         avi.hide();
         mRefreshLayout.setRefreshing(false);
@@ -374,8 +383,17 @@ public class FollowFragment extends BaseFragment implements NoteDataView, SwipeR
 
     @Override
     public void loadDataError(Throwable throwable) {
+        errorType = 2;
         avi.hide();
         mRefreshLayout.setRefreshing(false);
+        if (currentPage == 1) {
+            mRecommendListView.setVisibility(View.GONE);
+            noDataLayout.setVisibility(View.VISIBLE);
+            mNoDataTiltTv.setText("数据加载失败\n请检查网络后重试");
+            mFollowUserTv.setText("重新加载");
+            mFollowUserTv.setTextColor(ContextCompat.getColor(getActivity(), R.color.search_number_color2));
+            mFollowUserTv.setTextSize(16);
+        }
     }
 
     @Override

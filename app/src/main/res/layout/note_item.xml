@@ -37,15 +37,15 @@
                     android:id="@+id/iv_user_head"
                     android:layout_width="36dp"
                     android:layout_height="36dp"
-                    android:src="@mipmap/head_def"/>
+                    android:src="@mipmap/head_def" />
 
                 <ImageView
                     android:id="@+id/iv_system_user"
                     android:layout_width="12dp"
                     android:layout_height="12dp"
                     android:layout_gravity="right|bottom"
-                    android:visibility="gone"
-                    android:src="@mipmap/system_user_icon" />
+                    android:src="@mipmap/system_user_icon"
+                    android:visibility="gone" />
             </FrameLayout>
 
             <LinearLayout
@@ -61,6 +61,9 @@
                     android:id="@+id/tv_nick_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:lines="1"
+                    android:maxWidth="240dp"
                     android:text="用户昵称"
                     android:textColor="@color/into_community_color"
                     android:textSize="14dp" />

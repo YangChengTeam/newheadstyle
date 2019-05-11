@@ -163,7 +163,7 @@ public class MoreTypeActivity extends BaseFragmentActivity implements MoreTypeDa
     }
 
     @Override
-    public void config() {
+    public void openConfig() {
         String appId = "wxd1112ca9a216aeda"; // 填应用AppId
         IWXAPI api = WXAPIFactory.createWXAPI(this, appId);
 
@@ -175,7 +175,7 @@ public class MoreTypeActivity extends BaseFragmentActivity implements MoreTypeDa
     }
 
     @Override
-    public void cancel() {
+    public void openCancel() {
 
     }
 

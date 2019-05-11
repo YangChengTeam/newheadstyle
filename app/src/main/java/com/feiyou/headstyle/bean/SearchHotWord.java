@@ -19,7 +19,10 @@ public class SearchHotWord {
     @SerializedName("origin_id")
     private String originId;
 
-    private String type;
+    private int type;
+
+    @SerializedName("ad_id")
+    private String adId;
 
     public String getAppid() {
         return appid;
@@ -61,11 +64,19 @@ public class SearchHotWord {
         this.originId = originId;
     }
 
-    public String getType() {
+    public int getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(int type) {
         this.type = type;
+    }
+
+    public String getAdId() {
+        return adId;
+    }
+
+    public void setAdId(String adId) {
+        this.adId = adId;
     }
 }

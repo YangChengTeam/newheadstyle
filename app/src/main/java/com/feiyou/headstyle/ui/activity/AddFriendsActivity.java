@@ -38,12 +38,14 @@ import com.feiyou.headstyle.utils.MyToastUtils;
 import com.feiyou.headstyle.view.UserInfoListView;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 import com.qmuiteam.qmui.widget.QMUITopBar;
+import com.umeng.socialize.UMShareAPI;
 import com.wang.avi.AVLoadingIndicatorView;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
+import butterknife.OnClick;
 
 /**
  * Created by myflying on 2018/11/23.
@@ -66,6 +68,15 @@ public class AddFriendsActivity extends BaseFragmentActivity implements UserInfo
 
     @BindView(R.id.layout_no_data)
     LinearLayout mNoDataLayout;
+
+    @BindView(R.id.tv_no_data)
+    TextView mNoDataTv;
+
+    @BindView(R.id.tv_reload)
+    TextView mReloadTv;
+
+    @BindView(R.id.tv_refresh)
+    TextView mRefreshTv;
 
     AddFriendsListAdapter addFriendsListAdapter;
 
@@ -261,8 +272,10 @@ public class AddFriendsActivity extends BaseFragmentActivity implements UserInfo
         } else {
             if (tData instanceof UserInfoListRet) {
                 if (currentPage == 1) {
+                    mNoDataTv.setText("暂无数据");
                     mFriendsListView.setVisibility(View.GONE);
                     mNoDataLayout.setVisibility(View.VISIBLE);
+                    mReloadTv.setVisibility(View.GONE);
                 }
             }
             ToastUtils.showLong(StringUtils.isEmpty(tData.getMsg()) ? "操作失败" : tData.getMsg());
@@ -273,5 +286,29 @@ public class AddFriendsActivity extends BaseFragmentActivity implements UserInfo
     public void loadDataError(Throwable throwable) {
         avi.hide();
         dismissDialog();
+        if (currentPage == 1) {
+            mFriendsListView.setVisibility(View.GONE);
+            mNoDataLayout.setVisibility(View.VISIBLE);
+            mReloadTv.setVisibility(View.VISIBLE);
+            mNoDataTv.setText("数据加载失败\n请检查网络后重试");
+            mReloadTv.setText("重新加载");
+            mReloadTv.setTextColor(ContextCompat.getColor(this, R.color.search_number_color2));
+            mReloadTv.setTextSize(16);
+        }
     }
+
+    @OnClick(R.id.tv_refresh)
+    void refresh() {
+        avi.show();
+        currentPage = 1;
+        userInfoListPresenterImp.addFriendsList(currentPage);
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        UMShareAPI.get(this).onActivityResult(requestCode, resultCode, data);
+    }
+
 }

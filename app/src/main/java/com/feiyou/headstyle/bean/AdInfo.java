@@ -13,6 +13,7 @@ public class AdInfo {
     private int type;
     @SerializedName("origin_id")
     private String originId;
+
     private String appid;
 
     private String name;

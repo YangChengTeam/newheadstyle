@@ -13,10 +13,10 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center"
-            android:paddingLeft="12dp"
-            android:paddingRight="12dp"
             android:background="@color/white"
-            android:nestedScrollingEnabled="false" />
+            android:nestedScrollingEnabled="false"
+            android:paddingLeft="12dp"
+            android:paddingRight="12dp" />
 
         <com.wang.avi.AVLoadingIndicatorView
             android:id="@+id/avi"
@@ -45,18 +45,20 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:text="暂无数据"
+                android:gravity="center"
+                android:lineSpacingMultiplier="1.1"
+                android:text="数据加载失败，请检查网络后重试"
                 android:textColor="@color/search_number_def"
-                android:textSize="16dp" />
+                android:textSize="13dp" />
 
             <TextView
-                android:id="@+id/tv_follow_user"
+                android:id="@+id/tv_reload"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="10dp"
-                android:text="去关注 >"
-                android:textColor="@color/colorPrimary"
-                android:textSize="14dp" />
+                android:text="重新加载"
+                android:textColor="@color/search_number_color2"
+                android:textSize="16dp" />
         </LinearLayout>
     </FrameLayout>
 </LinearLayout>

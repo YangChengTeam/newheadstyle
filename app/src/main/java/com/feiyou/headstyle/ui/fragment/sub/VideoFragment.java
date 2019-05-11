@@ -169,6 +169,8 @@ public class VideoFragment extends BaseFragment implements VideoInfoView, SwipeR
 
     @OnClick(R.id.tv_reload)
     void reload() {
+        noDataLayout.setVisibility(View.GONE);
+        avi.show();
         onRefresh();
     }
 
@@ -223,12 +225,16 @@ public class VideoFragment extends BaseFragment implements VideoInfoView, SwipeR
     public void loadDataError(Throwable throwable) {
         avi.hide();
         mRefreshLayout.setRefreshing(false);
+        if (currentPage == 1) {
+            mVideoListView.setVisibility(View.GONE);
+            noDataLayout.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
     public void onRefresh() {
         mRefreshLayout.setRefreshing(true);
-        currentPage = 0;
+        currentPage = 1;
         videoInfoPresenterImp.getDataList(currentPage, userInfo != null ? userInfo.getId() : "");
     }
 

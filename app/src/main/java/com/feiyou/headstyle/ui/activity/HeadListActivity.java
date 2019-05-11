@@ -35,6 +35,7 @@ import com.qmuiteam.qmui.widget.QMUITopBar;
 import com.wang.avi.AVLoadingIndicatorView;
 
 import butterknife.BindView;
+import butterknife.OnClick;
 
 /**
  * Created by myflying on 2018/11/23.
@@ -55,6 +56,9 @@ public class HeadListActivity extends BaseFragmentActivity implements HeadListDa
 
     @BindView(R.id.layout_no_data)
     LinearLayout mNoDataLayout;
+
+    @BindView(R.id.tv_reload)
+    TextView mReloadTv;
 
     ImageView mBackImageView;
 
@@ -223,8 +227,10 @@ public class HeadListActivity extends BaseFragmentActivity implements HeadListDa
     public void loadDataError(Throwable throwable) {
         avi.hide();
         mRefreshLayout.setRefreshing(false);
-        mHeadInfoListView.setVisibility(View.GONE);
-        mNoDataLayout.setVisibility(View.VISIBLE);
+        if (currentPage == 1) {
+            mHeadInfoListView.setVisibility(View.GONE);
+            mNoDataLayout.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
@@ -232,5 +238,10 @@ public class HeadListActivity extends BaseFragmentActivity implements HeadListDa
         mRefreshLayout.setRefreshing(true);
         currentPage = 1;
         headListDataPresenterImp.getDataByTagId(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", tagId, currentPage, pageSize);
+    }
+
+    @OnClick(R.id.tv_reload)
+    void reLoad() {
+        onRefresh();
     }
 }

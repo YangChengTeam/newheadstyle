@@ -22,6 +22,9 @@ public class BannerInfo {
 
     private String name;
 
+    @SerializedName("ad_id")
+    private String adId;
+
     public String getId() {
         return id;
     }
@@ -76,5 +79,13 @@ public class BannerInfo {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getAdId() {
+        return adId;
+    }
+
+    public void setAdId(String adId) {
+        this.adId = adId;
     }
 }

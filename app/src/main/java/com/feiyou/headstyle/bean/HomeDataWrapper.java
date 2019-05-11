@@ -29,6 +29,12 @@ public class HomeDataWrapper {
     @SerializedName("suspend_ad")
     private AdInfo suspendAdInfo;
 
+    @SerializedName("open_ad")
+    private AdInfo openAdInfo;
+
+    @SerializedName("message_ad")
+    private AdInfo messageAdInfo;
+
     private int page;
 
     @SerializedName("my_notice_num")
@@ -96,5 +102,21 @@ public class HomeDataWrapper {
 
     public void setSuspendAdInfo(AdInfo suspendAdInfo) {
         this.suspendAdInfo = suspendAdInfo;
+    }
+
+    public AdInfo getOpenAdInfo() {
+        return openAdInfo;
+    }
+
+    public void setOpenAdInfo(AdInfo openAdInfo) {
+        this.openAdInfo = openAdInfo;
+    }
+
+    public AdInfo getMessageAdInfo() {
+        return messageAdInfo;
+    }
+
+    public void setMessageAdInfo(AdInfo messageAdInfo) {
+        this.messageAdInfo = messageAdInfo;
     }
 }

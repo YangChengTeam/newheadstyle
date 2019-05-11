@@ -59,7 +59,11 @@ public class App extends Application {
 
     public AdInfo suspendInfo;//悬浮广告
 
+    public AdInfo messageAdInfo;//悬浮广告
+
     public boolean showFloatAd = true;
+
+    public boolean showAlertAd = false;
 
     public App() {
         mInstance = this;
@@ -120,6 +124,14 @@ public class App extends Application {
 
     public void setSuspendInfo(AdInfo suspendInfo) {
         this.suspendInfo = suspendInfo;
+    }
+
+    public AdInfo getMessageAdInfo() {
+        return messageAdInfo;
+    }
+
+    public void setMessageAdInfo(AdInfo messageAdInfo) {
+        this.messageAdInfo = messageAdInfo;
     }
 
     public boolean isShowFloatAd() {

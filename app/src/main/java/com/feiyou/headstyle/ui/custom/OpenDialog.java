@@ -29,9 +29,9 @@ public class OpenDialog extends Dialog implements View.OnClickListener {
     private ConfigListener configListener;
 
     public interface ConfigListener {
-        void config();
+        void openConfig();
 
-        void cancel();
+        void openCancel();
     }
 
     public void setConfigListener(ConfigListener configListener) {
@@ -88,11 +88,11 @@ public class OpenDialog extends Dialog implements View.OnClickListener {
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.layout_config:
-                configListener.config();
+                configListener.openConfig();
                 this.dismiss();
                 break;
             case R.id.layout_cancel:
-                configListener.cancel();
+                configListener.openCancel();
                 this.dismiss();
                 break;
             case R.id.iv_close:

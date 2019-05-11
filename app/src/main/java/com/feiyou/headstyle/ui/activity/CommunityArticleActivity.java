@@ -30,6 +30,9 @@ import android.widget.Toast;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
+import com.blankj.utilcode.util.SPUtils;
+import com.blankj.utilcode.util.ScreenUtils;
 import com.blankj.utilcode.util.SizeUtils;
 import com.blankj.utilcode.util.StringUtils;
 import com.blankj.utilcode.util.TimeUtils;
@@ -53,6 +56,7 @@ import com.feiyou.headstyle.common.Constants;
 import com.feiyou.headstyle.presenter.AddZanPresenterImp;
 import com.feiyou.headstyle.presenter.FollowInfoPresenterImp;
 import com.feiyou.headstyle.presenter.NoteInfoDetailDataPresenterImp;
+import com.feiyou.headstyle.presenter.RecordInfoPresenterImp;
 import com.feiyou.headstyle.presenter.ReplyCommentPresenterImp;
 import com.feiyou.headstyle.ui.adapter.CommunityHeadAdapter;
 import com.feiyou.headstyle.ui.adapter.CommunityItemAdapter;
@@ -60,6 +64,7 @@ import com.feiyou.headstyle.ui.base.BaseFragmentActivity;
 import com.feiyou.headstyle.ui.custom.GlideRoundTransform;
 import com.feiyou.headstyle.ui.custom.LoginDialog;
 import com.feiyou.headstyle.ui.custom.MyWebView;
+import com.feiyou.headstyle.ui.custom.RoundedCornersTransformation;
 import com.feiyou.headstyle.ui.fragment.sub.WonderfulFragment;
 import com.feiyou.headstyle.view.CommentDialog;
 import com.feiyou.headstyle.view.NoteInfoDetailDataView;
@@ -146,6 +151,12 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
     @BindView(R.id.layout_web_view)
     LinearLayout mWebViewLayout;
 
+    @BindView(R.id.layout_ad)
+    LinearLayout mAdLayout;
+
+    @BindView(R.id.iv_ad)
+    ImageView mAdImageView;
+
     List<String> mTitleDataList;
 
     private String newsId;
@@ -163,6 +174,8 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
     private ProgressDialog progressDialog = null;
 
     private ReplyCommentPresenterImp replyCommentPresenterImp;
+
+    private RecordInfoPresenterImp recordInfoPresenterImp;
 
     private int commentNum;
 
@@ -282,6 +295,7 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
         replyCommentPresenterImp = new ReplyCommentPresenterImp(this, this);
 
         noteInfoDetailDataPresenterImp.getNoteInfoDetailData(userInfo != null ? userInfo.getId() : "", messageId);
+        recordInfoPresenterImp = new RecordInfoPresenterImp(this, this);
 
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("回复中");
@@ -324,7 +338,13 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
             }
             return;
         }
-
+        if (userInfo == null || StringUtils.isEmpty(userInfo.getId())) {
+            if (!StringUtils.isEmpty(SPUtils.getInstance().getString(Constants.USER_INFO))) {
+                Logger.i(SPUtils.getInstance().getString(Constants.USER_INFO));
+                userInfo = JSON.parseObject(SPUtils.getInstance().getString(Constants.USER_INFO), new TypeReference<UserInfo>() {
+                });
+            }
+        }
         followInfoPresenterImp.addFollow(userInfo != null ? userInfo.getId() : "", currentNoteInfo != null ? currentNoteInfo.getUserId() : "");
     }
 
@@ -336,7 +356,13 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
             }
             return;
         }
-
+        if (userInfo == null || StringUtils.isEmpty(userInfo.getId())) {
+            if (!StringUtils.isEmpty(SPUtils.getInstance().getString(Constants.USER_INFO))) {
+                Logger.i(SPUtils.getInstance().getString(Constants.USER_INFO));
+                userInfo = JSON.parseObject(SPUtils.getInstance().getString(Constants.USER_INFO), new TypeReference<UserInfo>() {
+                });
+            }
+        }
         showDialog();
     }
 
@@ -348,7 +374,13 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
             }
             return;
         }
-
+        if (userInfo == null || StringUtils.isEmpty(userInfo.getId())) {
+            if (!StringUtils.isEmpty(SPUtils.getInstance().getString(Constants.USER_INFO))) {
+                Logger.i(SPUtils.getInstance().getString(Constants.USER_INFO));
+                userInfo = JSON.parseObject(SPUtils.getInstance().getString(Constants.USER_INFO), new TypeReference<UserInfo>() {
+                });
+            }
+        }
         addZanPresenterImp.addZan(1, userInfo != null ? userInfo.getId() : "", currentNoteInfo.getUserId(), messageId, "", "", 1);
     }
 
@@ -437,7 +469,12 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
                     mSystemUserIv.setVisibility(View.GONE);
                 }
 
-                mNickNameTextView.setText(currentNoteInfo.getNickname());
+                String nickName = "火星用户";
+                if (!StringUtils.isEmpty(currentNoteInfo.getNickname())) {
+                    nickName = currentNoteInfo.getNickname().replace("\r", "").replace("\n", "");
+                }
+
+                mNickNameTextView.setText(nickName);
                 mTopicNameTextView.setText(currentNoteInfo.getName());
                 mAddDateTextView.setText(TimeUtils.millis2String(currentNoteInfo.getAddTime() != null ? currentNoteInfo.getAddTime() * 1000 : 0));
 
@@ -533,6 +570,19 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
             } else {
                 Toasty.normal(this, StringUtils.isEmpty(tData.getMsg()) ? "操作失败" : tData.getMsg()).show();
             }
+        }
+
+        if (App.getApp().getMessageAdInfo() != null && !StringUtils.isEmpty(App.getApp().getMessageAdInfo().getId())) {
+            mAdLayout.setVisibility(View.VISIBLE);
+
+            int tempWidth = ScreenUtils.getScreenWidth() - SizeUtils.dp2px(18);
+            RequestOptions options = new RequestOptions().skipMemoryCache(true);
+            options.transform(new RoundedCornersTransformation(SizeUtils.dp2px(5), 0));
+            options.override(tempWidth, SizeUtils.dp2px(80));
+
+            Glide.with(this).load(App.getApp().getMessageAdInfo().getIco()).apply(options).into(mAdImageView);
+        } else {
+            mAdLayout.setVisibility(View.GONE);
         }
     }
 
@@ -689,5 +739,19 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
         if (commonShareDialog != null && commonShareDialog.isShowing()) {
             commonShareDialog.dismiss();
         }
+    }
+
+    @OnClick(R.id.layout_ad)
+    void adClick() {
+        if (App.getApp().getMessageAdInfo() != null && !StringUtils.isEmpty(App.getApp().getMessageAdInfo().getId())) {
+            addRecord(App.getApp().getMessageAdInfo().getId());
+            Intent intent = new Intent(this, AdActivity.class);
+            intent.putExtra("open_url", App.getApp().getMessageAdInfo().getJumpPath());
+            startActivity(intent);
+        }
+    }
+
+    public void addRecord(String aid) {
+        recordInfoPresenterImp.adClickInfo(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", aid);
     }
 }

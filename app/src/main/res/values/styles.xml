@@ -90,4 +90,11 @@
         <item name="android:textSize">14sp</item>
         <item name="android:textColor">@color/tab_select_color</item>
     </style>
+
+    <style name="my_popwindow_anim_style">
+        <item name="android:windowEnterAnimation">@anim/window_enter</item>
+        <!-- 指定显示的动画xml -->
+        <item name="android:windowExitAnimation">@anim/window_out</item>
+        <!-- 指定消失的动画xml -->
+    </style>
 </resources>

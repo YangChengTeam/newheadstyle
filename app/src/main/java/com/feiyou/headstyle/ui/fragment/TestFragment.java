@@ -50,6 +50,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 /**
  * Created by myflying on 2019/2/20.
@@ -64,6 +65,9 @@ public class TestFragment extends BaseFragment implements TestInfoView, View.OnC
 
     @BindView(R.id.layout_no_data)
     LinearLayout mNoDataLayout;
+
+    @BindView(R.id.tv_reload)
+    TextView mReLoadTv;
 
     LinearLayout mBannerLayout;
 
@@ -296,7 +300,7 @@ public class TestFragment extends BaseFragment implements TestInfoView, View.OnC
     }
 
     @Override
-    public void config() {
+    public void openConfig() {
         String appId = "wxd1112ca9a216aeda"; // 填应用AppId
         IWXAPI api = WXAPIFactory.createWXAPI(getActivity(), appId);
         WXLaunchMiniProgram.Req req = new WXLaunchMiniProgram.Req();
@@ -306,9 +310,16 @@ public class TestFragment extends BaseFragment implements TestInfoView, View.OnC
     }
 
     @Override
-    public void cancel() {
+    public void openCancel() {
         if (openDialog != null && openDialog.isShowing()) {
             openDialog.dismiss();
         }
+    }
+
+    @OnClick(R.id.tv_reload)
+    void reload() {
+        mNoDataLayout.setVisibility(View.GONE);
+        avi.show();
+        testInfoPresenterImp.getHotAndRecommendList(1);
     }
 }

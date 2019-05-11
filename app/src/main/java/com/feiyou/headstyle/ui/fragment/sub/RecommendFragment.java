@@ -44,6 +44,7 @@ import com.feiyou.headstyle.common.Constants;
 import com.feiyou.headstyle.presenter.AddZanPresenterImp;
 import com.feiyou.headstyle.presenter.FollowInfoPresenterImp;
 import com.feiyou.headstyle.presenter.NoteDataPresenterImp;
+import com.feiyou.headstyle.ui.activity.AddFriendsActivity;
 import com.feiyou.headstyle.ui.activity.CommunityArticleActivity;
 import com.feiyou.headstyle.ui.activity.CommunityType1Activity;
 import com.feiyou.headstyle.ui.activity.CommunityTypeActivity;
@@ -134,6 +135,8 @@ public class RecommendFragment extends BaseFragment implements NoteDataView, Swi
 
     BottomSheetDialog bottomSheetDialog;
 
+    private int errorType = 1;
+
     public static RecommendFragment getInstance() {
         return new RecommendFragment();
     }
@@ -150,7 +153,7 @@ public class RecommendFragment extends BaseFragment implements NoteDataView, Swi
     protected View onCreateView() {
         View root = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_tab_recommend, null);
 
-        if(!EventBus.getDefault().isRegistered(this)){
+        if (!EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().register(this);
         }
 
@@ -219,7 +222,7 @@ public class RecommendFragment extends BaseFragment implements NoteDataView, Swi
                 public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
                     Intent intent = new Intent(getActivity(), CommunityType1Activity.class);
                     intent.putExtra("topic_id", topicAdapter.getData().get(position).getId());
-                    intent.putExtra("topic_index",position);
+                    intent.putExtra("topic_index", position);
                     startActivity(intent);
                 }
             });
@@ -336,6 +339,18 @@ public class RecommendFragment extends BaseFragment implements NoteDataView, Swi
         }
     }
 
+    @OnClick(R.id.tv_follow_user)
+    void addFriends() {
+        if (errorType == 1) {
+            Intent intent = new Intent(getActivity(), AddFriendsActivity.class);
+            startActivity(intent);
+        } else {
+            noDataLayout.setVisibility(View.GONE);
+            avi.show();
+            onRefresh();
+        }
+    }
+
     @OnClick(R.id.fab)
     void fabButton() {
         if (!App.getApp().isLogin) {
@@ -367,6 +382,7 @@ public class RecommendFragment extends BaseFragment implements NoteDataView, Swi
 
     @Override
     public void loadDataSuccess(ResultInfo tData) {
+        errorType = 1;
         avi.hide();
         mRefreshLayout.setRefreshing(false);
         if (tData != null && tData.getCode() == Constants.SUCCESS) {
@@ -443,8 +459,17 @@ public class RecommendFragment extends BaseFragment implements NoteDataView, Swi
 
     @Override
     public void loadDataError(Throwable throwable) {
+        errorType = 2;
         avi.hide();
         mRefreshLayout.setRefreshing(false);
+        if (currentPage == 1) {
+            mRecommendListView.setVisibility(View.GONE);
+            noDataLayout.setVisibility(View.VISIBLE);
+            mNoDataTiltTv.setText("数据加载失败\n请检查网络后重试");
+            mFollowUserTv.setText("重新加载");
+            mFollowUserTv.setTextColor(ContextCompat.getColor(getActivity(), R.color.search_number_color2));
+            mFollowUserTv.setTextSize(16);
+        }
     }
 
     @Override

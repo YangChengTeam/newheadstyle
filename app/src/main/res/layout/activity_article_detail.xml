@@ -76,6 +76,9 @@
                                 android:id="@+id/tv_user_nick_name"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
+                                android:ellipsize="end"
+                                android:lines="1"
+                                android:maxWidth="240dp"
                                 android:text="用户昵称"
                                 android:textColor="@color/into_community_color"
                                 android:textSize="14dp" />
@@ -144,6 +147,26 @@
                         android:paddingLeft="12dp"
                         android:paddingRight="12dp"
                         android:paddingBottom="6dp"></android.support.v7.widget.RecyclerView>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="8dp"
+                        android:background="@color/search_bg_color"></View>
+
+                    <LinearLayout
+                        android:id="@+id/layout_ad"
+                        android:layout_width="match_parent"
+                        android:layout_height="86dp"
+                        android:background="@color/search_bg_color"
+                        android:gravity="center"
+                        android:visibility="gone">
+
+                        <ImageView
+                            android:id="@+id/iv_ad"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:scaleType="centerInside" />
+                    </LinearLayout>
 
                     <View
                         android:layout_width="match_parent"
