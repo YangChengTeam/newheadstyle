@@ -563,10 +563,15 @@ public class CommunityType1Activity extends BaseFragmentActivity implements Note
         }
 
         UMImage normalImage = null;
-        if (noteInfoAdapter.getData().get(currentClickIndex).getImageArr() != null && noteInfoAdapter.getData().get(currentClickIndex).getImageArr().length > 0) {
-            normalImage = new UMImage(CommunityType1Activity.this, noteInfoAdapter.getData().get(currentClickIndex).getImageArr()[0]);
-            normalImage.compressStyle = UMImage.CompressStyle.QUALITY;
-        } else {
+        if(noteInfoAdapter.getData() != null && noteInfoAdapter.getData().size() > 0) {
+            if (noteInfoAdapter.getData().get(currentClickIndex).getImageArr() != null && noteInfoAdapter.getData().get(currentClickIndex).getImageArr().length > 0) {
+                normalImage = new UMImage(CommunityType1Activity.this, noteInfoAdapter.getData().get(currentClickIndex).getImageArr()[0]);
+                normalImage.compressStyle = UMImage.CompressStyle.QUALITY;
+            } else {
+                normalImage = new UMImage(CommunityType1Activity.this, R.drawable.app_share);
+                normalImage.compressStyle = UMImage.CompressStyle.QUALITY;
+            }
+        }else {
             normalImage = new UMImage(CommunityType1Activity.this, R.drawable.app_share);
             normalImage.compressStyle = UMImage.CompressStyle.QUALITY;
         }

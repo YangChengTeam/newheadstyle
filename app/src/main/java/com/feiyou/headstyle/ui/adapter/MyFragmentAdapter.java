@@ -5,6 +5,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.view.ViewGroup;
 
+import com.feiyou.headstyle.ui.fragment.Create1Fragment;
 import com.feiyou.headstyle.ui.fragment.Home1Fragment;
 import com.feiyou.headstyle.ui.fragment.CommunityFragment;
 import com.feiyou.headstyle.ui.fragment.CreateFragment;
@@ -14,7 +15,7 @@ import com.feiyou.headstyle.ui.fragment.TestFragment;
 
 public class MyFragmentAdapter extends FragmentPagerAdapter {
 
-    private final Fragment[] FRAGMENTS = new Fragment[]{new Home1Fragment(), new CommunityFragment(), new CreateFragment(), new TestFragment(), new MyFragment()};
+    private final Fragment[] FRAGMENTS = new Fragment[]{new Home1Fragment(), new CommunityFragment(), new Create1Fragment(), new TestFragment(), new MyFragment()};
 
     public MyFragmentAdapter(FragmentManager fragmentManager) {
         super(fragmentManager);

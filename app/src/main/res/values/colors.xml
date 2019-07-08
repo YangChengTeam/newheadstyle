@@ -91,4 +91,14 @@
     <color name="join_us_color">#256de5</color>
 
     <color name="weixin_color">#7ab939</color>
+
+    <color name="gold_color">#fbe394</color>
+
+    <color name="profit_color">#fe6805</color>
+
+    <color name="sign_in_color">#fd6704</color>
+
+    <color name="task_gold_color">#fff04e</color>
+
+    <color name="task_border_color">#fb5360</color>
 </resources>

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/layout_answer_item"
+    android:layout_width="match_parent"
+    android:layout_height="66dp"
+    android:gravity="center"
+    android:orientation="horizontal">
+
+    <ImageView
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_margin="10dp"
+        android:src="@mipmap/gold_icon" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="25dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="签到奖励" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="12dp"
+                android:background="@drawable/task_gold_bg"
+                android:drawableLeft="@mipmap/gold_icon"
+                android:drawablePadding="4dp"
+                android:paddingLeft="2dp"
+                android:paddingRight="4dp"
+                android:text="+50金币"
+                android:textColor="@color/profit_color"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="25dp"
+            android:text="连续签到2天奖励"
+            android:textColor="@color/black2" />
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/tv_sign_state"
+        android:layout_width="72dp"
+        android:layout_height="30dp"
+        android:background="@drawable/task_btn_bg"
+        android:gravity="center"
+        android:text="已领取"
+        android:layout_marginRight="10dp"
+        android:textColor="@color/task_border_color"
+        android:textSize="12dp" />
+</LinearLayout>

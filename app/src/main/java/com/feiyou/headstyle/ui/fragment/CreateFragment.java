@@ -96,7 +96,7 @@ public class CreateFragment extends BaseFragment {
                 } else {
                     ToastUtils.showLong("没有相机权限，请在设置中打开");
                 }
-            }else {
+            } else {
                 ToastUtils.showLong("没有相机权限，请在设置中打开");
             }
 
