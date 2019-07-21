@@ -5,4 +5,7 @@
     <declare-styleable name="RoundImageView">
         <attr name="radius" format="reference|dimension" />
     </declare-styleable>
+    <declare-styleable name="CircleTextProgressbar">
+        <attr name="in_circle_color" format="color" />
+    </declare-styleable>
 </resources>

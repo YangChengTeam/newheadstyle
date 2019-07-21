@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.BottomSheetDialog;
@@ -50,6 +51,7 @@ import com.feiyou.headstyle.bean.NoteInfoDetailRet;
 import com.feiyou.headstyle.bean.ReplyParams;
 import com.feiyou.headstyle.bean.ReplyResultInfoRet;
 import com.feiyou.headstyle.bean.ResultInfo;
+import com.feiyou.headstyle.bean.TaskRecordInfoRet;
 import com.feiyou.headstyle.bean.UserInfo;
 import com.feiyou.headstyle.bean.ZanResultRet;
 import com.feiyou.headstyle.common.Constants;
@@ -58,6 +60,7 @@ import com.feiyou.headstyle.presenter.FollowInfoPresenterImp;
 import com.feiyou.headstyle.presenter.NoteInfoDetailDataPresenterImp;
 import com.feiyou.headstyle.presenter.RecordInfoPresenterImp;
 import com.feiyou.headstyle.presenter.ReplyCommentPresenterImp;
+import com.feiyou.headstyle.presenter.TaskRecordInfoPresenterImp;
 import com.feiyou.headstyle.ui.adapter.CommunityHeadAdapter;
 import com.feiyou.headstyle.ui.adapter.CommunityItemAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragmentActivity;
@@ -66,6 +69,7 @@ import com.feiyou.headstyle.ui.custom.LoginDialog;
 import com.feiyou.headstyle.ui.custom.MyWebView;
 import com.feiyou.headstyle.ui.custom.RoundedCornersTransformation;
 import com.feiyou.headstyle.ui.fragment.sub.WonderfulFragment;
+import com.feiyou.headstyle.utils.MyTimeUtil;
 import com.feiyou.headstyle.view.CommentDialog;
 import com.feiyou.headstyle.view.NoteInfoDetailDataView;
 import com.orhanobut.logger.Logger;
@@ -218,6 +222,16 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
 
     private boolean isMyNote;
 
+    private String taskId = "3";
+
+    private int goldNum = 0;
+
+    TaskRecordInfoPresenterImp taskRecordInfoPresenterImp;
+
+    private boolean isAddTaskRecord;
+
+    private String recordId;
+
     @Override
     protected int getContextViewId() {
         return R.layout.activity_article_detail;
@@ -263,6 +277,7 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
         if (bundle != null) {
             isFromStick = bundle.getBoolean("if_from_stick", false);
         }
+
         userInfo = App.getApp().getmUserInfo();
         FragmentManager manager = getSupportFragmentManager();
         FragmentTransaction transaction = manager.beginTransaction();
@@ -291,6 +306,7 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
         noteInfoDetailDataPresenterImp = new NoteInfoDetailDataPresenterImp(this, this);
         addZanPresenterImp = new AddZanPresenterImp(this, this);
         followInfoPresenterImp = new FollowInfoPresenterImp(this, this);
+        taskRecordInfoPresenterImp = new TaskRecordInfoPresenterImp(this, this);
 
         replyCommentPresenterImp = new ReplyCommentPresenterImp(this, this);
 
@@ -305,6 +321,13 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
         if (shareAction == null) {
             shareAction = new ShareAction(this);
             shareAction.setCallback(shareListener);//回调监听器
+        }
+
+        String addCommentDate = SPUtils.getInstance().getString(Constants.TODAY_PUSH_COMMENT, "");
+        if (StringUtils.isEmpty(addCommentDate) || !addCommentDate.equals(MyTimeUtil.getYearAndDay())) {
+            //当天没有签到
+            SPUtils.getInstance().put(Constants.TODAY_PUSH_COMMENT, MyTimeUtil.getYearAndDay());
+            taskRecordInfoPresenterImp.addTaskRecord(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", taskId, goldNum, 0, 0, "0");
         }
     }
 
@@ -537,6 +560,10 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
                 mMessageCountTextView.setText(commentNum > 0 ? commentNum + "" : "");
 
                 EventBus.getDefault().post(new MessageEvent("更新精彩评论"));
+
+                if (isAddTaskRecord) {
+                    taskRecordInfoPresenterImp.addTaskRecord(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", taskId, goldNum, 0, 1, recordId);
+                }
             }
 
             if (tData instanceof ZanResultRet) {
@@ -558,6 +585,19 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
                 mFollowLayout.setBackgroundResource(tempResult == 0 ? R.drawable.into_bg : R.drawable.is_follow_bg);
                 mFollowTv.setTextColor(ContextCompat.getColor(this, tempResult == 0 ? R.color.tab_select_color : R.color.black2));
                 mFollowTv.setText(tempResult == 0 ? "+关注" : "已关注");
+            }
+
+            if (tData instanceof TaskRecordInfoRet) {
+                if (StringUtils.isEmpty(recordId)) {
+                    isAddTaskRecord = true;
+                    if (((TaskRecordInfoRet) tData).getData() != null) {
+                        recordId = ((TaskRecordInfoRet) tData).getData().getInfoid();
+                    }
+                } else {
+                    if (((TaskRecordInfoRet) tData).getData() != null) {
+                        ToastUtils.showLong("领取成功 +" + ((TaskRecordInfoRet) tData).getData().getGoldnum() + "金币");
+                    }
+                }
             }
 
         } else {

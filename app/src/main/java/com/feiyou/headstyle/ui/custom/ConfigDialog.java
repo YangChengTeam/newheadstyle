@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.feiyou.headstyle.R;
 
 public class ConfigDialog extends Dialog implements View.OnClickListener {
@@ -25,11 +26,21 @@ public class ConfigDialog extends Dialog implements View.OnClickListener {
 
     TextView mContentTv;
 
+    TextView mCancelTv;
+
+    TextView mConfigTv;
+
     private String title;
 
     private String content;
 
     private ConfigListener configListener;
+
+    private String cancelTxt;
+
+    private String configTxt;
+
+    private int topImageRes;
 
     public interface ConfigListener {
         void config();
@@ -39,6 +50,16 @@ public class ConfigDialog extends Dialog implements View.OnClickListener {
 
     public void setConfigListener(ConfigListener configListener) {
         this.configListener = configListener;
+    }
+
+    public void setCancelTxt(String cancelTxt) {
+        this.cancelTxt = cancelTxt;
+        mCancelTv.setText(cancelTxt);
+    }
+
+    public void setConfigTxt(String configTxt) {
+        this.configTxt = configTxt;
+        mConfigTv.setText(configTxt);
     }
 
     public ConfigDialog(Context context) {
@@ -54,6 +75,7 @@ public class ConfigDialog extends Dialog implements View.OnClickListener {
     public ConfigDialog(Context context, int themeResId, int imgRes, String titleStr, String contentStr) {
         super(context, themeResId);
         this.mContext = context;
+        this.topImageRes = imgRes;
         this.title = titleStr;
         this.content = contentStr;
     }
@@ -72,10 +94,15 @@ public class ConfigDialog extends Dialog implements View.OnClickListener {
         mTopImageView = findViewById(R.id.iv_config_img);
         mTitleTv = findViewById(R.id.tv_config_title);
         mContentTv = findViewById(R.id.tv_config_content);
+        mCancelTv = findViewById(R.id.tv_cancel);
+        mConfigTv = findViewById(R.id.tv_config);
+
         mConfigLayout.setOnClickListener(this);
         mCancelLayout.setOnClickListener(this);
         setCanceledOnTouchOutside(true);
-
+        if (topImageRes > 0) {
+            Glide.with(mContext).load(topImageRes).into(mTopImageView);
+        }
         mTitleTv.setText(title);
         mContentTv.setText(content);
     }

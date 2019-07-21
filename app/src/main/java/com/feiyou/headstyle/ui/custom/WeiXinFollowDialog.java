@@ -31,7 +31,9 @@ public class WeiXinFollowDialog extends Dialog {
     private Dialog dialog;
 
     public interface TimeListener {
-        void timeStart();
+        void startOpen();
+
+        void closeDialog();
     }
 
     public WeiXinFollowDialog(Context context) {

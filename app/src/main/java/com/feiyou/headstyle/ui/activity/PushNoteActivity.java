@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -23,17 +24,23 @@ import com.blankj.utilcode.util.PathUtils;
 import com.blankj.utilcode.util.SPUtils;
 import com.blankj.utilcode.util.SizeUtils;
 import com.blankj.utilcode.util.StringUtils;
+import com.blankj.utilcode.util.TimeUtils;
+import com.blankj.utilcode.util.ToastUtils;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
+import com.feiyou.headstyle.base.IBaseView;
 import com.feiyou.headstyle.bean.AddNoteRet;
 import com.feiyou.headstyle.bean.MessageEvent;
+import com.feiyou.headstyle.bean.TaskRecordInfoRet;
 import com.feiyou.headstyle.common.Constants;
 import com.feiyou.headstyle.presenter.AddNotePresenterImp;
+import com.feiyou.headstyle.presenter.TaskRecordInfoPresenterImp;
 import com.feiyou.headstyle.ui.adapter.AddNoteImageAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragmentActivity;
 import com.feiyou.headstyle.ui.custom.Glide4Engine;
 import com.feiyou.headstyle.ui.custom.MsgEditText;
+import com.feiyou.headstyle.utils.MyTimeUtil;
 import com.feiyou.headstyle.view.AddNoteView;
 import com.jakewharton.rxbinding.view.RxView;
 import com.orhanobut.logger.Logger;
@@ -65,7 +72,7 @@ import top.zibin.luban.OnCompressListener;
 /**
  * Created by myflying on 2018/11/23.
  */
-public class PushNoteActivity extends BaseFragmentActivity implements AddNoteView {
+public class PushNoteActivity extends BaseFragmentActivity implements IBaseView {
 
     public static final int REQUEST_CODE_CHOOSE = 23;
 
@@ -135,6 +142,18 @@ public class PushNoteActivity extends BaseFragmentActivity implements AddNoteVie
 
     private ProgressDialog progressDialog = null;
 
+    private String taskId = "1";
+
+    private int goldNum = 0;
+
+    TaskRecordInfoPresenterImp taskRecordInfoPresenterImp;
+
+    private boolean isAddTaskRecord;
+
+    private String recordId;
+
+    private int isFromTask = 0;
+
     @Override
     protected int getContextViewId() {
         return R.layout.activity_add_note;
@@ -174,10 +193,8 @@ public class PushNoteActivity extends BaseFragmentActivity implements AddNoteVie
 
         if (bundle != null) {
             topicDefIndex = bundle.getInt("topic_index", -1);
-        }
-
-        if (bundle != null) {
             fromNoteType = bundle.getInt("from_note_type", 1);
+            isFromTask = bundle.getInt("is_from_task", 0);
         }
 
         //发布
@@ -280,6 +297,17 @@ public class PushNoteActivity extends BaseFragmentActivity implements AddNoteVie
         progressDialog.setCanceledOnTouchOutside(false);
 
         addNotePresenterImp = new AddNotePresenterImp(this, this);
+        taskRecordInfoPresenterImp = new TaskRecordInfoPresenterImp(this, this);
+
+        if (isFromTask == 1) {
+            String pushNoteDate = SPUtils.getInstance().getString(Constants.TODAY_PUSH_NOTE, "");
+            if (StringUtils.isEmpty(pushNoteDate) || !pushNoteDate.equals(MyTimeUtil.getYearAndDay())) {
+                //当天没有签到
+                SPUtils.getInstance().put(Constants.TODAY_PUSH_NOTE, MyTimeUtil.getYearAndDay());
+                taskRecordInfoPresenterImp.addTaskRecord(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", taskId, goldNum, 0, 0, "0");
+            }
+        }
+
     }
 
     public String setFriendIds(String input) {
@@ -451,43 +479,71 @@ public class PushNoteActivity extends BaseFragmentActivity implements AddNoteVie
     }
 
     @Override
-    public void loadDataSuccess(AddNoteRet tData) {
+    public void loadDataSuccess(Object tData) {
         Logger.i(JSON.toJSONString(tData));
 
         if (progressDialog != null && progressDialog.isShowing()) {
             progressDialog.dismiss();
         }
+        if (tData instanceof AddNoteRet) {
+            if (((AddNoteRet) tData).getCode() == Constants.SUCCESS) {
 
-        if (tData.getCode() == Constants.SUCCESS) {
-            if (tData.getData() != null) {
-                //发帖完成，可以弹出打分
-                SPUtils.getInstance().put(Constants.IS_OPEN_SCORE, true);
-                if (fromNoteType == 1) {
-                    MessageEvent addMessage = new MessageEvent("add_note");
-                    addMessage.setAddNoteInfo(tData.getData());
-                    EventBus.getDefault().post(addMessage);
-                    finish();
-                }
+                if (((AddNoteRet) tData).getData() != null) {
 
-                if (fromNoteType == 2) {
-                    MessageEvent addMessage = new MessageEvent("add_note_type");
-                    addMessage.setTopicId(topicId);
-                    EventBus.getDefault().post(addMessage);
-                    finish();
-                }
+                    //发帖完成，可以弹出打分
+                    SPUtils.getInstance().put(Constants.IS_OPEN_SCORE, true);
+                    if (fromNoteType == 1) {
+                        MessageEvent addMessage = new MessageEvent("add_note");
+                        addMessage.setAddNoteInfo(((AddNoteRet) tData).getData());
+                        EventBus.getDefault().post(addMessage);
+                    }
 
-                if (fromNoteType == 3) {
-                    Intent intent = new Intent(this, Main1Activity.class);
-                    intent.putExtra("home_index", 1);
-                    startActivity(intent);
-                    //App.getApp().setTempAddNoteInfo(tData.getData());
-                    finish();
+                    if (fromNoteType == 2) {
+                        MessageEvent addMessage = new MessageEvent("add_note_type");
+                        addMessage.setTopicId(topicId);
+                        EventBus.getDefault().post(addMessage);
+                    }
+
+                    if (fromNoteType == 3) {
+                        Intent intent = new Intent(this, Main1Activity.class);
+                        intent.putExtra("home_index", 1);
+                        startActivity(intent);
+                    }
+
+                    if (isAddTaskRecord) {
+                        taskRecordInfoPresenterImp.addTaskRecord(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", taskId, goldNum, 0, 1, recordId);
+                    } else {
+                        finish();
+                    }
                 }
+            } else {
+                Toasty.normal(this, StringUtils.isEmpty(((AddNoteRet) tData).getMsg()) ? "发帖失败" : ((AddNoteRet) tData).getMsg()).show();
             }
-
-        } else {
-            Toasty.normal(this, StringUtils.isEmpty(tData.getMsg()) ? "发帖失败" : tData.getMsg()).show();
         }
+
+        if (tData instanceof TaskRecordInfoRet) {
+            if (((TaskRecordInfoRet) tData).getCode() == Constants.SUCCESS) {
+                if (StringUtils.isEmpty(recordId)) {
+                    isAddTaskRecord = true;
+                    if (((TaskRecordInfoRet) tData).getData() != null) {
+                        recordId = ((TaskRecordInfoRet) tData).getData().getInfoid();
+                    }
+                } else {
+                    if (((TaskRecordInfoRet) tData).getData() != null) {
+                        ToastUtils.showLong("领取成功 +" + ((TaskRecordInfoRet) tData).getData().getGoldnum() + "金币");
+                        new Handler().postDelayed(new Runnable() {
+                            public void run() {
+                                finish();
+                            }
+                        }, 300);
+                    }
+                }
+            } else {
+                //finish();
+                Logger.i("task error--->");
+            }
+        }
+
     }
 
     @Override

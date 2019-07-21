@@ -1,5 +1,8 @@
 package com.feiyou.headstyle.utils;
 
+import com.blankj.utilcode.util.TimeUtils;
+
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class MyTimeUtil {
@@ -56,4 +59,12 @@ public class MyTimeUtil {
         return false;
     }
 
+    /**
+     * 获取当前的年月日
+     * @return
+     */
+    public static String getYearAndDay() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        return TimeUtils.getNowString(sdf);
+    }
 }

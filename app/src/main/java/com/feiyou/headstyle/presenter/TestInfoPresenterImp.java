@@ -3,6 +3,7 @@ package com.feiyou.headstyle.presenter;
 import android.content.Context;
 
 import com.feiyou.headstyle.base.BasePresenterImp;
+import com.feiyou.headstyle.base.IBaseView;
 import com.feiyou.headstyle.bean.TestInfoRet;
 import com.feiyou.headstyle.bean.TopicInfoRet;
 import com.feiyou.headstyle.model.TestInfoModelImp;
@@ -14,7 +15,7 @@ import com.feiyou.headstyle.view.TopicDataView;
  * Created by iflying on 2018/1/9.
  */
 
-public class TestInfoPresenterImp extends BasePresenterImp<TestInfoView, TestInfoRet> implements TestInfoPresenter {
+public class TestInfoPresenterImp extends BasePresenterImp<IBaseView, TestInfoRet> implements TestInfoPresenter {
 
     private Context context = null;
 
@@ -24,7 +25,7 @@ public class TestInfoPresenterImp extends BasePresenterImp<TestInfoView, TestInf
      * @param view 具体业务的视图接口对象
      * @descriptoin 构造方法
      */
-    public TestInfoPresenterImp(TestInfoView view, Context context) {
+    public TestInfoPresenterImp(IBaseView view, Context context) {
         super(view);
         testInfoModelImp = new TestInfoModelImp(context);
     }

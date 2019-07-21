@@ -18,7 +18,7 @@ import java.util.List;
  * Created by iflying on 2018/1/9.
  */
 
-public class AddNotePresenterImp extends BasePresenterImp<AddNoteView, AddNoteRet> implements AddNotePresenter {
+public class AddNotePresenterImp extends BasePresenterImp<IBaseView, AddNoteRet> implements AddNotePresenter {
     private Context context = null;
     private AddNoteModelImp addNoteModelImp = null;
 
@@ -26,7 +26,7 @@ public class AddNotePresenterImp extends BasePresenterImp<AddNoteView, AddNoteRe
      * @param view 具体业务的视图接口对象
      * @descriptoin 构造方法
      */
-    public AddNotePresenterImp(AddNoteView view, Context context) {
+    public AddNotePresenterImp(IBaseView view, Context context) {
         super(view);
         addNoteModelImp = new AddNoteModelImp(context);
     }

@@ -5,6 +5,9 @@ import android.content.Context;
 
 import com.blankj.utilcode.util.Utils;
 import com.bumptech.glide.Glide;
+import com.bytedance.sdk.openadsdk.TTAdConfig;
+import com.bytedance.sdk.openadsdk.TTAdConstant;
+import com.bytedance.sdk.openadsdk.TTAdSdk;
 import com.feiyou.headstyle.bean.AdInfo;
 import com.feiyou.headstyle.bean.NoteInfo;
 import com.feiyou.headstyle.bean.TestDetailInfoWrapper;
@@ -13,6 +16,7 @@ import com.feiyou.headstyle.bean.TopicInfo;
 import com.feiyou.headstyle.bean.UserInfo;
 import com.feiyou.headstyle.bean.VideoInfo;
 import com.feiyou.headstyle.utils.AppContextUtil;
+import com.feiyou.headstyle.utils.TTAdManagerHolder;
 import com.mob.MobSDK;
 import com.umeng.commonsdk.UMConfigure;
 import com.umeng.socialize.PlatformConfig;
@@ -92,6 +96,8 @@ public class App extends Application {
         Utils.init(this);
         AppContextUtil.init(this);
         applicationContext = this;
+
+        TTAdManagerHolder.init(this);//初始化今日头条
     }
 
     public UserInfo getmUserInfo() {

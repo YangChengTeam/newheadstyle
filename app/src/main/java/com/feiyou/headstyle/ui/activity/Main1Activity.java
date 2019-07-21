@@ -160,6 +160,7 @@ public class Main1Activity extends BaseFragmentActivity implements VersionView, 
         adapter = new MyFragmentAdapter(getSupportFragmentManager());
         viewPager.setAdapter(adapter);
         viewPager.addOnPageChangeListener(this);
+        viewPager.setOffscreenPageLimit(1);
         mTabRadioGroup.setOnCheckedChangeListener(this);
 
         praiseDialog = new PraiseDialog(this, R.style.login_dialog);
@@ -296,9 +297,9 @@ public class Main1Activity extends BaseFragmentActivity implements VersionView, 
 
     @Override
     public void onPageScrollStateChanged(int state) {
-        Logger.i("view pager onPageScrollStateChanged--->" + viewPager.getCurrentItem());
+        Logger.i("view pager onPageScrollStateChanged--->state--->" + state  + viewPager.getCurrentItem());
         if (state == 2) {
-            Logger.i("view pager onPageScrollStateChanged--->" + viewPager.getCurrentItem());
+            Logger.i("view pager onPageScrollStateChanged--->state--->" + state  + viewPager.getCurrentItem());
             RadioButton radioButton = (RadioButton) mTabRadioGroup.getChildAt(viewPager.getCurrentItem());
             radioButton.setChecked(true);
         }

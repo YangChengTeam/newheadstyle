@@ -297,8 +297,43 @@
                 android:layout_marginRight="14dp"
                 android:src="@mipmap/iv_right_icon" />
         </RelativeLayout>
-    </LinearLayout>
 
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:background="@color/line_color"></View>
+
+        <RelativeLayout
+            android:id="@+id/layout_my_exchange"
+            android:layout_width="match_parent"
+            android:layout_height="42dp">
+
+            <ImageView
+                android:id="@+id/iv_exchange"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="14dp"
+                android:src="@mipmap/my_exchange_icon" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="14dp"
+                android:layout_toRightOf="@+id/iv_exchange"
+                android:text="我的兑换" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="14dp"
+                android:src="@mipmap/iv_right_icon" />
+        </RelativeLayout>
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/layout_about"

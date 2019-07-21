@@ -3,6 +3,7 @@ package com.feiyou.headstyle.presenter;
 import android.content.Context;
 
 import com.feiyou.headstyle.base.BasePresenterImp;
+import com.feiyou.headstyle.base.IBaseView;
 import com.feiyou.headstyle.bean.LoginRequest;
 import com.feiyou.headstyle.bean.UserInfo;
 import com.feiyou.headstyle.bean.UserInfoRet;
@@ -16,7 +17,7 @@ import com.feiyou.headstyle.view.WordInfoView;
  * Created by iflying on 2018/1/9.
  */
 
-public class UserInfoPresenterImp extends BasePresenterImp<UserInfoView, UserInfoRet> implements UserInfoPresenter {
+public class UserInfoPresenterImp extends BasePresenterImp<IBaseView, UserInfoRet> implements UserInfoPresenter {
     private Context context = null;
     private UserInfoModelImp userInfoModelImp = null;
 
@@ -24,7 +25,7 @@ public class UserInfoPresenterImp extends BasePresenterImp<UserInfoView, UserInf
      * @param view 具体业务的视图接口对象
      * @descriptoin 构造方法
      */
-    public UserInfoPresenterImp(UserInfoView view, Context context) {
+    public UserInfoPresenterImp(IBaseView view, Context context) {
         super(view);
         userInfoModelImp = new UserInfoModelImp(context);
     }
@@ -52,5 +53,10 @@ public class UserInfoPresenterImp extends BasePresenterImp<UserInfoView, UserInf
     @Override
     public void updateOneInfo(UserInfo updateInfo) {
         userInfoModelImp.updateOneInfo(updateInfo, this);
+    }
+
+    @Override
+    public void updateTxOpenId(String uid, String txopenid, String txnickname) {
+        userInfoModelImp.updateTxOpenId(uid, txopenid, txnickname, this);
     }
 }

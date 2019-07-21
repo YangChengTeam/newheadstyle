@@ -13,4 +13,5 @@ public interface UserInfoPresenter {
     void updateUserInfo(UserInfo updateInfo);
     void getUserInfo(String userId,String toUserId);
     void updateOneInfo(UserInfo updateInfo);
+    void updateTxOpenId(String uid, String txopenid, String txnickname);
 }

@@ -101,4 +101,23 @@
     <color name="task_gold_color">#fff04e</color>
 
     <color name="task_border_color">#fb5360</color>
+
+    <color name="hongbao_color">#e3b871</color>
+
+    <color name="receive_txt_color">#f13838</color>
+
+    <color name="exchange_success_color">#09bb06</color>
+
+    <color name="sign_done_color">#8f8f8f</color>
+
+    <color name="get_hongbao_color">#fffa9a</color>
+
+    <color name="wait_charge_color">#fd6704</color>
+
+    <color name="overdue_color">#f8a2a0</color>
+
+    <color name="see_video_color">#fb5360</color>
+
+    <color name="see_video_bg_color">#f5f5f5</color>
+    <color name="see_video_money_color">#fa5262</color>
 </resources>

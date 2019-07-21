@@ -35,6 +35,7 @@ import com.feiyou.headstyle.presenter.UserInfoPresenterImp;
 import com.feiyou.headstyle.ui.activity.AboutActivity;
 import com.feiyou.headstyle.ui.activity.FeedBackActivity;
 import com.feiyou.headstyle.ui.activity.MyCollectionActivity;
+import com.feiyou.headstyle.ui.activity.MyExchangeListActivity;
 import com.feiyou.headstyle.ui.activity.MyFollowActivity;
 import com.feiyou.headstyle.ui.activity.MyMessageActivity;
 import com.feiyou.headstyle.ui.activity.MyNoteActivity;
@@ -400,6 +401,20 @@ public class MyFragment extends BaseFragment implements UserInfoView, PraiseDial
         }
 
         Intent intent = new Intent(getActivity(), MyMessageActivity.class);
+        startActivity(intent);
+    }
+
+    @OnClick(R.id.layout_my_exchange)
+    public void myExchange() {
+        //TODO 暂时不登录
+//        if (!App.getApp().isLogin) {
+//            if (loginDialog != null && !loginDialog.isShowing()) {
+//                loginDialog.show();
+//            }
+//            return;
+//        }
+
+        Intent intent = new Intent(getActivity(), MyExchangeListActivity.class);
         startActivity(intent);
     }
 

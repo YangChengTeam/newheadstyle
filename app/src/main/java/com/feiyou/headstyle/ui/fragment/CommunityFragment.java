@@ -220,7 +220,7 @@ public class CommunityFragment extends BaseFragment implements ViewPager.OnPageC
         Intent intent = new Intent(getActivity(), AddFriendsActivity.class);
         startActivity(intent);
     }
-
+    
     @Override
     public void showProgress() {
 

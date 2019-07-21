@@ -18,10 +18,28 @@
         android:layout_height="0.5dp"
         android:background="@color/line_color"></View>
 
-    <LinearLayout
-        android:id="@+id/layout_ad"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
-    </LinearLayout>
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:id="@+id/layout_ad"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"></LinearLayout>
+
+        <TextView
+            android:id="@+id/tv_count_down"
+            android:layout_width="96dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|right"
+            android:layout_margin="16dp"
+            android:background="@drawable/background_circle"
+            android:gravity="center"
+            android:text="倒计时"
+            android:textColor="@android:color/white"
+            android:textSize="14sp"
+            android:visibility="gone" />
+    </FrameLayout>
+
 </LinearLayout>

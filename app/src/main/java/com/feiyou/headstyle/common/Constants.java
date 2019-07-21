@@ -33,7 +33,9 @@ public class Constants {
 
     public static final String APP_PACKAGE_NAME = "com.feiyou.headstyle";
 
-    public static final String BASE_URL = "http://ytx.wk2.com/api/";
+    public static final String BASE_URL = "http://ytx.bshu.com/api/";
+
+    public static final String BASE_SCORE_URL = "http://ytx.bshu.com/api/";
 
     public static final String BASE_TEST_URL = "https://cj.197854.com/api/";
 
@@ -73,4 +75,9 @@ public class Constants {
 
     public static final String IS_OPEN_SCORE = "is_open_score";
 
+    public static final String TODAY_PUSH_NOTE = "today_push_note";
+
+    public static final String TODAY_PUSH_COMMENT = "today_push_comment";
+
+    public static final String TODAY_IS_TEST = "today_is_test";
 }

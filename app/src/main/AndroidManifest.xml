@@ -37,6 +37,10 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />    <!-- targetSdkVersion >= 26 时需要配置此权限，否则无法进行安装app的动作 -->
 
+    <uses-permission android:name="android.permission.GET_TASKS"/>
+    <!-- 如果有视频相关的广告且使用textureView播放，请务必添加，否则黑屏 -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
     <application
         android:name=".App"
         android:allowBackup="true"
@@ -133,6 +137,15 @@
             android:name=".ui.activity.MessageDetailActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:screenOrientation="portrait" />
+        <activity android:name=".ui.activity.CashActivity"></activity>
+        <activity android:name=".ui.activity.CashRecordActivity"></activity>
+        <activity android:name=".ui.activity.GoldDetailActivity"></activity>
+        <activity android:name=".ui.activity.GoldTaskActivity"></activity>
+        <activity android:name=".ui.activity.GoldMailActivity"></activity>
+        <activity android:name=".ui.activity.GoodDetailActivity"></activity>
+        <activity android:name=".ui.activity.ExchangeDetailActivity"></activity>
+        <activity android:name=".ui.activity.MyExchangeListActivity"></activity>
+        <activity android:name=".ui.activity.AboutGoldActivity"></activity>
         <activity
             android:name=".wxapi.WXEntryActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
@@ -180,7 +193,7 @@
 
         <provider
             android:name="android.support.v4.content.FileProvider"
-            android:authorities="com.feiyou.headstyle.fileprovider"
+            android:authorities="com.fy.tnzbsq.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true"
             tools:replace="android:authorities">
@@ -188,6 +201,21 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
+
+        <provider
+            android:name="com.bytedance.sdk.openadsdk.TTFileProvider"
+            android:authorities="com.fy.tnzbsq.TTFileProvider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/tt_file_paths" />
+        </provider>
+
+        <provider
+            android:name="com.bytedance.sdk.openadsdk.multipro.TTMultiProvider"
+            android:authorities="com.fy.tnzbsq.TTMultiProvider"
+            android:exported="false" />
 
         <meta-data
             android:name="UMENG_APPKEY"

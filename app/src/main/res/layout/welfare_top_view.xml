@@ -36,11 +36,12 @@
                 android:ellipsize="end"
                 android:lines="1"
                 android:maxWidth="150dp"
-                android:text="火星用户火星用户火星用户火星用户火星用户火星用户火星用户"
+                android:text="火星用户"
                 android:textColor="@color/white"
                 android:textSize="18sp" />
 
             <RelativeLayout
+                android:id="@+id/layout_about_gold"
                 android:layout_width="78dp"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
@@ -78,7 +79,7 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="88dp"
+            android:layout_height="92dp"
             android:gravity="center">
 
             <FrameLayout
@@ -87,6 +88,7 @@
                 android:layout_weight="1">
 
                 <LinearLayout
+                    android:id="@+id/layout_gold_detail"
                     android:layout_width="48dp"
                     android:layout_height="16dp"
                     android:layout_gravity="top|right"
@@ -110,14 +112,15 @@
                     android:orientation="vertical">
 
                     <TextView
+                        android:id="@+id/tv_gold_balance"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:drawableLeft="@mipmap/gold_icon"
-                        android:drawablePadding="4dp"
+                        android:drawablePadding="2dp"
                         android:gravity="center"
-                        android:text="10000"
+                        android:text="0"
                         android:textColor="@color/gold_color"
-                        android:textSize="20sp" />
+                        android:textSize="19sp" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -127,6 +130,7 @@
                         android:textSize="15sp" />
 
                     <Button
+                        android:id="@+id/btn_turn_profit"
                         android:layout_width="76dp"
                         android:layout_height="24dp"
                         android:layout_marginTop="4dp"
@@ -150,12 +154,13 @@
                 android:orientation="vertical">
 
                 <TextView
+                    android:id="@+id/tv_my_profit"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="¥1.2"
+                    android:text="¥0.0"
                     android:textColor="@color/gold_color"
-                    android:textSize="20sp" />
+                    android:textSize="19sp" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -165,6 +170,7 @@
                     android:textSize="15sp" />
 
                 <Button
+                    android:id="@+id/btn_cash"
                     android:layout_width="76dp"
                     android:layout_height="24dp"
                     android:layout_marginTop="4dp"
@@ -180,9 +186,9 @@
             android:layout_height="wrap_content">
 
             <TextView
+                android:id="@+id/tv_scale_remark"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="100金币≈1元"
                 android:textColor="@color/white"
                 android:textSize="11sp" />
         </LinearLayout>
@@ -234,6 +240,7 @@
                 android:textSize="14sp" />
 
             <TextView
+                android:id="@+id/tv_sign_days"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="3"
@@ -248,18 +255,33 @@
                 android:textSize="14sp" />
         </LinearLayout>
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/sign_in_list_view"
-            android:layout_width="294dp"
-            android:layout_height="66dp"></android.support.v7.widget.RecyclerView>
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="66dp">
 
-        <ImageView
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0.5dp"
+                android:layout_gravity="center"
+                android:layout_marginLeft="12dp"
+                android:layout_marginRight="12dp"
+                android:background="@color/line_color"></View>
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/sign_in_list_view"
+                android:layout_width="match_parent"
+                android:layout_height="66dp"
+                android:layout_marginLeft="12dp"
+                android:layout_marginRight="12dp"></android.support.v7.widget.RecyclerView>
+        </FrameLayout>
+
+        <pl.droidsonroids.gif.GifImageView
             android:id="@+id/iv_sign_in"
             android:layout_width="294dp"
             android:layout_height="33dp"
             android:layout_marginTop="4dp"
-            android:textColor="@color/white"
-            android:textSize="16sp" />
+            android:src="@drawable/sign_in"
+            android:textColor="@color/white" />
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -269,7 +291,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="连续签到7天可以领取现金红包"
+                android:text="连续签到可以领取现金红包"
                 android:textColor="@color/profit_color"
                 android:textSize="11sp" />
         </LinearLayout>
@@ -278,9 +300,11 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="100dp"
-        android:layout_marginTop="6dp">
+        android:layout_marginTop="6dp"
+        android:gravity="center">
 
         <LinearLayout
+            android:id="@+id/layout_gold_task"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -301,6 +325,7 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/layout_gold_mail"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -341,6 +366,7 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/layout_get_money"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -355,7 +381,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="姓氏头像"
+                android:text="领钱"
                 android:textColor="@color/black1"
                 android:textSize="14sp" />
         </LinearLayout>
@@ -368,34 +394,73 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="48dp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
                 android:layout_centerVertical="true"
-                android:layout_marginLeft="24dp"
+                android:layout_marginLeft="12dp"
                 android:drawableLeft="@mipmap/tuijian_icon"
-                android:drawablePadding="2dp"
+                android:drawablePadding="4dp"
                 android:text="推荐任务"
-                android:textSize="18sp"
+                android:textSize="16sp"
                 android:textStyle="bold" />
 
             <TextView
+                android:id="@+id/tv_more_task"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
-                android:layout_marginRight="24dp"
+                android:padding="12dp"
                 android:text="更多>"
                 android:textColor="@color/black2"
-                android:textSize="16sp" />
+                android:textSize="14sp" />
         </RelativeLayout>
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/task_list_view"
             android:layout_width="match_parent"
-            android:layout_height="186dp"></android.support.v7.widget.RecyclerView>
+            android:layout_height="186dp"
+            android:layout_marginLeft="12dp"
+            android:layout_marginRight="12dp"></android.support.v7.widget.RecyclerView>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.3dp"
+            android:layout_marginLeft="12dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginRight="12dp"
+            android:background="@color/line_color"></View>
     </LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="48dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="12dp"
+            android:drawableLeft="@mipmap/tuijian_icon"
+            android:drawablePadding="4dp"
+            android:text="0元免费拿"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tv_good_more"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:padding="12dp"
+            android:text="更多>"
+            android:textColor="@color/black2"
+            android:textSize="14sp" />
+    </RelativeLayout>
 </LinearLayout>

@@ -3,6 +3,7 @@ package com.feiyou.headstyle.ui.activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.InputFilter;
@@ -18,6 +19,7 @@ import android.widget.TextView;
 
 import com.alibaba.fastjson.JSONObject;
 import com.blankj.utilcode.util.KeyboardUtils;
+import com.blankj.utilcode.util.SPUtils;
 import com.blankj.utilcode.util.SizeUtils;
 import com.blankj.utilcode.util.StringUtils;
 import com.blankj.utilcode.util.ToastUtils;
@@ -25,6 +27,7 @@ import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.bean.ResultInfo;
+import com.feiyou.headstyle.bean.TaskRecordInfoRet;
 import com.feiyou.headstyle.bean.TestDetailInfoRet;
 import com.feiyou.headstyle.bean.TestDetailInfoWrapper;
 import com.feiyou.headstyle.bean.TestInfoWrapper;
@@ -33,10 +36,12 @@ import com.feiyou.headstyle.bean.TestResultInfoRet;
 import com.feiyou.headstyle.bean.TestResultParams;
 import com.feiyou.headstyle.bean.UserInfo;
 import com.feiyou.headstyle.common.Constants;
+import com.feiyou.headstyle.presenter.TaskRecordInfoPresenterImp;
 import com.feiyou.headstyle.presenter.TestDetailInfoPresenterImp;
 import com.feiyou.headstyle.presenter.TestResultInfoPresenterImp;
 import com.feiyou.headstyle.ui.adapter.TestChatImageListAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragmentActivity;
+import com.feiyou.headstyle.utils.MyTimeUtil;
 import com.feiyou.headstyle.view.TestDetailInfoView;
 import com.jakewharton.rxbinding.view.RxView;
 import com.orhanobut.logger.Logger;
@@ -122,6 +127,16 @@ public class TestImageDetailActivity extends BaseFragmentActivity implements Tes
 
     TestMsgInfo resultMsgInfo;
 
+    private String taskId = "5";
+
+    private int goldNum = 0;
+
+    TaskRecordInfoPresenterImp taskRecordInfoPresenterImp;
+
+    private boolean isAddTaskRecord;
+
+    private String recordId;
+
     @Override
     protected int getContextViewId() {
         return R.layout.activity_test_image_detail;
@@ -189,6 +204,7 @@ public class TestImageDetailActivity extends BaseFragmentActivity implements Tes
 
                     Intent intent = new Intent(TestImageDetailActivity.this, TestResultActivity.class);
                     intent.putExtra("from_type", 2);
+                    intent.putExtra("record_id", recordId);
                     intent.putExtra("image_url", chatListAdapter.getData().get(position).getCodeImageUrl());
                     intent.putExtra("nocode_image_url", chatListAdapter.getData().get(position).getResultImageUrl());
                     startActivity(intent);
@@ -203,7 +219,7 @@ public class TestImageDetailActivity extends BaseFragmentActivity implements Tes
 
         testDetailInfoPresenterImp = new TestDetailInfoPresenterImp(this, this);
         testResultInfoPresenterImp = new TestResultInfoPresenterImp(this, this);
-
+        taskRecordInfoPresenterImp = new TaskRecordInfoPresenterImp(this, this);
 
         //发布
         RxView.clicks(mConfigLayout).throttleFirst(300, TimeUnit.MILLISECONDS).subscribe(new Action1<Void>() {
@@ -215,7 +231,12 @@ public class TestImageDetailActivity extends BaseFragmentActivity implements Tes
 
         testDetailInfoPresenterImp.getTestDetail(tid, 2);
 
-
+        String todayIsTest = SPUtils.getInstance().getString(Constants.TODAY_IS_TEST, "");
+        if (StringUtils.isEmpty(todayIsTest) || !todayIsTest.equals(MyTimeUtil.getYearAndDay())) {
+            //当天没有签到
+            SPUtils.getInstance().put(Constants.TODAY_IS_TEST, MyTimeUtil.getYearAndDay());
+            taskRecordInfoPresenterImp.addTaskRecord(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", taskId, goldNum, 0, 0, "0");
+        }
     }
 
     @OnClick(R.id.layout_comment)
@@ -224,6 +245,7 @@ public class TestImageDetailActivity extends BaseFragmentActivity implements Tes
             isOver = false;
             //再测一次
             Intent intent = new Intent(TestImageDetailActivity.this, TestResultActivity.class);
+            intent.putExtra("record_id", recordId);
             intent.putExtra("from_type", 2);
             intent.putExtra("image_url", resultMsgInfo != null ? resultMsgInfo.getCodeImageUrl() : "");
             intent.putExtra("nocode_image_url", resultMsgInfo != null ? resultMsgInfo.getResultImageUrl() : "");
@@ -407,6 +429,15 @@ public class TestImageDetailActivity extends BaseFragmentActivity implements Tes
                     mCommentTextView.setText("查看结果");
 
                     KeyboardUtils.hideSoftInput(this);
+                }
+            }
+
+            if (tData instanceof TaskRecordInfoRet) {
+                if (StringUtils.isEmpty(recordId)) {
+                    isAddTaskRecord = true;
+                    if (((TaskRecordInfoRet) tData).getData() != null) {
+                        recordId = ((TaskRecordInfoRet) tData).getData().getInfoid();
+                    }
                 }
             }
         }

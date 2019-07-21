@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.design.widget.BottomSheetDialog;
 import android.support.v4.content.ContextCompat;
@@ -37,8 +38,11 @@ import com.bumptech.glide.request.transition.Transition;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
+import com.feiyou.headstyle.base.IBaseView;
+import com.feiyou.headstyle.bean.TaskRecordInfoRet;
 import com.feiyou.headstyle.bean.TestInfoRet;
 import com.feiyou.headstyle.common.Constants;
+import com.feiyou.headstyle.presenter.TaskRecordInfoPresenterImp;
 import com.feiyou.headstyle.presenter.TestInfoPresenterImp;
 import com.feiyou.headstyle.ui.adapter.TestInfoAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragmentActivity;
@@ -65,7 +69,7 @@ import rx.functions.Action1;
 /**
  * Created by myflying on 2018/11/23.
  */
-public class TestResultActivity extends BaseFragmentActivity implements TestInfoView, View.OnClickListener {
+public class TestResultActivity extends BaseFragmentActivity implements IBaseView, View.OnClickListener {
 
     @BindView(R.id.topbar)
     QMUITopBar mTopBar;
@@ -110,6 +114,16 @@ public class TestResultActivity extends BaseFragmentActivity implements TestInfo
 
     private ProgressDialog progressDialog = null;
 
+    private String taskId = "5";
+
+    private int goldNum = 0;
+
+    TaskRecordInfoPresenterImp taskRecordInfoPresenterImp;
+
+    private boolean isAddTaskRecord;
+
+    private String recordId;
+
     @Override
     protected int getContextViewId() {
         return R.layout.activity_test_result;
@@ -144,14 +158,18 @@ public class TestResultActivity extends BaseFragmentActivity implements TestInfo
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
             fromType = bundle.getInt("from_type", 1);
-        }
 
-        if (bundle != null && bundle.getString("image_url") != null) {
-            imageUrl = bundle.getString("image_url");
-        }
+            if (bundle.getString("image_url") != null) {
+                imageUrl = bundle.getString("image_url");
+            }
 
-        if (bundle != null && bundle.getString("nocode_image_url") != null) {
-            noCodeImageUrl = bundle.getString("nocode_image_url");
+            if (bundle.getString("nocode_image_url") != null) {
+                noCodeImageUrl = bundle.getString("nocode_image_url");
+            }
+
+            if (bundle.getString("record_id") != null) {
+                recordId = bundle.getString("record_id");
+            }
         }
 
         progressDialog = new ProgressDialog(this);
@@ -208,8 +226,9 @@ public class TestResultActivity extends BaseFragmentActivity implements TestInfo
             }
         });
 
-
         testInfoPresenterImp = new TestInfoPresenterImp(this, this);
+        taskRecordInfoPresenterImp = new TaskRecordInfoPresenterImp(this, this);
+
         testInfoAdapter = new TestInfoAdapter(this, null);
         mRecommendListView.setLayoutManager(new LinearLayoutManager(this));
         mRecommendListView.addItemDecoration(new NormalDecoration(ContextCompat.getColor(this, R.color.line_color), 1));
@@ -245,6 +264,10 @@ public class TestResultActivity extends BaseFragmentActivity implements TestInfo
 
         //推荐列表
         testInfoPresenterImp.getHotAndRecommendList(2);
+
+        if (!StringUtils.isEmpty(recordId)) {
+            taskRecordInfoPresenterImp.addTaskRecord(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", taskId, goldNum, 0, 1, recordId);
+        }
     }
 
     @OnClick(R.id.tv_more)
@@ -333,14 +356,28 @@ public class TestResultActivity extends BaseFragmentActivity implements TestInfo
     }
 
     @Override
-    public void loadDataSuccess(TestInfoRet tData) {
+    public void loadDataSuccess(Object tData) {
         Logger.i("test result --->" + JSON.toJSONString(tData));
 
-        if (tData != null && tData.getCode() == Constants.SUCCESS) {
-            if (tData.getData() != null && tData.getData().size() > 6) {
-                testInfoAdapter.setNewData(tData.getData().subList(0, 6));
-            } else {
-                testInfoAdapter.setNewData(tData.getData());
+        if (tData != null) {
+            if (tData instanceof TestInfoRet) {
+                if (((TestInfoRet) tData).getCode() == Constants.SUCCESS) {
+                    if (((TestInfoRet) tData).getData() != null && ((TestInfoRet) tData).getData().size() > 6) {
+                        testInfoAdapter.setNewData(((TestInfoRet) tData).getData().subList(0, 6));
+                    } else {
+                        testInfoAdapter.setNewData(((TestInfoRet) tData).getData());
+                    }
+                }
+            }
+
+            if (tData instanceof TaskRecordInfoRet) {
+                if (((TaskRecordInfoRet) tData).getCode() == Constants.SUCCESS) {
+                    if (((TaskRecordInfoRet) tData).getData() != null) {
+                        ToastUtils.showLong("领取成功 +" + ((TaskRecordInfoRet) tData).getData().getGoldnum() + "金币");
+                    }
+                } else {
+                    finish();
+                }
             }
         }
     }

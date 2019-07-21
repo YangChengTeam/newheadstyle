@@ -28,6 +28,8 @@ public class UserInfo {
 
     private String sig;
 
+    private String txopenid;
+
     @SerializedName("collect_num")
     private int collectNum;
 
@@ -314,5 +316,13 @@ public class UserInfo {
 
     public void setFollowerNum(int followerNum) {
         this.followerNum = followerNum;
+    }
+
+    public String getTxopenid() {
+        return txopenid;
+    }
+
+    public void setTxopenid(String txopenid) {
+        this.txopenid = txopenid;
     }
 }

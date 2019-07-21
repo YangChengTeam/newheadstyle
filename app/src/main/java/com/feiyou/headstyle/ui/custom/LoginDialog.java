@@ -182,7 +182,7 @@ public class LoginDialog extends Dialog implements View.OnClickListener, UserInf
                 }
 
                 LoginRequest loginRequest = new LoginRequest();
-                loginRequest.setOpenid(data.get("uid").toUpperCase());//openid全部大写
+                loginRequest.setOpenid(data.get("uid"));//openid全部大写
                 loginRequest.setType(loginType);
                 loginRequest.setNickname(data.get("name"));
                 loginRequest.setSex(data.get("gender").equals("男") ? "1" : "2");
