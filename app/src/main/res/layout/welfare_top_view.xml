@@ -36,7 +36,7 @@
                 android:ellipsize="end"
                 android:lines="1"
                 android:maxWidth="150dp"
-                android:text="火星用户"
+                android:text="点击登录"
                 android:textColor="@color/white"
                 android:textSize="18sp" />
 
@@ -82,27 +82,68 @@
             android:layout_height="92dp"
             android:gravity="center">
 
-            <FrameLayout
+            <LinearLayout
                 android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1">
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
 
-                <LinearLayout
-                    android:id="@+id/layout_gold_detail"
-                    android:layout_width="48dp"
-                    android:layout_height="16dp"
-                    android:layout_gravity="top|right"
-                    android:background="@mipmap/gold_detail_bg"
-                    android:gravity="center">
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="32dp"
+                    android:orientation="horizontal">
 
-                    <TextView
+                    <LinearLayout
+                        android:id="@+id/layout_gold_num"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:layout_toLeftOf="@+id/layout_gold_detail"
                         android:gravity="center"
-                        android:text="金币明细"
-                        android:textColor="@color/white"
-                        android:textSize="10sp" />
-                </LinearLayout>
+                        android:minWidth="50dp"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="15dp"
+                            android:layout_height="15dp"
+                            android:layout_gravity="bottom"
+                            android:layout_marginRight="2dp"
+                            android:layout_marginBottom="3dp"
+                            android:src="@mipmap/gold_icon" />
+
+                        <TextView
+                            android:id="@+id/tv_gold_balance"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="bottom"
+                            android:maxLength="7"
+                            android:text="0"
+                            android:textColor="@color/gold_color"
+                            android:textSize="20sp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/layout_gold_detail"
+                        android:layout_width="48dp"
+                        android:layout_height="16dp"
+                        android:layout_alignParentTop="true"
+                        android:layout_alignParentRight="true"
+                        android:layout_marginLeft="6dp"
+                        android:layout_marginRight="6dp"
+                        android:background="@mipmap/gold_detail_bg"
+                        android:gravity="center">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="金币明细"
+                            android:textColor="@color/white"
+                            android:textSize="10sp" />
+                    </LinearLayout>
+
+                </RelativeLayout>
 
                 <LinearLayout
                     android:layout_width="wrap_content"
@@ -110,17 +151,6 @@
                     android:layout_gravity="center"
                     android:gravity="center"
                     android:orientation="vertical">
-
-                    <TextView
-                        android:id="@+id/tv_gold_balance"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:drawableLeft="@mipmap/gold_icon"
-                        android:drawablePadding="2dp"
-                        android:gravity="center"
-                        android:text="0"
-                        android:textColor="@color/gold_color"
-                        android:textSize="19sp" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -139,7 +169,7 @@
                         android:textColor="@color/profit_color"
                         android:textSize="12sp" />
                 </LinearLayout>
-            </FrameLayout>
+            </LinearLayout>
 
             <View
                 android:layout_width="0.5dp"
@@ -153,14 +183,30 @@
                 android:gravity="center"
                 android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/tv_my_profit"
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:text="¥0.0"
-                    android:textColor="@color/gold_color"
-                    android:textSize="19sp" />
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom"
+                        android:layout_marginRight="4dp"
+                        android:layout_marginBottom="1dp"
+                        android:text="¥"
+                        android:textColor="@color/gold_color"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:id="@+id/tv_my_profit"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="0.0"
+                        android:textColor="@color/gold_color"
+                        android:textSize="20sp" />
+                </LinearLayout>
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -207,16 +253,24 @@
             android:layout_marginLeft="12dp"
             android:src="@mipmap/horn_icon" />
 
-        <TextView
+        <!--<TextView-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_centerInParent="true"-->
+        <!--android:layout_weight="1"-->
+        <!--android:text="提现了1元"-->
+        <!--android:textColor="@color/profit_color"-->
+        <!--android:textSize="13sp" />-->
+
+        <com.xiaosu.view.text.VerticalRollingTextView
+            android:id="@+id/ver_txt_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
             android:layout_centerInParent="true"
-            android:layout_weight="1"
-            android:text="提现了1元"
             android:textColor="@color/profit_color"
             android:textSize="13sp" />
     </RelativeLayout>
-
 
     <LinearLayout
         android:layout_width="345dp"
@@ -275,12 +329,11 @@
                 android:layout_marginRight="12dp"></android.support.v7.widget.RecyclerView>
         </FrameLayout>
 
-        <pl.droidsonroids.gif.GifImageView
+        <ImageView
             android:id="@+id/iv_sign_in"
             android:layout_width="294dp"
             android:layout_height="33dp"
             android:layout_marginTop="4dp"
-            android:src="@drawable/sign_in"
             android:textColor="@color/white" />
 
         <LinearLayout
@@ -297,95 +350,136 @@
         </LinearLayout>
     </LinearLayout>
 
-    <LinearLayout
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="100dp"
-        android:layout_marginTop="6dp"
         android:gravity="center">
 
         <LinearLayout
-            android:id="@+id/layout_gold_task"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_gravity="center"
             android:gravity="center"
-            android:orientation="vertical">
+            android:orientation="horizontal">
 
-            <ImageView
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:id="@+id/layout_gold_task"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:src="@mipmap/zjb_icon" />
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
 
-            <TextView
-                android:layout_width="wrap_content"
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@mipmap/zjb_icon" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/layout_gold_mail"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="赚金币"
-                android:textColor="@color/black1"
-                android:textSize="14sp" />
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@mipmap/gold_mall_icon" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@mipmap/lucky_icon" />
+            </LinearLayout>
+
+            <FrameLayout
+                android:id="@+id/layout_get_money"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:id="@+id/iv_get_money_bg"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="top|center" />
+
+                <FrameLayout
+                    android:id="@+id/layout_count_down"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:visibility="gone">
+
+                    <ImageView
+                        android:id="@+id/iv_mask_bg"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:src="@mipmap/mask_bg" />
+
+                    <TextView
+                        android:id="@+id/tv_count_down_number"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:text="04:12"
+                        android:textColor="@color/white"
+                        android:textSize="16sp" />
+                </FrameLayout>
+            </FrameLayout>
         </LinearLayout>
+
 
         <LinearLayout
-            android:id="@+id/layout_gold_mail"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_gravity="bottom"
             android:gravity="center"
-            android:orientation="vertical">
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@mipmap/gold_mall_icon" />
+            android:orientation="horizontal">
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="金币商城"
-                android:textColor="@color/black1"
-                android:textSize="14sp" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="vertical">
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@mipmap/lucky_icon" />
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="赚金币" />
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="幸运转盘"
-                android:textColor="@color/black1"
-                android:textSize="14sp" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/layout_get_money"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="vertical">
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@mipmap/profit_ad_icon" />
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="金币商城" />
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="领钱"
-                android:textColor="@color/black1"
-                android:textSize="14sp" />
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="领金币" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="领钱" />
         </LinearLayout>
-    </LinearLayout>
+    </FrameLayout>
 
     <LinearLayout
         android:layout_width="match_parent"

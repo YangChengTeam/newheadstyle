@@ -236,7 +236,7 @@ public class CashActivity extends BaseFragmentActivity implements ConfigDialog.C
     public void config() {
         try {
             if (progressDialog != null && !progressDialog.isShowing()) {
-                progressDialog.setMessage("正常提现");
+                progressDialog.setMessage("正在提现");
                 progressDialog.show();
             }
             cashInfoPresenterImp.startCash(mUserInfo != null ? mUserInfo.getId() : "", openId, realCashMoney, cashType, PhoneUtils.getIMEI());
@@ -342,6 +342,7 @@ public class CashActivity extends BaseFragmentActivity implements ConfigDialog.C
                 if (((UserInfoRet) tData).getCode() == Constants.SUCCESS) {
                     ToastUtils.showLong("绑定成功");
                     mCashWeixinTv.setText(txNickName);
+                    mChangeNumberTv.setText(StringUtils.isEmpty(txNickName) ? "立即绑定" : "切换账号");
                 }
             }
 
@@ -357,7 +358,7 @@ public class CashActivity extends BaseFragmentActivity implements ConfigDialog.C
                     openId = ((CashMoneyInfoRet) tData).getData().getTxopenid();
                     txNickName = ((CashMoneyInfoRet) tData).getData().getTxnickname();
                     mCashWeixinTv.setText(StringUtils.isEmpty(txNickName) ? "绑定微信后可直接提现" : txNickName);
-                    mChangeNumberTv.setText(StringUtils.isEmpty(txNickName) ? "立即绑定>" : "切换账号>");
+                    mChangeNumberTv.setText(StringUtils.isEmpty(txNickName) ? "立即绑定" : "切换账号");
 
                     mCashRemarkTv.setText(Html.fromHtml(((CashMoneyInfoRet) tData).getData().getContent()));
 

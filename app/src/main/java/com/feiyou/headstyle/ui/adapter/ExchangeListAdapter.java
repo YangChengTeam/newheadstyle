@@ -30,7 +30,7 @@ public class ExchangeListAdapter extends BaseQuickAdapter<GoodDetailInfo.Exchang
     @Override
     protected void convert(final BaseViewHolder helper, GoodDetailInfo.ExchangeRecord item) {
         helper.setText(R.id.tv_user_name, item.getNickname())
-                .setText(R.id.tv_exchange_date, TimeUtils.millis2String(item.getAddtime()));
+                .setText(R.id.tv_exchange_date, TimeUtils.millis2String(item.getAddtime() * 1000));
         RequestOptions options = new RequestOptions();
         options.transform(new GlideRoundTransform(mContext, 18));
         Glide.with(mContext).load(item.getUserimg()).apply(options).into((ImageView) helper.getView(R.id.iv_user_head));

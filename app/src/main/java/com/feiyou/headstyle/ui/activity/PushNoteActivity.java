@@ -300,14 +300,13 @@ public class PushNoteActivity extends BaseFragmentActivity implements IBaseView 
         taskRecordInfoPresenterImp = new TaskRecordInfoPresenterImp(this, this);
 
         if (isFromTask == 1) {
-            String pushNoteDate = SPUtils.getInstance().getString(Constants.TODAY_PUSH_NOTE, "");
-            if (StringUtils.isEmpty(pushNoteDate) || !pushNoteDate.equals(MyTimeUtil.getYearAndDay())) {
-                //当天没有签到
-                SPUtils.getInstance().put(Constants.TODAY_PUSH_NOTE, MyTimeUtil.getYearAndDay());
-                taskRecordInfoPresenterImp.addTaskRecord(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", taskId, goldNum, 0, 0, "0");
-            }
+//            String pushNoteDate = SPUtils.getInstance().getString(Constants.TODAY_PUSH_NOTE, "");
+//            if (StringUtils.isEmpty(pushNoteDate) || !pushNoteDate.equals(MyTimeUtil.getYearAndDay())) {
+//                //当天没有签到
+//                SPUtils.getInstance().put(Constants.TODAY_PUSH_NOTE, MyTimeUtil.getYearAndDay());
+//            }
+            taskRecordInfoPresenterImp.addTaskRecord(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", taskId, goldNum, 0, 0, "0");
         }
-
     }
 
     public String setFriendIds(String input) {

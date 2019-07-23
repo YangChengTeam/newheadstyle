@@ -1,5 +1,7 @@
 package com.feiyou.headstyle.ui.fragment;
 
+import android.app.Activity;
+import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
@@ -34,6 +36,7 @@ import com.feiyou.headstyle.common.Constants;
 import com.feiyou.headstyle.presenter.UserInfoPresenterImp;
 import com.feiyou.headstyle.ui.activity.AboutActivity;
 import com.feiyou.headstyle.ui.activity.FeedBackActivity;
+import com.feiyou.headstyle.ui.activity.GoldTaskActivity;
 import com.feiyou.headstyle.ui.activity.MyCollectionActivity;
 import com.feiyou.headstyle.ui.activity.MyExchangeListActivity;
 import com.feiyou.headstyle.ui.activity.MyFollowActivity;
@@ -46,10 +49,12 @@ import com.feiyou.headstyle.ui.custom.GlideRoundTransform;
 import com.feiyou.headstyle.ui.custom.LoginDialog;
 import com.feiyou.headstyle.ui.custom.PraiseDialog;
 import com.feiyou.headstyle.ui.custom.WeiXinFollowDialog;
+import com.feiyou.headstyle.ui.custom.WeiXinTaskDialog;
 import com.feiyou.headstyle.utils.AppUtils;
 import com.feiyou.headstyle.utils.GoToScoreUtils;
 import com.feiyou.headstyle.view.UserInfoView;
 import com.orhanobut.logger.Logger;
+import com.umeng.analytics.MobclickAgent;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -63,7 +68,7 @@ import es.dmoral.toasty.Toasty;
 /**
  * Created by myflying on 2019/1/24.
  */
-public class MyFragment extends BaseFragment implements UserInfoView, PraiseDialog.PraiseListener {
+public class MyFragment extends BaseFragment implements UserInfoView, PraiseDialog.PraiseListener, WeiXinTaskDialog.OpenWeixinListener {
 
     @BindView(R.id.layout_my_info_top)
     RelativeLayout mMyInfoTopLayout;
@@ -108,10 +113,13 @@ public class MyFragment extends BaseFragment implements UserInfoView, PraiseDial
 
     private boolean isRunResume;
 
+    private WeiXinTaskDialog weiXinTaskDialog;
+
     @Override
     protected View onCreateView() {
         View root = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_my, null);
         ButterKnife.bind(this, root);
+        EventBus.getDefault().register(this);
         initViews();
         return root;
     }
@@ -119,6 +127,9 @@ public class MyFragment extends BaseFragment implements UserInfoView, PraiseDial
     public void initViews() {
         praiseDialog = new PraiseDialog(getActivity(), R.style.login_dialog);
         praiseDialog.setPraiseListener(this);
+
+        weiXinTaskDialog = new WeiXinTaskDialog(getActivity());
+        weiXinTaskDialog.setOpenWeixinListener(this);
 
         mUserIdTv.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
@@ -266,13 +277,6 @@ public class MyFragment extends BaseFragment implements UserInfoView, PraiseDial
     @Override
     public void onStart() {
         super.onStart();
-        EventBus.getDefault().register(this);
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        EventBus.getDefault().unregister(this);
     }
 
     @OnClick(R.id.layout_my_guan)
@@ -300,11 +304,6 @@ public class MyFragment extends BaseFragment implements UserInfoView, PraiseDial
         startActivity(4);
     }
 
-    @OnClick(R.id.layout_about)
-    public void about() {
-        startActivity(6);
-    }
-
     @OnClick(R.id.layout_feed_back)
     public void feedBack() {
         startActivity(7);
@@ -317,8 +316,8 @@ public class MyFragment extends BaseFragment implements UserInfoView, PraiseDial
             return;
         }
 
-        WeiXinFollowDialog weiXinFollowDialog = new WeiXinFollowDialog(getActivity());
-        weiXinFollowDialog.showChargeDialog(weiXinFollowDialog);
+        weiXinTaskDialog.show();
+        weiXinTaskDialog.setLocalImage(R.mipmap.gxtx_follow_bg);
     }
 
     @OnClick(R.id.layout_add_score)
@@ -363,9 +362,6 @@ public class MyFragment extends BaseFragment implements UserInfoView, PraiseDial
                 case 5:
                     intent = new Intent(getActivity(), MyCollectionActivity.class);
                     break;
-                case 6:
-                    intent = new Intent(getActivity(), AboutActivity.class);
-                    break;
                 case 7:
                     intent = new Intent(getActivity(), FeedBackActivity.class);
                     break;
@@ -406,13 +402,12 @@ public class MyFragment extends BaseFragment implements UserInfoView, PraiseDial
 
     @OnClick(R.id.layout_my_exchange)
     public void myExchange() {
-        //TODO 暂时不登录
-//        if (!App.getApp().isLogin) {
-//            if (loginDialog != null && !loginDialog.isShowing()) {
-//                loginDialog.show();
-//            }
-//            return;
-//        }
+        if (!App.getApp().isLogin) {
+            if (loginDialog != null && !loginDialog.isShowing()) {
+                loginDialog.show();
+            }
+            return;
+        }
 
         Intent intent = new Intent(getActivity(), MyExchangeListActivity.class);
         startActivity(intent);
@@ -518,5 +513,27 @@ public class MyFragment extends BaseFragment implements UserInfoView, PraiseDial
         if (praiseDialog != null && praiseDialog.isShowing()) {
             praiseDialog.dismiss();
         }
+    }
+
+    @Override
+    public void startOpen() {
+        ClipboardManager cm = (ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
+        // 将文本内容放到系统剪贴板里。
+        cm.setPrimaryClip(ClipData.newPlainText(null, "头像达人"));
+
+        ToastUtils.showLong("公众号已复制,可以关注了");
+        MobclickAgent.onEvent(getActivity(), "open_weixin_click", AppUtils.getVersionName(getActivity()));
+        AppUtils.launchApp((Activity) getActivity(), "com.tencent.mm", 1);
+    }
+
+    @Override
+    public void closeDialog() {
+
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault().unregister(this);
     }
 }

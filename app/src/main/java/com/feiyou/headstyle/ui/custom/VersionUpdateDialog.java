@@ -11,6 +11,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.feiyou.headstyle.R;
+import com.feiyou.headstyle.view.UpdataAPPProgressBar;
 
 public class VersionUpdateDialog extends Dialog implements View.OnClickListener {
 
@@ -31,6 +32,8 @@ public class VersionUpdateDialog extends Dialog implements View.OnClickListener 
     private String versionContent;
 
     private int isForceUpdate;//0:不强制，1：强制
+
+    UpdataAPPProgressBar updataAPPProgressBar;
 
     public interface UpdateListener {
         void update();
@@ -78,6 +81,7 @@ public class VersionUpdateDialog extends Dialog implements View.OnClickListener 
         mVersionCodeTv = findViewById(R.id.tv_version_code);
         mContentTv = findViewById(R.id.tv_content);
         mUpdateVersionBtn = findViewById(R.id.btn_update_version);
+        updataAPPProgressBar = findViewById(R.id.down_progress);
         mCloseImageView = findViewById(R.id.iv_close);
         closeLayout = findViewById(R.id.layout_close);
 
@@ -90,12 +94,18 @@ public class VersionUpdateDialog extends Dialog implements View.OnClickListener 
         setCanceledOnTouchOutside(isForceUpdate == 1 ? false : true);
     }
 
+    public void setProgress(int progress){
+        updataAPPProgressBar.setProgress(progress);
+    }
+
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_update_version:
                 updateListener.update();
-                this.dismiss();
+                mUpdateVersionBtn.setVisibility(View.GONE);
+                updataAPPProgressBar.setVisibility(View.VISIBLE);
+                //this.dismiss();
                 break;
             case R.id.iv_close:
                 updateListener.updateCancel();

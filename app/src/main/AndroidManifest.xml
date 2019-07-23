@@ -60,7 +60,7 @@
             android:required="false" />
 
         <activity
-            android:name=".ui.activity.SplashActivity"
+            android:name=".ui.activity.Splash1Activity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
             android:theme="@style/AppTransparentTheme"
             android:windowSoftInputMode="stateHidden">

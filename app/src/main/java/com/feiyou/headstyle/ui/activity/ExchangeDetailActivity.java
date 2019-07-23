@@ -16,6 +16,7 @@ import com.blankj.utilcode.util.StringUtils;
 import com.blankj.utilcode.util.TimeUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.bumptech.glide.Glide;
+import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.bean.BindAccountInfoRet;
 import com.feiyou.headstyle.bean.ExchangeInfo;
@@ -66,6 +67,9 @@ public class ExchangeDetailActivity extends BaseFragmentActivity implements Bind
 
     @BindView(R.id.tv_order_remark)
     TextView mOrderRemarkTv;
+
+    @BindView(R.id.layout_bind_number)
+    RelativeLayout mBindNumberLayout;
 
     ImageView mBackImageView;
 
@@ -127,6 +131,7 @@ public class ExchangeDetailActivity extends BaseFragmentActivity implements Bind
                 orderState = exchangeInfo.getStatus();
 
                 mGoodNameTv.setText(exchangeInfo.getGoodsname());
+                mOrderRemarkTv.setText(exchangeInfo.getExchange());
                 mGoodNumTv.setText(StringUtils.isEmpty(exchangeInfo.getGoldprice()) ? "0" : exchangeInfo.getGoldprice() + "");
                 mOrderNumberTv.setText(exchangeInfo.getGoodsorder());
                 mOrderDateTv.setText(TimeUtils.millis2String(exchangeInfo.getGoodstime() * 1000));
@@ -149,24 +154,28 @@ public class ExchangeDetailActivity extends BaseFragmentActivity implements Bind
                 mExchangeBtn.setBackgroundResource(R.drawable.use_now_bg);
                 mExchangeBtn.setText("立即使用");
                 mExchangeStateTv.setText("兑换成功");
+                mBindNumberLayout.setVisibility(View.GONE);
                 break;
             case 1:
                 mExchangeStateLayout.setBackgroundColor(ContextCompat.getColor(this, R.color.wait_charge_color));
                 mExchangeBtn.setBackgroundResource(R.drawable.wait_charge_bg);
                 mExchangeBtn.setText("提醒发货");
                 mExchangeStateTv.setText("待充值");
+                mBindNumberLayout.setVisibility(View.VISIBLE);
                 break;
             case 2:
                 mExchangeStateLayout.setBackgroundColor(ContextCompat.getColor(this, R.color.gray_aaa));
                 mExchangeBtn.setBackgroundResource(R.drawable.common_gray_bg);
                 mExchangeBtn.setText("已到账");
                 mExchangeStateTv.setText("已到账");
+                mBindNumberLayout.setVisibility(View.VISIBLE);
                 break;
             case 99:
                 mExchangeStateLayout.setBackgroundColor(ContextCompat.getColor(this, R.color.overdue_color));
                 mExchangeBtn.setBackgroundResource(R.drawable.overdue_bg);
                 mExchangeBtn.setText("已过期");
                 mExchangeStateTv.setText("已过期");
+                mBindNumberLayout.setVisibility(View.VISIBLE);
                 break;
             default:
                 break;
@@ -212,6 +221,13 @@ public class ExchangeDetailActivity extends BaseFragmentActivity implements Bind
         if (tData != null && tData.getCode() == Constants.SUCCESS) {
             if (tData.getData() != null) {
                 ToastUtils.showLong("绑定成功");
+                orderState = 1;
+                mBindNumberLayout.setVisibility(View.VISIBLE);
+                mOrderAccountTv.setText(tData.getData().getAccount() + "");
+                mExchangeStateLayout.setBackgroundColor(ContextCompat.getColor(this, R.color.wait_charge_color));
+                mExchangeBtn.setBackgroundResource(R.drawable.wait_charge_bg);
+                mExchangeBtn.setText("提醒发货");
+                mExchangeStateTv.setText("待充值");
             }
         }
     }
@@ -229,7 +245,7 @@ public class ExchangeDetailActivity extends BaseFragmentActivity implements Bind
             progressDialog.show();
         }
 
-        bindAccountPresenterImp.bindAccount("11", account, orderNumber);
+        bindAccountPresenterImp.bindAccount(App.getApp().mUserInfo != null ? App.getApp().mUserInfo.getId() : "", account, orderNumber);
     }
 
     @Override

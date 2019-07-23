@@ -28,8 +28,8 @@
             android:layout_toRightOf="@+id/iv_user_head"
             android:ellipsize="end"
             android:lines="1"
-            android:maxWidth="180dp"
-            android:text="未知用户"
+            android:maxWidth="160dp"
+            android:maxLength="12"
             android:textColor="@color/black1"
             android:textSize="14sp" />
 
@@ -41,6 +41,6 @@
             android:layout_centerVertical="true"
             android:text="2019-07-03 12:32:23"
             android:textColor="@color/black2"
-            android:textSize="14sp" />
+            android:textSize="13sp" />
     </RelativeLayout>
 </LinearLayout>

@@ -69,6 +69,10 @@ public class App extends Application {
 
     public boolean showAlertAd = false;
 
+    public String randomNoteId;
+
+    public int userGoldNum;
+
     public App() {
         mInstance = this;
     }
@@ -146,5 +150,21 @@ public class App extends Application {
 
     public void setShowFloatAd(boolean showFloatAd) {
         this.showFloatAd = showFloatAd;
+    }
+
+    public String getRandomNoteId() {
+        return randomNoteId;
+    }
+
+    public void setRandomNoteId(String randomNoteId) {
+        this.randomNoteId = randomNoteId;
+    }
+
+    public int getUserGoldNum() {
+        return userGoldNum;
+    }
+
+    public void setUserGoldNum(int userGoldNum) {
+        this.userGoldNum = userGoldNum;
     }
 }

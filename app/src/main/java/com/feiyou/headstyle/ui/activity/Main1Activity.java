@@ -8,6 +8,8 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
@@ -32,6 +34,7 @@ import com.blankj.utilcode.util.SPUtils;
 import com.blankj.utilcode.util.StringUtils;
 import com.blankj.utilcode.util.TimeUtils;
 import com.blankj.utilcode.util.ToastUtils;
+import com.bumptech.glide.Glide;
 import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.bean.MessageEvent;
@@ -83,6 +86,9 @@ public class Main1Activity extends BaseFragmentActivity implements VersionView, 
     @BindView(R.id.iv_home_message_remind)
     ImageView mTotalCountIv;
 
+    @BindView(R.id.iv_create)
+    ImageView mCreateIv;
+
     private MyFragmentAdapter adapter;
 
     private UserInfo userInfo;
@@ -107,6 +113,20 @@ public class Main1Activity extends BaseFragmentActivity implements VersionView, 
     protected int getContextViewId() {
         return R.layout.activity_main1;
     }
+
+    private Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(android.os.Message msg) {
+            switch (msg.what) {
+                case 0:
+                    int progress = (Integer) msg.obj;
+                    updateDialog.setProgress(progress);
+                    break;
+                default:
+                    break;
+            }
+        }
+    };
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -147,7 +167,7 @@ public class Main1Activity extends BaseFragmentActivity implements VersionView, 
     }
 
     public void initData() {
-
+        //Glide.with(this).load(R.drawable.welfare_gif).into(mCreateIv);
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
             currentIndex = bundle.getInt("home_index", 0);
@@ -297,9 +317,9 @@ public class Main1Activity extends BaseFragmentActivity implements VersionView, 
 
     @Override
     public void onPageScrollStateChanged(int state) {
-        Logger.i("view pager onPageScrollStateChanged--->state--->" + state  + viewPager.getCurrentItem());
+        Logger.i("view pager onPageScrollStateChanged--->state--->" + state + viewPager.getCurrentItem());
         if (state == 2) {
-            Logger.i("view pager onPageScrollStateChanged--->state--->" + state  + viewPager.getCurrentItem());
+            Logger.i("view pager onPageScrollStateChanged--->state--->" + state + viewPager.getCurrentItem());
             RadioButton radioButton = (RadioButton) mTabRadioGroup.getChildAt(viewPager.getCurrentItem());
             radioButton.setChecked(true);
         }
@@ -416,10 +436,6 @@ public class Main1Activity extends BaseFragmentActivity implements VersionView, 
 
     @Override
     public void update() {
-        if (progressDialog != null && !progressDialog.isShowing()) {
-            progressDialog.setMessage("正在更新版本");
-            progressDialog.show();
-        }
         if (versionInfo != null && !StringUtils.isEmpty(versionInfo.getVersionUrl())) {
             downAppFile(versionInfo.getVersionUrl());
         }
@@ -449,6 +465,13 @@ public class Main1Activity extends BaseFragmentActivity implements VersionView, 
 
                     @Override
                     protected void progress(BaseDownloadTask task, int soFarBytes, int totalBytes) {
+                        int progress = (int) ((soFarBytes * 1.0 / totalBytes) * 100);
+                        Logger.i("progress--->" + soFarBytes + "---" + totalBytes + "---" + progress);
+
+                        Message message = new Message();
+                        message.what = 0;
+                        message.obj = progress;
+                        mHandler.sendMessage(message);
                     }
 
                     @Override

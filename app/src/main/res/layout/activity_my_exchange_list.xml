@@ -21,9 +21,9 @@
         android:layout_below="@+id/topbar"
         android:background="@color/line_color"></View>
 
-    <LinearLayout
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_below="@+id/top_line_view"
         android:background="@color/white"
         android:orientation="vertical">
@@ -34,5 +34,30 @@
             android:layout_height="match_parent"
             android:layout_marginLeft="12dp"
             android:layout_marginRight="12dp"></android.support.v7.widget.RecyclerView>
-    </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layout_no_data"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:background="@color/white"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@mipmap/empty_icon" />
+
+            <TextView
+                android:id="@+id/tv_no_data"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="暂无兑换记录"
+                android:textColor="@color/search_number_def"
+                android:textSize="16dp" />
+        </LinearLayout>
+    </FrameLayout>
 </RelativeLayout>

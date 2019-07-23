@@ -27,10 +27,14 @@ public class ReceiveHongBaoDialog extends Dialog implements View.OnClickListener
 
     RelativeLayout mReceiveDoneLayout;
 
+    Button mDoubleMoneyBtn;
+
     public OpenHongBaoListener openHongBaoListener;
 
     public interface OpenHongBaoListener {
         void openHongbao();
+
+        void doubleMoney();
     }
 
     public void setOpenHongBaoListener(OpenHongBaoListener openHongBaoListener) {
@@ -62,9 +66,12 @@ public class ReceiveHongBaoDialog extends Dialog implements View.OnClickListener
         mReceiveBeforeLayout = findViewById(R.id.layout_receive_before);
         mReceiveDoneLayout = findViewById(R.id.layout_receive_done);
         mRedNumTv = findViewById(R.id.tv_red_num);
+        mDoubleMoneyBtn = findViewById(R.id.btn_double_money);
 
         mOpenHongBaoIv.setOnClickListener(this);
         mCloseTv.setOnClickListener(this);
+        mDoubleMoneyBtn.setOnClickListener(this);
+
         setCanceledOnTouchOutside(true);
         Glide.with(mContext).load(R.drawable.open_hongbao).into(mOpenHongBaoIv);
     }
@@ -74,6 +81,9 @@ public class ReceiveHongBaoDialog extends Dialog implements View.OnClickListener
         switch (v.getId()) {
             case R.id.iv_open_hongbao:
                 openHongBaoListener.openHongbao();
+                break;
+            case R.id.btn_double_money:
+                openHongBaoListener.doubleMoney();
                 break;
             case R.id.tv_close:
                 this.dismiss();

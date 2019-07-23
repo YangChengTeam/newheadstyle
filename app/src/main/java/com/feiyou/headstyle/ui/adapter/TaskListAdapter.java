@@ -1,6 +1,7 @@
 package com.feiyou.headstyle.ui.adapter;
 
 import android.content.Context;
+import android.support.v4.content.ContextCompat;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
@@ -31,5 +32,9 @@ public class TaskListAdapter extends BaseQuickAdapter<TaskInfo, BaseViewHolder> 
                 .setText(R.id.tv_add_gold_num, "+" + item.getGoldnum())
                 .setText(R.id.btn_task_state, item.getButton());
         Glide.with(mContext).load(item.getIco()).into((ImageView) helper.getView(R.id.iv_task_icon));
+
+        helper.setBackgroundRes(R.id.btn_task_state, item.getIsFinish() == 1 ? R.drawable.task_done_btn_bg : R.drawable.task_btn_bg);
+        helper.setTextColor(R.id.btn_task_state, ContextCompat.getColor(mContext, item.getIsFinish() == 1 ? R.color.black3 : R.color.task_border_color));
+
     }
 }

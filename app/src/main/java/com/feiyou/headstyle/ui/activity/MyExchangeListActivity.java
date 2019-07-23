@@ -7,11 +7,13 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.blankj.utilcode.util.SizeUtils;
 import com.chad.library.adapter.base.BaseQuickAdapter;
+import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.bean.ExchangeInfoRet;
 import com.feiyou.headstyle.common.Constants;
@@ -37,6 +39,9 @@ public class MyExchangeListActivity extends BaseFragmentActivity implements Exch
 
     @BindView(R.id.exchange_list_view)
     RecyclerView mExchangeListView;
+
+    @BindView(R.id.layout_no_data)
+    LinearLayout mNoDataLayout;
 
     MyExchangeListAdapter myExchangeListAdapter;
 
@@ -84,7 +89,7 @@ public class MyExchangeListActivity extends BaseFragmentActivity implements Exch
         }
 
         exchangeInfoPresenterImp = new ExchangeInfoPresenterImp(this, this);
-        exchangeInfoPresenterImp.exchangeList("11", currentPage, pageSize, eid);
+        exchangeInfoPresenterImp.exchangeList(App.getApp().mUserInfo != null ? App.getApp().mUserInfo.getId() : "", currentPage, pageSize, eid);
 
         myExchangeListAdapter = new MyExchangeListAdapter(this, null);
         mExchangeListView.setLayoutManager(new LinearLayoutManager(this));
@@ -95,7 +100,7 @@ public class MyExchangeListActivity extends BaseFragmentActivity implements Exch
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
                 Intent intent = new Intent(MyExchangeListActivity.this, ExchangeDetailActivity.class);
-                intent.putExtra("order_item",myExchangeListAdapter.getData().get(position));
+                intent.putExtra("order_item", myExchangeListAdapter.getData().get(position));
                 startActivity(intent);
             }
         });
@@ -120,13 +125,33 @@ public class MyExchangeListActivity extends BaseFragmentActivity implements Exch
     public void loadDataSuccess(ExchangeInfoRet tData) {
         if (tData != null && tData.getCode() == Constants.SUCCESS) {
             if (tData.getData() != null && tData.getData().size() > 0) {
-                myExchangeListAdapter.setNewData(tData.getData());
+                mNoDataLayout.setVisibility(View.GONE);
+                mExchangeListView.setVisibility(View.VISIBLE);
+                if (currentPage == 1) {
+                    myExchangeListAdapter.setNewData(tData.getData());
+                } else {
+                    myExchangeListAdapter.addData(tData.getData());
+                }
+
+                if (tData.getData().size() == pageSize) {
+                    myExchangeListAdapter.loadMoreComplete();
+                } else {
+                    myExchangeListAdapter.loadMoreEnd();
+                }
+            } else {
+                if (currentPage == 1) {
+                    mNoDataLayout.setVisibility(View.VISIBLE);
+                    mExchangeListView.setVisibility(View.GONE);
+                }
             }
         }
     }
 
     @Override
     public void loadDataError(Throwable throwable) {
-
+        if (currentPage == 1) {
+            mNoDataLayout.setVisibility(View.VISIBLE);
+            mExchangeListView.setVisibility(View.GONE);
+        }
     }
 }

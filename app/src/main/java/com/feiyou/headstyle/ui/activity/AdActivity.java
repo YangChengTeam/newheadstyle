@@ -24,6 +24,7 @@ import com.feiyou.headstyle.bean.TaskRecordInfoRet;
 import com.feiyou.headstyle.common.Constants;
 import com.feiyou.headstyle.presenter.TaskRecordInfoPresenterImp;
 import com.feiyou.headstyle.ui.base.BaseFragmentActivity;
+import com.feiyou.headstyle.ui.custom.SignOutDialog;
 import com.just.agentweb.AgentWeb;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 import com.qmuiteam.qmui.widget.QMUITopBar;
@@ -35,7 +36,7 @@ import butterknife.BindView;
  */
 
 
-public class AdActivity extends BaseFragmentActivity implements IBaseView {
+public class AdActivity extends BaseFragmentActivity implements IBaseView, SignOutDialog.SignOutListener {
 
     @BindView(R.id.topbar)
     QMUITopBar mTopBar;
@@ -63,6 +64,10 @@ public class AdActivity extends BaseFragmentActivity implements IBaseView {
     private String recordId;
 
     private int isFromTask;
+
+    private SignOutDialog signOutDialog;
+
+    private boolean isFinish;
 
     @Override
     protected int getContextViewId() {
@@ -93,6 +98,9 @@ public class AdActivity extends BaseFragmentActivity implements IBaseView {
     }
 
     public void initData() {
+        signOutDialog = new SignOutDialog(this, R.style.login_dialog);
+        signOutDialog.setSignOutListener(this);
+
         String openUrl = "http://gx.qqtn.com";
         Bundle bundle = getIntent().getExtras();
         if (bundle != null && bundle.getString("open_url") != null) {
@@ -143,6 +151,7 @@ public class AdActivity extends BaseFragmentActivity implements IBaseView {
 
                 @Override
                 public void onFinish() {
+                    isFinish = true;
                     if (isFromTask > 0 && !StringUtils.isEmpty(recordId)) {
                         mCountDownTv.setVisibility(View.GONE);
                         taskRecordInfoPresenterImp.addTaskRecord(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", taskId, goldNum, 0, 1, recordId);
@@ -160,7 +169,13 @@ public class AdActivity extends BaseFragmentActivity implements IBaseView {
 
     @Override
     public void onBackPressed() {
-        popBackStack();
+        if (!isFinish) {
+            if (signOutDialog != null && !signOutDialog.isShowing()) {
+                signOutDialog.show();
+            }
+        } else {
+            popBackStack();
+        }
     }
 
     @Override
@@ -193,6 +208,17 @@ public class AdActivity extends BaseFragmentActivity implements IBaseView {
 
     @Override
     public void loadDataError(Throwable throwable) {
+
+    }
+
+    @Override
+    public void configSignOut() {
+        ToastUtils.showLong("任务失败");
+        popBackStack();
+    }
+
+    @Override
+    public void cancelSignOut() {
 
     }
 }

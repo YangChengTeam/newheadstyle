@@ -232,6 +232,8 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
 
     private String recordId;
 
+    private int isFromTask = 0;
+
     @Override
     protected int getContextViewId() {
         return R.layout.activity_article_detail;
@@ -272,6 +274,7 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
         Bundle bundle = getIntent().getExtras();
         if (bundle != null && !StringUtils.isEmpty(bundle.getString("msg_id"))) {
             messageId = bundle.getString("msg_id");
+            isFromTask = bundle.getInt("is_from_task", 0);
         }
 
         if (bundle != null) {
@@ -323,10 +326,8 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
             shareAction.setCallback(shareListener);//回调监听器
         }
 
-        String addCommentDate = SPUtils.getInstance().getString(Constants.TODAY_PUSH_COMMENT, "");
-        if (StringUtils.isEmpty(addCommentDate) || !addCommentDate.equals(MyTimeUtil.getYearAndDay())) {
+        if (isFromTask == 1) {
             //当天没有签到
-            SPUtils.getInstance().put(Constants.TODAY_PUSH_COMMENT, MyTimeUtil.getYearAndDay());
             taskRecordInfoPresenterImp.addTaskRecord(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", taskId, goldNum, 0, 0, "0");
         }
     }

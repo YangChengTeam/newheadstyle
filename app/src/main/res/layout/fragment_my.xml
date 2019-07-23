@@ -297,11 +297,16 @@
                 android:layout_marginRight="14dp"
                 android:src="@mipmap/iv_right_icon" />
         </RelativeLayout>
+    </LinearLayout>
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="0.5dp"
-            android:background="@color/line_color"></View>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="24dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="24dp"
+        android:background="@drawable/common_white_bg"
+        android:orientation="vertical">
 
         <RelativeLayout
             android:id="@+id/layout_my_exchange"
@@ -346,41 +351,6 @@
         android:orientation="vertical">
 
         <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="42dp">
-
-            <ImageView
-                android:id="@+id/iv_about_us"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_alignParentLeft="true"
-                android:layout_centerVertical="true"
-                android:layout_marginLeft="14dp"
-                android:src="@mipmap/my_message_icon" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_marginLeft="14dp"
-                android:layout_toRightOf="@+id/iv_about_us"
-                android:text="关于我们" />
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
-                android:layout_marginRight="14dp"
-                android:src="@mipmap/iv_right_icon" />
-        </RelativeLayout>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="0.5dp"
-            android:background="@color/line_color"></View>
-
-        <RelativeLayout
             android:id="@+id/layout_add_score"
             android:layout_width="match_parent"
             android:layout_height="42dp">
@@ -410,19 +380,14 @@
                 android:layout_marginRight="14dp"
                 android:src="@mipmap/iv_right_icon" />
         </RelativeLayout>
-    </LinearLayout>
 
-    <LinearLayout
-        android:id="@+id/layout_weixin_code"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="24dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginRight="24dp"
-        android:background="@drawable/common_white_bg"
-        android:orientation="vertical">
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:background="@color/line_color"></View>
 
         <RelativeLayout
+            android:id="@+id/layout_weixin_code"
             android:layout_width="match_parent"
             android:layout_height="42dp">
 

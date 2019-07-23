@@ -39,9 +39,15 @@ public class SignInListAdapter extends BaseQuickAdapter<WelfareInfo.SignSetInfo,
 
     @Override
     protected void convert(final BaseViewHolder helper, WelfareInfo.SignSetInfo item) {
-        helper.setText(R.id.tv_sign_day_txt, "第" + (loop * 7 + item.getDays()) + "天");
 
-        if (helper.getAdapterPosition() < signDoneDay) {
+
+        if(signDoneDay == 0 && loop > 0){
+            helper.setText(R.id.tv_sign_day_txt, "第" + ((loop-1) * 7 + item.getDays()) + "天");
+        }else{
+            helper.setText(R.id.tv_sign_day_txt, "第" + (loop * 7 + item.getDays()) + "天");
+        }
+
+        if (helper.getAdapterPosition() < signDoneDay || (signDoneDay == 0 && loop > 0)) {
             helper.setText(R.id.tv_sign_state, "已领");
             Glide.with(mContext).load(R.mipmap.sign_done_gold_icon).into((ImageView) helper.getView(R.id.iv_gold_icon));
             helper.setTextColor(R.id.tv_sign_state, ContextCompat.getColor(mContext, R.color.sign_done_color));

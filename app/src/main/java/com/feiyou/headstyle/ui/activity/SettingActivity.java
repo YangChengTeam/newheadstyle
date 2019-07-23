@@ -7,6 +7,8 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.content.FileProvider;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -18,6 +20,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.blankj.utilcode.util.AppUtils;
 import com.blankj.utilcode.util.CacheDiskUtils;
 import com.blankj.utilcode.util.CacheDoubleUtils;
@@ -30,7 +33,9 @@ import com.blankj.utilcode.util.ToastUtils;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
+import com.feiyou.headstyle.bean.MessageEvent;
 import com.feiyou.headstyle.bean.UserInfo;
+import com.feiyou.headstyle.bean.UserInfoRet;
 import com.feiyou.headstyle.bean.VersionInfo;
 import com.feiyou.headstyle.bean.VersionInfoRet;
 import com.feiyou.headstyle.common.Constants;
@@ -49,6 +54,8 @@ import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 import com.qmuiteam.qmui.widget.QMUITopBar;
 import com.umeng.socialize.UMShareAPI;
 import com.umeng.socialize.bean.SHARE_MEDIA;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -125,6 +132,20 @@ public class SettingActivity extends BaseFragmentActivity implements VersionView
     protected int getContextViewId() {
         return R.layout.activity_setting;
     }
+
+    private Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(android.os.Message msg) {
+            switch (msg.what) {
+                case 0:
+                    int progress = (Integer) msg.obj;
+                    updateDialog.setProgress(progress);
+                    break;
+                default:
+                    break;
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -266,6 +287,12 @@ public class SettingActivity extends BaseFragmentActivity implements VersionView
         versionPresenterImp.getVersionInfo(com.feiyou.headstyle.utils.AppUtils.getMetaDataValue(this, "UMENG_CHANNEL"));
     }
 
+    @OnClick(R.id.layout_about_us)
+    void aboutUs() {
+        Intent intent = new Intent(this, AboutActivity.class);
+        startActivity(intent);
+    }
+
     @OnClick(R.id.layout_login_out)
     void loginOut() {
         if (configDialog != null && !configDialog.isShowing()) {
@@ -294,6 +321,7 @@ public class SettingActivity extends BaseFragmentActivity implements VersionView
         App.getApp().setLogin(false);
         //移除存储的对象
         SPUtils.getInstance().remove(Constants.USER_INFO);
+        EventBus.getDefault().post(new MessageEvent("login_out"));
         finish();
     }
 
@@ -344,10 +372,10 @@ public class SettingActivity extends BaseFragmentActivity implements VersionView
 
     @Override
     public void update() {
-        if (progressDialog != null && !progressDialog.isShowing()) {
-            progressDialog.setMessage("正在更新版本");
-            progressDialog.show();
-        }
+//        if (progressDialog != null && !progressDialog.isShowing()) {
+//            progressDialog.setMessage("正在更新版本");
+//            progressDialog.show();
+//        }
         if (versionInfo != null && !StringUtils.isEmpty(versionInfo.getVersionUrl())) {
             downAppFile(versionInfo.getVersionUrl());
         }
@@ -377,6 +405,13 @@ public class SettingActivity extends BaseFragmentActivity implements VersionView
 
                     @Override
                     protected void progress(BaseDownloadTask task, int soFarBytes, int totalBytes) {
+                        int progress = (int) ((soFarBytes * 1.0 / totalBytes) * 100);
+                        Logger.i("progress--->" + soFarBytes + "---" + totalBytes + "---" + progress);
+
+                        Message message = new Message();
+                        message.what = 0;
+                        message.obj = progress;
+                        mHandler.sendMessage(message);
                     }
 
                     @Override

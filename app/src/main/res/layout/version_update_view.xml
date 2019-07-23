@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="233dp"
         android:layout_height="wrap_content"
         android:minHeight="250dp"
         android:orientation="vertical">
@@ -49,6 +50,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
+                android:layout_marginLeft="12dp"
                 android:layout_marginTop="6dp"
                 android:ellipsize="end"
                 android:gravity="left|center"
@@ -57,20 +59,40 @@
                 android:textColor="@color/black1"
                 android:textSize="14dp" />
 
-            <Button
-                android:id="@+id/btn_update_version"
-                android:layout_width="120dp"
-                android:layout_height="30dp"
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
-                android:layout_marginBottom="16dp"
                 android:layout_marginTop="12dp"
-                android:background="@mipmap/update_btn_bg"
-                android:text="立即更新"
-                android:textColor="@color/white"
-                android:textSize="12dp" />
+                android:layout_marginBottom="16dp">
+
+                <com.feiyou.headstyle.view.UpdataAPPProgressBar
+                    android:id="@+id/down_progress"
+                    android:layout_width="match_parent"
+                    android:layout_height="16dp"
+                    android:layout_gravity="center"
+                    android:paddingLeft="12dp"
+                    android:paddingRight="12dp"
+                    android:visibility="gone"
+                    app:updataAPPBarHeight="16dp"
+                    app:updataAPPMax="100"
+                    app:updataAPPProgress="0"
+                    app:updataAPPReachedBarColor="@color/bar_finish_color"
+                    app:updataAPPTextColor="@color/black4"
+                    app:updataAPPUnreachedBarColor="@color/bar_not_finish_color" />
+
+                <Button
+                    android:id="@+id/btn_update_version"
+                    android:layout_width="120dp"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center"
+                    android:background="@mipmap/update_btn_bg"
+                    android:text="立即更新"
+                    android:textColor="@color/white"
+                    android:textSize="12dp" />
+            </FrameLayout>
         </RelativeLayout>
     </LinearLayout>
-
 
     <LinearLayout
         android:id="@+id/layout_close"

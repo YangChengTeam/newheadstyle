@@ -388,6 +388,8 @@ public class RecommendFragment extends BaseFragment implements NoteDataView, Swi
         if (tData != null && tData.getCode() == Constants.SUCCESS) {
             if (tData instanceof NoteInfoRet) {
                 if (((NoteInfoRet) tData).getData() != null && ((NoteInfoRet) tData).getData().size() > 0) {
+                    //获取第一个帖子的ID，为后面的“评论任务”提供帖子ID
+                    App.getApp().setRandomNoteId(((NoteInfoRet) tData).getData().get(0).getId());
                     mRecommendListView.setVisibility(View.VISIBLE);
                     noDataLayout.setVisibility(View.GONE);
                     if (currentPage == 1) {

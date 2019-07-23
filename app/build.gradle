@@ -134,4 +134,5 @@ dependencies {
 
     implementation(name: 'open_ad_sdk', ext: 'aar')
     implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.6'
+    implementation 'com.xiaosu:VerticalRollingTextView:2.0.9'
 }

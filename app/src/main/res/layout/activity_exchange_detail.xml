@@ -193,6 +193,7 @@
                     </RelativeLayout>
 
                     <RelativeLayout
+                        android:id="@+id/layout_bind_number"
                         android:layout_width="match_parent"
                         android:layout_height="36dp">
 
@@ -242,7 +243,6 @@
                         android:layout_marginBottom="12dp"
                         android:ellipsize="end"
                         android:lineSpacingMultiplier="1.1"
-                        android:text="@string/cash_remark"
                         android:textColor="@color/black2"
                         android:textSize="12sp" />
                 </LinearLayout>

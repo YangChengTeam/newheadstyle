@@ -16,16 +16,20 @@ public class TurnProfitDialog extends Dialog implements View.OnClickListener {
 
     private LinearLayout mSeeVideoLayout;
 
+    private TextView mGoldNumTv;
+
+    private TextView mCashNumTv;
+
     private TextView mCloseTv;
 
-    private SignSuccessListener signSuccessListener;
+    private TurnListener turnListener;
 
-    public interface SignSuccessListener {
-        void seeVideo();
+    public interface TurnListener {
+        void configTurn();
     }
 
-    public void setSignSuccessListener(SignSuccessListener signSuccessListener) {
-        this.signSuccessListener = signSuccessListener;
+    public void setTurnListener(TurnListener turnListener) {
+        this.turnListener = turnListener;
     }
 
     public TurnProfitDialog(Context context) {
@@ -36,6 +40,11 @@ public class TurnProfitDialog extends Dialog implements View.OnClickListener {
     public TurnProfitDialog(Context context, int themeResId) {
         super(context, themeResId);
         this.mContext = context;
+    }
+
+    public void setTurnInfo(String goldNum, String cashNum) {
+        mGoldNumTv.setText(goldNum);
+        mCashNumTv.setText(cashNum);
     }
 
     @Override
@@ -49,6 +58,8 @@ public class TurnProfitDialog extends Dialog implements View.OnClickListener {
     private void initView() {
         mSeeVideoLayout = findViewById(R.id.layout_see_video);
         mCloseTv = findViewById(R.id.tv_close);
+        mGoldNumTv = findViewById(R.id.tv_gold_num);
+        mCashNumTv = findViewById(R.id.tv_cash_num);
         mSeeVideoLayout.setOnClickListener(this);
         mCloseTv.setOnClickListener(this);
         setCanceledOnTouchOutside(true);
@@ -57,8 +68,8 @@ public class TurnProfitDialog extends Dialog implements View.OnClickListener {
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.btn_see_video:
-                signSuccessListener.seeVideo();
+            case R.id.layout_see_video:
+                turnListener.configTurn();
                 this.dismiss();
                 break;
             case R.id.tv_close:

@@ -1,5 +1,7 @@
 package com.feiyou.headstyle.bean;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.io.Serializable;
 
 public class TaskInfo implements Serializable {
@@ -16,8 +18,13 @@ public class TaskInfo implements Serializable {
     private String oldid; //小程序原始id
     private String publicname;//公众号名称
     private String pubulicimg;//关注公众号引导图
-    private int is_finish; //是否完成 0：否 1：是
+    @SerializedName("is_finish")
+    private int isFinish; //是否完成 0：否 1：是
     private String cashindex;
+
+    @SerializedName("remain_time")
+    private int remainTime;//倒计时剩余时间 (如果不是首页零钱任务，这里默认为0)
+
     public int getId() {
         return id;
     }
@@ -122,12 +129,12 @@ public class TaskInfo implements Serializable {
         this.pubulicimg = pubulicimg;
     }
 
-    public int getIs_finish() {
-        return is_finish;
+    public int getIsFinish() {
+        return isFinish;
     }
 
-    public void setIs_finish(int is_finish) {
-        this.is_finish = is_finish;
+    public void setIsFinish(int isFinish) {
+        this.isFinish = isFinish;
     }
 
     public String getCashindex() {
@@ -136,5 +143,13 @@ public class TaskInfo implements Serializable {
 
     public void setCashindex(String cashindex) {
         this.cashindex = cashindex;
+    }
+
+    public int getRemainTime() {
+        return remainTime;
+    }
+
+    public void setRemainTime(int remainTime) {
+        this.remainTime = remainTime;
     }
 }

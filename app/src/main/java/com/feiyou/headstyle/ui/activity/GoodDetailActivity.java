@@ -17,6 +17,7 @@ import com.alibaba.fastjson.JSON;
 import com.blankj.utilcode.util.SizeUtils;
 import com.blankj.utilcode.util.StringUtils;
 import com.blankj.utilcode.util.ToastUtils;
+import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.base.IBaseView;
 import com.feiyou.headstyle.bean.ExchangeInfoRet;
@@ -31,6 +32,7 @@ import com.feiyou.headstyle.ui.adapter.ExchangeListAdapter;
 import com.feiyou.headstyle.ui.adapter.GoodImageAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragmentActivity;
 import com.feiyou.headstyle.ui.custom.ConfigDialog;
+import com.feiyou.headstyle.ui.custom.LackDialog;
 import com.feiyou.headstyle.view.GoodDetailInfoView;
 import com.feiyou.headstyle.view.GoodInfoView;
 import com.orhanobut.logger.Logger;
@@ -45,7 +47,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.OnClick;
 
-public class GoodDetailActivity extends BaseFragmentActivity implements ConfigDialog.ConfigListener, IBaseView {
+public class GoodDetailActivity extends BaseFragmentActivity implements ConfigDialog.ConfigListener, IBaseView, LackDialog.LackListener {
 
     @BindView(R.id.topbar)
     QMUITopBar mTopBar;
@@ -78,7 +80,7 @@ public class GoodDetailActivity extends BaseFragmentActivity implements ConfigDi
 
     ConfigDialog configDialog;
 
-    ConfigDialog lackDialog;//金币不足
+    LackDialog lackDialog;//金币不足
 
     GoodDetailInfoPresenterImp goodDetailInfoPresenterImp;
 
@@ -87,6 +89,8 @@ public class GoodDetailActivity extends BaseFragmentActivity implements ConfigDi
     private String gid;
 
     private ProgressDialog progressDialog = null;
+
+    private double goodGoldNum;
 
     @Override
     protected int getContextViewId() {
@@ -119,11 +123,8 @@ public class GoodDetailActivity extends BaseFragmentActivity implements ConfigDi
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("正在兑换");
 
-        configDialog = new ConfigDialog(this, R.style.login_dialog, R.mipmap.turn_profit_icon, "兑换提示", "是否确认使用60金币兑换？");
-        configDialog.setConfigListener(this);
-
-        lackDialog = new ConfigDialog(this, R.style.login_dialog, R.mipmap.turn_profit_icon, "兑换提示", "你的金币余额不足，无法兑换");
-        lackDialog.setConfigListener(this);
+        lackDialog = new LackDialog(this, R.style.login_dialog);
+        lackDialog.setLackListener(this);
     }
 
     public void initData() {
@@ -152,8 +153,7 @@ public class GoodDetailActivity extends BaseFragmentActivity implements ConfigDi
         mExchangeListView.setAdapter(exchangeListAdapter);
 
         goodDetailInfoPresenterImp = new GoodDetailInfoPresenterImp(this, this);
-        goodDetailInfoPresenterImp.getGoodDetail(gid, "11");
-
+        goodDetailInfoPresenterImp.getGoodDetail(gid, App.getApp().mUserInfo != null ? App.getApp().mUserInfo.getId() : "");
         exchangeInfoPresenterImp = new ExchangeInfoPresenterImp(this, this);
     }
 
@@ -166,11 +166,18 @@ public class GoodDetailActivity extends BaseFragmentActivity implements ConfigDi
 
     @Override
     public void config() {
+
+        if (App.getApp().getUserGoldNum() < goodGoldNum) {
+            if (lackDialog != null && !lackDialog.isShowing()) {
+                lackDialog.show();
+            }
+            return;
+        }
+
         if (progressDialog != null && !progressDialog.isShowing()) {
             progressDialog.show();
         }
-
-        exchangeInfoPresenterImp.exchangeGood(gid, "11", 1);
+        exchangeInfoPresenterImp.exchangeGood(gid, App.getApp().mUserInfo != null ? App.getApp().mUserInfo.getId() : "", 1);
     }
 
     @Override
@@ -206,6 +213,10 @@ public class GoodDetailActivity extends BaseFragmentActivity implements ConfigDi
                         GoodDetailInfo goodDetailInfo = ((GoodDetailInfoRet) tData).getData();
 
                         if (goodDetailInfo != null) {
+                            goodGoldNum = goodDetailInfo.getGoodInfo().getGoldprice();
+                            configDialog = new ConfigDialog(this, R.style.login_dialog, R.mipmap.turn_profit_icon, "兑换提示", "是否确认使用" + (int) goodGoldNum + "金币兑换？");
+                            configDialog.setConfigListener(this);
+
                             mGoodTitleTv.setText(goodDetailInfo.getGoodInfo().getGoodsname());
                             mGoldNumTv.setText(goodDetailInfo.getGoodInfo().getGoldprice() + "");
                             mGetUserNumTv.setText(goodDetailInfo.getGoodInfo().getFalsenum() + "人已0元拿");
@@ -245,7 +256,7 @@ public class GoodDetailActivity extends BaseFragmentActivity implements ConfigDi
                         //intent.putExtra("order_number", ((ExchangeInfoRet) tData).getData().get(0).getGoodsorder());
                         //intent.putExtra("order_state",((ExchangeInfoRet) tData).getData().get(0).getStatus());
 
-                        intent.putExtra("order_item",((ExchangeInfoRet) tData).getData().get(0));
+                        intent.putExtra("order_item", ((ExchangeInfoRet) tData).getData().get(0));
                         startActivity(intent);
                     }
                 }
@@ -266,4 +277,14 @@ public class GoodDetailActivity extends BaseFragmentActivity implements ConfigDi
         popBackStack();
     }
 
+    @Override
+    public void lackConfig() {
+        Intent intent = new Intent(this, GoldTaskActivity.class);
+        startActivity(intent);
+    }
+
+    @Override
+    public void lackCancel() {
+
+    }
 }

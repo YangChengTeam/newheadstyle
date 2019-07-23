@@ -44,6 +44,10 @@ public class WeiXinTaskDialog extends Dialog {
         Glide.with(context).load(url).into(mPublicIv);
     }
 
+    public void setLocalImage(int localUrl) {
+        Glide.with(context).load(localUrl).into(mPublicIv);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

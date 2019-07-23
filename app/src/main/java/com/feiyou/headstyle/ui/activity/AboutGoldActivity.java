@@ -1,12 +1,14 @@
 package com.feiyou.headstyle.ui.activity;
 
 import android.os.Bundle;
+import android.text.Html;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.blankj.utilcode.util.SizeUtils;
+import com.blankj.utilcode.util.StringUtils;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.ui.base.BaseFragmentActivity;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
@@ -20,6 +22,9 @@ public class AboutGoldActivity extends BaseFragmentActivity {
     QMUITopBar mTopBar;
 
     ImageView mBackImageView;
+
+    @BindView(R.id.tv_about_gold)
+    TextView mAboutGoldTv;
 
     @Override
     protected int getContextViewId() {
@@ -52,7 +57,10 @@ public class AboutGoldActivity extends BaseFragmentActivity {
     }
 
     public void initData() {
-
+        Bundle bundle = getIntent().getExtras();
+        if (bundle != null && !StringUtils.isEmpty(bundle.getString("about_gold"))) {
+            mAboutGoldTv.setText(Html.fromHtml(bundle.getString("about_gold")));
+        }
     }
 
     @Override
