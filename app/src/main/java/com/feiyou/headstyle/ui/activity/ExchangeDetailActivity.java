@@ -1,6 +1,9 @@
 package com.feiyou.headstyle.ui.activity;
 
 import android.app.ProgressDialog;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
@@ -70,6 +73,9 @@ public class ExchangeDetailActivity extends BaseFragmentActivity implements Bind
 
     @BindView(R.id.layout_bind_number)
     RelativeLayout mBindNumberLayout;
+
+    @BindView(R.id.iv_copy_order_number)
+    TextView mCopyOrderNumberTv;
 
     ImageView mBackImageView;
 
@@ -194,6 +200,15 @@ public class ExchangeDetailActivity extends BaseFragmentActivity implements Bind
         if (orderState == 1) {
             ToastUtils.showLong("已发送提醒");
         }
+    }
+
+    @OnClick(R.id.iv_copy_order_number)
+    void copyOrderNumber() {
+        ClipboardManager cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+        // 将文本内容放到系统剪贴板里。
+        cm.setPrimaryClip(ClipData.newPlainText(null, orderNumber));
+
+        ToastUtils.showLong("已复制");
     }
 
     @Override

@@ -26,11 +26,9 @@
 
             <com.feiyou.headstyle.view.UpdataAPPProgressBar
                 android:id="@+id/down_progress"
-                android:layout_width="match_parent"
+                android:layout_width="224dp"
                 android:layout_height="16dp"
-                android:layout_marginTop="10dp"
-                android:paddingLeft="12dp"
-                android:paddingRight="12dp"
+                android:layout_marginTop="12dp"
                 app:updataAPPBarHeight="16dp"
                 app:updataAPPMax="100"
                 app:updataAPPProgress="0"

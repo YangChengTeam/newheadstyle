@@ -98,7 +98,7 @@
 
     <color name="sign_in_color">#fd6704</color>
 
-    <color name="task_gold_color">#fff04e</color>
+    <color name="task_gold_color">#fff0e4</color>
 
     <color name="task_border_color">#fb5360</color>
 
@@ -125,4 +125,6 @@
     <color name="bar_finish_color">#fc707c</color>
 
     <color name="bar_not_finish_color">#d3d3d3</color>
+
+    <color name="profit_btn_color">#fef3ec</color>
 </resources>

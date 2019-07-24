@@ -1,23 +1,15 @@
 package com.feiyou.headstyle.ui.fragment;
 
-import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
-import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Message;
-import android.provider.MediaStore;
-import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
@@ -34,16 +26,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.blankj.utilcode.util.AppUtils;
 import com.blankj.utilcode.util.BarUtils;
 import com.blankj.utilcode.util.PathUtils;
 import com.blankj.utilcode.util.SPUtils;
-import com.blankj.utilcode.util.ScreenUtils;
 import com.blankj.utilcode.util.SizeUtils;
 import com.blankj.utilcode.util.StringUtils;
-import com.blankj.utilcode.util.TimeUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
@@ -76,7 +65,6 @@ import com.feiyou.headstyle.ui.activity.GoldDetailActivity;
 import com.feiyou.headstyle.ui.activity.GoldMailActivity;
 import com.feiyou.headstyle.ui.activity.GoldTaskActivity;
 import com.feiyou.headstyle.ui.activity.GoodDetailActivity;
-import com.feiyou.headstyle.ui.activity.HeadEditActivity;
 import com.feiyou.headstyle.ui.activity.Main1Activity;
 import com.feiyou.headstyle.ui.activity.PushNoteActivity;
 import com.feiyou.headstyle.ui.activity.TestDetailActivity;
@@ -85,7 +73,7 @@ import com.feiyou.headstyle.ui.adapter.GoodsListAdapter;
 import com.feiyou.headstyle.ui.adapter.SignInListAdapter;
 import com.feiyou.headstyle.ui.adapter.TaskListAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragment;
-import com.feiyou.headstyle.ui.custom.Glide4Engine;
+import com.feiyou.headstyle.ui.custom.DownFileDialog;
 import com.feiyou.headstyle.ui.custom.GlideRoundTransform;
 import com.feiyou.headstyle.ui.custom.LoginDialog;
 import com.feiyou.headstyle.ui.custom.NormalDecoration;
@@ -97,47 +85,35 @@ import com.feiyou.headstyle.ui.custom.WeiXinTaskDialog;
 import com.feiyou.headstyle.utils.GoToScoreUtils;
 import com.feiyou.headstyle.utils.MyTimeUtil;
 import com.feiyou.headstyle.utils.RandomUtils;
-import com.feiyou.headstyle.utils.StatusBarUtil;
 import com.feiyou.headstyle.utils.TTAdManagerHolder;
-import com.feiyou.headstyle.view.WelfareInfoView;
 import com.liulishuo.filedownloader.BaseDownloadTask;
 import com.liulishuo.filedownloader.FileDownloadListener;
 import com.liulishuo.filedownloader.FileDownloader;
 import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 import com.qmuiteam.qmui.widget.QMUITopBar;
+import com.sunfusheng.marqueeview.MarqueeView;
 import com.tencent.mm.opensdk.modelbiz.WXLaunchMiniProgram;
 import com.tencent.mm.opensdk.openapi.IWXAPI;
 import com.tencent.mm.opensdk.openapi.WXAPIFactory;
-import com.xiaosu.view.text.DataSetAdapter;
-import com.xiaosu.view.text.VerticalRollingTextView;
-import com.zhihu.matisse.Matisse;
-import com.zhihu.matisse.MimeType;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-import java.io.File;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 import es.dmoral.toasty.Toasty;
-import pl.droidsonroids.gif.GifImageView;
-
-import static android.app.Activity.RESULT_OK;
 
 /**
  * Created by myflying on 2019/3/12.
  */
-public class Create1Fragment extends BaseFragment implements View.OnClickListener, SignSuccessDialog.SignSuccessListener, IBaseView, ReceiveHongBaoDialog.OpenHongBaoListener, SeeVideoDialog.GetMoneyListener, SwipeRefreshLayout.OnRefreshListener, TurnProfitDialog.TurnListener, WeiXinTaskDialog.OpenWeixinListener {
+public class Create1Fragment extends BaseFragment implements View.OnClickListener, SignSuccessDialog.SignSuccessListener, IBaseView, ReceiveHongBaoDialog.OpenHongBaoListener, SeeVideoDialog.GetMoneyListener, SwipeRefreshLayout.OnRefreshListener, TurnProfitDialog.TurnListener, WeiXinTaskDialog.OpenWeixinListener, DownFileDialog.DownListener {
 
     @BindView(R.id.swipe_refresh)
     SwipeRefreshLayout mRefreshLayout;
@@ -208,7 +184,9 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
 
     TextView mCountDownTv;
 
-    VerticalRollingTextView verticalRollingTextView;
+    TextView mTurnTableTv;
+
+    MarqueeView marqueeView;
 
     private UserInfo userInfo;
 
@@ -266,7 +244,7 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
 
     CountDownTimer seeVideoTimer;
 
-    ProgressDialog downApkDialog;
+    DownFileDialog downApkDialog;
 
     BaseDownloadTask task;
 
@@ -278,11 +256,13 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
 
     private int goldNum = 0;
 
-    private String miniGoldNum = "0";
+    private int miniGoldNum;
 
     private int adCountDown = 0;
 
     private String aboutGoldTxt;
+
+    private boolean seeVideoIsFinish;
 
     private Handler mHandler = new Handler() {
         @Override
@@ -291,6 +271,8 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
                 case 0:
                     int progress = (Integer) msg.obj;
                     downApkDialog.setProgress(progress);
+                    break;
+                case 1:
                     break;
                 default:
                     break;
@@ -327,7 +309,7 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
         mAboutGoldLayout = topView.findViewById(R.id.layout_about_gold);
         mGetMoneyLayout = topView.findViewById(R.id.layout_get_money);
 
-        verticalRollingTextView = topView.findViewById(R.id.ver_txt_view);
+        marqueeView = topView.findViewById(R.id.marqueeView);
 
         mCountDownLayout = topView.findViewById(R.id.layout_count_down);
         mMaskBgIv = topView.findViewById(R.id.iv_mask_bg);
@@ -342,8 +324,8 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
         mSignDaysTv = topView.findViewById(R.id.tv_sign_days);
         mMoreTaskTv = topView.findViewById(R.id.tv_more_task);
         mGoodMoreTv = topView.findViewById(R.id.tv_good_more);
+        mTurnTableTv = topView.findViewById(R.id.tv_turntable);
 
-        Glide.with(getActivity()).load(R.drawable.sign_in).into(mSignInIv);
         mUserHeadIv.setOnClickListener(this);
         mUserNameTv.setOnClickListener(this);
         mSignInIv.setOnClickListener(this);
@@ -356,6 +338,8 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
         mGetMoneyLayout.setOnClickListener(this);
         mMoreTaskTv.setOnClickListener(this);
         mGoodMoreTv.setOnClickListener(this);
+        mTurnTableTv.setOnClickListener(this);
+        mGetMoneyBgIv.setOnClickListener(this);
 
         signSuccessDialog = new SignSuccessDialog(getActivity(), R.style.login_dialog);
         signSuccessDialog.setSignSuccessListener(this);
@@ -367,6 +351,9 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
         loginDialog = new LoginDialog(getActivity(), R.style.login_dialog);
         seeVideoDialog = new SeeVideoDialog(getActivity(), R.style.login_dialog);
         seeVideoDialog.setGetMoneyListener(this);
+
+        downApkDialog = new DownFileDialog(getActivity(), R.style.login_dialog);
+        downApkDialog.setDownListener(this);
     }
 
     public void initData() {
@@ -517,16 +504,11 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
                         taskId = "8";
                         recordId = "";
                         downFilePageName = taskListAdapter.getData().get(position).getWeburl();
-                        downApkDialog = new ProgressDialog(getActivity());
-                        //依次设置标题,内容,是否用取消按钮关闭,是否显示进度
-                        downApkDialog.setTitle("下载" + taskListAdapter.getData().get(position).getTitle());
-                        downApkDialog.setMessage("正在下载,请稍后...");
-                        downApkDialog.setCancelable(true);
-                        //这里是设置进度条的风格,HORIZONTAL是水平进度条,SPINNER是圆形进度条
-                        downApkDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-                        downApkDialog.setIndeterminate(false);
-                        //调用show()方法将ProgressDialog显示出来
-                        downApkDialog.show();
+
+                        if (downApkDialog != null && !downApkDialog.isShowing()) {
+                            downApkDialog.show();
+                        }
+
                         downAppFile(taskListAdapter.getData().get(position).getDownaddress());
                         break;
                     case 9:
@@ -547,16 +529,34 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
             }
         });
 
-        Glide.with(getActivity()).load(R.drawable.see_video_normal_gif).into(mGetMoneyBgIv);
+        //首页领钱
+        followCountDownTimer = new CountDownTimer(30 * 1000, 1000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                Logger.i("剩余时间--->" + millisUntilFinished / 1000);
+            }
 
-        CharSequence[] sequences = {
-                "张三提现了1元",
-                "李四提现了0.2元",
-                "蔡徐坤提现了0.2元",
-                "周杰伦提现了1.2元",
-                "方冰冰现了4.2元"
+            @Override
+            public void onFinish() {
+                isAccord = true;
+            }
         };
 
+
+        marketTimer = new CountDownTimer(30 * 1000, 1000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                Logger.i("剩余时间--->" + millisUntilFinished / 1000);
+            }
+
+            @Override
+            public void onFinish() {
+                isAccord = true;
+            }
+        };
+
+        Glide.with(getActivity()).load(R.drawable.sign_in).into(mSignInIv);
+        Glide.with(getActivity()).load(R.drawable.see_video_normal_gif).into(mGetMoneyBgIv);
     }
 
     @Override
@@ -622,17 +622,10 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
         super.onPause();
         if (taskId.equals("6")) {
             /** 倒计时30秒，一次1秒 */
-            marketTimer = new CountDownTimer(30 * 1000, 1000) {
-                @Override
-                public void onTick(long millisUntilFinished) {
-                    Logger.i("剩余时间--->" + millisUntilFinished / 1000);
-                }
+            if (marketTimer != null) {
+                marketTimer.start();
+            }
 
-                @Override
-                public void onFinish() {
-                    isAccord = true;
-                }
-            }.start();
             taskRecordInfoPresenterImp.addTaskRecord(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", taskId, goldNum, 0, 0, "0");
         }
     }
@@ -645,6 +638,17 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
         if (messageEvent.getMessage().equals("login_out")) {
             userInfo = null;
             App.getApp().setmUserInfo(null);
+            adCountDown = 0;
+            mCountDownLayout.setVisibility(View.GONE);
+            if (followCountDownTimer != null) {
+                followCountDownTimer.cancel();
+            }
+            if (marketTimer != null) {
+                marketTimer.cancel();
+            }
+            if (seeVideoTimer != null) {
+                seeVideoTimer.cancel();
+            }
         }
     }
 
@@ -672,7 +676,7 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
                 break;
             case R.id.btn_turn_profit:
                 if (userGoldNum < leastGoldNum) {
-                    ToastUtils.showLong("你的金币数低于最低转换金币");
+                    ToastUtils.showLong("您的金币余额不足" + leastGoldNum + "，建议多攒点金币！");
                     return;
                 }
                 if (turnProfitDialog != null && !turnProfitDialog.isShowing()) {
@@ -707,9 +711,16 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
                 intent4.putExtra("about_gold", aboutGoldTxt);
                 startActivity(intent4);
                 break;
+            case R.id.iv_get_money_bg:
             case R.id.layout_get_money:
                 //倒计时未结束，不可点击
                 if (adCountDown > 0) {
+                    ToastUtils.showLong("技能冷却中···");
+                    return;
+                }
+
+                if (seeVideoIsFinish) {
+                    ToastUtils.showLong("今日已领完，明天再来！");
                     return;
                 }
 
@@ -731,6 +742,9 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
                 Intent intent6 = new Intent(getActivity(), GoldMailActivity.class);
                 startActivity(intent6);
                 break;
+            case R.id.tv_turntable:
+                ToastUtils.showLong("正在升级，敬请期待！");
+                break;
             default:
                 break;
         }
@@ -743,6 +757,7 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
         if (signSuccessDialog != null && signSuccessDialog.isShowing()) {
             signSuccessDialog.dismiss();
         }
+        recordId = "";
         taskRecordInfoPresenterImp.addTaskRecord(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", taskId, getGoldNum, 0, 0, "0");
         //step6:在获取到广告后展示
         mttRewardVideoAd.showRewardVideoAd(getActivity());
@@ -778,20 +793,12 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
                     }
                     if (welfareInfo.getCashInfoList() != null && welfareInfo.getCashInfoList().size() > 0) {
 
-                        List<CharSequence> temp = new ArrayList<>();
+                        List<String> temp = new ArrayList<>();
                         for (int i = 0; i < welfareInfo.getCashInfoList().size(); i++) {
                             temp.add(welfareInfo.getCashInfoList().get(i).getNickname() + "提现了" + welfareInfo.getCashInfoList().get(i).getCash() + "元");
                         }
 
-                        verticalRollingTextView.setDataSetAdapter(new DataSetAdapter<CharSequence>(temp) {
-
-                            @Override
-                            protected CharSequence text(CharSequence charSequence) {
-                                return charSequence;
-                            }
-                        });
-
-                        verticalRollingTextView.run();
+                        marqueeView.startWithList(temp);
                     }
                     //金币兑换比列
                     if (welfareInfo.getGoldScale() != null) {
@@ -830,9 +837,21 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
                             if (tempList.get(i).getId() == 4) {
                                 loadAd("920819306", TTAdConstant.VERTICAL, tempList.get(i).getGoldnum());
                             }
+                            //签到的信息
+                            if (tempList.get(i).getId() == 7) {
+                                int isSignToday = tempList.get(i).getIsFinish();
+                                if (isSignToday == 1) {
+                                    Glide.with(getActivity()).load(R.mipmap.sign_done_today).into(mSignInIv);
+                                } else {
+                                    Glide.with(getActivity()).load(R.drawable.sign_in).into(mSignInIv);
+                                }
+                            }
+
                             //首页领钱任务
                             if (tempList.get(i).getId() == 13) {
                                 adCountDown = tempList.get(i).getRemainTime();
+                                //adCountDown = 60;
+                                seeVideoIsFinish = tempList.get(i).getIsFinish() == 1 ? true : false;
                                 Logger.i("home count down--->" + adCountDown);
                                 seeVideoMoneys = tempList.get(i).getCashindex().split("/");
                                 randomMoney();
@@ -877,6 +896,7 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
             if (tData instanceof SignDoneInfoRet) {
                 Logger.i("sign done --->" + JSON.toJSONString(tData));
                 if (((SignDoneInfoRet) tData).getCode() == Constants.SUCCESS) {
+                    Glide.with(getActivity()).load(R.mipmap.sign_done_today).into(mSignInIv);
                     if (signDays > 0 && (signDays + 1) % 7 == 0) {
                         receiveHongBaoDialog.updateDialog(randomHongbao);
                     } else {
@@ -895,7 +915,8 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
                         }
                     }
                 } else {
-                    ToastUtils.showLong(((SignDoneInfoRet) tData).getMsg());
+                    //TODO 待定
+                    //ToastUtils.showLong(((SignDoneInfoRet) tData).getMsg());
                     return;
                 }
             }
@@ -917,13 +938,11 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
                                 ToastUtils.showLong("转换成功");
                             } else if (taskId.equals("13")) {
                                 ToastUtils.showLong("获得收益" + seeVideoMoney + "元");
-                                //adCountDown = 300;
-                                //homeSeeVideoCountDown();
                             } else {
                                 if ((signDays + 1) % 7 == 0) {
-                                    ToastUtils.showLong("翻倍收益领取成功");
+                                    ToastUtils.showLong("翻倍领取成功");
                                 } else {
-                                    ToastUtils.showLong("领取成功 +" + ((TaskRecordInfoRet) tData).getData().getGoldnum() + "金币");
+                                    ToastUtils.showLong("翻倍领取成功");
                                 }
                             }
                         }
@@ -939,6 +958,13 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
     public void homeSeeVideoCountDown() {
         if (adCountDown > 0) {
             mCountDownLayout.setVisibility(View.VISIBLE);
+
+            if (seeVideoTimer != null) {
+                seeVideoTimer.cancel();
+                seeVideoTimer = null;
+            }
+
+            //翻倍看视频
             seeVideoTimer = new CountDownTimer(adCountDown * 1000, 1000) {
                 @Override
                 public void onTick(long millisUntilFinished) {
@@ -949,6 +975,8 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
                 @Override
                 public void onFinish() {
                     isAccord = true;
+                    adCountDown = 0;
+                    mCountDownLayout.setVisibility(View.GONE);
                 }
             }.start();
         } else {
@@ -1131,7 +1159,12 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
         if (seeVideoDialog != null && seeVideoDialog.isShowing()) {
             seeVideoDialog.dismiss();
         }
+        //如果有之前的倒计时任务，先取消
+        if (seeVideoTimer != null) {
+            seeVideoTimer.cancel();
+        }
 
+        recordId = "";
         getGoldNum = 0;
 
         taskRecordInfoPresenterImp.addTaskRecord(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", taskId, getGoldNum, 0, 0, "0");
@@ -1146,6 +1179,7 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
             turnProfitDialog.dismiss();
         }
 
+        recordId = "";
         getGoldNum = 0;
 
         taskRecordInfoPresenterImp.addTaskRecord(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", taskId, getGoldNum, 0, 0, "0");
@@ -1264,23 +1298,19 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
      */
     public void followPublic() {
         /** 倒计时30秒，一次1秒 */
-        followCountDownTimer = new CountDownTimer(30 * 1000, 1000) {
-            @Override
-            public void onTick(long millisUntilFinished) {
-                Logger.i("剩余时间--->" + millisUntilFinished / 1000);
-            }
-
-            @Override
-            public void onFinish() {
-                isAccord = true;
-            }
-        }.start();
+        if (followCountDownTimer != null) {
+            followCountDownTimer.start();
+        }
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        verticalRollingTextView.stop();
         EventBus.getDefault().unregister(this);
+    }
+
+    @Override
+    public void downCancel() {
+
     }
 }

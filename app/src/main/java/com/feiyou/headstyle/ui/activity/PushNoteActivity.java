@@ -178,6 +178,9 @@ public class PushNoteActivity extends BaseFragmentActivity implements IBaseView 
         mCancelTv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if(isFromTask == 1){
+                    ToastUtils.showLong("任务未完成");
+                }
                 popBackStack();
             }
         });
@@ -460,6 +463,9 @@ public class PushNoteActivity extends BaseFragmentActivity implements IBaseView 
 
     @Override
     public void onBackPressed() {
+        if(isFromTask == 1){
+            ToastUtils.showLong("任务未完成");
+        }
         popBackStack();
     }
 

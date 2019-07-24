@@ -30,7 +30,7 @@ public class TaskListAdapter extends BaseQuickAdapter<TaskInfo, BaseViewHolder> 
         helper.setText(R.id.tv_task_title, item.getTitle())
                 .setText(R.id.tv_task_remark, item.getContent())
                 .setText(R.id.tv_add_gold_num, "+" + item.getGoldnum())
-                .setText(R.id.btn_task_state, item.getButton());
+                .setText(R.id.btn_task_state, item.getIsFinish() == 1 ? "已完成" : item.getButton());
         Glide.with(mContext).load(item.getIco()).into((ImageView) helper.getView(R.id.iv_task_icon));
 
         helper.setBackgroundRes(R.id.btn_task_state, item.getIsFinish() == 1 ? R.drawable.task_done_btn_bg : R.drawable.task_btn_bg);

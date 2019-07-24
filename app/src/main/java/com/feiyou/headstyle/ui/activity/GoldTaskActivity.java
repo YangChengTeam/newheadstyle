@@ -1,7 +1,5 @@
 package com.feiyou.headstyle.ui.activity;
 
-import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -19,6 +17,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.blankj.utilcode.util.AppUtils;
 import com.blankj.utilcode.util.PathUtils;
 import com.blankj.utilcode.util.SizeUtils;
 import com.blankj.utilcode.util.StringUtils;
@@ -33,20 +32,17 @@ import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.base.IBaseView;
-import com.feiyou.headstyle.bean.TaskInfo;
 import com.feiyou.headstyle.bean.TaskInfoRet;
 import com.feiyou.headstyle.bean.TaskRecordInfoRet;
 import com.feiyou.headstyle.common.Constants;
 import com.feiyou.headstyle.presenter.TaskInfoPresenterImp;
 import com.feiyou.headstyle.presenter.TaskRecordInfoPresenterImp;
-import com.feiyou.headstyle.ui.adapter.CashRecordAdapter;
 import com.feiyou.headstyle.ui.adapter.TaskListAdapter;
+import com.feiyou.headstyle.ui.base.BaseActivity;
 import com.feiyou.headstyle.ui.base.BaseFragmentActivity;
 import com.feiyou.headstyle.ui.custom.DownFileDialog;
 import com.feiyou.headstyle.ui.custom.NormalDecoration;
 import com.feiyou.headstyle.ui.custom.WeiXinTaskDialog;
-
-import com.blankj.utilcode.util.AppUtils;
 import com.feiyou.headstyle.utils.GoToScoreUtils;
 import com.feiyou.headstyle.utils.RandomUtils;
 import com.feiyou.headstyle.utils.TTAdManagerHolder;
@@ -59,15 +55,11 @@ import com.qmuiteam.qmui.widget.QMUITopBar;
 import com.tencent.mm.opensdk.modelbiz.WXLaunchMiniProgram;
 import com.tencent.mm.opensdk.openapi.IWXAPI;
 import com.tencent.mm.opensdk.openapi.WXAPIFactory;
-import com.umeng.analytics.MobclickAgent;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import butterknife.BindView;
 import es.dmoral.toasty.Toasty;
 
-public class GoldTaskActivity extends BaseFragmentActivity implements IBaseView, WeiXinTaskDialog.OpenWeixinListener, DownFileDialog.DownListener {
+public class GoldTaskActivity extends BaseActivity implements IBaseView, WeiXinTaskDialog.OpenWeixinListener, DownFileDialog.DownListener {
 
     @BindView(R.id.topbar)
     QMUITopBar mTopBar;
@@ -109,7 +101,7 @@ public class GoldTaskActivity extends BaseFragmentActivity implements IBaseView,
 
     private String downFilePageName;
 
-    private String miniGoldNum = "0";
+    private int miniGoldNum;
 
     private TTAdNative mTTAdNative;
 
@@ -134,36 +126,23 @@ public class GoldTaskActivity extends BaseFragmentActivity implements IBaseView,
     };
 
     @Override
-    protected int getContextViewId() {
+    protected int getLayoutId() {
         return R.layout.activity_gold_task;
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    protected void initVars() {
         FileDownloader.setup(this);
         initTopBar();
-        initData();
     }
 
-    private void initTopBar() {
-        QMUIStatusBarHelper.setStatusBarLightMode(this);
-        View aboutView = getLayoutInflater().inflate(R.layout.common_top_back, null);
-        aboutView.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, SizeUtils.dp2px(48)));
-        TextView titleTv = aboutView.findViewById(R.id.tv_title);
-        titleTv.setText("金币任务");
+    @Override
+    protected void initViews() {
 
-        mTopBar.setCenterView(aboutView);
-        mBackImageView = aboutView.findViewById(R.id.iv_back);
-        mBackImageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                popBackStack();
-            }
-        });
     }
 
-    public void initData() {
+    @Override
+    protected void initData(Bundle savedInstanceState) {
         TTAdManager ttAdManager = TTAdManagerHolder.get();
         //step2:(可选，强烈建议在合适的时机调用):申请部分权限，如read_phone_state,防止获取不了imei时候，下载类广告没有填充的问题。
         TTAdManagerHolder.get().requestPermissionIfNecessary(this);
@@ -258,11 +237,18 @@ public class GoldTaskActivity extends BaseFragmentActivity implements IBaseView,
                         recordId = "";
                         downFilePageName = taskListAdapter.getData().get(position).getWeburl();
 
-                        if (downFileDialog != null && !downFileDialog.isShowing()) {
-                            downFileDialog.show();
+                        if (AppUtils.isAppInstalled(downFilePageName)) {
+                            //已安装
+                            taskRecordInfoPresenterImp.addTaskRecord(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", taskId, goldNum, 0, 0, "0");
+                            AppUtils.launchApp(GoldTaskActivity.this, downFilePageName, 1);
+                        } else {
+                            if (downFileDialog != null && !downFileDialog.isShowing()) {
+                                downFileDialog.show();
+                            }
+
+                            downAppFile(taskListAdapter.getData().get(position).getDownaddress());
                         }
 
-                        downAppFile(taskListAdapter.getData().get(position).getDownaddress());
                         break;
                     case 9:
                         Intent intent3 = new Intent(GoldTaskActivity.this, AdActivity.class);
@@ -273,7 +259,7 @@ public class GoldTaskActivity extends BaseFragmentActivity implements IBaseView,
                     case 10:
                         taskId = "10";
                         recordId = "";
-                        taskRecordInfoPresenterImp.addTaskRecord(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", taskId, goldNum, 0, 1, "0");
+                        taskRecordInfoPresenterImp.addTaskRecord(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", taskId, miniGoldNum, 0, 1, "0");
                         openMiniApp(taskListAdapter.getData().get(position).getOldid());
                         break;
                     default:
@@ -281,17 +267,52 @@ public class GoldTaskActivity extends BaseFragmentActivity implements IBaseView,
                 }
             }
         });
+
+        followCountDownTimer = new CountDownTimer(30 * 1000, 1000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                Logger.i("剩余时间--->" + millisUntilFinished / 1000);
+            }
+
+            @Override
+            public void onFinish() {
+                isAccord = true;
+            }
+        };
+    }
+
+    private void initTopBar() {
+        QMUIStatusBarHelper.setStatusBarLightMode(this);
+        View aboutView = getLayoutInflater().inflate(R.layout.common_top_back, null);
+        aboutView.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, SizeUtils.dp2px(48)));
+        TextView titleTv = aboutView.findViewById(R.id.tv_title);
+        titleTv.setText("金币任务");
+
+        mTopBar.setCenterView(aboutView);
+        mBackImageView = aboutView.findViewById(R.id.iv_back);
+        mBackImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //popBackStack();
+                finish();
+            }
+        });
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        Logger.i("gold task onresume--->");
 
         taskInfoPresenterImp.taskList(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "");
 
         if (taskId.equals("2")) {
             if (isAccord) {
                 taskRecordInfoPresenterImp.addTaskRecord(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", taskId, goldNum, 0, 1, recordId);
+            } else {
+                if (followCountDownTimer != null) {
+                    followCountDownTimer.cancel();
+                }
             }
         }
 
@@ -348,22 +369,15 @@ public class GoldTaskActivity extends BaseFragmentActivity implements IBaseView,
      */
     public void followPublic() {
         /** 倒计时30秒，一次1秒 */
-        followCountDownTimer = new CountDownTimer(30 * 1000, 1000) {
-            @Override
-            public void onTick(long millisUntilFinished) {
-                Logger.i("剩余时间--->" + millisUntilFinished / 1000);
-            }
-
-            @Override
-            public void onFinish() {
-                isAccord = true;
-            }
-        }.start();
+        if (followCountDownTimer != null) {
+            followCountDownTimer.start();
+        }
     }
 
     @Override
     public void onBackPressed() {
-        popBackStack();
+        //popBackStack();
+        finish();
     }
 
     @Override
@@ -386,6 +400,9 @@ public class GoldTaskActivity extends BaseFragmentActivity implements IBaseView,
                         if (((TaskInfoRet) tData).getData().get(i).getId() == 4) {
                             //预加载视频广告
                             loadAd("920819306", TTAdConstant.VERTICAL, ((TaskInfoRet) tData).getData().get(i).getGoldnum());
+                        }
+                        if (((TaskInfoRet) tData).getData().get(i).getId() == 10) {
+                            miniGoldNum = ((TaskInfoRet) tData).getData().get(i).getGoldnum();
                         }
                     }
                     taskListAdapter.setNewData(((TaskInfoRet) tData).getData());

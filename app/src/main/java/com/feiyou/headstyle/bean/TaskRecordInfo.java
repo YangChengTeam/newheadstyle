@@ -3,7 +3,7 @@ package com.feiyou.headstyle.bean;
 public class TaskRecordInfo {
     private String uid;//用户user_id
     private String taskid;//任务id
-    private String goldnum;//金币奖励数量
+    private int goldnum;//金币奖励数量
     private String cash;//红包奖励金额
     private String infoid;//当前完成的任务记录id
 
@@ -23,11 +23,11 @@ public class TaskRecordInfo {
         this.taskid = taskid;
     }
 
-    public String getGoldnum() {
+    public int getGoldnum() {
         return goldnum;
     }
 
-    public void setGoldnum(String goldnum) {
+    public void setGoldnum(int goldnum) {
         this.goldnum = goldnum;
     }
 

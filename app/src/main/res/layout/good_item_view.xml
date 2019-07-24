@@ -84,6 +84,7 @@
             android:background="@drawable/task_btn_bg"
             android:gravity="center"
             android:text="立即兑换"
+            android:clickable="false"
             android:textColor="@color/task_border_color"
             android:textSize="12dp" />
     </LinearLayout>

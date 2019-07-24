@@ -69,6 +69,8 @@ public class AdActivity extends BaseFragmentActivity implements IBaseView, SignO
 
     private boolean isFinish;
 
+    CountDownTimer timer;
+
     @Override
     protected int getContextViewId() {
         return R.layout.activity_ad;
@@ -92,7 +94,13 @@ public class AdActivity extends BaseFragmentActivity implements IBaseView, SignO
         mBackImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                popBackStack();
+                if (!isFinish) {
+                    if (signOutDialog != null && !signOutDialog.isShowing()) {
+                        signOutDialog.show();
+                    }
+                } else {
+                    popBackStack();
+                }
             }
         });
     }
@@ -140,24 +148,26 @@ public class AdActivity extends BaseFragmentActivity implements IBaseView, SignO
         public void onPageFinished(WebView view, String url) {
             super.onPageFinished(view, url);
 
-            mCountDownTv.setVisibility(View.VISIBLE);
+            if (isFromTask > 0) {
+                mCountDownTv.setVisibility(View.VISIBLE);
 
-            /** 倒计时30秒，一次1秒 */
-            CountDownTimer timer = new CountDownTimer(30 * 1000, 1000) {
-                @Override
-                public void onTick(long millisUntilFinished) {
-                    mCountDownTv.setText("倒计时 " + millisUntilFinished / 1000 + " S");
-                }
-
-                @Override
-                public void onFinish() {
-                    isFinish = true;
-                    if (isFromTask > 0 && !StringUtils.isEmpty(recordId)) {
-                        mCountDownTv.setVisibility(View.GONE);
-                        taskRecordInfoPresenterImp.addTaskRecord(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", taskId, goldNum, 0, 1, recordId);
+                /** 倒计时30秒，一次1秒 */
+                timer = new CountDownTimer(30 * 1000, 1000) {
+                    @Override
+                    public void onTick(long millisUntilFinished) {
+                        mCountDownTv.setText("倒计时 " + millisUntilFinished / 1000 + " S");
                     }
-                }
-            }.start();
+
+                    @Override
+                    public void onFinish() {
+                        isFinish = true;
+                        if (isFromTask > 0 && !StringUtils.isEmpty(recordId)) {
+                            mCountDownTv.setVisibility(View.GONE);
+                            taskRecordInfoPresenterImp.addTaskRecord(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", taskId, goldNum, 0, 1, recordId);
+                        }
+                    }
+                }.start();
+            }
         }
     };
     private WebChromeClient mWebChromeClient = new WebChromeClient() {
@@ -220,5 +230,13 @@ public class AdActivity extends BaseFragmentActivity implements IBaseView, SignO
     @Override
     public void cancelSignOut() {
 
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (timer != null) {
+            timer.cancel();
+        }
     }
 }
