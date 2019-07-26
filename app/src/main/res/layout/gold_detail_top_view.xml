@@ -47,6 +47,7 @@
             </LinearLayout>
 
             <TextView
+                android:id="@+id/tv_get_gold"
                 android:layout_width="65dp"
                 android:layout_height="28dp"
                 android:layout_alignParentRight="true"
@@ -54,7 +55,7 @@
                 android:layout_marginRight="20dp"
                 android:background="@drawable/profit_btn_bg"
                 android:gravity="center"
-                android:text="转换收益"
+                android:text="赚金币"
                 android:textColor="@color/profit_color"
                 android:textSize="14sp" />
         </RelativeLayout>

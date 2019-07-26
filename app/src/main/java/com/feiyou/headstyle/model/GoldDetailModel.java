@@ -7,5 +7,5 @@ import com.feiyou.headstyle.base.IBaseRequestCallBack;
  */
 
 public interface GoldDetailModel<T> {
-    void goldDetailList(String uid, int page, int pageSize, IBaseRequestCallBack<T> iBaseRequestCallBack);
+    void goldDetailList(String uid, String openid,int page, int pageSize, IBaseRequestCallBack<T> iBaseRequestCallBack);
 }

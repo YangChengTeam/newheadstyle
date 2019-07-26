@@ -28,8 +28,8 @@ public class BindAccountPresenterImp extends BasePresenterImp<BindAccountInfoVie
     }
 
     @Override
-    public void bindAccount(String uid, String account, String orderNumber) {
-        bindAccountModelImp.bindAccount(uid, account, orderNumber, this);
+    public void bindAccount(String uid, String openid, String account, String orderNumber) {
+        bindAccountModelImp.bindAccount(uid, openid, account, orderNumber, this);
     }
 
 }

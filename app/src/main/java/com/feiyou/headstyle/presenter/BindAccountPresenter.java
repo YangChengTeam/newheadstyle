@@ -5,5 +5,5 @@ package com.feiyou.headstyle.presenter;
  */
 
 public interface BindAccountPresenter {
-    void bindAccount(String uid, String account, String orderNumber);
+    void bindAccount(String uid, String openid,String account, String orderNumber);
 }

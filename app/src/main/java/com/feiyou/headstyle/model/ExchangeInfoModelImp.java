@@ -77,10 +77,11 @@ public class ExchangeInfoModelImp extends BaseModel implements ExchangeInfoModel
     }
 
     @Override
-    public void exchangeList(String uid, int page, int pageSize, String eid, IBaseRequestCallBack<ExchangeInfoRet> iBaseRequestCallBack) {
+    public void exchangeList(String uid,String openid, int page, int pageSize, String eid, IBaseRequestCallBack<ExchangeInfoRet> iBaseRequestCallBack) {
         JSONObject params = new JSONObject();
         try {
             params.put("user_id", uid);
+            params.put("openid",openid);
             params.put("page", page + "");
             params.put("pagesize", pageSize + "");
             params.put("id", eid);

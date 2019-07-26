@@ -36,10 +36,11 @@ public class GoldDetailModelImp extends BaseModel implements GoldDetailModel<Gol
     }
 
     @Override
-    public void goldDetailList(String uid, int page, int pageSize, IBaseRequestCallBack<GoldDetailRet> iBaseRequestCallBack) {
+    public void goldDetailList(String uid,  String openid,int page, int pageSize, IBaseRequestCallBack<GoldDetailRet> iBaseRequestCallBack) {
         JSONObject params = new JSONObject();
         try {
             params.put("user_id", uid);
+            params.put("openid",openid);
             params.put("page", page + "");
             params.put("pagesize", pageSize + "");
         } catch (JSONException e) {

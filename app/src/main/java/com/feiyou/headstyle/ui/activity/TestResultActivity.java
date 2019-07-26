@@ -120,8 +120,6 @@ public class TestResultActivity extends BaseFragmentActivity implements IBaseVie
 
     TaskRecordInfoPresenterImp taskRecordInfoPresenterImp;
 
-    private boolean isAddTaskRecord;
-
     private String recordId;
 
     @Override
@@ -266,7 +264,8 @@ public class TestResultActivity extends BaseFragmentActivity implements IBaseVie
         testInfoPresenterImp.getHotAndRecommendList(2);
 
         if (!StringUtils.isEmpty(recordId)) {
-            taskRecordInfoPresenterImp.addTaskRecord(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", taskId, goldNum, 0, 1, recordId);
+            String openid = App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getOpenid() : "";
+            taskRecordInfoPresenterImp.addTaskRecord(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "",openid, taskId, goldNum, 0, 1, recordId);
         }
     }
 

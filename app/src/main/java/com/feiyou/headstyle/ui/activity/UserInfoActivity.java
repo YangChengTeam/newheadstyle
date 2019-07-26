@@ -286,7 +286,7 @@ public class UserInfoActivity extends BaseFragmentActivity implements UserInfoVi
 
         if (isMyInfo) {
 
-            userId = userInfo.getId();
+            userId = userInfo != null ? userInfo.getId():"";
 
             Glide.with(this).load(userInfo.getUserimg()).apply(options).into(mUserHeadIv);
 

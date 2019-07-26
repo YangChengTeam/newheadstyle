@@ -34,7 +34,7 @@ public class ExchangeInfoPresenterImp extends BasePresenterImp<IBaseView, Exchan
     }
 
     @Override
-    public void exchangeList(String uid, int page, int pageSize, String eid) {
-        exchangeInfoModelImp.exchangeList(uid, page, pageSize, eid, this);
+    public void exchangeList(String uid, String openid, int page, int pageSize, String eid) {
+        exchangeInfoModelImp.exchangeList(uid, openid, page, pageSize, eid, this);
     }
 }

@@ -36,10 +36,11 @@ public class TaskRecordInfoModelImp extends BaseModel implements TaskRecordInfoM
     }
 
     @Override
-    public void addTaskRecord(String uid, String taskId, int goldNum, double cash, int status, String recordId, IBaseRequestCallBack<TaskRecordInfoRet> iBaseRequestCallBack) {
+    public void addTaskRecord(String uid, String openid, String taskId, int goldNum, double cash, int status, String recordId, IBaseRequestCallBack<TaskRecordInfoRet> iBaseRequestCallBack) {
         JSONObject params = new JSONObject();
         try {
             params.put("user_id", uid);
+            params.put("openid",openid);
             params.put("taskid", taskId);
             params.put("goldnum", goldNum + "");
             params.put("cash", cash + "");

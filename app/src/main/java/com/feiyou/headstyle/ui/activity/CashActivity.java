@@ -163,7 +163,7 @@ public class CashActivity extends BaseFragmentActivity implements ConfigDialog.C
         cashInfoPresenterImp = new CashInfoPresenterImp(this, this);
         cashMoneyInfoPresenterImp = new CashMoneyInfoPresenterImp(this, this);
         try {
-            cashMoneyInfoPresenterImp.cashMoneyList(mUserInfo != null ? mUserInfo.getId() : "", PhoneUtils.getIMEI());
+            cashMoneyInfoPresenterImp.cashMoneyList(mUserInfo != null ? mUserInfo.getId() : "", mUserInfo != null ? mUserInfo.getOpenid() : "", PhoneUtils.getIMEI());
         } catch (SecurityException e) {
             e.printStackTrace();
         }

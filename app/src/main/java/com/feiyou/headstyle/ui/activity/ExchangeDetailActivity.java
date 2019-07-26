@@ -259,8 +259,8 @@ public class ExchangeDetailActivity extends BaseFragmentActivity implements Bind
         if (progressDialog != null && !progressDialog.isShowing()) {
             progressDialog.show();
         }
-
-        bindAccountPresenterImp.bindAccount(App.getApp().mUserInfo != null ? App.getApp().mUserInfo.getId() : "", account, orderNumber);
+        String openid = App.getApp().mUserInfo != null ? App.getApp().mUserInfo.getOpenid() : "";
+        bindAccountPresenterImp.bindAccount(App.getApp().mUserInfo != null ? App.getApp().mUserInfo.getId() : "", openid, account, orderNumber);
     }
 
     @Override

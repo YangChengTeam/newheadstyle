@@ -1,5 +1,6 @@
 package com.feiyou.headstyle.ui.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
@@ -50,6 +51,8 @@ public class GoldDetailActivity extends BaseFragmentActivity implements GoldDeta
 
     TextView mGoldTotalEarnTv;
 
+    TextView mGetGoldTv;
+
     GoldDetailPresenterImp goldDetailPresenterImp;
 
     private int currentPage = 1;
@@ -95,20 +98,28 @@ public class GoldDetailActivity extends BaseFragmentActivity implements GoldDeta
         mGoldNumTv = topView.findViewById(R.id.tv_gold_num);
         mGoldTodayTv = topView.findViewById(R.id.tv_gold_today);
         mGoldTotalEarnTv = topView.findViewById(R.id.tv_gold_total_earn);
-
+        mGetGoldTv = topView.findViewById(R.id.tv_get_gold);
         goldDetailAdapter.addHeaderView(topView);
+        mGetGoldTv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(GoldDetailActivity.this, GoldTaskActivity.class);
+                startActivity(intent);
+            }
+        });
 
         goldDetailPresenterImp = new GoldDetailPresenterImp(this, this);
-        goldDetailPresenterImp.goldDetailList(App.getApp().mUserInfo != null ? App.getApp().mUserInfo.getId() : "", currentPage, pageSize);
+
+        String openid = App.getApp().mUserInfo != null ? App.getApp().mUserInfo.getOpenid() : "";
+        goldDetailPresenterImp.goldDetailList(App.getApp().mUserInfo != null ? App.getApp().mUserInfo.getId() : "", openid, currentPage, pageSize);
 
         goldDetailAdapter.setOnLoadMoreListener(new BaseQuickAdapter.RequestLoadMoreListener() {
             @Override
             public void onLoadMoreRequested() {
                 currentPage++;
-                goldDetailPresenterImp.goldDetailList(App.getApp().mUserInfo != null ? App.getApp().mUserInfo.getId() : "", currentPage, pageSize);
+                goldDetailPresenterImp.goldDetailList(App.getApp().mUserInfo != null ? App.getApp().mUserInfo.getId() : "", openid, currentPage, pageSize);
             }
         }, mGoldDetailListView);
-
     }
 
     @Override

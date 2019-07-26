@@ -7,5 +7,5 @@ package com.feiyou.headstyle.presenter;
 public interface ExchangeInfoPresenter {
     void exchangeGood(String gid, String uid, int type);
 
-    void exchangeList(String uid, int page, int pageSize, String eid);
+    void exchangeList(String uid,String openid, int page, int pageSize, String eid);
 }

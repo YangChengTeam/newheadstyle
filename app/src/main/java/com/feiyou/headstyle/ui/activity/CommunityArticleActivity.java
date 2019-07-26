@@ -328,7 +328,8 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
 
         if (isFromTask == 1) {
             //当天没有签到
-            taskRecordInfoPresenterImp.addTaskRecord(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", taskId, goldNum, 0, 0, "0");
+            String openid = App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getOpenid() : "";
+            taskRecordInfoPresenterImp.addTaskRecord(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "",openid, taskId, goldNum, 0, 0, "0");
         }
     }
 
@@ -563,7 +564,8 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
                 EventBus.getDefault().post(new MessageEvent("更新精彩评论"));
 
                 if (isAddTaskRecord) {
-                    taskRecordInfoPresenterImp.addTaskRecord(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", taskId, goldNum, 0, 1, recordId);
+                    String openid = App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getOpenid() : "";
+                    taskRecordInfoPresenterImp.addTaskRecord(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "",openid, taskId, goldNum, 0, 1, recordId);
                 }
             }
 

@@ -7,5 +7,5 @@ import com.feiyou.headstyle.base.IBaseRequestCallBack;
  */
 
 public interface CashMoneyInfoModel<T> {
-    void cashMoneyList(String uid,String imei, IBaseRequestCallBack<T> iBaseRequestCallBack);
+    void cashMoneyList(String uid,String openid,String imei, IBaseRequestCallBack<T> iBaseRequestCallBack);
 }

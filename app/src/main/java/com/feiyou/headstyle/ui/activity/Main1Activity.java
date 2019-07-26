@@ -49,6 +49,7 @@ import com.feiyou.headstyle.ui.custom.PraiseDialog;
 import com.feiyou.headstyle.ui.custom.VersionUpdateDialog;
 import com.feiyou.headstyle.utils.GoToScoreUtils;
 import com.feiyou.headstyle.utils.NotificationUtils;
+import com.feiyou.headstyle.utils.TTAdManagerHolder;
 import com.feiyou.headstyle.view.VersionView;
 import com.liulishuo.filedownloader.BaseDownloadTask;
 import com.liulishuo.filedownloader.FileDownloadListener;
@@ -167,6 +168,9 @@ public class Main1Activity extends BaseFragmentActivity implements VersionView, 
     }
 
     public void initData() {
+        //step2:(可选，强烈建议在合适的时机调用):申请部分权限，如read_phone_state,防止获取不了imei时候，下载类广告没有填充的问题。
+        TTAdManagerHolder.get().requestPermissionIfNecessary(this);
+
         //Glide.with(this).load(R.drawable.welfare_gif).into(mCreateIv);
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {

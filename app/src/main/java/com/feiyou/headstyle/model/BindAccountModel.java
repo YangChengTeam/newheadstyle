@@ -7,5 +7,5 @@ import com.feiyou.headstyle.base.IBaseRequestCallBack;
  */
 
 public interface BindAccountModel<T> {
-    void bindAccount(String uid, String account, String orderNumber, IBaseRequestCallBack<T> iBaseRequestCallBack);
+    void bindAccount(String uid, String openid,String account, String orderNumber, IBaseRequestCallBack<T> iBaseRequestCallBack);
 }

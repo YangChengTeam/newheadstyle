@@ -87,9 +87,9 @@ public class MyExchangeListActivity extends BaseFragmentActivity implements Exch
         if (bundle != null) {
             eid = bundle.getString("eid", "");
         }
-
+        String openid = App.getApp().mUserInfo != null ? App.getApp().mUserInfo.getOpenid() : "";
         exchangeInfoPresenterImp = new ExchangeInfoPresenterImp(this, this);
-        exchangeInfoPresenterImp.exchangeList(App.getApp().mUserInfo != null ? App.getApp().mUserInfo.getId() : "", currentPage, pageSize, eid);
+        exchangeInfoPresenterImp.exchangeList(App.getApp().mUserInfo != null ? App.getApp().mUserInfo.getId() : "",openid, currentPage, pageSize, eid);
 
         myExchangeListAdapter = new MyExchangeListAdapter(this, null);
         mExchangeListView.setLayoutManager(new LinearLayoutManager(this));

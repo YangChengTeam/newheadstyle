@@ -60,7 +60,7 @@
             android:required="false" />
 
         <activity
-            android:name=".ui.activity.Splash1Activity"
+            android:name=".ui.activity.SplashActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
             android:theme="@style/AppTransparentTheme"
             android:windowSoftInputMode="stateHidden">
@@ -146,6 +146,7 @@
         <activity android:name=".ui.activity.ExchangeDetailActivity"></activity>
         <activity android:name=".ui.activity.MyExchangeListActivity"></activity>
         <activity android:name=".ui.activity.AboutGoldActivity"></activity>
+        <activity android:name=".ui.activity.NativeVerticalVideoActivity"></activity>
         <activity
             android:name=".wxapi.WXEntryActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"

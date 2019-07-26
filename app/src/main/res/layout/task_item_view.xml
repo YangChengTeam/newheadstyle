@@ -63,7 +63,7 @@
             android:textSize="12sp" />
     </LinearLayout>
 
-    <Button
+    <TextView
         android:id="@+id/btn_task_state"
         android:layout_width="72dp"
         android:layout_height="30dp"

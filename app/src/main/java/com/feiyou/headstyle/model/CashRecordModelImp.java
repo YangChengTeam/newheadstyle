@@ -35,10 +35,11 @@ public class CashRecordModelImp extends BaseModel implements CashRecordModel<Cas
     }
 
     @Override
-    public void cashList(String uid, int page, int pageSize, IBaseRequestCallBack<CashRecordRet> iBaseRequestCallBack) {
+    public void cashList(String uid,String openid, int page, int pageSize, IBaseRequestCallBack<CashRecordRet> iBaseRequestCallBack) {
         JSONObject params = new JSONObject();
         try {
             params.put("user_id", uid);
+            params.put("openid",openid);
             params.put("page", page + "");
             params.put("pagesize", pageSize + "");
 

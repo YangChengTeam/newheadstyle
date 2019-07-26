@@ -308,7 +308,8 @@ public class PushNoteActivity extends BaseFragmentActivity implements IBaseView 
 //                //当天没有签到
 //                SPUtils.getInstance().put(Constants.TODAY_PUSH_NOTE, MyTimeUtil.getYearAndDay());
 //            }
-            taskRecordInfoPresenterImp.addTaskRecord(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", taskId, goldNum, 0, 0, "0");
+            String openid = App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getOpenid() : "";
+            taskRecordInfoPresenterImp.addTaskRecord(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "",openid, taskId, goldNum, 0, 0, "0");
         }
     }
 
@@ -516,7 +517,8 @@ public class PushNoteActivity extends BaseFragmentActivity implements IBaseView 
                     }
 
                     if (isAddTaskRecord) {
-                        taskRecordInfoPresenterImp.addTaskRecord(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", taskId, goldNum, 0, 1, recordId);
+                        String openid = App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getOpenid() : "";
+                        taskRecordInfoPresenterImp.addTaskRecord(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "",openid, taskId, goldNum, 0, 1, recordId);
                     } else {
                         finish();
                     }

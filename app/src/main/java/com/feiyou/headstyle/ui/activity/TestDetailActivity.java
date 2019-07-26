@@ -22,6 +22,7 @@ import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.bean.QuestionJumpInfo;
 import com.feiyou.headstyle.bean.ResultInfo;
+import com.feiyou.headstyle.bean.TaskRecordInfoRet;
 import com.feiyou.headstyle.bean.TestDetailInfoRet;
 import com.feiyou.headstyle.bean.TestDetailInfoWrapper;
 import com.feiyou.headstyle.bean.TestMsgInfo;
@@ -29,6 +30,7 @@ import com.feiyou.headstyle.bean.TestResultInfoRet;
 import com.feiyou.headstyle.bean.TestResultParams;
 import com.feiyou.headstyle.bean.UserInfo;
 import com.feiyou.headstyle.common.Constants;
+import com.feiyou.headstyle.presenter.TaskRecordInfoPresenterImp;
 import com.feiyou.headstyle.presenter.TestDetailInfoPresenterImp;
 import com.feiyou.headstyle.presenter.TestResultInfoPresenterImp;
 import com.feiyou.headstyle.ui.adapter.MsgAdapter;
@@ -91,6 +93,18 @@ public class TestDetailActivity extends BaseFragmentActivity implements TestDeta
 
     TextView titleTv;
 
+    TaskRecordInfoPresenterImp taskRecordInfoPresenterImp;
+
+    private boolean isAddTaskRecord;
+
+    private String recordId;
+
+    private int isFromTask = 0;
+
+    private String taskId = "5";
+
+    private int goldNum = 0;
+
     @Override
     protected int getContextViewId() {
         return R.layout.activity_test_detail;
@@ -125,6 +139,7 @@ public class TestDetailActivity extends BaseFragmentActivity implements TestDeta
         Bundle bundle = getIntent().getExtras();
         if (bundle != null && !StringUtils.isEmpty(bundle.getString("tid"))) {
             tid = bundle.getString("tid");
+            isFromTask = bundle.getInt("is_from_task", 0);
         }
         userInfo = App.getApp().getmUserInfo();
 
@@ -140,8 +155,13 @@ public class TestDetailActivity extends BaseFragmentActivity implements TestDeta
 
         testDetailInfoPresenterImp = new TestDetailInfoPresenterImp(this, this);
         testResultInfoPresenterImp = new TestResultInfoPresenterImp(this, this);
-
+        taskRecordInfoPresenterImp = new TaskRecordInfoPresenterImp(this,this);
         testDetailInfoPresenterImp.getTestDetail(tid, 1);
+
+        if (isFromTask == 1) {
+            String openid = App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getOpenid() : "";
+            taskRecordInfoPresenterImp.addTaskRecord(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", openid, taskId, goldNum, 0, 0, "0");
+        }
     }
 
     @OnClick(R.id.layout_comment)
@@ -285,10 +305,25 @@ public class TestDetailActivity extends BaseFragmentActivity implements TestDeta
                 if (((TestResultInfoRet) tData).getData() != null) {
                     Intent intent = new Intent(this, TestResultActivity.class);
                     intent.putExtra("from_type", 1);
+                    intent.putExtra("record_id", recordId);
                     intent.putExtra("image_url", ((TestResultInfoRet) tData).getData().getImage());
                     intent.putExtra("nocode_image_url", ((TestResultInfoRet) tData).getData().getImageNocode());
                     startActivity(intent);
                     finish();
+                }
+            }
+
+            if (tData instanceof TaskRecordInfoRet) {
+                if (((TaskRecordInfoRet) tData).getCode() == Constants.SUCCESS) {
+                    if (StringUtils.isEmpty(recordId)) {
+                        isAddTaskRecord = true;
+                        if (((TaskRecordInfoRet) tData).getData() != null) {
+                            recordId = ((TaskRecordInfoRet) tData).getData().getInfoid();
+                        }
+                    }
+                } else {
+                    //finish();
+                    Logger.i("task error--->");
                 }
             }
         }

@@ -137,6 +137,8 @@ public class TestImageDetailActivity extends BaseFragmentActivity implements Tes
 
     private String recordId;
 
+    private int isFromTask = 0;
+
     @Override
     protected int getContextViewId() {
         return R.layout.activity_test_image_detail;
@@ -171,6 +173,7 @@ public class TestImageDetailActivity extends BaseFragmentActivity implements Tes
         Bundle bundle = getIntent().getExtras();
         if (bundle != null && !StringUtils.isEmpty(bundle.getString("tid"))) {
             tid = bundle.getString("tid");
+            isFromTask = bundle.getInt("is_from_task", 0);
         }
         userInfo = App.getApp().getmUserInfo();
 
@@ -231,11 +234,9 @@ public class TestImageDetailActivity extends BaseFragmentActivity implements Tes
 
         testDetailInfoPresenterImp.getTestDetail(tid, 2);
 
-        String todayIsTest = SPUtils.getInstance().getString(Constants.TODAY_IS_TEST, "");
-        if (StringUtils.isEmpty(todayIsTest) || !todayIsTest.equals(MyTimeUtil.getYearAndDay())) {
-            //当天没有签到
-            SPUtils.getInstance().put(Constants.TODAY_IS_TEST, MyTimeUtil.getYearAndDay());
-            taskRecordInfoPresenterImp.addTaskRecord(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", taskId, goldNum, 0, 0, "0");
+        if (isFromTask == 1) {
+            String openid = App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getOpenid() : "";
+            taskRecordInfoPresenterImp.addTaskRecord(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", openid, taskId, goldNum, 0, 0, "0");
         }
     }
 
@@ -429,15 +430,21 @@ public class TestImageDetailActivity extends BaseFragmentActivity implements Tes
                     mCommentTextView.setText("查看结果");
 
                     KeyboardUtils.hideSoftInput(this);
+
                 }
             }
 
             if (tData instanceof TaskRecordInfoRet) {
-                if (StringUtils.isEmpty(recordId)) {
-                    isAddTaskRecord = true;
-                    if (((TaskRecordInfoRet) tData).getData() != null) {
-                        recordId = ((TaskRecordInfoRet) tData).getData().getInfoid();
+                if (((TaskRecordInfoRet) tData).getCode() == Constants.SUCCESS) {
+                    if (StringUtils.isEmpty(recordId)) {
+                        isAddTaskRecord = true;
+                        if (((TaskRecordInfoRet) tData).getData() != null) {
+                            recordId = ((TaskRecordInfoRet) tData).getData().getInfoid();
+                        }
                     }
+                } else {
+                    //finish();
+                    Logger.i("task error--->");
                 }
             }
         }

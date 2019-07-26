@@ -29,7 +29,7 @@ public class SignDoneInfoPresenterImp extends BasePresenterImp<IBaseView, SignDo
     }
 
     @Override
-    public void signDone(String uid, double cash) {
-        signDoneInfoModelImp.signDone(uid,cash,this);
+    public void signDone(String uid, String openid, double cash) {
+        signDoneInfoModelImp.signDone(uid, openid, cash, this);
     }
 }

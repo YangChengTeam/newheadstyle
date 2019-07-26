@@ -7,5 +7,5 @@ import com.feiyou.headstyle.base.IBaseRequestCallBack;
  */
 
 public interface SignDoneInfoModel<T> {
-    void signDone(String uid, double cash, IBaseRequestCallBack<T> iBaseRequestCallBack);
+    void signDone(String uid, String openid,double cash, IBaseRequestCallBack<T> iBaseRequestCallBack);
 }

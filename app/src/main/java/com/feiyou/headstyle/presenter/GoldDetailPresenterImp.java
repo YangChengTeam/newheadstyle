@@ -28,7 +28,7 @@ public class GoldDetailPresenterImp extends BasePresenterImp<GoldDetailView, Gol
     }
 
     @Override
-    public void goldDetailList(String uid, int page, int pageSize) {
-        goldDetailModelImp.goldDetailList(uid, page, pageSize, this);
+    public void goldDetailList(String uid, String openid,int page, int pageSize) {
+        goldDetailModelImp.goldDetailList(uid, openid,page, pageSize, this);
     }
 }

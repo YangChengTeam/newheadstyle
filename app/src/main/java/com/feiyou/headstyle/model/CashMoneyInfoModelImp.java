@@ -36,10 +36,11 @@ public class CashMoneyInfoModelImp extends BaseModel implements CashMoneyInfoMod
     }
 
     @Override
-    public void cashMoneyList(String uid,String imei, IBaseRequestCallBack<CashMoneyInfoRet> iBaseRequestCallBack) {
+    public void cashMoneyList(String uid,String openid,String imei, IBaseRequestCallBack<CashMoneyInfoRet> iBaseRequestCallBack) {
         JSONObject params = new JSONObject();
         try {
             params.put("user_id", uid);
+            params.put("openid",openid);
             params.put("imei", imei);
         } catch (JSONException e) {
             e.printStackTrace();

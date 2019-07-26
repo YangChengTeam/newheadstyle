@@ -62,7 +62,7 @@ public class DownFileDialog extends Dialog implements View.OnClickListener {
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.iv_close:
+            case R.id.iv_down_close:
                 downListener.downCancel();
                 dismiss();
                 break;

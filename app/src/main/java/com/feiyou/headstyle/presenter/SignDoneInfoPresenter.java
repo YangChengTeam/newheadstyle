@@ -5,5 +5,5 @@ package com.feiyou.headstyle.presenter;
  */
 
 public interface SignDoneInfoPresenter {
-    void signDone(String uid, double cash);
+    void signDone(String uid,String openid, double cash);
 }

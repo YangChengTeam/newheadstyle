@@ -87,13 +87,14 @@ public class CashRecordActivity extends BaseFragmentActivity implements CashReco
         mCashRecordListView.setAdapter(cashRecordAdapter);
 
         cashRecordPresenterImp = new CashRecordPresenterImp(this, this);
-        cashRecordPresenterImp.cashList(App.getApp().mUserInfo != null ? App.getApp().mUserInfo.getId() : "", currentPage, pageSize);
+        String openid = App.getApp().mUserInfo != null ? App.getApp().mUserInfo.getOpenid() : "";
+        cashRecordPresenterImp.cashList(App.getApp().mUserInfo != null ? App.getApp().mUserInfo.getId() : "", openid, currentPage, pageSize);
 
         cashRecordAdapter.setOnLoadMoreListener(new BaseQuickAdapter.RequestLoadMoreListener() {
             @Override
             public void onLoadMoreRequested() {
                 currentPage++;
-                cashRecordPresenterImp.cashList(App.getApp().mUserInfo != null ? App.getApp().mUserInfo.getId() : "", currentPage, pageSize);
+                cashRecordPresenterImp.cashList(App.getApp().mUserInfo != null ? App.getApp().mUserInfo.getId() : "", openid, currentPage, pageSize);
             }
         }, mCashRecordListView);
     }

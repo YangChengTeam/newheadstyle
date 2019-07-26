@@ -7,5 +7,5 @@ import com.feiyou.headstyle.base.IBaseRequestCallBack;
  */
 
 public interface CashRecordModel<T> {
-    void cashList(String uid, int page, int pageSize, IBaseRequestCallBack<T> iBaseRequestCallBack);
+    void cashList(String uid,String openid, int page, int pageSize, IBaseRequestCallBack<T> iBaseRequestCallBack);
 }

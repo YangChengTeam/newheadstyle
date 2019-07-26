@@ -35,6 +35,6 @@ public class TaskListAdapter extends BaseQuickAdapter<TaskInfo, BaseViewHolder> 
 
         helper.setBackgroundRes(R.id.btn_task_state, item.getIsFinish() == 1 ? R.drawable.task_done_btn_bg : R.drawable.task_btn_bg);
         helper.setTextColor(R.id.btn_task_state, ContextCompat.getColor(mContext, item.getIsFinish() == 1 ? R.color.black3 : R.color.task_border_color));
-
+        helper.setVisible(R.id.tv_add_gold_num, item.getId() == 7 ? false : true);
     }
 }

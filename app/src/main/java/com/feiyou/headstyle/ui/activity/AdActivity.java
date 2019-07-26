@@ -134,7 +134,8 @@ public class AdActivity extends BaseFragmentActivity implements IBaseView, SignO
                 .go(openUrl);
         taskRecordInfoPresenterImp = new TaskRecordInfoPresenterImp(this, this);
         if (isFromTask > 0) {
-            taskRecordInfoPresenterImp.addTaskRecord(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", taskId, goldNum, 0, 0, "0");
+            String openid = App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getOpenid() : "";
+            taskRecordInfoPresenterImp.addTaskRecord(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "",openid, taskId, goldNum, 0, 0, "0");
         }
     }
 
@@ -163,7 +164,8 @@ public class AdActivity extends BaseFragmentActivity implements IBaseView, SignO
                         isFinish = true;
                         if (isFromTask > 0 && !StringUtils.isEmpty(recordId)) {
                             mCountDownTv.setVisibility(View.GONE);
-                            taskRecordInfoPresenterImp.addTaskRecord(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", taskId, goldNum, 0, 1, recordId);
+                            String openid = App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getOpenid() : "";
+                            taskRecordInfoPresenterImp.addTaskRecord(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "",openid, taskId, goldNum, 0, 1, recordId);
                         }
                     }
                 }.start();

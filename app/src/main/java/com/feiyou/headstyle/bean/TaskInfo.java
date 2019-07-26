@@ -22,8 +22,9 @@ public class TaskInfo implements Serializable {
     private int isFinish; //是否完成 0：否 1：是
     private String cashindex;
 
-    @SerializedName("remain_time")
-    private int remainTime;//倒计时剩余时间 (如果不是首页零钱任务，这里默认为0)
+    private Long systime;//系统当前时间
+
+    private Long addtime;//上一次任务完成时间(默认为0，已完成时才会有时间)
 
     public int getId() {
         return id;
@@ -145,11 +146,19 @@ public class TaskInfo implements Serializable {
         this.cashindex = cashindex;
     }
 
-    public int getRemainTime() {
-        return remainTime;
+    public Long getSystime() {
+        return systime;
     }
 
-    public void setRemainTime(int remainTime) {
-        this.remainTime = remainTime;
+    public void setSystime(Long systime) {
+        this.systime = systime;
+    }
+
+    public Long getAddtime() {
+        return addtime;
+    }
+
+    public void setAddtime(Long addtime) {
+        this.addtime = addtime;
     }
 }

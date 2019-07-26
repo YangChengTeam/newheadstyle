@@ -34,11 +34,12 @@ public class BindAccountModelImp extends BaseModel implements BindAccountModel<B
     }
 
     @Override
-    public void bindAccount(String uid, String account, String orderNumber, IBaseRequestCallBack<BindAccountInfoRet> iBaseRequestCallBack) {
+    public void bindAccount(String uid, String openid,String account, String orderNumber, IBaseRequestCallBack<BindAccountInfoRet> iBaseRequestCallBack) {
         JSONObject params = new JSONObject();
         try {
             params.put("account", account);
             params.put("user_id", uid);
+            params.put("openid",openid);
             params.put("order", orderNumber);
         } catch (JSONException e) {
             e.printStackTrace();

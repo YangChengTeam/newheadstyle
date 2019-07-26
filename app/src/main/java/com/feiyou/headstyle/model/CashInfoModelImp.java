@@ -40,7 +40,7 @@ public class CashInfoModelImp extends BaseModel implements CashInfoModel<CashInf
         JSONObject params = new JSONObject();
         try {
             params.put("user_id", uid);
-            params.put("openid", openid);
+            params.put("txopenid", openid);
             params.put("amount", money + "");
             params.put("stype", stype + "");
             params.put("imei", imei);

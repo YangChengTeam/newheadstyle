@@ -58,7 +58,12 @@ public class SignInListAdapter extends BaseQuickAdapter<WelfareInfo.SignSetInfo,
         }
 
         if (helper.getAdapterPosition() > 0 && helper.getAdapterPosition() % 6 == 0) {
-            helper.setImageResource(R.id.iv_gold_icon, R.mipmap.small_red);
+            if(signDoneDay == 0 && loop > 0){
+                Glide.with(mContext).load(R.mipmap.seven_day_sign_done).into((ImageView) helper.getView(R.id.iv_gold_icon));
+            }else{
+                Glide.with(mContext).load(R.mipmap.small_red).into((ImageView) helper.getView(R.id.iv_gold_icon));
+            }
+
             helper.setText(R.id.tv_sign_state, "现金");
             helper.setTextColor(R.id.tv_sign_state, ContextCompat.getColor(mContext, R.color.profit_color));
         }

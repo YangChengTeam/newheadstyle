@@ -28,7 +28,7 @@ public class CashMoneyInfoPresenterImp extends BasePresenterImp<IBaseView, CashM
     }
 
     @Override
-    public void cashMoneyList(String uid,String imei) {
-        cashMoneyInfoModelImp.cashMoneyList(uid,imei, this);
+    public void cashMoneyList(String uid,String openid,String imei) {
+        cashMoneyInfoModelImp.cashMoneyList(uid,openid,imei, this);
     }
 }

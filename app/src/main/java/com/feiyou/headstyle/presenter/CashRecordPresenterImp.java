@@ -28,7 +28,7 @@ public class CashRecordPresenterImp extends BasePresenterImp<CashRecordView, Cas
     }
 
     @Override
-    public void cashList(String uid, int page, int pageSize) {
-        cashRecordModelImp.cashList(uid, page, pageSize, this);
+    public void cashList(String uid,String openid, int page, int pageSize) {
+        cashRecordModelImp.cashList(uid, openid,page, pageSize, this);
     }
 }

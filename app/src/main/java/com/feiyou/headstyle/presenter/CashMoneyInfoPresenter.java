@@ -5,5 +5,5 @@ package com.feiyou.headstyle.presenter;
  */
 
 public interface CashMoneyInfoPresenter {
-    void cashMoneyList(String uid,String imei);
+    void cashMoneyList(String uid,String openid,String imei);
 }

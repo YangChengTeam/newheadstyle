@@ -19,6 +19,7 @@ import com.blankj.utilcode.util.StringUtils;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.ui.adapter.BlackListAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragmentActivity;
+import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 import com.qmuiteam.qmui.widget.QMUITopBar;
 import com.umeng.socialize.ShareAction;
@@ -80,6 +81,12 @@ public class AboutActivity extends BaseFragmentActivity implements View.OnClickL
                 popBackStack();
             }
         });
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Logger.i("about onresume--->");
     }
 
     public void initData() {

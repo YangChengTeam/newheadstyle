@@ -27,12 +27,14 @@ import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
+import com.blankj.utilcode.constant.TimeConstants;
 import com.blankj.utilcode.util.AppUtils;
 import com.blankj.utilcode.util.BarUtils;
 import com.blankj.utilcode.util.PathUtils;
 import com.blankj.utilcode.util.SPUtils;
 import com.blankj.utilcode.util.SizeUtils;
 import com.blankj.utilcode.util.StringUtils;
+import com.blankj.utilcode.util.TimeUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
@@ -82,6 +84,7 @@ import com.feiyou.headstyle.ui.custom.SeeVideoDialog;
 import com.feiyou.headstyle.ui.custom.SignSuccessDialog;
 import com.feiyou.headstyle.ui.custom.TurnProfitDialog;
 import com.feiyou.headstyle.ui.custom.WeiXinTaskDialog;
+import com.feiyou.headstyle.utils.ClickUtil;
 import com.feiyou.headstyle.utils.GoToScoreUtils;
 import com.feiyou.headstyle.utils.MyTimeUtil;
 import com.feiyou.headstyle.utils.RandomUtils;
@@ -108,6 +111,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import es.dmoral.toasty.Toasty;
 
 /**
@@ -185,6 +189,8 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
     TextView mCountDownTv;
 
     TextView mTurnTableTv;
+
+    ImageView mTurnTableIv;
 
     MarqueeView marqueeView;
 
@@ -325,6 +331,7 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
         mMoreTaskTv = topView.findViewById(R.id.tv_more_task);
         mGoodMoreTv = topView.findViewById(R.id.tv_good_more);
         mTurnTableTv = topView.findViewById(R.id.tv_turntable);
+        mTurnTableIv = topView.findViewById(R.id.iv_turntable);
 
         mUserHeadIv.setOnClickListener(this);
         mUserNameTv.setOnClickListener(this);
@@ -340,6 +347,7 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
         mGoodMoreTv.setOnClickListener(this);
         mTurnTableTv.setOnClickListener(this);
         mGetMoneyBgIv.setOnClickListener(this);
+        mTurnTableIv.setOnClickListener(this);
 
         signSuccessDialog = new SignSuccessDialog(getActivity(), R.style.login_dialog);
         signSuccessDialog.setSignSuccessListener(this);
@@ -381,8 +389,7 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
         mRefreshLayout.setOnChildScrollUpCallback(null);
 
         TTAdManager ttAdManager = TTAdManagerHolder.get();
-        //step2:(可选，强烈建议在合适的时机调用):申请部分权限，如read_phone_state,防止获取不了imei时候，下载类广告没有填充的问题。
-        TTAdManagerHolder.get().requestPermissionIfNecessary(getActivity());
+
         //step3:创建TTAdNative对象,用于调用广告请求接口
         mTTAdNative = ttAdManager.createAdNative(getActivity());
 
@@ -439,6 +446,7 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
                     return;
                 }
                 int id = taskListAdapter.getData().get(position).getId();
+                String openid = App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getOpenid() : "";
                 switch (id) {
                     case 1:
                         Intent intent = new Intent(getActivity(), PushNoteActivity.class);
@@ -464,7 +472,7 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
                     case 4:
                         taskId = "4";
                         recordId = "";
-                        taskRecordInfoPresenterImp.addTaskRecord(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", taskId, taskListAdapter.getData().get(position).getGoldnum(), 0, 0, "0");
+                        taskRecordInfoPresenterImp.addTaskRecord(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", openid, taskId, taskListAdapter.getData().get(position).getGoldnum(), 0, 0, "0");
                         if (mttRewardVideoAd != null) {
                             //step6:在获取到广告后展示
                             mttRewardVideoAd.showRewardVideoAd(getActivity());
@@ -495,10 +503,15 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
                         GoToScoreUtils.goToMarket(getActivity(), Constants.APP_PACKAGE_NAME);
                         break;
                     case 7:
-                        Intent intent4 = new Intent(getActivity(), Main1Activity.class);
-                        intent4.putExtra("home_index", 2);
-                        intent4.putExtra("is_from_task_sign", 1);
-                        startActivity(intent4);
+                        if (signDays > 0 && (signDays + 1) % 7 == 0) {
+                            //领取红包
+                            if (receiveHongBaoDialog != null && !receiveHongBaoDialog.isShowing()) {
+                                receiveHongBaoDialog.show();
+                            }
+                        } else {
+                            //提示签到
+                            signDoneInfoPresenterImp.signDone(userInfo != null ? userInfo.getId() : "", userInfo != null ? userInfo.getOpenid() : "", 0);
+                        }
                         break;
                     case 8:
                         taskId = "8";
@@ -520,7 +533,7 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
                     case 10:
                         taskId = "10";
                         recordId = "";
-                        taskRecordInfoPresenterImp.addTaskRecord(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", taskId, goldNum, 0, 1, "0");
+                        taskRecordInfoPresenterImp.addTaskRecord(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", openid, taskId, goldNum, 0, 1, "0");
                         openMiniApp(taskListAdapter.getData().get(position).getOldid());
                         break;
                     default:
@@ -530,9 +543,10 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
         });
 
         //首页领钱
-        followCountDownTimer = new CountDownTimer(30 * 1000, 1000) {
+        followCountDownTimer = new CountDownTimer(20 * 1000, 1000) {
             @Override
             public void onTick(long millisUntilFinished) {
+                isAccord = false;
                 Logger.i("剩余时间--->" + millisUntilFinished / 1000);
             }
 
@@ -543,9 +557,10 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
         };
 
 
-        marketTimer = new CountDownTimer(30 * 1000, 1000) {
+        marketTimer = new CountDownTimer(20 * 1000, 1000) {
             @Override
             public void onTick(long millisUntilFinished) {
+                isAccord = false;
                 Logger.i("剩余时间--->" + millisUntilFinished / 1000);
             }
 
@@ -557,6 +572,19 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
 
         Glide.with(getActivity()).load(R.drawable.sign_in).into(mSignInIv);
         Glide.with(getActivity()).load(R.drawable.see_video_normal_gif).into(mGetMoneyBgIv);
+
+        //如果是从任务列表跳转过来的签到，怎根据规则，打开签到弹窗或者领红包的弹窗
+        if (isFromTaskSign == 1) {
+            if (signDays > 0 && (signDays + 1) % 7 == 0) {
+                //领取红包
+                if (receiveHongBaoDialog != null && !receiveHongBaoDialog.isShowing()) {
+                    receiveHongBaoDialog.show();
+                }
+            } else {
+                //执行签到
+                signDoneInfoPresenterImp.signDone(userInfo != null ? userInfo.getId() : "", userInfo != null ? userInfo.getOpenid() : "", 0);
+            }
+        }
     }
 
     @Override
@@ -592,26 +620,37 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
 
         welfareInfoPresenterImp.getWelfareData(userInfo != null ? userInfo.getId() : "");
 
+        String openid = App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getOpenid() : "";
+
         if (taskId.equals("2")) {
             if (isAccord) {
-                taskRecordInfoPresenterImp.addTaskRecord(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", taskId, goldNum, 0, 1, recordId);
+                taskRecordInfoPresenterImp.addTaskRecord(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", openid, taskId, goldNum, 0, 1, recordId);
             }
         }
 
         if (taskId.equals("8")) {
             if (AppUtils.isAppInstalled(downFilePageName)) {
-                taskRecordInfoPresenterImp.addTaskRecord(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", taskId, goldNum, 0, 1, recordId);
+                taskRecordInfoPresenterImp.addTaskRecord(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", openid, taskId, goldNum, 0, 1, recordId);
             }
         }
 
         if (taskId.equals("10")) {
             ToastUtils.showLong("领取成功 +" + miniGoldNum + "金币");
+            recordId = "";
+            taskId = "";
+            isAccord = false;
         }
         if (taskId.equals("6")) {
             if (isAccord) {
-                taskRecordInfoPresenterImp.addTaskRecord(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", taskId, goldNum, 0, 1, recordId);
+                taskRecordInfoPresenterImp.addTaskRecord(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", openid, taskId, goldNum, 0, 1, recordId);
             } else {
                 ToastUtils.showLong("任务失败");
+                recordId = "";
+                taskId = "";
+                isAccord = false;
+                if (marketTimer != null) {
+                    marketTimer.cancel();
+                }
             }
         }
 
@@ -625,8 +664,8 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
             if (marketTimer != null) {
                 marketTimer.start();
             }
-
-            taskRecordInfoPresenterImp.addTaskRecord(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", taskId, goldNum, 0, 0, "0");
+            String openid = App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getOpenid() : "";
+            taskRecordInfoPresenterImp.addTaskRecord(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", openid, taskId, goldNum, 0, 0, "0");
         }
     }
 
@@ -671,7 +710,7 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
                     }
                 } else {
                     //提示签到
-                    signDoneInfoPresenterImp.signDone(userInfo != null ? userInfo.getId() : "", 0);
+                    signDoneInfoPresenterImp.signDone(userInfo != null ? userInfo.getId() : "", userInfo != null ? userInfo.getOpenid() : "", 0);
                 }
                 break;
             case R.id.btn_turn_profit:
@@ -742,6 +781,7 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
                 Intent intent6 = new Intent(getActivity(), GoldMailActivity.class);
                 startActivity(intent6);
                 break;
+            case R.id.iv_turntable:
             case R.id.tv_turntable:
                 ToastUtils.showLong("正在升级，敬请期待！");
                 break;
@@ -750,7 +790,6 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
         }
     }
 
-
     @Override
     public void seeVideo() {
         Logger.i("看视频翻倍奖励 start--->");
@@ -758,7 +797,9 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
             signSuccessDialog.dismiss();
         }
         recordId = "";
-        taskRecordInfoPresenterImp.addTaskRecord(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", taskId, getGoldNum, 0, 0, "0");
+
+        String openid = App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getOpenid() : "";
+        taskRecordInfoPresenterImp.addTaskRecord(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", openid, taskId, getGoldNum, 0, 0, "0");
         //step6:在获取到广告后展示
         mttRewardVideoAd.showRewardVideoAd(getActivity());
         mttRewardVideoAd = null;
@@ -849,7 +890,11 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
 
                             //首页领钱任务
                             if (tempList.get(i).getId() == 13) {
-                                adCountDown = tempList.get(i).getRemainTime();
+
+                                long diffSecond = TimeUtils.getTimeSpanByNow((tempList.get(i).getAddtime() + 60) * 1000, TimeConstants.SEC);
+                                Logger.i("间隔的时间--->" + diffSecond);
+
+                                adCountDown = (int) diffSecond;
                                 //adCountDown = 60;
                                 seeVideoIsFinish = tempList.get(i).getIsFinish() == 1 ? true : false;
                                 Logger.i("home count down--->" + adCountDown);
@@ -859,9 +904,7 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
                             }
                         }
 
-                        if (adCountDown > 0) {
-                            homeSeeVideoCountDown();
-                        }
+                        homeSeeVideoCountDown();
 
                         if (allTaskInfoList.size() > 3) {
                             taskListAdapter.setNewData(allTaskInfoList.subList(0, 3));
@@ -878,18 +921,6 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
                         }
                     }
 
-                    //如果是从任务列表跳转过来的签到，怎根据规则，打开签到弹窗或者领红包的弹窗
-                    if (isFromTaskSign == 1) {
-                        if (signDays > 0 && (signDays + 1) % 7 == 0) {
-                            //领取红包
-                            if (receiveHongBaoDialog != null && !receiveHongBaoDialog.isShowing()) {
-                                receiveHongBaoDialog.show();
-                            }
-                        } else {
-                            //提示签到
-                            signDoneInfoPresenterImp.signDone(userInfo != null ? userInfo.getId() : "", 0);
-                        }
-                    }
                 }
             }
 
@@ -914,9 +945,12 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
                             signSuccessDialog.setSignInfo(((SignDoneInfoRet) tData).getData().getGoldnum(), ((SignDoneInfoRet) tData).getData().getSigndays());
                         }
                     }
+
+                    //签到后重新查询首页收据
+                    welfareInfoPresenterImp.getWelfareData(userInfo != null ? userInfo.getId():"");
                 } else {
                     //TODO 待定
-                    //ToastUtils.showLong(((SignDoneInfoRet) tData).getMsg());
+                    ToastUtils.showLong(((SignDoneInfoRet) tData).getMsg());
                     return;
                 }
             }
@@ -934,17 +968,25 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
                         }
                     } else {
                         if (((TaskRecordInfoRet) tData).getData() != null) {
+
                             if (taskId.equals("11")) {
                                 ToastUtils.showLong("转换成功");
-                            } else if (taskId.equals("13")) {
+                            }
+
+                            if (taskId.equals("13")) {
                                 ToastUtils.showLong("获得收益" + seeVideoMoney + "元");
-                            } else {
+                            }
+
+                            if (taskId.equals("12")) {
                                 if ((signDays + 1) % 7 == 0) {
                                     ToastUtils.showLong("翻倍领取成功");
                                 } else {
                                     ToastUtils.showLong("翻倍领取成功");
                                 }
                             }
+
+                            recordId = "";
+                            taskId = "";
                         }
                     }
                 } else {
@@ -1000,7 +1042,7 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
     @Override
     public void openHongbao() {
         if (signDoneInfoPresenterImp != null && randomHongbao > 0) {
-            signDoneInfoPresenterImp.signDone(userInfo != null ? userInfo.getId() : "", randomHongbao);
+            signDoneInfoPresenterImp.signDone(userInfo != null ? userInfo.getId() : "", userInfo != null ? userInfo.getOpenid() : "", randomHongbao);
         }
         loadAd("920819710", TTAdConstant.VERTICAL, 0);
     }
@@ -1014,8 +1056,8 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
         taskId = "12";
         getGoldNum = 0;
         recordId = "";
-
-        taskRecordInfoPresenterImp.addTaskRecord(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", taskId, getGoldNum, randomHongbao, 0, "0");
+        String openid = App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getOpenid() : "";
+        taskRecordInfoPresenterImp.addTaskRecord(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", openid, taskId, getGoldNum, randomHongbao, 0, "0");
         //step6:在获取到广告后展示
         mttRewardVideoAd.showRewardVideoAd(getActivity());
         mttRewardVideoAd = null;
@@ -1107,7 +1149,8 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
                             if (taskId.equals("13")) {
                                 rewardAmount = 0;
                             }
-                            taskRecordInfoPresenterImp.addTaskRecord(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", taskId, rewardAmount, seeVideoMoney, 1, recordId);
+                            String openid = App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getOpenid() : "";
+                            taskRecordInfoPresenterImp.addTaskRecord(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", openid, taskId, rewardAmount, seeVideoMoney, 1, recordId);
                         }
                     }
 
@@ -1166,8 +1209,8 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
 
         recordId = "";
         getGoldNum = 0;
-
-        taskRecordInfoPresenterImp.addTaskRecord(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", taskId, getGoldNum, 0, 0, "0");
+        String openid = App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getOpenid() : "";
+        taskRecordInfoPresenterImp.addTaskRecord(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", openid, taskId, getGoldNum, 0, 0, "0");
         //step6:在获取到广告后展示
         mttRewardVideoAd.showRewardVideoAd(getActivity());
         mttRewardVideoAd = null;
@@ -1181,8 +1224,8 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
 
         recordId = "";
         getGoldNum = 0;
-
-        taskRecordInfoPresenterImp.addTaskRecord(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", taskId, getGoldNum, 0, 0, "0");
+        String openid = App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getOpenid() : "";
+        taskRecordInfoPresenterImp.addTaskRecord(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", openid, taskId, getGoldNum, 0, 0, "0");
         //step6:在获取到广告后展示
         mttRewardVideoAd.showRewardVideoAd(getActivity());
         mttRewardVideoAd = null;
@@ -1207,10 +1250,11 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
         cm.setPrimaryClip(ClipData.newPlainText(null, StringUtils.isEmpty(followPublicName) ? "头像达人" : followPublicName));
 
         ToastUtils.showLong("公众号已复制,可以关注了");
-        AppUtils.launchApp(getActivity(), "com.tencent.mm", 1);
+        AppUtils.launchApp("com.tencent.mm");
         followPublic();
-
-        taskRecordInfoPresenterImp.addTaskRecord(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", taskId, goldNum, 0, 0, "0");
+        isAccord = false;
+        String openid = App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getOpenid() : "";
+        taskRecordInfoPresenterImp.addTaskRecord(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", openid, taskId, goldNum, 0, 0, "0");
     }
 
     @Override
@@ -1228,7 +1272,8 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
                     @Override
                     protected void pending(BaseDownloadTask task, int soFarBytes, int totalBytes) {
                         //Toasty.normal(GoldTaskActivity.this, "正在下载打开请稍后...").show();
-                        taskRecordInfoPresenterImp.addTaskRecord(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", taskId, goldNum, 0, 0, "0");
+                        String openid = App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getOpenid() : "";
+                        taskRecordInfoPresenterImp.addTaskRecord(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", openid, taskId, goldNum, 0, 0, "0");
                     }
 
                     @Override
@@ -1311,6 +1356,8 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
 
     @Override
     public void downCancel() {
-
+        if (task != null) {
+            task.pause();
+        }
     }
 }

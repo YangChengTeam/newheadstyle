@@ -36,10 +36,11 @@ public class SignDoneInfoModelImp extends BaseModel implements SignDoneInfoModel
     }
 
     @Override
-    public void signDone(String uid, double cash, IBaseRequestCallBack<SignDoneInfoRet> iBaseRequestCallBack) {
+    public void signDone(String uid, String openid,double cash, IBaseRequestCallBack<SignDoneInfoRet> iBaseRequestCallBack) {
         JSONObject params = new JSONObject();
         try {
             params.put("user_id", uid);
+            params.put("openid",openid);
             params.put("cash", cash + "");
         } catch (JSONException e) {
             e.printStackTrace();

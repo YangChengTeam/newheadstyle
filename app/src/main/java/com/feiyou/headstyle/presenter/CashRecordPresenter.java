@@ -5,5 +5,5 @@ package com.feiyou.headstyle.presenter;
  */
 
 public interface CashRecordPresenter {
-    void cashList(String uid, int page, int pageSize);
+    void cashList(String uid,String openid, int page, int pageSize);
 }
