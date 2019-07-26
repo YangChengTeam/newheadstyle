@@ -252,7 +252,7 @@ public class UserInfoActivity extends BaseFragmentActivity implements UserInfoVi
     }
 
     public void initData() {
-        userInfo = App.getApp().getmUserInfo();
+        userInfo = App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo() : new UserInfo();
 
         lastPhoneList = new ArrayList<>();
 
@@ -286,7 +286,7 @@ public class UserInfoActivity extends BaseFragmentActivity implements UserInfoVi
 
         if (isMyInfo) {
 
-            userId = userInfo != null ? userInfo.getId():"";
+            userId = userInfo != null ? userInfo.getId() : "";
 
             Glide.with(this).load(userInfo.getUserimg()).apply(options).into(mUserHeadIv);
 
@@ -664,7 +664,7 @@ public class UserInfoActivity extends BaseFragmentActivity implements UserInfoVi
                         ToastUtils.showLong("数据异常，请重试");
                         break;
                     }
-                    cropImageUri(imageUri, (int)tempWidth, (int)tempHeight, CROP_SMALL_PICTURE);
+                    cropImageUri(imageUri, (int) tempWidth, (int) tempHeight, CROP_SMALL_PICTURE);
                     break;
                 case REQUEST_CODE_CHOOSE:
                     Logger.i(JSONObject.toJSONString(Matisse.obtainPathResult(data)));
@@ -672,7 +672,7 @@ public class UserInfoActivity extends BaseFragmentActivity implements UserInfoVi
                         outputImage = new File(PathUtils.getExternalAppPicturesPath(), TimeUtils.getNowMills() + ".png");
                         imageUri = Uri.fromFile(outputImage);
 
-                        cropImageUri(Matisse.obtainResult(data).get(0), (int)tempWidth, (int)tempHeight, CROP_SMALL_PICTURE);
+                        cropImageUri(Matisse.obtainResult(data).get(0), (int) tempWidth, (int) tempHeight, CROP_SMALL_PICTURE);
                     }
                     break;
                 case CROP_SMALL_PICTURE:

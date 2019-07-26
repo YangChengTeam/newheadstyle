@@ -73,6 +73,8 @@ public class App extends Application {
 
     public int userGoldNum;
 
+    private int isFromTaskSign;
+
     public App() {
         mInstance = this;
     }
@@ -166,5 +168,13 @@ public class App extends Application {
 
     public void setUserGoldNum(int userGoldNum) {
         this.userGoldNum = userGoldNum;
+    }
+
+    public int getIsFromTaskSign() {
+        return isFromTaskSign;
+    }
+
+    public void setIsFromTaskSign(int isFromTaskSign) {
+        this.isFromTaskSign = isFromTaskSign;
     }
 }

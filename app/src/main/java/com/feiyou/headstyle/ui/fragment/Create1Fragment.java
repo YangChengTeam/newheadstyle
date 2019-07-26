@@ -214,8 +214,6 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
 
     private List<TaskInfo> allTaskInfoList;
 
-    private int isFromTaskSign;
-
     private double myProfitMoney;
 
     TaskRecordInfoPresenterImp taskRecordInfoPresenterImp;
@@ -367,12 +365,6 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
     public void initData() {
 
         Logger.i("create init data--->");
-        Bundle bundle = getActivity().getIntent().getExtras();
-        if (bundle != null) {
-            isFromTaskSign = bundle.getInt("is_from_task_sign", 0);
-        }
-
-        Logger.i("isFromTaskSign--->" + isFromTaskSign);
 
         mRefreshLayout.setOnRefreshListener(this);
         //设置进度View样式的大小，只有两个值DEFAULT和LARGE
@@ -484,10 +476,12 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
                             if (App.testInfoList.get(0).getTestType() == 1) {
                                 Intent intent2 = new Intent(getActivity(), TestDetailActivity.class);
                                 intent2.putExtra("tid", App.testInfoList.get(0).getId());
+                                intent2.putExtra("is_from_task", 1);
                                 startActivity(intent2);
                             } else {
                                 Intent intent2 = new Intent(getActivity(), TestImageDetailActivity.class);
                                 intent2.putExtra("tid", App.testInfoList.get(0).getId());
+                                intent2.putExtra("is_from_task", 1);
                                 startActivity(intent2);
                             }
                         } else {
@@ -518,11 +512,17 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
                         recordId = "";
                         downFilePageName = taskListAdapter.getData().get(position).getWeburl();
 
-                        if (downApkDialog != null && !downApkDialog.isShowing()) {
-                            downApkDialog.show();
-                        }
+                        if (AppUtils.isAppInstalled(downFilePageName)) {
+                            //已安装
+                            taskRecordInfoPresenterImp.addTaskRecord(userInfo.getId(), userInfo.getOpenid(), taskId, goldNum, 0, 0, "0");
+                            AppUtils.launchApp(downFilePageName);
+                        } else {
+                            if (downApkDialog != null && !downApkDialog.isShowing()) {
+                                downApkDialog.show();
+                            }
 
-                        downAppFile(taskListAdapter.getData().get(position).getDownaddress());
+                            downAppFile(taskListAdapter.getData().get(position).getDownaddress());
+                        }
                         break;
                     case 9:
                         Intent intent3 = new Intent(getActivity(), AdActivity.class);
@@ -533,7 +533,7 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
                     case 10:
                         taskId = "10";
                         recordId = "";
-                        taskRecordInfoPresenterImp.addTaskRecord(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", openid, taskId, goldNum, 0, 1, "0");
+                        taskRecordInfoPresenterImp.addTaskRecord(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", openid, taskId, miniGoldNum, 0, 1, "0");
                         openMiniApp(taskListAdapter.getData().get(position).getOldid());
                         break;
                     default:
@@ -561,7 +561,7 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
             @Override
             public void onTick(long millisUntilFinished) {
                 isAccord = false;
-                Logger.i("剩余时间--->" + millisUntilFinished / 1000);
+                Logger.i("应用市场剩余时间--->" + millisUntilFinished / 1000);
             }
 
             @Override
@@ -573,18 +573,6 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
         Glide.with(getActivity()).load(R.drawable.sign_in).into(mSignInIv);
         Glide.with(getActivity()).load(R.drawable.see_video_normal_gif).into(mGetMoneyBgIv);
 
-        //如果是从任务列表跳转过来的签到，怎根据规则，打开签到弹窗或者领红包的弹窗
-        if (isFromTaskSign == 1) {
-            if (signDays > 0 && (signDays + 1) % 7 == 0) {
-                //领取红包
-                if (receiveHongBaoDialog != null && !receiveHongBaoDialog.isShowing()) {
-                    receiveHongBaoDialog.show();
-                }
-            } else {
-                //执行签到
-                signDoneInfoPresenterImp.signDone(userInfo != null ? userInfo.getId() : "", userInfo != null ? userInfo.getOpenid() : "", 0);
-            }
-        }
     }
 
     @Override
@@ -625,6 +613,14 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
         if (taskId.equals("2")) {
             if (isAccord) {
                 taskRecordInfoPresenterImp.addTaskRecord(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", openid, taskId, goldNum, 0, 1, recordId);
+            } else {
+                ToastUtils.showLong("任务失败");
+                recordId = "";
+                taskId = "";
+                isAccord = false;
+                if (followCountDownTimer != null) {
+                    followCountDownTimer.cancel();
+                }
             }
         }
 
@@ -635,11 +631,12 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
         }
 
         if (taskId.equals("10")) {
-            ToastUtils.showLong("领取成功 +" + miniGoldNum + "金币");
-            recordId = "";
-            taskId = "";
-            isAccord = false;
+//            ToastUtils.showLong("领取成功 +" + miniGoldNum + "金币");
+//            recordId = "";
+//            taskId = "";
+//            isAccord = false;
         }
+
         if (taskId.equals("6")) {
             if (isAccord) {
                 taskRecordInfoPresenterImp.addTaskRecord(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", openid, taskId, goldNum, 0, 1, recordId);
@@ -651,6 +648,20 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
                 if (marketTimer != null) {
                     marketTimer.cancel();
                 }
+            }
+        }
+
+        //如果是从任务列表跳转过来的签到，怎根据规则，打开签到弹窗或者领红包的弹窗
+        if (App.getApp().getIsFromTaskSign() == 1) {
+            App.getApp().setIsFromTaskSign(0);
+            if (signDays > 0 && (signDays + 1) % 7 == 0) {
+                //领取红包
+                if (receiveHongBaoDialog != null && !receiveHongBaoDialog.isShowing()) {
+                    receiveHongBaoDialog.show();
+                }
+            } else {
+                //执行签到
+                signDoneInfoPresenterImp.signDone(userInfo != null ? userInfo.getId() : "", userInfo != null ? userInfo.getOpenid() : "", 0);
             }
         }
 
@@ -712,6 +723,7 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
                     //提示签到
                     signDoneInfoPresenterImp.signDone(userInfo != null ? userInfo.getId() : "", userInfo != null ? userInfo.getOpenid() : "", 0);
                 }
+
                 break;
             case R.id.btn_turn_profit:
                 if (userGoldNum < leastGoldNum) {
@@ -753,13 +765,13 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
             case R.id.iv_get_money_bg:
             case R.id.layout_get_money:
                 //倒计时未结束，不可点击
-                if (adCountDown > 0) {
-                    ToastUtils.showLong("技能冷却中···");
+                if (seeVideoIsFinish) {
+                    ToastUtils.showLong("今日已领完，明天再来！");
                     return;
                 }
 
-                if (seeVideoIsFinish) {
-                    ToastUtils.showLong("今日已领完，明天再来！");
+                if (adCountDown > 0) {
+                    ToastUtils.showLong("技能冷却中···");
                     return;
                 }
 
@@ -870,9 +882,9 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
 
                     if (welfareInfo.getTaskInfoList() != null && welfareInfo.getTaskInfoList().size() > 0) {
                         Logger.i("temp list--->" + JSON.toJSONString(welfareInfo.getTaskInfoList()));
-
-                        List<TaskInfo> tempList = welfareInfo.getTaskInfoList();
-                        allTaskInfoList = tempList;
+                        allTaskInfoList = welfareInfo.getTaskInfoList();
+                        List<TaskInfo> tempList = new ArrayList<>();
+                        tempList.addAll(allTaskInfoList);
 
                         for (int i = 0; i < tempList.size(); i++) {
                             if (tempList.get(i).getId() == 4) {
@@ -947,7 +959,7 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
                     }
 
                     //签到后重新查询首页收据
-                    welfareInfoPresenterImp.getWelfareData(userInfo != null ? userInfo.getId():"");
+                    welfareInfoPresenterImp.getWelfareData(userInfo != null ? userInfo.getId() : "");
                 } else {
                     //TODO 待定
                     ToastUtils.showLong(((SignDoneInfoRet) tData).getMsg());
@@ -965,25 +977,29 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
 
                         if (taskId.equals("10")) {
                             miniGoldNum = ((TaskRecordInfoRet) tData).getData().getGoldnum();
+                            ToastUtils.showLong("领取成功 +" + miniGoldNum + "金币");
+                            recordId = "";
+                            taskId = "";
+                            isAccord = false;
                         }
                     } else {
                         if (((TaskRecordInfoRet) tData).getData() != null) {
 
                             if (taskId.equals("11")) {
                                 ToastUtils.showLong("转换成功");
-                            }
-
-                            if (taskId.equals("13")) {
-                                ToastUtils.showLong("获得收益" + seeVideoMoney + "元");
-                            }
-
-                            if (taskId.equals("12")) {
+                            } else if (taskId.equals("12")) {
                                 if ((signDays + 1) % 7 == 0) {
                                     ToastUtils.showLong("翻倍领取成功");
                                 } else {
                                     ToastUtils.showLong("翻倍领取成功");
                                 }
+                            } else if (taskId.equals("13")) {
+                                ToastUtils.showLong("获得收益" + seeVideoMoney + "元");
+                            } else {
+                                ToastUtils.showLong("领取成功 +" + ((TaskRecordInfoRet) tData).getData().getGoldnum() + "金币");
                             }
+
+                            welfareInfoPresenterImp.getWelfareData(userInfo != null ? userInfo.getId() : "");
 
                             recordId = "";
                             taskId = "";
@@ -998,7 +1014,7 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
     }
 
     public void homeSeeVideoCountDown() {
-        if (adCountDown > 0) {
+        if (adCountDown > 0 && !seeVideoIsFinish) {
             mCountDownLayout.setVisibility(View.VISIBLE);
 
             if (seeVideoTimer != null) {

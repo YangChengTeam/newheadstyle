@@ -9,7 +9,7 @@ public class GoodDetailInfo {
     private GoodInfo goodInfo;
 
     @SerializedName("is_exchange")
-    private int isExchange;
+    private int isExchange;//商品是否能兑换，0：否，1:是
 
     @SerializedName("record_list")
     private List<ExchangeRecord> recordList;

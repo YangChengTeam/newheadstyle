@@ -385,7 +385,18 @@ public class CashActivity extends BaseFragmentActivity implements ConfigDialog.C
                 Logger.i("cash result" + JSON.toJSONString(tData));
                 if (((CashInfoRet) tData).getCode() == Constants.SUCCESS) {
                     ToastUtils.showLong("提现已申请");
+                    try {
+                        cashMoneyInfoPresenterImp.cashMoneyList(mUserInfo != null ? mUserInfo.getId() : "", mUserInfo != null ? mUserInfo.getOpenid() : "", PhoneUtils.getIMEI());
+                    } catch (SecurityException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    ToastUtils.showLong("提现失败");
                 }
+            }
+        } else {
+            if (tData instanceof CashInfoRet) {
+                ToastUtils.showLong("提现失败");
             }
         }
     }

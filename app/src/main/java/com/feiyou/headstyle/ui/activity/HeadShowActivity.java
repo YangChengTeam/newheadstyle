@@ -490,9 +490,13 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
             adapter.setShowShape(showShape);
         }
         adapter.notifyDataSetChanged();
-        ImageView currentIv = swipeView.getSelectedView().findViewById(R.id.iv_show_head);
-        RequestOptions options = new RequestOptions().skipMemoryCache(true);
-        Glide.with(this).load(currentImageUrl).apply(options).into(currentIv);
+        try {
+            ImageView currentIv = swipeView.getSelectedView().findViewById(R.id.iv_show_head);
+            RequestOptions options = new RequestOptions().skipMemoryCache(true);
+            Glide.with(this).load(currentImageUrl).apply(options).into(currentIv);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     void circle() {

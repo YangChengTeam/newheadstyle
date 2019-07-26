@@ -184,9 +184,9 @@ public class GoldTaskActivity extends BaseFragmentActivity implements IBaseView,
         taskListAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
-//                if (taskListAdapter.getData().get(position).getIsFinish() == 1) {
-//                    return;
-//                }
+                if (taskListAdapter.getData().get(position).getIsFinish() == 1) {
+                    return;
+                }
                 int id = taskListAdapter.getData().get(position).getId();
                 switch (id) {
                     case 1:
@@ -246,10 +246,12 @@ public class GoldTaskActivity extends BaseFragmentActivity implements IBaseView,
                         GoToScoreUtils.goToMarket(GoldTaskActivity.this, Constants.APP_PACKAGE_NAME);
                         break;
                     case 7:
-                        Intent intent4 = new Intent(GoldTaskActivity.this, Main1Activity.class);
-                        intent4.putExtra("home_index", 2);
-                        intent4.putExtra("is_from_task_sign", 1);
-                        startActivity(intent4);
+//                        Intent intent4 = new Intent(GoldTaskActivity.this, Main1Activity.class);
+//                        intent4.putExtra("home_index", 2);
+//                        intent4.putExtra("is_from_task_sign", 1);
+//                        startActivity(intent4);
+                        App.getApp().setIsFromTaskSign(1);
+                        finish();
                         break;
                     case 8:
 
@@ -260,9 +262,6 @@ public class GoldTaskActivity extends BaseFragmentActivity implements IBaseView,
                         if (AppUtils.isAppInstalled(downFilePageName)) {
                             //已安装
                             taskRecordInfoPresenterImp.addTaskRecord(mUserInfo.getId(), mUserInfo.getOpenid(), taskId, goldNum, 0, 0, "0");
-//                            Intent intent2 = Utils.getApp().getPackageManager().getLaunchIntentForPackage(downFilePageName);
-//                            intent2.setFlags(0);
-//                            startActivityForResult(intent2, 1);
                             AppUtils.launchApp(downFilePageName);
                         } else {
                             if (downFileDialog != null && !downFileDialog.isShowing()) {
@@ -441,12 +440,19 @@ public class GoldTaskActivity extends BaseFragmentActivity implements IBaseView,
                     }
                     if (taskId.equals("10")) {
                         miniGoldNum = ((TaskRecordInfoRet) tData).getData().getGoldnum();
+                        ToastUtils.showLong("领取成功 +" + miniGoldNum + "金币");
+                        recordId = "";
+                        taskId = "";
+                        isAccord = false;
                     }
                     Logger.i("recordId--->" + recordId);
                 } else {
                     if (((TaskRecordInfoRet) tData).getData() != null) {
                         ToastUtils.showLong("领取成功 +" + ((TaskRecordInfoRet) tData).getData().getGoldnum() + "金币");
                     }
+
+                    //任务完成后再次刷新页面
+                    taskInfoPresenterImp.taskList(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "");
                 }
             } else {
                 //finish();

@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.media.Image;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -243,6 +244,13 @@ public class GoodDetailActivity extends BaseFragmentActivity implements ConfigDi
                             if (goodDetailInfo.getRecordList() != null && goodDetailInfo.getRecordList().size() > 0) {
                                 exchangeListAdapter.setNewData(goodDetailInfo.getRecordList());
                             }
+
+                            if (goodDetailInfo.getIsExchange() == 0) {
+                                mExchangeBtn.setBackgroundResource(R.drawable.common_gray_bg);
+                                mExchangeBtn.setBackgroundColor(ContextCompat.getColor(this, R.color.gray_aaa));
+                                mExchangeBtn.setText("");
+                                mExchangeBtn.setClickable(false);
+                            }
                         }
                     }
                 }
@@ -259,6 +267,8 @@ public class GoodDetailActivity extends BaseFragmentActivity implements ConfigDi
                         intent.putExtra("order_item", ((ExchangeInfoRet) tData).getData().get(0));
                         startActivity(intent);
                     }
+                } else {
+                    ToastUtils.showLong(((ExchangeInfoRet) tData).getMsg());
                 }
             }
 

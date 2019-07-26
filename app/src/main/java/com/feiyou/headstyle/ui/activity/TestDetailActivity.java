@@ -294,7 +294,7 @@ public class TestDetailActivity extends BaseFragmentActivity implements TestDeta
                     chatListAdapter.addData(guideInfo);
                     chatListAdapter.notifyDataSetChanged();
 
-                    if (((TestDetailInfoRet) tData).getData().getList() != null) {
+                    if (((TestDetailInfoRet) tData).getData().getList() != null ) {
                         question = ((TestDetailInfoRet) tData).getData().getList().getQuestion();
                         answer = ((TestDetailInfoRet) tData).getData().getList().getAnswer();
                         jump = ((TestDetailInfoRet) tData).getData().getList().getJump();
