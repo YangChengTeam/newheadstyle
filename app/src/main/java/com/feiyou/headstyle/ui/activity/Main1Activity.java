@@ -35,6 +35,12 @@ import com.blankj.utilcode.util.StringUtils;
 import com.blankj.utilcode.util.TimeUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.bumptech.glide.Glide;
+import com.bytedance.sdk.openadsdk.AdSlot;
+import com.bytedance.sdk.openadsdk.TTAdConstant;
+import com.bytedance.sdk.openadsdk.TTAdManager;
+import com.bytedance.sdk.openadsdk.TTAdNative;
+import com.bytedance.sdk.openadsdk.TTAppDownloadListener;
+import com.bytedance.sdk.openadsdk.TTRewardVideoAd;
 import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.bean.MessageEvent;
@@ -45,10 +51,12 @@ import com.feiyou.headstyle.common.Constants;
 import com.feiyou.headstyle.presenter.VersionPresenterImp;
 import com.feiyou.headstyle.ui.adapter.MyFragmentAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragmentActivity;
+import com.feiyou.headstyle.ui.custom.EveryDayHongBaoDialog;
 import com.feiyou.headstyle.ui.custom.PraiseDialog;
 import com.feiyou.headstyle.ui.custom.VersionUpdateDialog;
 import com.feiyou.headstyle.utils.GoToScoreUtils;
 import com.feiyou.headstyle.utils.NotificationUtils;
+import com.feiyou.headstyle.utils.RandomUtils;
 import com.feiyou.headstyle.utils.TTAdManagerHolder;
 import com.feiyou.headstyle.view.VersionView;
 import com.liulishuo.filedownloader.BaseDownloadTask;
@@ -76,7 +84,7 @@ import permissions.dispatcher.RuntimePermissions;
 
 
 @RuntimePermissions
-public class Main1Activity extends BaseFragmentActivity implements VersionView, ViewPager.OnPageChangeListener, RadioGroup.OnCheckedChangeListener, PraiseDialog.PraiseListener, VersionUpdateDialog.UpdateListener {
+public class Main1Activity extends BaseFragmentActivity implements VersionView, ViewPager.OnPageChangeListener, RadioGroup.OnCheckedChangeListener, PraiseDialog.PraiseListener, VersionUpdateDialog.UpdateListener, EveryDayHongBaoDialog.EveryDayHongBaoListener {
 
     @BindView(R.id.viewpager)
     ViewPager viewPager;
@@ -109,6 +117,12 @@ public class Main1Activity extends BaseFragmentActivity implements VersionView, 
     VersionUpdateDialog updateDialog;
 
     private int currentIndex;
+
+    EveryDayHongBaoDialog everyDayHongBaoDialog;
+
+    private TTAdNative mTTAdNative;
+
+    private TTRewardVideoAd mttRewardVideoAd;
 
     @Override
     protected int getContextViewId() {
@@ -171,6 +185,13 @@ public class Main1Activity extends BaseFragmentActivity implements VersionView, 
         //step2:(可选，强烈建议在合适的时机调用):申请部分权限，如read_phone_state,防止获取不了imei时候，下载类广告没有填充的问题。
         TTAdManagerHolder.get().requestPermissionIfNecessary(this);
 
+        TTAdManager ttAdManager = TTAdManagerHolder.get();
+
+        //step3:创建TTAdNative对象,用于调用广告请求接口
+        mTTAdNative = ttAdManager.createAdNative(this);
+
+        loadAd("920819619", TTAdConstant.VERTICAL, 100);
+
         Glide.with(this).load(R.drawable.welfare_gif).into(mCreateIv);
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
@@ -186,6 +207,9 @@ public class Main1Activity extends BaseFragmentActivity implements VersionView, 
         viewPager.addOnPageChangeListener(this);
         viewPager.setOffscreenPageLimit(1);
         mTabRadioGroup.setOnCheckedChangeListener(this);
+
+        everyDayHongBaoDialog = new EveryDayHongBaoDialog(this, R.style.login_dialog);
+        everyDayHongBaoDialog.setEveryDayHongBaoListener(this);
 
         praiseDialog = new PraiseDialog(this, R.style.login_dialog);
         praiseDialog.setPraiseListener(this);
@@ -232,16 +256,15 @@ public class Main1Activity extends BaseFragmentActivity implements VersionView, 
 
         if (currentIndex > 0) {
             viewPager.setCurrentItem(currentIndex);
-//            if (App.getApp().getTempAddNoteInfo() != null) {
-//                MessageEvent addMessage = new MessageEvent("add_note");
-//                addMessage.setAddNoteInfo(App.getApp().getTempAddNoteInfo());
-//                EventBus.getDefault().post(addMessage);
-//            }
         }
 
         versionPresenterImp = new VersionPresenterImp(this, this);
         //请求版本更新
         versionPresenterImp.getVersionInfo(com.feiyou.headstyle.utils.AppUtils.getMetaDataValue(this, "UMENG_CHANNEL"));
+
+        if (everyDayHongBaoDialog != null && !everyDayHongBaoDialog.isShowing()) {
+            everyDayHongBaoDialog.show();
+        }
     }
 
     public void showScore() {
@@ -268,6 +291,8 @@ public class Main1Activity extends BaseFragmentActivity implements VersionView, 
     @Override
     public void onResume() {
         super.onResume();
+
+        Logger.i("main onresume--->");
 
         if (!StringUtils.isEmpty(SPUtils.getInstance().getString(Constants.USER_INFO))) {
             Logger.i(SPUtils.getInstance().getString(Constants.USER_INFO));
@@ -494,8 +519,6 @@ public class Main1Activity extends BaseFragmentActivity implements VersionView, 
                         }
 
                         AppUtils.installApp(filePath);
-
-                        //install(filePath);
                     }
 
                     @Override
@@ -514,21 +537,128 @@ public class Main1Activity extends BaseFragmentActivity implements VersionView, 
         task.start();
     }
 
-    private void install(String filePath) {
+    private boolean mHasShowDownloadActive = false;
 
-        File apkFile = new File(filePath);
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+    private void loadAd(String codeId, int orientation, int goldNum) {
+        //step4:创建广告请求参数AdSlot,具体参数含义参考文档
+        AdSlot adSlot = new AdSlot.Builder()
+                .setCodeId(codeId)
+                .setSupportDeepLink(true)
+                .setImageAcceptedSize(1080, 1920)
+                .setRewardName("金币") //奖励的名称
+                .setRewardAmount(goldNum)  //奖励的数量
+                .setUserID(userInfo != null ? userInfo.getId() : "10000" + RandomUtils.nextInt())//用户id,必传参数
+                .setMediaExtra("media_extra") //附加参数，可选
+                .setOrientation(orientation) //必填参数，期望视频的播放方向：TTAdConstant.HORIZONTAL 或 TTAdConstant.VERTICAL
+                .build();
 
-            intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            Uri contentUri = FileProvider.getUriForFile(Main1Activity.this, "com.feiyou.headstyle.fileprovider", apkFile);
-            intent.setDataAndType(contentUri, "application/vnd.android.package-archive");
-        } else {
-            intent.setDataAndType(Uri.fromFile(apkFile), "application/vnd.android.package-archive");
-        }
-        startActivity(intent);
+        //step5:请求广告
+        mTTAdNative.loadRewardVideoAd(adSlot, new TTAdNative.RewardVideoAdListener() {
+            @Override
+            public void onError(int code, String message) {
+                Logger.i("code--->" + code + "---" + message);
+            }
+
+            //视频广告加载后，视频资源缓存到本地的回调，在此回调后，播放本地视频，流畅不阻塞。
+            @Override
+            public void onRewardVideoCached() {
+                Logger.i("rewardVideoAd video cached");
+            }
+
+            //视频广告的素材加载完毕，比如视频url等，在此回调后，可以播放在线视频，网络不好可能出现加载缓冲，影响体验。
+            @Override
+            public void onRewardVideoAdLoad(TTRewardVideoAd ad) {
+                Logger.i("rewardVideoAd loaded");
+
+                mttRewardVideoAd = ad;
+                mttRewardVideoAd.setRewardAdInteractionListener(new TTRewardVideoAd.RewardAdInteractionListener() {
+
+                    @Override
+                    public void onAdShow() {
+                        Logger.i("rewardVideoAd show");
+                    }
+
+                    @Override
+                    public void onAdVideoBarClick() {
+                        Logger.i("rewardVideoAd bar click");
+                    }
+
+                    @Override
+                    public void onAdClose() {
+                        Logger.i("rewardVideoAd close");
+                    }
+
+                    //视频播放完成回调
+                    @Override
+                    public void onVideoComplete() {
+                        Logger.i("rewardVideoAd complete");
+                    }
+
+                    @Override
+                    public void onVideoError() {
+                        Logger.i("rewardVideoAd error");
+                    }
+
+                    //视频播放完成后，奖励验证回调，rewardVerify：是否有效，rewardAmount：奖励梳理，rewardName：奖励名称
+                    @Override
+                    public void onRewardVerify(boolean rewardVerify, int rewardAmount, String rewardName) {
+                        if (rewardVerify) {
+                            ToastUtils.showLong("正常播放完成，奖励有效");
+                        }
+                    }
+
+                    @Override
+                    public void onSkippedVideo() {
+                        Logger.i("rewardVideoAd has onSkippedVideo");
+                    }
+                });
+                mttRewardVideoAd.setDownloadListener(new TTAppDownloadListener() {
+                    @Override
+                    public void onIdle() {
+                        mHasShowDownloadActive = false;
+                    }
+
+                    @Override
+                    public void onDownloadActive(long totalBytes, long currBytes, String fileName, String appName) {
+                        if (!mHasShowDownloadActive) {
+                            mHasShowDownloadActive = true;
+                            ToastUtils.showLong("下载中，点击下载区域暂停", Toast.LENGTH_LONG);
+                        }
+                    }
+
+                    @Override
+                    public void onDownloadPaused(long totalBytes, long currBytes, String fileName, String appName) {
+                        ToastUtils.showLong("下载暂停，点击下载区域继续", Toast.LENGTH_LONG);
+                    }
+
+                    @Override
+                    public void onDownloadFailed(long totalBytes, long currBytes, String fileName, String appName) {
+                        ToastUtils.showLong("下载失败，点击下载区域重新下载", Toast.LENGTH_LONG);
+                    }
+
+                    @Override
+                    public void onDownloadFinished(long totalBytes, String fileName, String appName) {
+                        ToastUtils.showLong("下载完成，点击下载区域重新下载", Toast.LENGTH_LONG);
+                    }
+
+                    @Override
+                    public void onInstalled(String fileName, String appName) {
+                        ToastUtils.showLong("安装完成，点击下载区域打开", Toast.LENGTH_LONG);
+                    }
+                });
+            }
+        });
     }
 
+    @Override
+    public void openEveryDayHongBao() {
+        //step6:在获取到广告后展示
+        mttRewardVideoAd.showRewardVideoAd(this);
+        mttRewardVideoAd = null;
+    }
 
+    @Override
+    public void closeEveryDayHongBao() {
+        ToastUtils.showLong("关闭领红包");
+    }
 }

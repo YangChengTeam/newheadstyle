@@ -127,4 +127,10 @@
     <color name="bar_not_finish_color">#d3d3d3</color>
 
     <color name="profit_btn_color">#fef3ec</color>
+
+    <color name="every_day_txt_color">#ffe0b0</color>
+    <color name="every_day_money_color">#f5dc82</color>
+    <color name="open_video_color">#f15f4f</color>
+    <color name="every_day_get_money_color">#f9ebb5</color>
+    <color name="cash_txt_color">#df8f05</color>
 </resources>
