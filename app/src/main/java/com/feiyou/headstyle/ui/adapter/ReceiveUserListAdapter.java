@@ -36,7 +36,7 @@ public class ReceiveUserListAdapter extends BaseQuickAdapter<ReceiveUserInfo, Ba
     @Override
     protected void convert(final BaseViewHolder helper, ReceiveUserInfo item) {
 
-        SimpleDateFormat tempSdf = new SimpleDateFormat("mm:ss", Locale.getDefault());
+        SimpleDateFormat tempSdf = new SimpleDateFormat("HH:mm", Locale.getDefault());
         String tempTime = TimeUtils.date2String(TimeUtils.millis2Date(item.getAddtime() * 1000), tempSdf);
 
         helper.setText(R.id.tv_user_name, item.getNickname())

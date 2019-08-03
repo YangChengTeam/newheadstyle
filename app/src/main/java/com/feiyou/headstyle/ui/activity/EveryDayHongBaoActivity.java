@@ -79,6 +79,8 @@ public class EveryDayHongBaoActivity extends BaseFragmentActivity implements IBa
 
     View topView;
 
+    View footView;
+
     ReceiveUserListAdapter receiveUserListAdapter;
 
     private String recordId;
@@ -141,6 +143,7 @@ public class EveryDayHongBaoActivity extends BaseFragmentActivity implements IBa
 
 
         topView = LayoutInflater.from(this).inflate(R.layout.every_day_top_view, null);
+        footView = LayoutInflater.from(this).inflate(R.layout.every_day_foot_view, null);
         mMoneyTv = topView.findViewById(R.id.tv_money);
         mMoneyMaskIv = topView.findViewById(R.id.layout_money_mask);
         mCashMoneyIv = topView.findViewById(R.id.iv_cash_money);
@@ -157,6 +160,7 @@ public class EveryDayHongBaoActivity extends BaseFragmentActivity implements IBa
         mReceiveUserListView.setLayoutManager(new LinearLayoutManager(this));
         mReceiveUserListView.setAdapter(receiveUserListAdapter);
         receiveUserListAdapter.addHeaderView(topView);
+        receiveUserListAdapter.addFooterView(footView);
 
         mCashMoneyIv.setOnClickListener(new View.OnClickListener() {
             @Override

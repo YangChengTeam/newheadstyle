@@ -740,7 +740,7 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
                 }
                 if (turnProfitDialog != null && !turnProfitDialog.isShowing()) {
                     //转换收益视频广告
-                    loadAd("920819147", TTAdConstant.VERTICAL, userGoldNum);
+                    loadAd("920819888", TTAdConstant.VERTICAL, userGoldNum);
                     taskId = "11";
                     turnProfitDialog.show();
                     turnProfitDialog.setTurnInfo(userGoldNum + "", userGoldNum / (scaleGoldNum / scaleCashNum) + "");
@@ -784,7 +784,7 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
                 }
 
                 //加载首页领钱的广告
-                loadAd("920819632", TTAdConstant.VERTICAL, 0);
+                loadAd("920819888", TTAdConstant.VERTICAL, 0);
                 taskId = "13";
 
                 if (seeVideoDialog != null && !seeVideoDialog.isShowing()) {
@@ -808,6 +808,11 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
                     ToastUtils.showLong("正在升级，敬请期待！");
                     return;
                 }
+
+                //此处是一步统计，直接点击后算完成
+                taskId = "15";
+                String openid = App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getOpenid() : "";
+                taskRecordInfoPresenterImp.addTaskRecord(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", openid, taskId, 0, 0, 0, "0");
 
                 Intent intent7 = new Intent(getActivity(), AdActivity.class);
                 intent7.putExtra("open_url", luckDrawUrl);
@@ -905,7 +910,7 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
 
                         for (int i = 0; i < tempList.size(); i++) {
                             if (tempList.get(i).getId() == 4) {
-                                loadAd("920819306", TTAdConstant.VERTICAL, tempList.get(i).getGoldnum());
+                                loadAd("920819888", TTAdConstant.VERTICAL, tempList.get(i).getGoldnum());
                             }
                             //签到的信息
                             if (tempList.get(i).getId() == 7) {
@@ -931,10 +936,10 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
                                 randomMoney();
                                 allTaskInfoList.remove(i);
                             }
+                        }
 
-                            if (tempList.get(i).getId() == 15) {
-                                luckDrawUrl = tempList.get(i).getWeburl();
-                            }
+                        if (welfareInfo.getLuckDrawInfo() != null) {
+                            luckDrawUrl = welfareInfo.getLuckDrawInfo().getWeburl();
                         }
 
                         homeSeeVideoCountDown();
@@ -971,7 +976,7 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
 
                             getGoldNum = ((SignDoneInfoRet) tData).getData().getGoldnum();
                             //签到看视频翻倍奖励
-                            loadAd("920819710", TTAdConstant.VERTICAL, getGoldNum);
+                            loadAd("920819888", TTAdConstant.VERTICAL, getGoldNum);
                             taskId = "12";
 
                             signSuccessDialog.show();
@@ -1081,7 +1086,7 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
         if (signDoneInfoPresenterImp != null && randomHongbao > 0) {
             signDoneInfoPresenterImp.signDone(userInfo != null ? userInfo.getId() : "", userInfo != null ? userInfo.getOpenid() : "", randomHongbao);
         }
-        loadAd("920819710", TTAdConstant.VERTICAL, 0);
+        loadAd("920819888", TTAdConstant.VERTICAL, 0);
     }
 
     @Override

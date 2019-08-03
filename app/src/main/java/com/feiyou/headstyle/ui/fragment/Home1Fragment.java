@@ -325,6 +325,8 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
     }
 
     public void initData() {
+        Logger.i("home fragment init data--->");
+
         mUserInfo = App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo() : new UserInfo();
 
         TTAdManager ttAdManager = TTAdManagerHolder.get();
@@ -332,7 +334,13 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
         //step3:创建TTAdNative对象,用于调用广告请求接口
         mTTAdNative = ttAdManager.createAdNative(getActivity());
 
-        loadAd("920819619", TTAdConstant.VERTICAL, 100);
+        //初始化加载红包信息
+        loadAd("920819401", TTAdConstant.VERTICAL, 100);
+        try {
+            everyDayHongBaoPresenterImp.everyDayHongBaoInfo(StringUtils.isEmpty(mUserInfo.getId()) ? "0" : mUserInfo.getId(), StringUtils.isEmpty(mUserInfo.getOpenid()) ? "0" : mUserInfo.getOpenid(), PhoneUtils.getIMEI());
+        } catch (SecurityException e) {
+            e.printStackTrace();
+        }
 
         everyDayHongBaoDialog = new EveryDayHongBaoDialog(getActivity(), R.style.login_dialog);
         everyDayHongBaoDialog.setEveryDayHongBaoListener(this);
@@ -465,18 +473,6 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
 
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        Logger.i("home onresume--->");
-        try {
-            mUserInfo = App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo() : new UserInfo();
-            everyDayHongBaoPresenterImp.everyDayHongBaoInfo(StringUtils.isEmpty(mUserInfo.getId()) ? "0" : mUserInfo.getId(), StringUtils.isEmpty(mUserInfo.getOpenid()) ? "0" : mUserInfo.getOpenid(), PhoneUtils.getIMEI());
-        } catch (SecurityException e) {
-            e.printStackTrace();
-        }
-    }
-
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void Event(MessageEvent messageEvent) {
         if (messageEvent.getMessage().equals("permission_use")) {
@@ -496,9 +492,16 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
-        if (isVisibleToUser && isRefreshHongBao) {
-            loadAd("920819619", TTAdConstant.VERTICAL, 100);
-            onResume();
+        if (getContext() != null  && isVisibleToUser) {
+            loadAd("920819401", TTAdConstant.VERTICAL, 100);
+
+            Logger.i("home fragment setUserVisibleHint--->");
+            try {
+                mUserInfo = App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo() : new UserInfo();
+                everyDayHongBaoPresenterImp.everyDayHongBaoInfo(StringUtils.isEmpty(mUserInfo.getId()) ? "0" : mUserInfo.getId(), StringUtils.isEmpty(mUserInfo.getOpenid()) ? "0" : mUserInfo.getOpenid(), PhoneUtils.getIMEI());
+            } catch (SecurityException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -1018,7 +1021,7 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
     void floatHb() {
         //点击悬浮图时，打开大的领取红包图
         if (everyDayHongBaoDialog != null && !everyDayHongBaoDialog.isShowing()) {
-            loadAd("920819619", TTAdConstant.VERTICAL, 100);
+            loadAd("920819401", TTAdConstant.VERTICAL, 100);
             mFloatHbLayout.setVisibility(View.GONE);
             everyDayHongBaoDialog.show();
         }

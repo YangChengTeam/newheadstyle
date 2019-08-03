@@ -420,7 +420,7 @@ public class GoldTaskActivity extends BaseFragmentActivity implements IBaseView,
                     for (int i = 0; i < ((TaskInfoRet) tData).getData().size(); i++) {
                         if (((TaskInfoRet) tData).getData().get(i).getId() == 4) {
                             //预加载视频广告
-                            loadAd("920819306", TTAdConstant.VERTICAL, ((TaskInfoRet) tData).getData().get(i).getGoldnum());
+                            loadAd("920819888", TTAdConstant.VERTICAL, ((TaskInfoRet) tData).getData().get(i).getGoldnum());
                         }
                         if (((TaskInfoRet) tData).getData().get(i).getId() == 10) {
                             miniGoldNum = ((TaskInfoRet) tData).getData().get(i).getGoldnum();

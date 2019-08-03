@@ -27,6 +27,9 @@ public class WelfareInfo {
     @SerializedName("cashout_list")
     public List<CashInfo> cashInfoList;
 
+    @SerializedName("cj_info")
+    private LuckDraw luckDrawInfo;
+
     public class GoldUser {
         private int goldnum;
         private double cash;
@@ -129,6 +132,27 @@ public class WelfareInfo {
         }
     }
 
+    public class LuckDraw {
+        private String id;//任务id
+        private String weburl;//抽奖跳转链接
+
+        public String getId() {
+            return id;
+        }
+
+        public void setId(String id) {
+            this.id = id;
+        }
+
+        public String getWeburl() {
+            return weburl;
+        }
+
+        public void setWeburl(String weburl) {
+            this.weburl = weburl;
+        }
+    }
+
     public GoldUser getGoldUser() {
         return goldUser;
     }
@@ -184,5 +208,13 @@ public class WelfareInfo {
 
     public void setCashInfoList(List<CashInfo> cashInfoList) {
         this.cashInfoList = cashInfoList;
+    }
+
+    public LuckDraw getLuckDrawInfo() {
+        return luckDrawInfo;
+    }
+
+    public void setLuckDrawInfo(LuckDraw luckDrawInfo) {
+        this.luckDrawInfo = luckDrawInfo;
     }
 }
