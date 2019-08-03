@@ -16,12 +16,14 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
 import com.blankj.utilcode.util.AppUtils;
 import com.blankj.utilcode.util.BarUtils;
 import com.blankj.utilcode.util.NetworkUtils;
 import com.blankj.utilcode.util.PathUtils;
+import com.blankj.utilcode.util.PhoneUtils;
 import com.blankj.utilcode.util.SPUtils;
 import com.blankj.utilcode.util.ScreenUtils;
 import com.blankj.utilcode.util.SizeUtils;
@@ -29,31 +31,49 @@ import com.blankj.utilcode.util.StringUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.bytedance.sdk.openadsdk.AdSlot;
+import com.bytedance.sdk.openadsdk.TTAdConstant;
+import com.bytedance.sdk.openadsdk.TTAdManager;
+import com.bytedance.sdk.openadsdk.TTAdNative;
+import com.bytedance.sdk.openadsdk.TTAppDownloadListener;
+import com.bytedance.sdk.openadsdk.TTRewardVideoAd;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.bean.AdInfo;
 import com.feiyou.headstyle.bean.BannerInfo;
+import com.feiyou.headstyle.bean.EveryDayHbRet;
 import com.feiyou.headstyle.bean.HomeDataRet;
 import com.feiyou.headstyle.bean.HomeDataWrapper;
 import com.feiyou.headstyle.bean.MessageEvent;
+import com.feiyou.headstyle.bean.ReceiveUserInfo;
 import com.feiyou.headstyle.bean.ResultInfo;
+import com.feiyou.headstyle.bean.TaskRecordInfoRet;
+import com.feiyou.headstyle.bean.UserInfo;
 import com.feiyou.headstyle.common.Constants;
 import com.feiyou.headstyle.common.GlideImageLoader;
+import com.feiyou.headstyle.presenter.EveryDayHongBaoPresenterImp;
 import com.feiyou.headstyle.presenter.HomeDataPresenterImp;
 import com.feiyou.headstyle.presenter.RecordInfoPresenterImp;
+import com.feiyou.headstyle.presenter.TaskRecordInfoPresenterImp;
 import com.feiyou.headstyle.ui.activity.AdActivity;
 import com.feiyou.headstyle.ui.activity.Collection2Activity;
 import com.feiyou.headstyle.ui.activity.CommunityArticleActivity;
+import com.feiyou.headstyle.ui.activity.EveryDayHongBaoActivity;
 import com.feiyou.headstyle.ui.activity.HeadListActivity;
 import com.feiyou.headstyle.ui.activity.HeadShowActivity;
+import com.feiyou.headstyle.ui.activity.Main1Activity;
 import com.feiyou.headstyle.ui.activity.MoreTypeActivity;
 import com.feiyou.headstyle.ui.activity.SearchActivity;
 import com.feiyou.headstyle.ui.adapter.HeadInfoAdapter;
 import com.feiyou.headstyle.ui.adapter.HeadTypeAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragment;
+import com.feiyou.headstyle.ui.custom.EveryDayHongBaoDialog;
 import com.feiyou.headstyle.ui.custom.OpenDialog;
 import com.feiyou.headstyle.ui.custom.RoundedCornersTransformation;
+import com.feiyou.headstyle.utils.MyTimeUtil;
+import com.feiyou.headstyle.utils.RandomUtils;
+import com.feiyou.headstyle.utils.TTAdManagerHolder;
 import com.feiyou.headstyle.view.HomeDataView;
 import com.liulishuo.filedownloader.BaseDownloadTask;
 import com.liulishuo.filedownloader.FileDownloadListener;
@@ -67,6 +87,8 @@ import com.youth.banner.Banner;
 import com.youth.banner.listener.OnBannerListener;
 
 import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -80,7 +102,7 @@ import es.dmoral.toasty.Toasty;
 /**
  * Created by myflying on 2019/1/3.
  */
-public class Home1Fragment extends BaseFragment implements HomeDataView, View.OnClickListener, SwipeRefreshLayout.OnRefreshListener, OpenDialog.ConfigListener, CardWindowFragment.AdDismissListener {
+public class Home1Fragment extends BaseFragment implements HomeDataView, View.OnClickListener, SwipeRefreshLayout.OnRefreshListener, OpenDialog.ConfigListener, CardWindowFragment.AdDismissListener, EveryDayHongBaoDialog.EveryDayHongBaoListener {
 
     LinearLayout mSearchLayout;
 
@@ -103,6 +125,15 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
 
     @BindView(R.id.tv_reload)
     TextView mReloadTv;
+
+    @BindView(R.id.iv_home_float)
+    ImageView mHomeFloatIv;
+
+    @BindView(R.id.layout_float_hb)
+    FrameLayout mFloatHbLayout;
+
+    @BindView(R.id.iv_close_float_hb)
+    ImageView mCloseFloatHbIv;
 
     Banner mBanner;
 
@@ -168,10 +199,31 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
 
     AdInfo openAdInfo;
 
+    EveryDayHongBaoDialog everyDayHongBaoDialog;
+
+    private TTAdNative mTTAdNative;
+
+    private TTRewardVideoAd mttRewardVideoAd;
+
+    TaskRecordInfoPresenterImp taskRecordInfoPresenterImp;
+
+    EveryDayHongBaoPresenterImp everyDayHongBaoPresenterImp;
+
+    private String taskId = "";
+
+    private String recordId = "";
+
+    private UserInfo mUserInfo;
+
+    private boolean isRefreshHongBao;
+
+    private List<ReceiveUserInfo> receiveUserList;
+
     @Override
     protected View onCreateView() {
         View root = LayoutInflater.from(getActivity()).inflate(R.layout.fragment1, null);
         ButterKnife.bind(this, root);
+        EventBus.getDefault().register(this);
         FileDownloader.setup(getActivity());
         initTopView();
         initBanner();
@@ -225,6 +277,8 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
         openDialog.setConfigListener(this);
 
         recordInfoPresenterImp = new RecordInfoPresenterImp(this, getActivity());
+        everyDayHongBaoPresenterImp = new EveryDayHongBaoPresenterImp(this, getActivity());
+
         //广告模块
         LinearLayout adLayout = topView.findViewById(R.id.layout_ad);
         adLayout.setOnClickListener(new View.OnClickListener() {
@@ -271,7 +325,20 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
     }
 
     public void initData() {
+        mUserInfo = App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo() : new UserInfo();
+
+        TTAdManager ttAdManager = TTAdManagerHolder.get();
+
+        //step3:创建TTAdNative对象,用于调用广告请求接口
+        mTTAdNative = ttAdManager.createAdNative(getActivity());
+
+        loadAd("920819619", TTAdConstant.VERTICAL, 100);
+
+        everyDayHongBaoDialog = new EveryDayHongBaoDialog(getActivity(), R.style.login_dialog);
+        everyDayHongBaoDialog.setEveryDayHongBaoListener(this);
+
         homeDataPresenterImp = new HomeDataPresenterImp(this, getActivity());
+        taskRecordInfoPresenterImp = new TaskRecordInfoPresenterImp(this, getActivity());
 
         headTypeAdapter = new HeadTypeAdapter(getActivity(), null);
         mHeadTypeList.setLayoutManager(new GridLayoutManager(getActivity(), 4));
@@ -290,6 +357,8 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
                 }
             }
         });
+        //加载悬浮的红包
+        Glide.with(getActivity()).load(R.drawable.home_float).into(mHomeFloatIv);
 
         gridLayoutManager = new GridLayoutManager(getActivity(), 3);
         headInfoAdapter = new HeadInfoAdapter(getActivity(), null);
@@ -383,18 +452,54 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
                 isFirstLoad = false;
                 isChange = "";
                 currentPage++;
-                homeDataPresenterImp.getData(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", currentPage + "", "", "", 0);
+                homeDataPresenterImp.getData(mUserInfo.getId(), currentPage + "", "", "", 0);
             }
         }, mHeadInfoListView);
 
-        homeDataPresenterImp.getData(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", "", "", "", 0);
+        homeDataPresenterImp.getData(mUserInfo.getId(), "", "", "", 0);
 
         if (cardWindowFragment == null) {
             cardWindowFragment = new CardWindowFragment();
         }
-
         cardWindowFragment.setAdDismissListener(this);
 
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Logger.i("home onresume--->");
+        try {
+            mUserInfo = App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo() : new UserInfo();
+            everyDayHongBaoPresenterImp.everyDayHongBaoInfo(StringUtils.isEmpty(mUserInfo.getId()) ? "0" : mUserInfo.getId(), StringUtils.isEmpty(mUserInfo.getOpenid()) ? "0" : mUserInfo.getOpenid(), PhoneUtils.getIMEI());
+        } catch (SecurityException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void Event(MessageEvent messageEvent) {
+        if (messageEvent.getMessage().equals("permission_use")) {
+            try {
+                mUserInfo = App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo() : new UserInfo();
+                everyDayHongBaoPresenterImp.everyDayHongBaoInfo(StringUtils.isEmpty(mUserInfo.getId()) ? "0" : mUserInfo.getId(), StringUtils.isEmpty(mUserInfo.getOpenid()) ? "0" : mUserInfo.getOpenid(), PhoneUtils.getIMEI());
+            } catch (SecurityException e) {
+                e.printStackTrace();
+            }
+        }
+
+        if (messageEvent.getMessage().equals("login_success")) {
+            isRefreshHongBao = true;
+        }
+    }
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if (isVisibleToUser && isRefreshHongBao) {
+            loadAd("920819619", TTAdConstant.VERTICAL, 100);
+            onResume();
+        }
     }
 
     public void initBanner() {
@@ -421,7 +526,7 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
                 if (bannerInfo.getType() == 4) {
                     addRecord(bannerInfo.getAdId());
                     Intent intent = new Intent(getActivity(), AdActivity.class);
-                    intent.putExtra("ad_title",bannerInfo.getName());
+                    intent.putExtra("ad_title", bannerInfo.getName());
                     intent.putExtra("open_url", bannerInfo.getJumpPath());
                     startActivity(intent);
                 }
@@ -448,7 +553,7 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
         mRefreshLayout.setRefreshing(true);
         isFirstLoad = false;
         isChange = "1";
-        homeDataPresenterImp.getData(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", "", "", isChange, 0);
+        homeDataPresenterImp.getData(mUserInfo.getId(), "", "", isChange, 0);
         gridLayoutManager.scrollToPosition(0);
     }
 
@@ -457,7 +562,7 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
         mRefreshLayout.setRefreshing(true);
         isFirstLoad = true;
         isChange = "1";
-        homeDataPresenterImp.getData(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", "", "", isChange, 0);
+        homeDataPresenterImp.getData(mUserInfo.getId(), "", "", isChange, 0);
         gridLayoutManager.scrollToPosition(0);
     }
 
@@ -486,6 +591,7 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
 
     @Override
     public void loadDataSuccess(ResultInfo tData) {
+        Logger.i("home data--->" + JSON.toJSONString(tData));
         avi.hide();
         mRefreshLayout.setRefreshing(false);
         if (tData != null && tData.getCode() == Constants.SUCCESS) {
@@ -573,6 +679,49 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
                     mHeadInfoListView.setVisibility(View.GONE);
                 }
             }
+
+            //红包记录
+            if (tData instanceof EveryDayHbRet) {
+                if (((EveryDayHbRet) tData).getData().getIsFinish() == 0) {
+                    String smallKey = StringUtils.isEmpty(mUserInfo.getId()) ? Constants.SMALL_HONG_BAO_IS_CLOSE : Constants.SMALL_HONG_BAO + mUserInfo.getId();
+                    String lastCloseSmallDate = SPUtils.getInstance().getString(smallKey, "");
+                    if (((EveryDayHbRet) tData).getData().getIsFirst() == 0) {
+
+                        String bigKey = StringUtils.isEmpty(mUserInfo.getId()) ? Constants.BIG_HONG_BAO_IS_CLOSE : Constants.BIG_HONG_BAO + mUserInfo.getId();
+                        String lastCloseBigDate = SPUtils.getInstance().getString(bigKey, "");
+                        if (!lastCloseBigDate.equals(MyTimeUtil.getYearAndDay())) {
+                            if (everyDayHongBaoDialog != null && !everyDayHongBaoDialog.isShowing()) {
+                                mFloatHbLayout.setVisibility(View.GONE);
+                                everyDayHongBaoDialog.show();
+                            }
+                        } else {
+                            if (!lastCloseSmallDate.equals(MyTimeUtil.getYearAndDay())) {
+                                mFloatHbLayout.setVisibility(View.VISIBLE);
+                            } else {
+                                mFloatHbLayout.setVisibility(View.GONE);
+                            }
+                        }
+                    } else {
+
+                        if (!lastCloseSmallDate.equals(MyTimeUtil.getYearAndDay())) {
+                            mFloatHbLayout.setVisibility(View.VISIBLE);
+                        } else {
+                            mFloatHbLayout.setVisibility(View.GONE);
+                        }
+                    }
+                } else {
+                    mFloatHbLayout.setVisibility(View.GONE);
+                }
+            }
+
+            if (tData instanceof TaskRecordInfoRet) {
+                if (StringUtils.isEmpty(recordId)) {
+                    if (((TaskRecordInfoRet) tData).getData() != null) {
+                        recordId = ((TaskRecordInfoRet) tData).getData().getInfoid();
+                    }
+                    Logger.i("recordId--->" + recordId);
+                }
+            }
         } else {
             if (isFirstLoad) {
                 mNoDataLayout.setVisibility(View.VISIBLE);
@@ -597,7 +746,7 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
     }
 
     public void addRecord(String aid) {
-        recordInfoPresenterImp.adClickInfo(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", aid);
+        recordInfoPresenterImp.adClickInfo(mUserInfo.getId(), aid);
     }
 
     @Override
@@ -721,21 +870,140 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
         task.start();
     }
 
-    private void install(String filePath) {
+    private boolean mHasShowDownloadActive = false;
 
-        File apkFile = new File(filePath);
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+    private void loadAd(String codeId, int orientation, int goldNum) {
+        //step4:创建广告请求参数AdSlot,具体参数含义参考文档
+        AdSlot adSlot = new AdSlot.Builder()
+                .setCodeId(codeId)
+                .setSupportDeepLink(true)
+                .setImageAcceptedSize(1080, 1920)
+                .setRewardName("金币") //奖励的名称
+                .setRewardAmount(goldNum)  //奖励的数量
+                .setUserID(App.getApp().mUserInfo != null ? App.getApp().mUserInfo.getId() : "10000" + RandomUtils.nextInt())//用户id,必传参数
+                .setMediaExtra("media_extra") //附加参数，可选
+                .setOrientation(orientation) //必填参数，期望视频的播放方向：TTAdConstant.HORIZONTAL 或 TTAdConstant.VERTICAL
+                .build();
 
-            intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            Uri contentUri = FileProvider.getUriForFile(getActivity(), "com.feiyou.headstyle.fileprovider", apkFile);
-            intent.setDataAndType(contentUri, "application/vnd.android.package-archive");
-        } else {
-            intent.setDataAndType(Uri.fromFile(apkFile), "application/vnd.android.package-archive");
+        //step5:请求广告
+        mTTAdNative.loadRewardVideoAd(adSlot, new TTAdNative.RewardVideoAdListener() {
+            @Override
+            public void onError(int code, String message) {
+                Logger.i("code--->" + code + "---" + message);
+            }
+
+            //视频广告加载后，视频资源缓存到本地的回调，在此回调后，播放本地视频，流畅不阻塞。
+            @Override
+            public void onRewardVideoCached() {
+                Logger.i("rewardVideoAd video cached");
+            }
+
+            //视频广告的素材加载完毕，比如视频url等，在此回调后，可以播放在线视频，网络不好可能出现加载缓冲，影响体验。
+            @Override
+            public void onRewardVideoAdLoad(TTRewardVideoAd ad) {
+                Logger.i("rewardVideoAd loaded");
+
+                mttRewardVideoAd = ad;
+                mttRewardVideoAd.setRewardAdInteractionListener(new TTRewardVideoAd.RewardAdInteractionListener() {
+
+                    @Override
+                    public void onAdShow() {
+                        Logger.i("rewardVideoAd show");
+                    }
+
+                    @Override
+                    public void onAdVideoBarClick() {
+                        Logger.i("rewardVideoAd bar click");
+                    }
+
+                    @Override
+                    public void onAdClose() {
+                        Logger.i("rewardVideoAd close");
+                        Intent intent = new Intent(getActivity(), EveryDayHongBaoActivity.class);
+                        intent.putExtra("record_id", recordId);
+                        startActivity(intent);
+                    }
+
+                    //视频播放完成回调
+                    @Override
+                    public void onVideoComplete() {
+                        Logger.i("rewardVideoAd complete");
+                    }
+
+                    @Override
+                    public void onVideoError() {
+                        Logger.i("rewardVideoAd error");
+                    }
+
+                    //视频播放完成后，奖励验证回调，rewardVerify：是否有效，rewardAmount：奖励梳理，rewardName：奖励名称
+                    @Override
+                    public void onRewardVerify(boolean rewardVerify, int rewardAmount, String rewardName) {
+                        if (rewardVerify) {
+
+                        }
+                    }
+
+                    @Override
+                    public void onSkippedVideo() {
+                        Logger.i("rewardVideoAd has onSkippedVideo");
+                    }
+                });
+                mttRewardVideoAd.setDownloadListener(new TTAppDownloadListener() {
+                    @Override
+                    public void onIdle() {
+                        mHasShowDownloadActive = false;
+                    }
+
+                    @Override
+                    public void onDownloadActive(long totalBytes, long currBytes, String fileName, String appName) {
+                        if (!mHasShowDownloadActive) {
+                            mHasShowDownloadActive = true;
+                            ToastUtils.showLong("下载中，点击下载区域暂停", Toast.LENGTH_LONG);
+                        }
+                    }
+
+                    @Override
+                    public void onDownloadPaused(long totalBytes, long currBytes, String fileName, String appName) {
+                        ToastUtils.showLong("下载暂停，点击下载区域继续", Toast.LENGTH_LONG);
+                    }
+
+                    @Override
+                    public void onDownloadFailed(long totalBytes, long currBytes, String fileName, String appName) {
+                        ToastUtils.showLong("下载失败，点击下载区域重新下载", Toast.LENGTH_LONG);
+                    }
+
+                    @Override
+                    public void onDownloadFinished(long totalBytes, String fileName, String appName) {
+                        ToastUtils.showLong("下载完成，点击下载区域重新下载", Toast.LENGTH_LONG);
+                    }
+
+                    @Override
+                    public void onInstalled(String fileName, String appName) {
+                        ToastUtils.showLong("安装完成，点击下载区域打开", Toast.LENGTH_LONG);
+                    }
+                });
+            }
+        });
+    }
+
+    @Override
+    public void openEveryDayHongBao() {
+        //step6:在获取到广告后展示
+        mttRewardVideoAd.showRewardVideoAd(getActivity());
+        mttRewardVideoAd = null;
+
+        try {
+            taskRecordInfoPresenterImp.addHomeTaskRecord(StringUtils.isEmpty(mUserInfo.getId()) ? "0" : mUserInfo.getId(), StringUtils.isEmpty(mUserInfo.getOpenid()) ? "0" : mUserInfo.getOpenid(), PhoneUtils.getIMEI(), 0, 0, "0");
+        } catch (SecurityException e) {
+            e.printStackTrace();
         }
 
-        startActivity(intent);
+    }
+
+    @Override
+    public void closeEveryDayHongBao() {
+        mFloatHbLayout.setVisibility(View.VISIBLE);
+        SPUtils.getInstance().put(StringUtils.isEmpty(mUserInfo.getId()) ? Constants.BIG_HONG_BAO_IS_CLOSE : Constants.BIG_HONG_BAO + mUserInfo.getId(), MyTimeUtil.getYearAndDay());
     }
 
     @Override
@@ -744,5 +1012,27 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
         if (openAdInfo != null && !StringUtils.isEmpty(openAdInfo.getId())) {
             addRecord(openAdInfo.getId());
         }
+    }
+
+    @OnClick(R.id.layout_float_hb)
+    void floatHb() {
+        //点击悬浮图时，打开大的领取红包图
+        if (everyDayHongBaoDialog != null && !everyDayHongBaoDialog.isShowing()) {
+            loadAd("920819619", TTAdConstant.VERTICAL, 100);
+            mFloatHbLayout.setVisibility(View.GONE);
+            everyDayHongBaoDialog.show();
+        }
+    }
+
+    @OnClick(R.id.iv_close_float_hb)
+    void closeFloatHb() {
+        mFloatHbLayout.setVisibility(View.GONE);
+        SPUtils.getInstance().put(StringUtils.isEmpty(mUserInfo.getId()) ? Constants.SMALL_HONG_BAO_IS_CLOSE : Constants.SMALL_HONG_BAO + mUserInfo.getId(), MyTimeUtil.getYearAndDay());
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault().unregister(this);
     }
 }

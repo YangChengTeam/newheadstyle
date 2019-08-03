@@ -322,8 +322,8 @@ public class TestResultActivity extends BaseFragmentActivity implements IBaseVie
         boolean flag = true;
         try {
             if (!StringUtils.isEmpty(filePath)) {
-                MediaStore.Images.Media.insertImage(getContentResolver(),
-                        filePath, filePath.substring(filePath.lastIndexOf("/") + 1, filePath.length()), null);
+//                MediaStore.Images.Media.insertImage(getContentResolver(),
+//                        filePath, filePath.substring(filePath.lastIndexOf("/") + 1, filePath.length()), null);
 
                 MediaScannerConnection.scanFile(TestResultActivity.this, new String[]{filePath}, null, null);
                 // 最后通知图库更新
@@ -332,7 +332,7 @@ public class TestResultActivity extends BaseFragmentActivity implements IBaseVie
             } else {
                 flag = false;
             }
-        } catch (FileNotFoundException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             flag = false;
         }

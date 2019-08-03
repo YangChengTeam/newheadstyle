@@ -30,4 +30,9 @@ public class TaskRecordInfoPresenterImp extends BasePresenterImp<IBaseView, Task
     public void addTaskRecord(String uid, String openid, String taskId, int goldNum, double cash, int status, String recordId) {
         taskRecordInfoModelImp.addTaskRecord(uid, openid, taskId, goldNum, cash, status, recordId, this);
     }
+
+    @Override
+    public void addHomeTaskRecord(String uid, String openid, String imei, double cash, int status, String recordId) {
+        taskRecordInfoModelImp.addHomeTaskRecord(uid, openid, imei, cash, status, recordId, this);
+    }
 }

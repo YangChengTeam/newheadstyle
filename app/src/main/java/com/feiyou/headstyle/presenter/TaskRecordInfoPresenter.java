@@ -6,4 +6,6 @@ package com.feiyou.headstyle.presenter;
 
 public interface TaskRecordInfoPresenter {
     void addTaskRecord(String uid, String openid,String taskId, int goldNum, double cash, int status, String recordId);
+
+    void addHomeTaskRecord(String uid, String openid,String imei, double cash, int status, String recordId);
 }

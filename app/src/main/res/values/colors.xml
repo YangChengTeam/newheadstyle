@@ -133,4 +133,7 @@
     <color name="open_video_color">#f15f4f</color>
     <color name="every_day_get_money_color">#f9ebb5</color>
     <color name="cash_txt_color">#df8f05</color>
+
+    <color name="every_day_top_txt_color">#f8ecb7</color>
+    <color name="get_money_now_color">#c7a74d</color>
 </resources>

@@ -8,8 +8,8 @@ android {
         applicationId "com.feiyou.headstyle"
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode 56
-        versionName "4.1"
+        versionCode 57
+        versionName "4.1.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         ndk {
             abiFilters "armeabi-v7a"
@@ -134,4 +134,5 @@ dependencies {
     implementation(name: 'open_ad_sdk', ext: 'aar')
     implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.6'
     implementation 'com.sunfusheng:MarqueeView:1.4.1'
+
 }

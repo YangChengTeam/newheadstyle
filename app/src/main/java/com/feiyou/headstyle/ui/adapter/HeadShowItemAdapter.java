@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import com.blankj.utilcode.util.ScreenUtils;
 import com.blankj.utilcode.util.SizeUtils;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.bean.HeadInfo;
@@ -114,7 +115,7 @@ public class HeadShowItemAdapter extends BaseAdapter {
             //options.placeholder(R.mipmap.image_def);
             Glide.with(mContext).load(heads.get(position).getImgurl()).apply(options).into(holder.mHeadShowImageView);
         } else {
-            RequestOptions options = new RequestOptions().skipMemoryCache(true);
+            RequestOptions options = new RequestOptions().diskCacheStrategy(DiskCacheStrategy.NONE).skipMemoryCache(true);
             //options.placeholder(R.mipmap.image_def);
             options.transform(new GlideRoundTransform(mContext, SizeUtils.dp2px(117)));
             Glide.with(mContext).load(heads.get(position).getImgurl()).apply(options).into(holder.mHeadShowImageView);

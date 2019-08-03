@@ -66,6 +66,7 @@ public class EveryDayHongBaoDialog extends Dialog implements View.OnClickListene
         switch (v.getId()) {
             case R.id.iv_open_hongbao:
                 everyDayHongBaoListener.openEveryDayHongBao();
+                dismiss();
                 break;
             case R.id.iv_close:
                 everyDayHongBaoListener.closeEveryDayHongBao();

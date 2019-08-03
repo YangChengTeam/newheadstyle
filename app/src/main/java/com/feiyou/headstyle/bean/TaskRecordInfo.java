@@ -6,7 +6,8 @@ public class TaskRecordInfo {
     private int goldnum;//金币奖励数量
     private String cash;//红包奖励金额
     private String infoid;//当前完成的任务记录id
-
+    private String  imei;//用户手机串号
+    private Long addtime;//任务完成时间
     public String getUid() {
         return uid;
     }
@@ -45,5 +46,21 @@ public class TaskRecordInfo {
 
     public void setInfoid(String infoid) {
         this.infoid = infoid;
+    }
+
+    public String getImei() {
+        return imei;
+    }
+
+    public void setImei(String imei) {
+        this.imei = imei;
+    }
+
+    public Long getAddtime() {
+        return addtime;
+    }
+
+    public void setAddtime(Long addtime) {
+        this.addtime = addtime;
     }
 }

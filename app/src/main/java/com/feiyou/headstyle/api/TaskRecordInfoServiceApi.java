@@ -17,4 +17,7 @@ public interface TaskRecordInfoServiceApi {
     @POST("v1.welfare/addusertask")
     Observable<TaskRecordInfoRet> addTaskRecord(@Body RequestBody requestBody);
 
+    @POST("v1.welfare/addhbtask")
+    Observable<TaskRecordInfoRet> addHomeTaskRecord(@Body RequestBody requestBody);
+
 }

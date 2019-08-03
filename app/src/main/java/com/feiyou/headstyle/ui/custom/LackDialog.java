@@ -51,6 +51,11 @@ public class LackDialog extends Dialog implements View.OnClickListener {
         this.mContext = context;
     }
 
+    public void setLackInfo(String title, String content) {
+        mTitleTv.setText(title);
+        mContentTv.setText(content);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

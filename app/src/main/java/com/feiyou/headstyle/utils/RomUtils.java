@@ -10,6 +10,7 @@ import android.util.Log;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Random;
 
 /**
  * Description:
@@ -52,5 +53,13 @@ public class RomUtils {
 
     public static boolean checkIsMeizuRom() {
         return Build.MANUFACTURER.contains("Meizu");
+    }
+
+    public static int randomNum(){
+        int min=10000;
+        int max=20000;
+        Random random = new Random();
+        int num = random.nextInt(max)%(max-min+1) + min;
+        return num;
     }
 }

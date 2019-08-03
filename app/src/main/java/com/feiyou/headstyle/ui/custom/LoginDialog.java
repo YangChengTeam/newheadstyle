@@ -54,6 +54,16 @@ public class LoginDialog extends Dialog implements View.OnClickListener, UserInf
 
     private int loginType = 1; //1qq.2微信
 
+    public interface LoginCloseListener {
+        void loginClose();
+    }
+
+    public LoginCloseListener loginCloseListener;
+
+    public void setLoginCloseListener(LoginCloseListener loginCloseListener) {
+        this.loginCloseListener = loginCloseListener;
+    }
+
     public LoginDialog(Context context) {
         super(context);
         this.mContext = context;
@@ -86,7 +96,7 @@ public class LoginDialog extends Dialog implements View.OnClickListener, UserInf
         mWeiXinLayout.setOnClickListener(this);
         mQQLayout.setOnClickListener(this);
         mCloseImageView.setOnClickListener(this);
-        setCanceledOnTouchOutside(true);
+        setCanceledOnTouchOutside(false);
     }
 
     @Override
@@ -110,6 +120,9 @@ public class LoginDialog extends Dialog implements View.OnClickListener, UserInf
                 break;
             case R.id.iv_close:
                 this.dismiss();
+                if (this.loginCloseListener != null) {
+                    this.loginCloseListener.loginClose();
+                }
                 break;
         }
     }
@@ -129,7 +142,9 @@ public class LoginDialog extends Dialog implements View.OnClickListener, UserInf
     @Override
     public void loadDataSuccess(ResultInfo tData) {
         Logger.i("login dialog user info --->" + JSONObject.toJSONString(tData));
-
+        if (progressDialog != null && progressDialog.isShowing()) {
+            progressDialog.dismiss();
+        }
         if (tData != null && tData.getCode() == Constants.SUCCESS) {
             if (tData instanceof UserInfoRet) {
                 UserInfo userInfo = ((UserInfoRet) tData).getData();
@@ -142,9 +157,6 @@ public class LoginDialog extends Dialog implements View.OnClickListener, UserInf
         } else {
             //ToastUtils.showLong(StringUtils.isEmpty(tData.getMsg()) ? "登录失败" : tData.getMsg());
             Logger.i(StringUtils.isEmpty(tData.getMsg()) ? "登录失败" : tData.getMsg());
-            if (progressDialog != null && progressDialog.isShowing()) {
-                progressDialog.dismiss();
-            }
         }
     }
 

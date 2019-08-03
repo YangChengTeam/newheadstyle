@@ -160,6 +160,8 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
 
     FrameLayout mGetMoneyLayout;
 
+    LinearLayout mLuckDrawLayout;
+
     RelativeLayout mAboutGoldLayout;
 
     LoginDialog loginDialog;
@@ -268,6 +270,10 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
 
     private boolean seeVideoIsFinish;
 
+    private String luckDrawUrl;
+
+    private String luckTaskId = "15";
+
     private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(android.os.Message msg) {
@@ -312,6 +318,7 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
         mGoldMailLayout = topView.findViewById(R.id.layout_gold_mail);
         mAboutGoldLayout = topView.findViewById(R.id.layout_about_gold);
         mGetMoneyLayout = topView.findViewById(R.id.layout_get_money);
+        mLuckDrawLayout = topView.findViewById(R.id.layout_luck_draw);
 
         marqueeView = topView.findViewById(R.id.marqueeView);
 
@@ -346,6 +353,7 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
         mTurnTableTv.setOnClickListener(this);
         mGetMoneyBgIv.setOnClickListener(this);
         mTurnTableIv.setOnClickListener(this);
+        mLuckDrawLayout.setOnClickListener(this);
 
         signSuccessDialog = new SignSuccessDialog(getActivity(), R.style.login_dialog);
         signSuccessDialog.setSignSuccessListener(this);
@@ -795,7 +803,16 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
                 break;
             case R.id.iv_turntable:
             case R.id.tv_turntable:
-                ToastUtils.showLong("正在升级，敬请期待！");
+            case R.id.layout_luck_draw:
+                if (StringUtils.isEmpty(luckDrawUrl)) {
+                    ToastUtils.showLong("正在升级，敬请期待！");
+                    return;
+                }
+
+                Intent intent7 = new Intent(getActivity(), AdActivity.class);
+                intent7.putExtra("open_url", luckDrawUrl);
+                intent7.putExtra("ad_title", "转盘抽奖");
+                startActivity(intent7);
                 break;
             default:
                 break;
@@ -913,6 +930,10 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
                                 seeVideoMoneys = tempList.get(i).getCashindex().split("/");
                                 randomMoney();
                                 allTaskInfoList.remove(i);
+                            }
+
+                            if (tempList.get(i).getId() == 15) {
+                                luckDrawUrl = tempList.get(i).getWeburl();
                             }
                         }
 

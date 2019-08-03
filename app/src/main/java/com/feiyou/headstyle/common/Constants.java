@@ -80,4 +80,14 @@ public class Constants {
     public static final String TODAY_PUSH_COMMENT = "today_push_comment";
 
     public static final String TODAY_IS_TEST = "today_is_test";
+
+    public static final String BIG_HONG_BAO_IS_CLOSE = "big_hong_bao_is_close";
+
+    public static final String SMALL_HONG_BAO_IS_CLOSE = "small_hong_bao_is_close";
+
+    public static final String BIG_HONG_BAO = "big_hong";
+
+    public static final String SMALL_HONG_BAO = "small_hong";
+
+    public static final String GET_MONEY_NUM = "get_money_num";
 }

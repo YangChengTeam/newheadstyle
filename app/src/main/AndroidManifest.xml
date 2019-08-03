@@ -109,6 +109,7 @@
         <activity android:name=".ui.activity.MyCollectionActivity" />
         <activity android:name=".ui.activity.AboutActivity" />
         <activity android:name=".ui.activity.FeedBackActivity" />
+        <activity android:name=".ui.activity.EveryDayHongBaoActivity"></activity>
         <activity
             android:name=".ui.activity.CommunityTypeActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"

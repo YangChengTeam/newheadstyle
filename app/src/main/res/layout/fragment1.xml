@@ -49,10 +49,11 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:gravity="center"
-                    android:text="数据加载失败\n请检查网络后重试"
                     android:lineSpacingMultiplier="1.1"
+                    android:text="数据加载失败\n请检查网络后重试"
                     android:textColor="@color/search_number_def"
                     android:textSize="13dp" />
+
                 <TextView
                     android:id="@+id/tv_reload"
                     android:layout_width="wrap_content"
@@ -114,4 +115,28 @@
                 android:textSize="16dp" />
         </RelativeLayout>
     </RelativeLayout>
+
+    <FrameLayout
+        android:id="@+id/layout_float_hb"
+        android:layout_width="60dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right|bottom"
+        android:layout_marginRight="2dp"
+        android:visibility="gone"
+        android:layout_marginBottom="60dp">
+
+        <ImageView
+            android:id="@+id/iv_home_float"
+            android:layout_width="56dp"
+            android:layout_marginTop="5dp"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/head_def" />
+
+        <ImageView
+            android:id="@+id/iv_close_float_hb"
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:layout_gravity="top|right"
+            android:src="@mipmap/weixin_dialog_close" />
+    </FrameLayout>
 </FrameLayout>

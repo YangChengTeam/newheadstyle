@@ -38,6 +38,7 @@ import com.feiyou.headstyle.presenter.UserInfoPresenterImp;
 import com.feiyou.headstyle.ui.adapter.PriceListAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragmentActivity;
 import com.feiyou.headstyle.ui.custom.ConfigDialog;
+import com.feiyou.headstyle.ui.custom.LackDialog;
 import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 import com.qmuiteam.qmui.widget.QMUITopBar;
@@ -54,7 +55,7 @@ import butterknife.BindView;
 import butterknife.OnClick;
 import es.dmoral.toasty.Toasty;
 
-public class CashActivity extends BaseFragmentActivity implements ConfigDialog.ConfigListener, IBaseView {
+public class CashActivity extends BaseFragmentActivity implements ConfigDialog.ConfigListener, IBaseView ,LackDialog.LackListener{
 
     @BindView(R.id.topbar)
     QMUITopBar mTopBar;
@@ -113,6 +114,8 @@ public class CashActivity extends BaseFragmentActivity implements ConfigDialog.C
 
     private boolean quickTxIsClose;
 
+    LackDialog lackDialog;//收益不足
+
     @Override
     protected int getContextViewId() {
         return R.layout.activity_cash;
@@ -154,6 +157,9 @@ public class CashActivity extends BaseFragmentActivity implements ConfigDialog.C
     public void initData() {
         mUserInfo = App.getApp().mUserInfo;
         mShareAPI = UMShareAPI.get(this);
+
+        lackDialog = new LackDialog(this, R.style.login_dialog);
+        lackDialog.setLackListener(this);
 
         priceListAdapter = new PriceListAdapter(this, null);
         mPriceListView.setLayoutManager(new GridLayoutManager(this, 3));
@@ -222,7 +228,10 @@ public class CashActivity extends BaseFragmentActivity implements ConfigDialog.C
         }
 
         if (myProfitMoney < realCashMoney) {
-            ToastUtils.showLong("你的收益不足");
+            if (lackDialog != null && !lackDialog.isShowing()) {
+                lackDialog.show();
+                lackDialog.setLackInfo("收益提示","你的收益不足，请先赚取收益");
+            }
             return;
         }
 
@@ -403,6 +412,17 @@ public class CashActivity extends BaseFragmentActivity implements ConfigDialog.C
 
     @Override
     public void loadDataError(Throwable throwable) {
+
+    }
+
+    @Override
+    public void lackConfig() {
+        Intent intent = new Intent(this, GoldTaskActivity.class);
+        startActivity(intent);
+    }
+
+    @Override
+    public void lackCancel() {
 
     }
 }

@@ -584,17 +584,17 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
         boolean flag = true;
         try {
             if (!StringUtils.isEmpty(filePath)) {
-                MediaStore.Images.Media.insertImage(getContentResolver(),
-                        filePath, filePath.substring(filePath.lastIndexOf("/") + 1, filePath.length()), null);
+//                MediaStore.Images.Media.insertImage(getContentResolver(),
+//                        filePath, filePath.substring(filePath.lastIndexOf("/") + 1, filePath.length()), null);
 
-                MediaScannerConnection.scanFile(HeadShowActivity.this, new String[]{filePath}, null, null);
+                //MediaScannerConnection.scanFile(HeadShowActivity.this, new String[]{filePath}, null, null);
                 // 最后通知图库更新
                 sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.parse("file://" + filePath)));
                 Toasty.normal(this, loginType == 2 && bottomSheetDialog.isShowing() ? "已保存到相册，打开微信更换头像" : "已保存到相册").show();
             } else {
                 flag = false;
             }
-        } catch (FileNotFoundException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             flag = false;
         }

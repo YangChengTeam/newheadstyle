@@ -169,6 +169,8 @@ public class AdActivity extends BaseFragmentActivity implements IBaseView, SignO
                         }
                     }
                 }.start();
+            }else{
+                isFinish = true;
             }
         }
     };
