@@ -996,6 +996,7 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
         mttRewardVideoAd = null;
 
         try {
+            recordId = "";
             taskRecordInfoPresenterImp.addHomeTaskRecord(StringUtils.isEmpty(mUserInfo.getId()) ? "0" : mUserInfo.getId(), StringUtils.isEmpty(mUserInfo.getOpenid()) ? "0" : mUserInfo.getOpenid(), PhoneUtils.getIMEI(), 0, 0, "0");
         } catch (SecurityException e) {
             e.printStackTrace();
