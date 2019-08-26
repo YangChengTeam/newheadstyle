@@ -8,8 +8,8 @@ android {
         applicationId "com.feiyou.headstyle"
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode 57
-        versionName "4.1.1"
+        versionCode 58
+        versionName "4.1.2"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         ndk {
             abiFilters "armeabi-v7a"
@@ -23,11 +23,12 @@ android {
         }
     }
 
-    sourceSets {
-        main {
-            jniLibs.srcDirs = ['libs']
-        }
-    }
+//    sourceSets {
+//        main {
+//            jniLibs.srcDirs = ['libs']
+//        }
+//    }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -109,6 +110,7 @@ dependencies {
     implementation files('libs/umeng-share-QQ-full-6.9.4.jar')
     implementation files('libs/open_sdk_r5756.jar')
     implementation files('libs/GDTUnionSDK.4.24.894.min.jar')
+    implementation files('libs/qq_x5.jar')
     implementation 'com.zhihu.android:matisse:0.5.2-beta4'
     //implementation 'jp.co.cyberagent.android:gpuimage:2.0.3'
     implementation project(':Gpu-Image')
@@ -136,4 +138,7 @@ dependencies {
     implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.6'
     implementation 'com.sunfusheng:MarqueeView:1.4.1'
 
+    implementation name: 'cmgame-sdk-tt2017-1.1.4', ext: 'aar'
+    implementation 'com.google.code.gson:gson:2.8.5'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }

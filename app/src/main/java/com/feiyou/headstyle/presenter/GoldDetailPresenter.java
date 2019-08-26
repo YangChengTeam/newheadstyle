@@ -6,4 +6,5 @@ package com.feiyou.headstyle.presenter;
 
 public interface GoldDetailPresenter {
     void goldDetailList(String uid, String openid,int page, int pageSize);
+    void goldCashDetailList(String uid, String openid,int page, int pageSize,int iscash);
 }

@@ -44,6 +44,7 @@ import com.bytedance.sdk.openadsdk.TTRewardVideoAd;
 import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.bean.MessageEvent;
+import com.feiyou.headstyle.bean.ResultInfo;
 import com.feiyou.headstyle.bean.UserInfo;
 import com.feiyou.headstyle.bean.VersionInfo;
 import com.feiyou.headstyle.bean.VersionInfoRet;
@@ -422,17 +423,21 @@ public class Main1Activity extends BaseFragmentActivity implements VersionView, 
     }
 
     @Override
-    public void loadDataSuccess(VersionInfoRet tData) {
+    public void loadDataSuccess(ResultInfo tData) {
         Logger.i("version info ---> " + JSON.toJSONString(tData));
 
-        if (tData != null && tData.getCode() == Constants.SUCCESS) {
-            versionInfo = tData.getData();
-            if (versionInfo.getVersionCode() > AppUtils.getAppVersionCode()) {
-                if (updateDialog != null && !updateDialog.isShowing()) {
-                    updateDialog.setVersionCode(tData.getData().getVersionName());
-                    updateDialog.setVersionContent(tData.getData().getVersionDesc());
-                    updateDialog.setIsForceUpdate(tData.getData().getVersionIsChange());
-                    updateDialog.show();
+        if (tData != null) {
+            if (tData instanceof VersionInfoRet) {
+                if (tData.getCode() == Constants.SUCCESS) {
+                    versionInfo = ((VersionInfoRet) tData).getData();
+                    if (versionInfo.getVersionCode() > AppUtils.getAppVersionCode()) {
+                        if (updateDialog != null && !updateDialog.isShowing()) {
+                            updateDialog.setVersionCode(versionInfo.getVersionName());
+                            updateDialog.setVersionContent(versionInfo.getVersionDesc());
+                            updateDialog.setIsForceUpdate(versionInfo.getVersionIsChange());
+                            updateDialog.show();
+                        }
+                    }
                 }
             }
         }

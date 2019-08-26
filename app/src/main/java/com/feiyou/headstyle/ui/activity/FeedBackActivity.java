@@ -188,6 +188,7 @@ public class FeedBackActivity extends BaseFragmentActivity implements FeedBackVi
     void submit() {
 
         String tempInputContent = mContentEt.getText().toString();
+        String phoneMail = mPhoneEmailEt.getText().toString();
         if (StringUtils.isEmpty(tempInputContent)) {
             Toasty.normal(this, "请输入反馈内容").show();
             return;
@@ -201,6 +202,17 @@ public class FeedBackActivity extends BaseFragmentActivity implements FeedBackVi
                 result.add(tempList.get(i).toString());
             }
         }
+
+        if(result.size() == 0){
+            Toasty.normal(this, "请上传图片").show();
+            return;
+        }
+
+        if (StringUtils.isEmpty(phoneMail)) {
+            Toasty.normal(this, "请输入你的QQ号").show();
+            return;
+        }
+
         if (progressDialog != null && !progressDialog.isShowing()) {
             progressDialog.show();
         }

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:gravity="top|center"
+    android:orientation="vertical">
+
+    <com.qmuiteam.qmui.widget.QMUITopBar
+        android:id="@+id/topbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/qmui_topbar_height"
+        android:background="@color/white" />
+
+    <View
+        android:id="@+id/top_line_view"
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:layout_below="@+id/topbar"
+        android:background="@color/line_color"></View>
+
+    <android.support.v4.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:descendantFocusability="blocksDescendants"
+            android:gravity="top|center"
+            android:orientation="vertical">
+
+            <CheckBox
+                android:id="@+id/move_view_switch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="6dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginBottom="10dp"
+                android:text="打开悬浮"
+                android:visibility="gone" />
+
+            <ImageView
+                android:layout_width="346dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:src="@mipmap/game_splash" />
+
+            <com.cmcm.cmgame.GameView
+                android:id="@+id/gameView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="6dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginRight="6dp"
+                android:layout_marginBottom="15dp"
+                android:paddingLeft="5dp"
+                android:paddingTop="5dp"
+                android:paddingRight="5dp"
+                app:cmgame_category_title_text_color="#FF222222"
+                app:cmgame_category_title_text_size="15sp"
+                app:cmgame_view_background="@drawable/bg_game_classify_view" />
+
+            <!--cmgame_category_title_text_color 分类目录文字颜色-->
+            <!--cmgame_category_title_text_size 分类目录文字大小-->
+            <!--cmgame_view_background 整个View背景，demo使用的是8dp圆角白底-->
+        </LinearLayout>
+
+    </android.support.v4.widget.NestedScrollView>
+</LinearLayout>

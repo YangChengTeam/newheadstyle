@@ -37,7 +37,7 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />    <!-- targetSdkVersion >= 26 时需要配置此权限，否则无法进行安装app的动作 -->
 
-    <uses-permission android:name="android.permission.GET_TASKS"/>
+    <uses-permission android:name="android.permission.GET_TASKS" />
     <!-- 如果有视频相关的广告且使用textureView播放，请务必添加，否则黑屏 -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
@@ -60,7 +60,7 @@
             android:required="false" />
 
         <activity
-            android:name=".ui.activity.Main1Activity"
+            android:name=".ui.activity.SplashActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
             android:theme="@style/AppTransparentTheme"
             android:windowSoftInputMode="stateHidden">
@@ -71,7 +71,7 @@
         </activity>
 
         <activity
-            android:name=".ui.activity.SplashActivity"
+            android:name=".ui.activity.Main1Activity"
             android:label="@string/app_name"></activity>
         <activity android:name=".ui.activity.Main2Activity"></activity>
         <activity android:name=".ui.activity.HeadEditActivity"></activity>
@@ -148,6 +148,9 @@
         <activity android:name=".ui.activity.MyExchangeListActivity"></activity>
         <activity android:name=".ui.activity.AboutGoldActivity"></activity>
         <activity android:name=".ui.activity.NativeVerticalVideoActivity"></activity>
+        <activity android:name=".ui.activity.GameTestActivity"></activity>
+        <activity android:name=".ui.activity.GoldAndCashActivity"></activity>
+        <activity android:name=".ui.activity.ImageMakeActivity"></activity>
         <activity
             android:name=".wxapi.WXEntryActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
@@ -195,7 +198,7 @@
 
         <provider
             android:name="android.support.v4.content.FileProvider"
-            android:authorities="com.fy.tnzbsq.fileprovider"
+            android:authorities="com.feiyou.headstyle.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true"
             tools:replace="android:authorities">
@@ -206,7 +209,7 @@
 
         <provider
             android:name="com.bytedance.sdk.openadsdk.TTFileProvider"
-            android:authorities="com.fy.tnzbsq.TTFileProvider"
+            android:authorities="com.feiyou.headstyle.TTFileProvider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data
@@ -216,7 +219,7 @@
 
         <provider
             android:name="com.bytedance.sdk.openadsdk.multipro.TTMultiProvider"
-            android:authorities="com.fy.tnzbsq.TTMultiProvider"
+            android:authorities="com.feiyou.headstyle.TTMultiProvider"
             android:exported="false" />
 
         <meta-data

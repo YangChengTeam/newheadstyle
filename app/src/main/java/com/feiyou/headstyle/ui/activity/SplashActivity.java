@@ -20,7 +20,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.blankj.utilcode.util.StringUtils;
 import com.feiyou.headstyle.R;
+import com.feiyou.headstyle.bean.ResultInfo;
+import com.feiyou.headstyle.bean.VersionInfoRet;
+import com.feiyou.headstyle.presenter.VersionPresenterImp;
+import com.feiyou.headstyle.utils.AppUtils;
+import com.feiyou.headstyle.view.VersionView;
 import com.orhanobut.logger.Logger;
 import com.qq.e.ads.splash.SplashAD;
 import com.qq.e.ads.splash.SplashADListener;
@@ -35,7 +41,7 @@ import java.util.List;
  * <p>
  * 在调用SDK之前，如果您的App的targetSDKVersion >= 23，那么一定要把"READ_PHONE_STATE"、"WRITE_EXTERNAL_STORAGE"、"ACCESS_FINE_LOCATION"这几个权限申请到，否则SDK将不会工作。
  */
-public class SplashActivity extends Activity implements SplashADListener {
+public class SplashActivity extends Activity implements SplashADListener, VersionView {
 
     private SplashAD splashAD;
     private ViewGroup container;
@@ -55,7 +61,12 @@ public class SplashActivity extends Activity implements SplashADListener {
      * 记录拉取广告的时间
      */
     private long fetchSplashADTime = 0;
+
+    VersionPresenterImp versionPresenterImp;
+
     private Handler handler = new Handler(Looper.getMainLooper());
+
+    private boolean isHuaWeiClose;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +79,19 @@ public class SplashActivity extends Activity implements SplashADListener {
         if (!needLogo) {
             findViewById(R.id.app_logo).setVisibility(View.GONE);
         }
+
+        versionPresenterImp = new VersionPresenterImp(this, this);
+
+
+        String channel = AppUtils.getMetaDataValue(this, "UMENG_CHANNEL");
+        if (!StringUtils.isEmpty(channel) && channel.equals("fanglang")) {
+            versionPresenterImp.getVersionInfo(channel);
+        } else {
+            startAd();
+        }
+    }
+
+    public void startAd() {
         // 如果targetSDKVersion >= 23，就要申请好权限。如果您的App没有适配到Android6.0（即targetSDKVersion < 23），那么只需要在这里直接调用fetchSplashAD接口。
         if (Build.VERSION.SDK_INT >= 23) {
             checkAndRequestPermission();
@@ -104,7 +128,12 @@ public class SplashActivity extends Activity implements SplashADListener {
 
         // 权限都已经有了，那么直接调用SDK
         if (lackedPermission.size() == 0) {
-            fetchSplashAD(this, container, skipView, Constants.APP_ID, Constants.OPEN_ID, this, 0);
+            if (isHuaWeiClose) {
+                canJump = true;
+                next();
+            } else {
+                fetchSplashAD(this, container, skipView, Constants.APP_ID, Constants.OPEN_ID, this, 0);
+            }
         } else {
             // 请求所缺少的权限，在onRequestPermissionsResult中再看是否获得权限，如果获得权限就可以调用SDK，否则不要调用SDK。
             String[] requestPermissions = new String[lackedPermission.size()];
@@ -126,7 +155,12 @@ public class SplashActivity extends Activity implements SplashADListener {
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == 1024 && hasAllPermissionsGranted(grantResults)) {
-            fetchSplashAD(this, container, skipView, Constants.APP_ID, Constants.OPEN_ID, this, 0);
+            if (isHuaWeiClose) {
+                canJump = true;
+                next();
+            } else {
+                fetchSplashAD(this, container, skipView, Constants.APP_ID, Constants.OPEN_ID, this, 0);
+            }
         } else {
             // 如果用户没有授权，那么应该说明意图，引导用户去设置里面授权。
             Toast.makeText(this, "应用缺少必要的权限！请点击\"权限\"，打开所需要的权限。", Toast.LENGTH_LONG).show();
@@ -254,4 +288,43 @@ public class SplashActivity extends Activity implements SplashADListener {
         return super.onKeyDown(keyCode, event);
     }
 
+    @Override
+    public void showProgress() {
+
+    }
+
+    @Override
+    public void dismissProgress() {
+
+    }
+
+    @Override
+    public void loadDataSuccess(ResultInfo tData) {
+        if (tData != null && tData.getCode() == Constants.SUCCESS) {
+            if (tData instanceof VersionInfoRet) {
+                if (((VersionInfoRet) tData).getData().getAppOpenad() == 1) {
+                    startAd();
+                } else {
+                    isHuaWeiClose = true;
+                    if (Build.VERSION.SDK_INT >= 23) {
+                        checkAndRequestPermission();
+                    } else {
+                        canJump = true;
+                        next();
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
+    public void loadDataError(Throwable throwable) {
+        isHuaWeiClose = false;
+        if (Build.VERSION.SDK_INT >= 23) {
+            checkAndRequestPermission();
+        } else {
+            canJump = true;
+            next();
+        }
+    }
 }

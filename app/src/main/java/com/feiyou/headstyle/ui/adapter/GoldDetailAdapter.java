@@ -20,9 +20,12 @@ public class GoldDetailAdapter extends BaseQuickAdapter<GoldDetailInfo, BaseView
 
     private Context mContext;
 
-    public GoldDetailAdapter(Context context, List<GoldDetailInfo> datas) {
+    private int mType;
+
+    public GoldDetailAdapter(Context context, List<GoldDetailInfo> datas, int type) {
         super(R.layout.gold_detail_item, datas);
         this.mContext = context;
+        this.mType = type;
     }
 
     @Override
@@ -30,7 +33,9 @@ public class GoldDetailAdapter extends BaseQuickAdapter<GoldDetailInfo, BaseView
         TextView mGoldNumTv = helper.getView(R.id.tv_gold_num);
         helper.setText(R.id.tv_gold_name, item.getTaskname())
                 .setText(R.id.tv_gold_date, TimeUtils.millis2String(item.getAddtime() * 1000));
-        mGoldNumTv.setText(item.getStatus() == 1 ? "+" + item.getGoldnum() : "-" + item.getGoldnum());
+
+        String tempUnit = mType == 1 ? item.getGoldnum()  + "金币" :item.getCash() + "元";
+        mGoldNumTv.setText(item.getStatus() == 1 ? "+" + tempUnit : "-" + tempUnit);
         mGoldNumTv.setTextColor(ContextCompat.getColor(mContext, item.getStatus() == 1 ? R.color.set_weixin_bg_color : R.color.task_border_color));
     }
 }

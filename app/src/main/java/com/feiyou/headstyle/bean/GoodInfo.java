@@ -10,11 +10,15 @@ public class GoodInfo {
     private double goldprice;//金币价格
     private double cashprice;//现金价格
     private int falsenum;//已兑换人数(后台填写的)
+    private int allstock;//商品库存数量
     private int othnum;//剩余兑换次数
     private String smallimg;//商品预览图(多张图片使用英文逗号隔开)
     private String detailimg;//商品详情图片(多张图片使用英文逗号隔开)
     private String content;//商品描述
     private String exchange;
+    private int total;//用户可兑换的次数
+    private int truenum;//实际兑换人数
+
     public int getId() {
         return id;
     }
@@ -101,5 +105,29 @@ public class GoodInfo {
 
     public void setExchange(String exchange) {
         this.exchange = exchange;
+    }
+
+    public int getTotal() {
+        return total;
+    }
+
+    public void setTotal(int total) {
+        this.total = total;
+    }
+
+    public int getTruenum() {
+        return truenum;
+    }
+
+    public void setTruenum(int truenum) {
+        this.truenum = truenum;
+    }
+
+    public int getAllstock() {
+        return allstock;
+    }
+
+    public void setAllstock(int allstock) {
+        this.allstock = allstock;
     }
 }

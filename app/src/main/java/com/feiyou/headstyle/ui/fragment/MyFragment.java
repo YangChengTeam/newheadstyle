@@ -37,6 +37,7 @@ import com.feiyou.headstyle.presenter.UserInfoPresenterImp;
 import com.feiyou.headstyle.ui.activity.AboutActivity;
 import com.feiyou.headstyle.ui.activity.FeedBackActivity;
 import com.feiyou.headstyle.ui.activity.GoldTaskActivity;
+import com.feiyou.headstyle.ui.activity.ImageMakeActivity;
 import com.feiyou.headstyle.ui.activity.MyCollectionActivity;
 import com.feiyou.headstyle.ui.activity.MyExchangeListActivity;
 import com.feiyou.headstyle.ui.activity.MyFollowActivity;
@@ -125,6 +126,7 @@ public class MyFragment extends BaseFragment implements UserInfoView, PraiseDial
     }
 
     public void initViews() {
+        MobclickAgent.onEvent(getActivity(), "click_my_info", com.blankj.utilcode.util.AppUtils.getAppVersionName());
         praiseDialog = new PraiseDialog(getActivity(), R.style.login_dialog);
         praiseDialog.setPraiseListener(this);
 
@@ -309,6 +311,11 @@ public class MyFragment extends BaseFragment implements UserInfoView, PraiseDial
         startActivity(7);
     }
 
+    @OnClick(R.id.layout_image_make)
+    public void imageMake(){
+        startActivity(8);
+    }
+
     @OnClick(R.id.layout_weixin_code)
     public void followWeiXin() {
         if (!AppUtils.appInstalled(getActivity(), "com.tencent.mm")) {
@@ -364,6 +371,9 @@ public class MyFragment extends BaseFragment implements UserInfoView, PraiseDial
                     break;
                 case 7:
                     intent = new Intent(getActivity(), FeedBackActivity.class);
+                    break;
+                case 8:
+                    intent = new Intent(getActivity(), ImageMakeActivity.class);
                     break;
             }
             startActivity(intent);

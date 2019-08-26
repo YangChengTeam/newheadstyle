@@ -12,6 +12,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.alibaba.fastjson.JSON;
+import com.blankj.utilcode.util.AppUtils;
 import com.blankj.utilcode.util.BarUtils;
 import com.blankj.utilcode.util.SPUtils;
 import com.blankj.utilcode.util.SizeUtils;
@@ -41,6 +42,7 @@ import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 import com.tencent.mm.opensdk.modelbiz.WXLaunchMiniProgram;
 import com.tencent.mm.opensdk.openapi.IWXAPI;
 import com.tencent.mm.opensdk.openapi.WXAPIFactory;
+import com.umeng.analytics.MobclickAgent;
 import com.wang.avi.AVLoadingIndicatorView;
 import com.youth.banner.Banner;
 import com.youth.banner.listener.OnBannerListener;
@@ -104,6 +106,7 @@ public class TestFragment extends BaseFragment implements TestInfoView, View.OnC
     }
 
     public void initViews() {
+        MobclickAgent.onEvent(getActivity(), "click_ceshi", AppUtils.getAppVersionName());
         loginDialog = new LoginDialog(getActivity(), R.style.login_dialog);
         openDialog = new OpenDialog(getActivity(), R.style.login_dialog);
         openDialog.setConfigListener(this);

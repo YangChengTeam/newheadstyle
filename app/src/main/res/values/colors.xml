@@ -20,6 +20,7 @@
     <color name="gray_eee">#eeeeee</color>
     <color name="line_color">#dddddd</color>
     <color name="line1_color">#eeeeee</color>
+    <color name="line2_color">#f4f4f4</color>
 
     <color name="search_bg_color">#f6f8fa</color>
 
@@ -136,4 +137,14 @@
 
     <color name="every_day_top_txt_color">#f8ecb7</color>
     <color name="get_money_now_color">#c7a74d</color>
+
+    <color name="game_profit_color">#c16a09</color>
+
+    <color name="profit_money_num">#fb5262</color>
+
+    <color name="round_bg_color">#fdf4d2</color>
+
+    <color name="round_progress_color">#fcc63d</color>
+
+    <color name="iknow_color">#febc03</color>
 </resources>

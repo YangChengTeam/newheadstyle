@@ -16,10 +16,12 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.blankj.utilcode.util.SizeUtils;
+import com.blankj.utilcode.util.StringUtils;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.bean.GoodInfoRet;
+import com.feiyou.headstyle.bean.WelfareInfo;
 import com.feiyou.headstyle.common.Constants;
 import com.feiyou.headstyle.presenter.GoodInfoPresenterImp;
 import com.feiyou.headstyle.ui.adapter.GoodsListAdapter;
@@ -31,6 +33,7 @@ import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 import com.qmuiteam.qmui.widget.QMUITopBar;
 import com.wang.avi.AVLoadingIndicatorView;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -63,6 +66,14 @@ public class GoldMailActivity extends BaseFragmentActivity implements GoodInfoVi
 
     private int pageSize = 20;
 
+    List<WelfareInfo.SignSetInfo> signList;
+
+    private int signDays;//连续签到的天数
+
+    private double randomHongbao;
+
+    private int isSignToday;
+
     @Override
     protected int getContextViewId() {
         return R.layout.activity_gold_mail;
@@ -93,6 +104,16 @@ public class GoldMailActivity extends BaseFragmentActivity implements GoodInfoVi
     }
 
     public void initData() {
+
+        Bundle bundle = getIntent().getExtras();
+        if (bundle != null) {
+            randomHongbao = bundle.getDouble("random_money");
+            signDays = bundle.getInt("sign_days");
+            isSignToday = bundle.getInt("is_sign_today");
+        }
+
+        signList = (List<WelfareInfo.SignSetInfo>) getIntent().getSerializableExtra("sign_list");
+
         mRefreshLayout.setOnRefreshListener(this);
         //设置进度View样式的大小，只有两个值DEFAULT和LARGE
         //设置进度View下拉的起始点和结束点，scale 是指设置是否需要放大或者缩小动画
@@ -125,6 +146,10 @@ public class GoldMailActivity extends BaseFragmentActivity implements GoodInfoVi
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
                 Intent intent = new Intent(GoldMailActivity.this, GoodDetailActivity.class);
                 intent.putExtra("gid", goodsListAdapter.getData().get(position).getId() + "");
+                intent.putExtra("sign_list", (Serializable) signList);
+                intent.putExtra("sign_days", signDays);
+                intent.putExtra("random_money", randomHongbao);
+                intent.putExtra("is_sign_today", isSignToday);
                 startActivity(intent);
             }
         });

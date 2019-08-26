@@ -24,6 +24,9 @@ import com.feiyou.headstyle.base.IBaseView;
 import com.feiyou.headstyle.bean.ExchangeInfoRet;
 import com.feiyou.headstyle.bean.GoodDetailInfo;
 import com.feiyou.headstyle.bean.GoodDetailInfoRet;
+import com.feiyou.headstyle.bean.PlayGameInfo;
+import com.feiyou.headstyle.bean.SeeVideoInfo;
+import com.feiyou.headstyle.bean.WelfareInfo;
 import com.feiyou.headstyle.common.Constants;
 import com.feiyou.headstyle.common.GlideImageLoader;
 import com.feiyou.headstyle.common.GoodImageLoader;
@@ -41,6 +44,7 @@ import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 import com.qmuiteam.qmui.widget.QMUITopBar;
 import com.youth.banner.Banner;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -93,6 +97,18 @@ public class GoodDetailActivity extends BaseFragmentActivity implements ConfigDi
 
     private double goodGoldNum;
 
+    List<WelfareInfo.SignSetInfo> signList;
+
+    private int signDays;//连续签到的天数
+
+    private double randomHongbao;
+
+    private int isSignToday;
+
+    private int isExchange;//是否已经兑换
+
+    private int allstock;//商品库存数量
+
     @Override
     protected int getContextViewId() {
         return R.layout.activity_good_detail;
@@ -130,9 +146,16 @@ public class GoodDetailActivity extends BaseFragmentActivity implements ConfigDi
 
     public void initData() {
         Bundle bundle = getIntent().getExtras();
-        if (bundle != null && !StringUtils.isEmpty(bundle.getString("gid"))) {
-            gid = bundle.getString("gid");
+        if (bundle != null) {
+            if (!StringUtils.isEmpty(bundle.getString("gid"))) {
+                gid = bundle.getString("gid");
+            }
+            randomHongbao = bundle.getDouble("random_money");
+            signDays = bundle.getInt("sign_days");
+            isSignToday = bundle.getInt("is_sign_today");
         }
+
+        signList = (List<WelfareInfo.SignSetInfo>) getIntent().getSerializableExtra("sign_list");
 
         goodImageAdapter = new GoodImageAdapter(this, null);
         mGoodImageListView.setLayoutManager(new LinearLayoutManager(this));
@@ -160,6 +183,16 @@ public class GoodDetailActivity extends BaseFragmentActivity implements ConfigDi
 
     @OnClick(R.id.btn_exchange)
     void exchangeNow() {
+        if(allstock == 0){
+            ToastUtils.showLong("商品库存不足");
+            return;
+        }
+
+        if(isExchange == 0){
+            ToastUtils.showLong("该商品限购一次");
+            return;
+        }
+
         if (configDialog != null && !configDialog.isShowing()) {
             configDialog.show();
         }
@@ -245,12 +278,15 @@ public class GoodDetailActivity extends BaseFragmentActivity implements ConfigDi
                                 exchangeListAdapter.setNewData(goodDetailInfo.getRecordList());
                             }
 
-                            if (goodDetailInfo.getIsExchange() == 0) {
-                                mExchangeBtn.setBackgroundResource(R.drawable.common_gray_bg);
-                                mExchangeBtn.setBackgroundColor(ContextCompat.getColor(this, R.color.gray_aaa));
-                                mExchangeBtn.setText("");
-                                mExchangeBtn.setClickable(false);
-                            }
+                            isExchange = goodDetailInfo.getIsExchange();
+                            allstock = goodDetailInfo.getGoodInfo().getAllstock();
+
+//                            if (goodDetailInfo.getIsExchange() == 0) {
+//                                mExchangeBtn.setBackgroundResource(R.drawable.common_gray_bg);
+//                                mExchangeBtn.setTextColor(ContextCompat.getColor(this, R.color.white));
+//                                mExchangeBtn.setText("无法兑换");
+//                                mExchangeBtn.setClickable(false);
+//                            }
                         }
                     }
                 }
@@ -289,7 +325,12 @@ public class GoodDetailActivity extends BaseFragmentActivity implements ConfigDi
 
     @Override
     public void lackConfig() {
+
         Intent intent = new Intent(this, GoldTaskActivity.class);
+        intent.putExtra("sign_list", (Serializable) signList);
+        intent.putExtra("sign_days", signDays);
+        intent.putExtra("random_money", randomHongbao);
+        intent.putExtra("is_sign_today", isSignToday);
         startActivity(intent);
     }
 

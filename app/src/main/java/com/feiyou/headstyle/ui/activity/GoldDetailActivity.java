@@ -18,16 +18,12 @@ import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.bean.GoldDetailRet;
 import com.feiyou.headstyle.common.Constants;
 import com.feiyou.headstyle.presenter.GoldDetailPresenterImp;
-import com.feiyou.headstyle.ui.adapter.CashRecordAdapter;
 import com.feiyou.headstyle.ui.adapter.GoldDetailAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragmentActivity;
 import com.feiyou.headstyle.ui.custom.NormalDecoration;
 import com.feiyou.headstyle.view.GoldDetailView;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 import com.qmuiteam.qmui.widget.QMUITopBar;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import butterknife.BindView;
 
@@ -61,7 +57,7 @@ public class GoldDetailActivity extends BaseFragmentActivity implements GoldDeta
 
     @Override
     protected int getContextViewId() {
-        return R.layout.activity_gold_detail;
+        return R.layout.fragment_gold_detail;
     }
 
     @Override
@@ -89,7 +85,7 @@ public class GoldDetailActivity extends BaseFragmentActivity implements GoldDeta
     }
 
     public void initData() {
-        goldDetailAdapter = new GoldDetailAdapter(this, null);
+        goldDetailAdapter = new GoldDetailAdapter(this, null, 1);
         mGoldDetailListView.setLayoutManager(new LinearLayoutManager(this));
         mGoldDetailListView.addItemDecoration(new NormalDecoration(ContextCompat.getColor(this, R.color.line_color), 1));
         mGoldDetailListView.setAdapter(goldDetailAdapter);

@@ -9,6 +9,9 @@ public class GoldDetailWrapper {
     @SerializedName("gold_list")
     private List<GoldDetailInfo> goldDetailList;
 
+    @SerializedName("cash_list")
+    private List<GoldDetailInfo> cashList;
+
     @SerializedName("gold_num")
     private int goldNum;//用户账户金币余额
 
@@ -48,5 +51,13 @@ public class GoldDetailWrapper {
 
     public void setGoldToday(int goldToday) {
         this.goldToday = goldToday;
+    }
+
+    public List<GoldDetailInfo> getCashList() {
+        return cashList;
+    }
+
+    public void setCashList(List<GoldDetailInfo> cashList) {
+        this.cashList = cashList;
     }
 }

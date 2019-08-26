@@ -15,6 +15,7 @@ import android.widget.TabHost;
 import android.widget.TabWidget;
 import android.widget.TextView;
 
+import com.blankj.utilcode.util.AppUtils;
 import com.blankj.utilcode.util.BarUtils;
 import com.blankj.utilcode.util.SizeUtils;
 import com.feiyou.headstyle.App;
@@ -34,6 +35,7 @@ import com.feiyou.headstyle.ui.fragment.sub.VideoFragment;
 import com.feiyou.headstyle.view.TopicDataView;
 import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
+import com.umeng.analytics.MobclickAgent;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -148,6 +150,7 @@ public class CommunityFragment extends BaseFragment implements ViewPager.OnPageC
     }
 
     public void initData() {
+        MobclickAgent.onEvent(getActivity(), "click_shequ", AppUtils.getAppVersionName());
         topicDataPresenterImp = new TopicDataPresenterImp(this, getActivity());
         topicDataPresenterImp.getTopicDataList();
     }

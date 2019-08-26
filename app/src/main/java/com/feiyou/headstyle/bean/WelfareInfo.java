@@ -2,6 +2,7 @@ package com.feiyou.headstyle.bean;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
 import java.util.List;
 
 public class WelfareInfo {
@@ -29,6 +30,12 @@ public class WelfareInfo {
 
     @SerializedName("cj_info")
     private LuckDraw luckDrawInfo;
+
+    @SerializedName("game_info")
+    private PlayGameInfo gameInfo;
+
+    @SerializedName("sp_info")
+    private SeeVideoInfo seeVideoInfo;
 
     public class GoldUser {
         private int goldnum;
@@ -81,7 +88,7 @@ public class WelfareInfo {
         }
     }
 
-    public class SignSetInfo {
+    public class SignSetInfo implements Serializable {
         private int days;//连续签到天数
         private int gold;//金币奖励数量
         private String cash;//现金奖励区间
@@ -216,5 +223,21 @@ public class WelfareInfo {
 
     public void setLuckDrawInfo(LuckDraw luckDrawInfo) {
         this.luckDrawInfo = luckDrawInfo;
+    }
+
+    public PlayGameInfo getGameInfo() {
+        return gameInfo;
+    }
+
+    public void setGameInfo(PlayGameInfo gameInfo) {
+        this.gameInfo = gameInfo;
+    }
+
+    public SeeVideoInfo getSeeVideoInfo() {
+        return seeVideoInfo;
+    }
+
+    public void setSeeVideoInfo(SeeVideoInfo seeVideoInfo) {
+        this.seeVideoInfo = seeVideoInfo;
     }
 }

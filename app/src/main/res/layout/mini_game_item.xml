@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="6dp">
+
+    <ImageView
+        android:id="@+id/iv_game_cover"
+        android:layout_width="105dp"
+        android:layout_height="135dp"
+        android:scaleType="fitXY"
+        android:layout_marginLeft="4dp"
+        android:src="@mipmap/image_def" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="left|bottom"
+        android:layout_marginLeft="10dp"
+        android:layout_marginBottom="5dp"
+        android:gravity="left|center"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_game_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="热血传奇"
+            android:textColor="@color/white"
+            android:textSize="14dp" />
+
+        <TextView
+            android:id="@+id/tv_play_num"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="123234人在玩"
+            android:textColor="@color/white"
+            android:textSize="12dp" />
+    </LinearLayout>
+</FrameLayout>

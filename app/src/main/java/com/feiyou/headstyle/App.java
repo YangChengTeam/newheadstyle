@@ -1,23 +1,26 @@
 package com.feiyou.headstyle;
 
+import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
+import android.os.Bundle;
+import android.util.Log;
 
 import com.blankj.utilcode.util.Utils;
-import com.bumptech.glide.Glide;
-import com.bytedance.sdk.openadsdk.TTAdConfig;
-import com.bytedance.sdk.openadsdk.TTAdConstant;
-import com.bytedance.sdk.openadsdk.TTAdSdk;
+
+import com.cmcm.cmgame.CmGameSdk;
+import com.cmcm.cmgame.activity.H5GameActivity;
+import com.cmcm.cmgame.gamedata.CmGameAppInfo;
 import com.feiyou.headstyle.bean.AdInfo;
-import com.feiyou.headstyle.bean.NoteInfo;
 import com.feiyou.headstyle.bean.TestDetailInfoWrapper;
 import com.feiyou.headstyle.bean.TestInfo;
 import com.feiyou.headstyle.bean.TopicInfo;
 import com.feiyou.headstyle.bean.UserInfo;
-import com.feiyou.headstyle.bean.VideoInfo;
+import com.feiyou.headstyle.ui.custom.CmGameImageLoader;
 import com.feiyou.headstyle.utils.AppContextUtil;
 import com.feiyou.headstyle.utils.TTAdManagerHolder;
 import com.mob.MobSDK;
+import com.orhanobut.logger.Logger;
 import com.umeng.commonsdk.UMConfigure;
 import com.umeng.socialize.PlatformConfig;
 
@@ -27,7 +30,7 @@ import java.util.List;
  * Created by admin on 2017/3/24.
  */
 
-public class App extends Application {
+public class App extends Application  {
 
     protected static App mInstance;
 
@@ -87,6 +90,7 @@ public class App extends Application {
             mInstance.onCreate();
             return (App) mInstance;
         }
+
     }
 
     @Override
@@ -104,6 +108,27 @@ public class App extends Application {
         applicationContext = this;
 
         TTAdManagerHolder.init(this);//初始化今日头条
+
+        CmGameAppInfo cmGameAppInfo = new CmGameAppInfo();
+        cmGameAppInfo.setAppId("gexingtouxiang");                             // GameSdkID，向我方申请
+        cmGameAppInfo.setAppHost("https://gxtx-xyx-sdk-svc.beike.cn");   // 游戏host地址，向我方申请
+
+        // 游戏退出时，增加游戏推荐弹窗，提高游戏的点击个数，注释此行可去掉此功能
+        cmGameAppInfo.setQuitGameConfirmFlag(true);
+
+        // 可设置进入游戏默认静音，默认有声，设置true为游戏静音
+        // cmGameAppInfo.setMute(true);
+
+        CmGameAppInfo.TTInfo ttInfo = new CmGameAppInfo.TTInfo();
+        ttInfo.setRewardVideoId("920819795");   // 激励视频
+        ttInfo.setFullVideoId("920819314");     // 全屏视频
+        ttInfo.setExpressBannerId("920819459"); // Banner广告，模板渲染，尺寸：600*150
+        ttInfo.setExpressInteractionId("920819698"); // 插屏广告，模板渲染，尺寸比例 2：3
+
+        cmGameAppInfo.setTtInfo(ttInfo);
+
+        CmGameSdk.INSTANCE.initCmGameSdk(this, cmGameAppInfo, new CmGameImageLoader(), BuildConfig.DEBUG);
+        Log.d("cmgamesdk", "current sdk version : " + CmGameSdk.INSTANCE.getVersion());
     }
 
     public UserInfo getmUserInfo() {
@@ -177,4 +202,7 @@ public class App extends Application {
     public void setIsFromTaskSign(int isFromTaskSign) {
         this.isFromTaskSign = isFromTaskSign;
     }
+
+
+
 }

@@ -1,12 +1,10 @@
 package com.feiyou.headstyle.ui.fragment;
 
-import android.app.ProgressDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
-import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Message;
@@ -31,6 +29,7 @@ import com.blankj.utilcode.constant.TimeConstants;
 import com.blankj.utilcode.util.AppUtils;
 import com.blankj.utilcode.util.BarUtils;
 import com.blankj.utilcode.util.PathUtils;
+import com.blankj.utilcode.util.PhoneUtils;
 import com.blankj.utilcode.util.SPUtils;
 import com.blankj.utilcode.util.SizeUtils;
 import com.blankj.utilcode.util.StringUtils;
@@ -45,10 +44,18 @@ import com.bytedance.sdk.openadsdk.TTAdNative;
 import com.bytedance.sdk.openadsdk.TTAppDownloadListener;
 import com.bytedance.sdk.openadsdk.TTRewardVideoAd;
 import com.chad.library.adapter.base.BaseQuickAdapter;
+import com.cmcm.cmgame.CmGameSdk;
+import com.cmcm.cmgame.IAppCallback;
+import com.cmcm.cmgame.IGameAccountCallback;
+import com.cmcm.cmgame.IGameAdCallback;
+import com.cmcm.cmgame.IGamePlayTimeCallback;
+import com.cmcm.cmgame.gamedata.GameInfo;
 import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.base.IBaseView;
 import com.feiyou.headstyle.bean.MessageEvent;
+import com.feiyou.headstyle.bean.PlayGameInfo;
+import com.feiyou.headstyle.bean.SeeVideoInfo;
 import com.feiyou.headstyle.bean.SignDoneInfoRet;
 import com.feiyou.headstyle.bean.TaskInfo;
 import com.feiyou.headstyle.bean.TaskRecordInfoRet;
@@ -63,28 +70,31 @@ import com.feiyou.headstyle.ui.activity.AboutGoldActivity;
 import com.feiyou.headstyle.ui.activity.AdActivity;
 import com.feiyou.headstyle.ui.activity.CashActivity;
 import com.feiyou.headstyle.ui.activity.CommunityArticleActivity;
+import com.feiyou.headstyle.ui.activity.GameTestActivity;
+import com.feiyou.headstyle.ui.activity.GoldAndCashActivity;
 import com.feiyou.headstyle.ui.activity.GoldDetailActivity;
 import com.feiyou.headstyle.ui.activity.GoldMailActivity;
 import com.feiyou.headstyle.ui.activity.GoldTaskActivity;
 import com.feiyou.headstyle.ui.activity.GoodDetailActivity;
-import com.feiyou.headstyle.ui.activity.Main1Activity;
 import com.feiyou.headstyle.ui.activity.PushNoteActivity;
 import com.feiyou.headstyle.ui.activity.TestDetailActivity;
 import com.feiyou.headstyle.ui.activity.TestImageDetailActivity;
 import com.feiyou.headstyle.ui.adapter.GoodsListAdapter;
+import com.feiyou.headstyle.ui.adapter.MiniGameAdapter;
 import com.feiyou.headstyle.ui.adapter.SignInListAdapter;
 import com.feiyou.headstyle.ui.adapter.TaskListAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragment;
 import com.feiyou.headstyle.ui.custom.DownFileDialog;
+import com.feiyou.headstyle.ui.custom.GameProfitDialog;
 import com.feiyou.headstyle.ui.custom.GlideRoundTransform;
 import com.feiyou.headstyle.ui.custom.LoginDialog;
+import com.feiyou.headstyle.ui.custom.NewSignSuccessDialog;
 import com.feiyou.headstyle.ui.custom.NormalDecoration;
 import com.feiyou.headstyle.ui.custom.ReceiveHongBaoDialog;
 import com.feiyou.headstyle.ui.custom.SeeVideoDialog;
 import com.feiyou.headstyle.ui.custom.SignSuccessDialog;
 import com.feiyou.headstyle.ui.custom.TurnProfitDialog;
 import com.feiyou.headstyle.ui.custom.WeiXinTaskDialog;
-import com.feiyou.headstyle.utils.ClickUtil;
 import com.feiyou.headstyle.utils.GoToScoreUtils;
 import com.feiyou.headstyle.utils.MyTimeUtil;
 import com.feiyou.headstyle.utils.RandomUtils;
@@ -99,6 +109,7 @@ import com.sunfusheng.marqueeview.MarqueeView;
 import com.tencent.mm.opensdk.modelbiz.WXLaunchMiniProgram;
 import com.tencent.mm.opensdk.openapi.IWXAPI;
 import com.tencent.mm.opensdk.openapi.WXAPIFactory;
+import com.umeng.analytics.MobclickAgent;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -111,13 +122,12 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 import es.dmoral.toasty.Toasty;
 
 /**
  * Created by myflying on 2019/3/12.
  */
-public class Create1Fragment extends BaseFragment implements View.OnClickListener, SignSuccessDialog.SignSuccessListener, IBaseView, ReceiveHongBaoDialog.OpenHongBaoListener, SeeVideoDialog.GetMoneyListener, SwipeRefreshLayout.OnRefreshListener, TurnProfitDialog.TurnListener, WeiXinTaskDialog.OpenWeixinListener, DownFileDialog.DownListener {
+public class Create1Fragment extends BaseFragment implements View.OnClickListener, IBaseView, ReceiveHongBaoDialog.OpenHongBaoListener, SeeVideoDialog.GetMoneyListener, SwipeRefreshLayout.OnRefreshListener, TurnProfitDialog.TurnListener, WeiXinTaskDialog.OpenWeixinListener, DownFileDialog.DownListener, IGamePlayTimeCallback, IGameAdCallback, IGameAccountCallback, IAppCallback, NewSignSuccessDialog.NewSignListener {
 
     @BindView(R.id.swipe_refresh)
     SwipeRefreshLayout mRefreshLayout;
@@ -132,6 +142,8 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
 
     RecyclerView mTaskListView;
 
+    RecyclerView mMiniGameListView;
+
     ImageView mSignInIv;
 
     GoodsListAdapter goodsListAdapter;
@@ -140,9 +152,13 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
 
     TaskListAdapter taskListAdapter;
 
+    MiniGameAdapter miniGameAdapter;
+
     View topView;
 
-    SignSuccessDialog signSuccessDialog;
+    //SignSuccessDialog signSuccessDialog;
+
+    NewSignSuccessDialog newSignSuccessDialog;
 
     ReceiveHongBaoDialog receiveHongBaoDialog;
 
@@ -156,13 +172,15 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
 
     LinearLayout mGoldTaskLayout;
 
-    LinearLayout mGoldMailLayout;
+    FrameLayout mGoldMailLayout;
 
     FrameLayout mGetMoneyLayout;
 
-    LinearLayout mLuckDrawLayout;
+    FrameLayout mPlayGameLayout;
 
     RelativeLayout mAboutGoldLayout;
+
+    RelativeLayout mShouyiLayout;
 
     LoginDialog loginDialog;
 
@@ -190,11 +208,13 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
 
     TextView mCountDownTv;
 
-    TextView mTurnTableTv;
+    TextView mPlayGameTv;
 
     ImageView mTurnTableIv;
 
     MarqueeView marqueeView;
+
+    TextView mMoreGameTv;
 
     private UserInfo userInfo;
 
@@ -238,6 +258,8 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
 
     private int userGoldNum;//用户的金币数
 
+    private int userRealGoldNum;//用户实际转换的金额
+
     private String followPublicUrl;
 
     private String followPublicName;
@@ -274,7 +296,17 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
 
     private String luckTaskId = "15";
 
-    private Handler mHandler = new Handler() {
+    private PlayGameInfo playGameInfo;
+
+    private SeeVideoInfo gameSeeVideoInfo;
+
+    List<GameInfo> tempGameInfoList = null;
+
+    private int isSignToday;
+
+    private boolean isCanSign;
+
+    public Handler mHandler = new Handler() {
         @Override
         public void handleMessage(android.os.Message msg) {
             switch (msg.what) {
@@ -283,6 +315,7 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
                     downApkDialog.setProgress(progress);
                     break;
                 case 1:
+                    isCanSign = true;
                     break;
                 default:
                     break;
@@ -310,6 +343,8 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
         topView = LayoutInflater.from(getActivity()).inflate(R.layout.welfare_top_view, null);
         mSingInListView = topView.findViewById(R.id.sign_in_list_view);
         mTaskListView = topView.findViewById(R.id.task_list_view);
+        mMiniGameListView = topView.findViewById(R.id.mini_game_list_view);
+
         mSignInIv = topView.findViewById(R.id.iv_sign_in);
         mTurnProfitBtn = topView.findViewById(R.id.btn_turn_profit);
         mCashBtn = topView.findViewById(R.id.btn_cash);
@@ -318,9 +353,10 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
         mGoldMailLayout = topView.findViewById(R.id.layout_gold_mail);
         mAboutGoldLayout = topView.findViewById(R.id.layout_about_gold);
         mGetMoneyLayout = topView.findViewById(R.id.layout_get_money);
-        mLuckDrawLayout = topView.findViewById(R.id.layout_luck_draw);
-
+        mPlayGameLayout = topView.findViewById(R.id.layout_play_game);
+        mMoreGameTv = topView.findViewById(R.id.tv_more_game);
         marqueeView = topView.findViewById(R.id.marqueeView);
+        mShouyiLayout = topView.findViewById(R.id.layout_shouyi_wrapper);
 
         mCountDownLayout = topView.findViewById(R.id.layout_count_down);
         mMaskBgIv = topView.findViewById(R.id.iv_mask_bg);
@@ -335,7 +371,7 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
         mSignDaysTv = topView.findViewById(R.id.tv_sign_days);
         mMoreTaskTv = topView.findViewById(R.id.tv_more_task);
         mGoodMoreTv = topView.findViewById(R.id.tv_good_more);
-        mTurnTableTv = topView.findViewById(R.id.tv_turntable);
+        mPlayGameTv = topView.findViewById(R.id.tv_play_game);
         mTurnTableIv = topView.findViewById(R.id.iv_turntable);
 
         mUserHeadIv.setOnClickListener(this);
@@ -350,13 +386,16 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
         mGetMoneyLayout.setOnClickListener(this);
         mMoreTaskTv.setOnClickListener(this);
         mGoodMoreTv.setOnClickListener(this);
-        mTurnTableTv.setOnClickListener(this);
+        mPlayGameLayout.setOnClickListener(this);
         mGetMoneyBgIv.setOnClickListener(this);
         mTurnTableIv.setOnClickListener(this);
-        mLuckDrawLayout.setOnClickListener(this);
+        mPlayGameTv.setOnClickListener(this);
+        mMoreGameTv.setOnClickListener(this);
+        mShouyiLayout.setOnClickListener(this);
 
-        signSuccessDialog = new SignSuccessDialog(getActivity(), R.style.login_dialog);
-        signSuccessDialog.setSignSuccessListener(this);
+        newSignSuccessDialog = new NewSignSuccessDialog(getActivity(), R.style.login_dialog);
+        newSignSuccessDialog.setNewSignListener(this);
+
         receiveHongBaoDialog = new ReceiveHongBaoDialog(getActivity(), R.style.login_dialog);
         receiveHongBaoDialog.setOpenHongBaoListener(this);
 
@@ -368,10 +407,27 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
 
         downApkDialog = new DownFileDialog(getActivity(), R.style.login_dialog);
         downApkDialog.setDownListener(this);
+
     }
 
     public void initData() {
+        MobclickAgent.onEvent(getActivity(), "click_fuli", AppUtils.getAppVersionName());
 
+        // 默认游戏中心页面，点击游戏试，触发回调
+        CmGameSdk.INSTANCE.setGameClickCallback(this);
+
+        // 点击游戏右上角或物理返回键，退出游戏时触发回调，并返回游戏时长
+        CmGameSdk.INSTANCE.setGamePlayTimeCallback(this);
+
+        // 游戏内增加自定义view，提供产品多样性
+        //initMoveView();
+
+        // 所有广告类型的展示和点击事件回调，仅供参考，数据以广告后台为准
+        // 建议不要使用，有阻塞行为会导致程序无法正常使用
+        // CmGameSdk.INSTANCE.setGameAdCallback(this);
+
+        // 账号信息变化时触发回调，若需要支持APP卸载后游戏信息不丢失，需要注册该回调
+        CmGameSdk.INSTANCE.setGameAccountCallback(this);
         Logger.i("create init data--->");
 
         mRefreshLayout.setOnRefreshListener(this);
@@ -411,6 +467,10 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
 
                 Intent intent = new Intent(getActivity(), GoodDetailActivity.class);
                 intent.putExtra("gid", goodsListAdapter.getData().get(position).getId() + "");
+                intent.putExtra("sign_list", (Serializable) signInListAdapter.getData());
+                intent.putExtra("sign_days", signDays);
+                intent.putExtra("random_money", randomHongbao);
+                intent.putExtra("is_sign_today", isSignToday);
                 startActivity(intent);
             }
         });
@@ -423,6 +483,36 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
         mTaskListView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mTaskListView.addItemDecoration(new NormalDecoration(ContextCompat.getColor(getActivity(), R.color.gray_aaa), 1));
         mTaskListView.setAdapter(taskListAdapter);
+
+
+        if (CmGameSdk.INSTANCE.getGameInfoList().size() > 3) {
+            tempGameInfoList = CmGameSdk.INSTANCE.getGameInfoList().subList(0, 3);
+        } else {
+            tempGameInfoList = CmGameSdk.INSTANCE.getGameInfoList();
+        }
+
+        miniGameAdapter = new MiniGameAdapter(getActivity(), tempGameInfoList);
+        mMiniGameListView.setLayoutManager(new GridLayoutManager(getActivity(), 3));
+        mMiniGameListView.setAdapter(miniGameAdapter);
+
+        miniGameAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
+                if (!App.getApp().isLogin) {
+                    if (loginDialog != null && !loginDialog.isShowing()) {
+                        loginDialog.show();
+                    }
+                    return;
+                }
+
+                if (tempGameInfoList != null && tempGameInfoList.size() > 0) {
+                    Intent intent8 = new Intent(getActivity(), GameTestActivity.class);
+                    intent8.putExtra("play_game_info", playGameInfo);
+                    intent8.putExtra("game_see_video", gameSeeVideoInfo);
+                    startActivity(intent8);
+                }
+            }
+        });
 
         welfareInfoPresenterImp = new WelfareInfoPresenterImp(this, getActivity());
         signDoneInfoPresenterImp = new SignDoneInfoPresenterImp(this, getActivity());
@@ -564,7 +654,6 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
             }
         };
 
-
         marketTimer = new CountDownTimer(20 * 1000, 1000) {
             @Override
             public void onTick(long millisUntilFinished) {
@@ -659,20 +748,23 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
             }
         }
 
-        //如果是从任务列表跳转过来的签到，怎根据规则，打开签到弹窗或者领红包的弹窗
-        if (App.getApp().getIsFromTaskSign() == 1) {
-            App.getApp().setIsFromTaskSign(0);
-            if (signDays > 0 && (signDays + 1) % 7 == 0) {
+    }
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if (getContext() != null && isVisibleToUser && isCanSign) {
+            //自动签到
+            if (signDays > 0 && signDays % 7 == 0) {
                 //领取红包
                 if (receiveHongBaoDialog != null && !receiveHongBaoDialog.isShowing()) {
                     receiveHongBaoDialog.show();
                 }
             } else {
-                //执行签到
+                //提示签到
                 signDoneInfoPresenterImp.signDone(userInfo != null ? userInfo.getId() : "", userInfo != null ? userInfo.getOpenid() : "", 0);
             }
         }
-
     }
 
     @Override
@@ -743,26 +835,48 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
                     loadAd("920819888", TTAdConstant.VERTICAL, userGoldNum);
                     taskId = "11";
                     turnProfitDialog.show();
-                    turnProfitDialog.setTurnInfo(userGoldNum + "", userGoldNum / (scaleGoldNum / scaleCashNum) + "");
+
+                    userRealGoldNum = userGoldNum;
+
+                    if (userGoldNum % 10 > 0) {
+                        userRealGoldNum = userGoldNum - userGoldNum % 10;
+                    }
+                    turnProfitDialog.setTurnInfo(userRealGoldNum + "", userRealGoldNum / (scaleGoldNum / scaleCashNum) + "");
                 }
                 break;
             case R.id.btn_cash:
                 Intent intent = new Intent(getActivity(), CashActivity.class);
                 intent.putExtra("my_profit_money", myProfitMoney);
+                intent.putExtra("play_game_info", playGameInfo);
+                intent.putExtra("game_see_video", gameSeeVideoInfo);
                 startActivity(intent);
                 break;
+            case R.id.layout_shouyi_wrapper:
             case R.id.layout_gold_detail:
-                Intent intent1 = new Intent(getActivity(), GoldDetailActivity.class);
+                Intent intent1 = new Intent(getActivity(), GoldAndCashActivity.class);
+                intent1.putExtra("cash_money", myProfitMoney);
+                intent1.putExtra("scale_gold_num", scaleGoldNum);
+                intent1.putExtra("scale_cash_num", scaleCashNum);
+                intent1.putExtra("play_game_info", playGameInfo);
+                intent1.putExtra("game_see_video", gameSeeVideoInfo);
                 startActivity(intent1);
                 break;
             case R.id.layout_gold_task:
                 Intent intent2 = new Intent(getActivity(), GoldTaskActivity.class);
                 //把list强制类型转换成Serializable类型
                 intent2.putExtra("task_info_list", (Serializable) allTaskInfoList);
+                intent2.putExtra("sign_list", (Serializable) signInListAdapter.getData());
+                intent2.putExtra("sign_days", signDays);
+                intent2.putExtra("random_money", randomHongbao);
+                intent2.putExtra("is_sign_today", isSignToday);
                 startActivity(intent2);
                 break;
             case R.id.layout_gold_mail:
                 Intent intent3 = new Intent(getActivity(), GoldMailActivity.class);
+                intent3.putExtra("sign_list", (Serializable) signInListAdapter.getData());
+                intent3.putExtra("sign_days", signDays);
+                intent3.putExtra("random_money", randomHongbao);
+                intent3.putExtra("is_sign_today", isSignToday);
                 startActivity(intent3);
                 break;
             case R.id.layout_about_gold:
@@ -795,48 +909,53 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
                 Intent intent5 = new Intent(getActivity(), GoldTaskActivity.class);
                 //把list强制类型转换成Serializable类型
                 intent5.putExtra("task_info_list", (Serializable) allTaskInfoList);
+                intent5.putExtra("sign_list", (Serializable) signInListAdapter.getData());
+                intent5.putExtra("sign_days", signDays);
+                intent5.putExtra("random_money", randomHongbao);
+                intent5.putExtra("is_sign_today", isSignToday);
                 startActivity(intent5);
                 break;
             case R.id.tv_good_more:
                 Intent intent6 = new Intent(getActivity(), GoldMailActivity.class);
+                intent6.putExtra("sign_list", (Serializable) signInListAdapter.getData());
+                intent6.putExtra("sign_days", signDays);
+                intent6.putExtra("random_money", randomHongbao);
+                intent6.putExtra("is_sign_today", isSignToday);
                 startActivity(intent6);
                 break;
             case R.id.iv_turntable:
-            case R.id.tv_turntable:
-            case R.id.layout_luck_draw:
-                if (StringUtils.isEmpty(luckDrawUrl)) {
-                    ToastUtils.showLong("正在升级，敬请期待！");
-                    return;
-                }
+            case R.id.tv_play_game:
+            case R.id.layout_play_game:
+
+                Intent intent7 = new Intent(getActivity(), GameTestActivity.class);
+                intent7.putExtra("play_game_info", playGameInfo);
+                intent7.putExtra("game_see_video", gameSeeVideoInfo);
+                startActivity(intent7);
+
+//                if (StringUtils.isEmpty(luckDrawUrl)) {
+//                    ToastUtils.showLong("正在升级，敬请期待！");
+//                    return;
+//                }
 
                 //此处是一步统计，直接点击后算完成
-                taskId = "15";
+                /*taskId = "15";
                 String openid = App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getOpenid() : "";
                 taskRecordInfoPresenterImp.addTaskRecord(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", openid, taskId, 0, 0, 0, "0");
 
                 Intent intent7 = new Intent(getActivity(), AdActivity.class);
                 intent7.putExtra("open_url", luckDrawUrl);
                 intent7.putExtra("ad_title", "转盘抽奖");
-                startActivity(intent7);
+                startActivity(intent7);*/
+                break;
+            case R.id.tv_more_game:
+                Intent intent8 = new Intent(getActivity(), GameTestActivity.class);
+                intent8.putExtra("play_game_info", playGameInfo);
+                intent8.putExtra("game_see_video", gameSeeVideoInfo);
+                startActivity(intent8);
                 break;
             default:
                 break;
         }
-    }
-
-    @Override
-    public void seeVideo() {
-        Logger.i("看视频翻倍奖励 start--->");
-        if (signSuccessDialog != null && signSuccessDialog.isShowing()) {
-            signSuccessDialog.dismiss();
-        }
-        recordId = "";
-
-        String openid = App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getOpenid() : "";
-        taskRecordInfoPresenterImp.addTaskRecord(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", openid, taskId, getGoldNum, 0, 0, "0");
-        //step6:在获取到广告后展示
-        mttRewardVideoAd.showRewardVideoAd(getActivity());
-        mttRewardVideoAd = null;
     }
 
     @Override
@@ -914,7 +1033,7 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
                             }
                             //签到的信息
                             if (tempList.get(i).getId() == 7) {
-                                int isSignToday = tempList.get(i).getIsFinish();
+                                isSignToday = tempList.get(i).getIsFinish();
                                 if (isSignToday == 1) {
                                     Glide.with(getActivity()).load(R.mipmap.sign_done_today).into(mSignInIv);
                                 } else {
@@ -959,6 +1078,25 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
                         }
                     }
 
+                    //玩游戏的初始化数据
+                    if (welfareInfo.getGameInfo() != null) {
+                        playGameInfo = welfareInfo.getGameInfo();
+                    }
+
+                    //游戏有关看视频得金币的任务信息
+                    if (welfareInfo.getSeeVideoInfo() != null) {
+                        gameSeeVideoInfo = welfareInfo.getSeeVideoInfo();
+                    }
+
+                    Logger.i("play game info--->" + JSON.toJSONString(playGameInfo));
+                    Logger.i("see video info--->" + JSON.toJSONString(gameSeeVideoInfo));
+                }
+                if (isSignToday == 0) {
+                    Message message = new Message();
+                    message.what = 1;
+                    mHandler.sendMessage(message);
+                }else{
+                    isCanSign = false;
                 }
             }
 
@@ -972,15 +1110,15 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
                         signInListAdapter.setTotalSignDay(signDays + 1);
                         signInListAdapter.notifyDataSetChanged();
 
-                        if (signSuccessDialog != null && !signSuccessDialog.isShowing()) {
+                        if (newSignSuccessDialog != null && !newSignSuccessDialog.isShowing()) {
 
                             getGoldNum = ((SignDoneInfoRet) tData).getData().getGoldnum();
                             //签到看视频翻倍奖励
                             loadAd("920819888", TTAdConstant.VERTICAL, getGoldNum);
                             taskId = "12";
 
-                            signSuccessDialog.show();
-                            signSuccessDialog.setSignInfo(((SignDoneInfoRet) tData).getData().getGoldnum(), ((SignDoneInfoRet) tData).getData().getSigndays());
+                            newSignSuccessDialog.show();
+                            newSignSuccessDialog.setSignInfo(((SignDoneInfoRet) tData).getData().getGoldnum());
                         }
                     }
 
@@ -988,8 +1126,8 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
                     welfareInfoPresenterImp.getWelfareData(userInfo != null ? userInfo.getId() : "");
                 } else {
                     //TODO 待定
-                    ToastUtils.showLong(((SignDoneInfoRet) tData).getMsg());
-                    return;
+                    //ToastUtils.showLong(((SignDoneInfoRet) tData).getMsg());
+                    //return;
                 }
             }
 
@@ -1176,7 +1314,8 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
                         if (rewardVerify) {
                             //ToastUtils.showLong("正常播放完成，奖励有效");
                             if (taskId.equals("11")) {
-                                seeVideoMoney = userGoldNum / (scaleGoldNum / scaleCashNum);
+                                seeVideoMoney = userRealGoldNum / (scaleGoldNum / scaleCashNum);
+                                rewardAmount = userRealGoldNum;
                             }
 
                             if (taskId.equals("12")) {
@@ -1211,28 +1350,28 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
                     public void onDownloadActive(long totalBytes, long currBytes, String fileName, String appName) {
                         if (!mHasShowDownloadActive) {
                             mHasShowDownloadActive = true;
-                            ToastUtils.showLong("下载中，点击下载区域暂停", Toast.LENGTH_LONG);
+                            //ToastUtils.showLong("下载中，点击下载区域暂停", Toast.LENGTH_LONG);
                         }
                     }
 
                     @Override
                     public void onDownloadPaused(long totalBytes, long currBytes, String fileName, String appName) {
-                        ToastUtils.showLong("下载暂停，点击下载区域继续", Toast.LENGTH_LONG);
+                        //ToastUtils.showLong("下载暂停，点击下载区域继续", Toast.LENGTH_LONG);
                     }
 
                     @Override
                     public void onDownloadFailed(long totalBytes, long currBytes, String fileName, String appName) {
-                        ToastUtils.showLong("下载失败，点击下载区域重新下载", Toast.LENGTH_LONG);
+                        //ToastUtils.showLong("下载失败，点击下载区域重新下载", Toast.LENGTH_LONG);
                     }
 
                     @Override
                     public void onDownloadFinished(long totalBytes, String fileName, String appName) {
-                        ToastUtils.showLong("下载完成，点击下载区域重新下载", Toast.LENGTH_LONG);
+                        //ToastUtils.showLong("下载完成，点击下载区域重新下载", Toast.LENGTH_LONG);
                     }
 
                     @Override
                     public void onInstalled(String fileName, String appName) {
-                        ToastUtils.showLong("安装完成，点击下载区域打开", Toast.LENGTH_LONG);
+                        //ToastUtils.showLong("安装完成，点击下载区域打开", Toast.LENGTH_LONG);
                     }
                 });
             }
@@ -1253,9 +1392,11 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
         getGoldNum = 0;
         String openid = App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getOpenid() : "";
         taskRecordInfoPresenterImp.addTaskRecord(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", openid, taskId, getGoldNum, 0, 0, "0");
-        //step6:在获取到广告后展示
-        mttRewardVideoAd.showRewardVideoAd(getActivity());
-        mttRewardVideoAd = null;
+        if(mttRewardVideoAd != null) {
+            //step6:在获取到广告后展示
+            mttRewardVideoAd.showRewardVideoAd(getActivity());
+            mttRewardVideoAd = null;
+        }
     }
 
     @Override
@@ -1401,5 +1542,49 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
         if (task != null) {
             task.pause();
         }
+    }
+
+    @Override
+    public void onGameAccount(long l, String s, String s1) {
+
+    }
+
+    @Override
+    public void onGameAdAction(String s, int i, int i1) {
+
+    }
+
+    @Override
+    public void gamePlayTimeCallback(String s, int i) {
+
+    }
+
+    @Override
+    public void gameClickCallback(String s, String s1) {
+
+    }
+
+    @Override
+    public void newSignSeeVideo() {
+        Logger.i("看视频翻倍奖励 start--->");
+        if (newSignSuccessDialog != null && newSignSuccessDialog.isShowing()) {
+            newSignSuccessDialog.dismiss();
+        }
+        recordId = "";
+        if(mttRewardVideoAd != null) {
+            String openid = App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getOpenid() : "";
+            taskRecordInfoPresenterImp.addTaskRecord(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", openid, taskId, getGoldNum, 0, 0, "0");
+            //step6:在获取到广告后展示
+            mttRewardVideoAd.showRewardVideoAd(getActivity());
+            mttRewardVideoAd = null;
+        }
+    }
+
+    @Override
+    public void newSignPlayGame() {
+        Intent intent = new Intent(getActivity(), GameTestActivity.class);
+        intent.putExtra("play_game_info", playGameInfo);
+        intent.putExtra("game_see_video", gameSeeVideoInfo);
+        startActivity(intent);
     }
 }

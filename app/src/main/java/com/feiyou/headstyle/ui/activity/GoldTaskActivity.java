@@ -11,20 +11,29 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.alibaba.fastjson.JSON;
 import com.blankj.utilcode.util.AppUtils;
+import com.blankj.utilcode.util.BarUtils;
 import com.blankj.utilcode.util.PathUtils;
 import com.blankj.utilcode.util.SizeUtils;
 import com.blankj.utilcode.util.StringUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.blankj.utilcode.util.Utils;
+import com.bumptech.glide.Glide;
 import com.bytedance.sdk.openadsdk.AdSlot;
 import com.bytedance.sdk.openadsdk.TTAdConstant;
 import com.bytedance.sdk.openadsdk.TTAdManager;
@@ -35,16 +44,22 @@ import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.base.IBaseView;
+import com.feiyou.headstyle.bean.SignDoneInfoRet;
 import com.feiyou.headstyle.bean.TaskInfoRet;
 import com.feiyou.headstyle.bean.TaskRecordInfoRet;
 import com.feiyou.headstyle.bean.UserInfo;
+import com.feiyou.headstyle.bean.WelfareInfo;
 import com.feiyou.headstyle.common.Constants;
+import com.feiyou.headstyle.presenter.SignDoneInfoPresenterImp;
 import com.feiyou.headstyle.presenter.TaskInfoPresenterImp;
 import com.feiyou.headstyle.presenter.TaskRecordInfoPresenterImp;
+import com.feiyou.headstyle.ui.adapter.SignInListAdapter;
 import com.feiyou.headstyle.ui.adapter.TaskListAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragmentActivity;
 import com.feiyou.headstyle.ui.custom.DownFileDialog;
 import com.feiyou.headstyle.ui.custom.NormalDecoration;
+import com.feiyou.headstyle.ui.custom.ReceiveHongBaoDialog;
+import com.feiyou.headstyle.ui.custom.SignSuccessDialog;
 import com.feiyou.headstyle.ui.custom.WeiXinTaskDialog;
 import com.feiyou.headstyle.utils.GoToScoreUtils;
 import com.feiyou.headstyle.utils.RandomUtils;
@@ -59,19 +74,36 @@ import com.tencent.mm.opensdk.modelbiz.WXLaunchMiniProgram;
 import com.tencent.mm.opensdk.openapi.IWXAPI;
 import com.tencent.mm.opensdk.openapi.WXAPIFactory;
 
+import java.util.List;
+
 import butterknife.BindView;
 import butterknife.OnClick;
 import es.dmoral.toasty.Toasty;
 
-public class GoldTaskActivity extends BaseFragmentActivity implements IBaseView, WeiXinTaskDialog.OpenWeixinListener, DownFileDialog.DownListener {
+public class GoldTaskActivity extends BaseFragmentActivity implements IBaseView, WeiXinTaskDialog.OpenWeixinListener, DownFileDialog.DownListener, ReceiveHongBaoDialog.OpenHongBaoListener {
 
-    @BindView(R.id.topbar)
-    QMUITopBar mTopBar;
-
+    @BindView(R.id.iv_back)
     ImageView mBackImageView;
+
+    @BindView(R.id.tv_title)
+    TextView mTitleTv;
+
+    @BindView(R.id.layout_top)
+    RelativeLayout mTopLayout;
+
+    @BindView(R.id.layout_task)
+    LinearLayout mTaskLayout;
 
     @BindView(R.id.task_list_view)
     RecyclerView mTaskListView;
+
+    private View signView;
+
+    TextView mSignDaysTv;
+
+    RecyclerView mSingInListView;
+
+    ImageView mSignInIv;
 
     TaskListAdapter taskListAdapter;
 
@@ -117,6 +149,26 @@ public class GoldTaskActivity extends BaseFragmentActivity implements IBaseView,
 
     private UserInfo mUserInfo;
 
+    SignInListAdapter signInListAdapter;
+
+    private int signDays;//连续签到的天数
+
+    private String[] hongbaoMoney;
+
+    private double randomHongbao;
+
+    private int isSignToday;
+
+    ReceiveHongBaoDialog receiveHongBaoDialog;
+
+    private SignDoneInfoPresenterImp signDoneInfoPresenterImp;
+
+    List<WelfareInfo.SignSetInfo> signList;
+
+    private int getGoldNum;//任务完成获得的金币数
+
+    SignSuccessDialog signSuccessDialog;
+
     private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(android.os.Message msg) {
@@ -145,23 +197,53 @@ public class GoldTaskActivity extends BaseFragmentActivity implements IBaseView,
     }
 
     private void initTopBar() {
-        QMUIStatusBarHelper.setStatusBarLightMode(this);
-        View aboutView = getLayoutInflater().inflate(R.layout.common_top_back, null);
-        aboutView.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, SizeUtils.dp2px(48)));
-        TextView titleTv = aboutView.findViewById(R.id.tv_title);
-        titleTv.setText("金币任务");
-
-        mTopBar.setCenterView(aboutView);
-        mBackImageView = aboutView.findViewById(R.id.iv_back);
-        mBackImageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                popBackStack();
-            }
-        });
+        FrameLayout.LayoutParams paramsTask = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        paramsTask.setMargins(0, BarUtils.getStatusBarHeight() + SizeUtils.dp2px(10), 0, 0);
+        paramsTask.topMargin = BarUtils.getStatusBarHeight();
+        mTaskLayout.setLayoutParams(paramsTask);
+        mTaskLayout.setGravity(Gravity.TOP);
     }
 
     public void initData() {
+        Bundle bundle = getIntent().getExtras();
+        if (bundle != null) {
+            randomHongbao = bundle.getDouble("random_money");
+            signDays = bundle.getInt("sign_days");
+            isSignToday = bundle.getInt("is_sign_today");
+        }
+
+        signList = (List<WelfareInfo.SignSetInfo>) getIntent().getSerializableExtra("sign_list");
+
+        signDoneInfoPresenterImp = new SignDoneInfoPresenterImp(this, this);
+        signSuccessDialog = new SignSuccessDialog(this, R.style.login_dialog);
+        receiveHongBaoDialog = new ReceiveHongBaoDialog(this, R.style.login_dialog);
+        receiveHongBaoDialog.setOpenHongBaoListener(this);
+
+        signView = LayoutInflater.from(this).inflate(R.layout.sign_in_view, null);
+        mSingInListView = signView.findViewById(R.id.sign_in_list_view);
+        mSignInIv = signView.findViewById(R.id.iv_sign_in);
+        mSignDaysTv = signView.findViewById(R.id.tv_sign_days);
+        mSignDaysTv.setText(signDays+"");
+        mSignInIv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (signDays > 0 && signDays % 7 == 0 && isSignToday == 0) {
+                    //领取红包
+                    if (receiveHongBaoDialog != null && !receiveHongBaoDialog.isShowing()) {
+                        receiveHongBaoDialog.show();
+                    }
+                } else {
+                    //提示签到
+                    signDoneInfoPresenterImp.signDone(mUserInfo != null ? mUserInfo.getId() : "", mUserInfo != null ? mUserInfo.getOpenid() : "", 0);
+                }
+            }
+        });
+
+        if (isSignToday == 1) {
+            Glide.with(this).load(R.mipmap.sign_done_today).into(mSignInIv);
+        } else {
+            Glide.with(this).load(R.drawable.sign_in).into(mSignInIv);
+        }
 
         TTAdManager ttAdManager = TTAdManagerHolder.get();
         //step3:创建TTAdNative对象,用于调用广告请求接口
@@ -180,6 +262,18 @@ public class GoldTaskActivity extends BaseFragmentActivity implements IBaseView,
         mTaskListView.setLayoutManager(new LinearLayoutManager(this));
         mTaskListView.addItemDecoration(new NormalDecoration(ContextCompat.getColor(this, R.color.line_color), 1));
         mTaskListView.setAdapter(taskListAdapter);
+        taskListAdapter.addHeaderView(signView);
+
+        signInListAdapter = new SignInListAdapter(this, signList);
+        signInListAdapter.setTotalSignDay(signDays);
+        mSingInListView.setLayoutManager(new GridLayoutManager(this, 7));
+        mSingInListView.setAdapter(signInListAdapter);
+
+        View footView = new View(this);
+        footView.setBackgroundResource(R.drawable.sign_foot_bg);
+        ViewGroup.LayoutParams footParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, SizeUtils.dp2px(10));
+        footView.setLayoutParams(footParams);
+        taskListAdapter.addFooterView(footView);
 
         taskListAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
             @Override
@@ -250,8 +344,20 @@ public class GoldTaskActivity extends BaseFragmentActivity implements IBaseView,
 //                        intent4.putExtra("home_index", 2);
 //                        intent4.putExtra("is_from_task_sign", 1);
 //                        startActivity(intent4);
-                        App.getApp().setIsFromTaskSign(1);
-                        finish();
+
+                        //App.getApp().setIsFromTaskSign(1);
+                        //finish();
+
+                        if (signDays > 0 && (signDays + 1) % 7 == 0) {
+                            //领取红包
+                            if (receiveHongBaoDialog != null && !receiveHongBaoDialog.isShowing()) {
+                                receiveHongBaoDialog.show();
+                            }
+                        } else {
+                            //提示签到
+                            signDoneInfoPresenterImp.signDone(mUserInfo != null ? mUserInfo.getId() : "", mUserInfo != null ? mUserInfo.getOpenid() : "", 0);
+                        }
+
                         break;
                     case 8:
 
@@ -459,6 +565,35 @@ public class GoldTaskActivity extends BaseFragmentActivity implements IBaseView,
                 Logger.i("task error--->");
             }
         }
+
+        if (tData instanceof SignDoneInfoRet) {
+            Logger.i("sign done --->" + JSON.toJSONString(tData));
+            if (((SignDoneInfoRet) tData).getCode() == Constants.SUCCESS) {
+                Glide.with(this).load(R.mipmap.sign_done_today).into(mSignInIv);
+                if (signDays > 0 && (signDays + 1) % 7 == 0) {
+                    receiveHongBaoDialog.updateDialog(randomHongbao);
+                } else {
+                    signInListAdapter.setTotalSignDay(signDays + 1);
+                    signInListAdapter.notifyDataSetChanged();
+
+                    if (signSuccessDialog != null && !signSuccessDialog.isShowing()) {
+
+                        getGoldNum = ((SignDoneInfoRet) tData).getData().getGoldnum();
+                        //签到看视频翻倍奖励
+                        loadAd("920819888", TTAdConstant.VERTICAL, getGoldNum);
+                        taskId = "12";
+
+                        signSuccessDialog.show();
+                        signSuccessDialog.setSignInfo(((SignDoneInfoRet) tData).getData().getGoldnum(), ((SignDoneInfoRet) tData).getData().getSigndays());
+                    }
+                }
+            } else {
+                //TODO 待定
+                ToastUtils.showLong(((SignDoneInfoRet) tData).getMsg());
+                return;
+            }
+        }
+
     }
 
     @Override
@@ -641,28 +776,28 @@ public class GoldTaskActivity extends BaseFragmentActivity implements IBaseView,
                     public void onDownloadActive(long totalBytes, long currBytes, String fileName, String appName) {
                         if (!mHasShowDownloadActive) {
                             mHasShowDownloadActive = true;
-                            ToastUtils.showLong("下载中，点击下载区域暂停", Toast.LENGTH_LONG);
+                            //ToastUtils.showLong("下载中，点击下载区域暂停", Toast.LENGTH_LONG);
                         }
                     }
 
                     @Override
                     public void onDownloadPaused(long totalBytes, long currBytes, String fileName, String appName) {
-                        ToastUtils.showLong("下载暂停，点击下载区域继续", Toast.LENGTH_LONG);
+                        //ToastUtils.showLong("下载暂停，点击下载区域继续", Toast.LENGTH_LONG);
                     }
 
                     @Override
                     public void onDownloadFailed(long totalBytes, long currBytes, String fileName, String appName) {
-                        ToastUtils.showLong("下载失败，点击下载区域重新下载", Toast.LENGTH_LONG);
+                        //ToastUtils.showLong("下载失败，点击下载区域重新下载", Toast.LENGTH_LONG);
                     }
 
                     @Override
                     public void onDownloadFinished(long totalBytes, String fileName, String appName) {
-                        ToastUtils.showLong("下载完成，点击下载区域重新下载", Toast.LENGTH_LONG);
+                        //ToastUtils.showLong("下载完成，点击下载区域重新下载", Toast.LENGTH_LONG);
                     }
 
                     @Override
                     public void onInstalled(String fileName, String appName) {
-                        ToastUtils.showLong("安装完成，点击下载区域打开", Toast.LENGTH_LONG);
+                        //ToastUtils.showLong("安装完成，点击下载区域打开", Toast.LENGTH_LONG);
                     }
                 });
             }
@@ -690,5 +825,33 @@ public class GoldTaskActivity extends BaseFragmentActivity implements IBaseView,
         if (task != null) {
             task.pause();
         }
+    }
+
+    @Override
+    public void openHongbao() {
+        if (signDoneInfoPresenterImp != null && randomHongbao > 0) {
+            signDoneInfoPresenterImp.signDone(mUserInfo != null ? mUserInfo.getId() : "", mUserInfo != null ? mUserInfo.getOpenid() : "", randomHongbao);
+        }
+        loadAd("920819888", TTAdConstant.VERTICAL, 0);
+    }
+
+    @OnClick(R.id.iv_back)
+    void back(){
+        popBackStack();
+    }
+
+    @Override
+    public void doubleMoney() {
+        if (receiveHongBaoDialog != null && receiveHongBaoDialog.isShowing()) {
+            receiveHongBaoDialog.dismiss();
+        }
+
+        taskId = "12";
+        recordId = "";
+        String openid = App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getOpenid() : "";
+        taskRecordInfoPresenterImp.addTaskRecord(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", openid, taskId, 0, randomHongbao, 0, "0");
+        //step6:在获取到广告后展示
+        mttRewardVideoAd.showRewardVideoAd(this);
+        mttRewardVideoAd = null;
     }
 }

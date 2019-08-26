@@ -30,6 +30,8 @@ public class UserInfo {
 
     private String txopenid;
 
+    private String txnickname;
+
     @SerializedName("collect_num")
     private int collectNum;
 
@@ -324,5 +326,13 @@ public class UserInfo {
 
     public void setTxopenid(String txopenid) {
         this.txopenid = txopenid;
+    }
+
+    public String getTxnickname() {
+        return txnickname;
+    }
+
+    public void setTxnickname(String txnickname) {
+        this.txnickname = txnickname;
     }
 }

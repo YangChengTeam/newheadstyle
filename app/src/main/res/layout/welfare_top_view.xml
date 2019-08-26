@@ -93,6 +93,7 @@
                 android:orientation="vertical">
 
                 <RelativeLayout
+                    android:id="@+id/layout_shouyi_wrapper"
                     android:layout_width="match_parent"
                     android:layout_height="32dp"
                     android:orientation="horizontal">
@@ -279,7 +280,8 @@
         android:layout_height="170dp"
         android:background="@mipmap/sign_in_bg"
         android:gravity="top|center"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:visibility="gone">
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -354,13 +356,15 @@
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="100dp"
+        android:layout_height="90dp"
         android:gravity="center">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
+            android:layout_gravity="center|top"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="6dp"
             android:gravity="center"
             android:orientation="horizontal">
 
@@ -378,10 +382,10 @@
                     android:src="@mipmap/zjb_icon" />
             </LinearLayout>
 
-            <LinearLayout
+            <FrameLayout
                 android:id="@+id/layout_gold_mail"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="64dp"
                 android:layout_weight="1"
                 android:gravity="center"
                 android:orientation="vertical">
@@ -389,13 +393,22 @@
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="center"
                     android:src="@mipmap/gold_mall_icon" />
-            </LinearLayout>
 
-            <LinearLayout
-                android:id="@+id/layout_luck_draw"
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="top|right"
+                    android:layout_marginRight="6dp"
+                    android:visibility="gone"
+                    android:src="@mipmap/mall_top" />
+            </FrameLayout>
+
+            <FrameLayout
+                android:id="@+id/layout_play_game"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="64dp"
                 android:layout_weight="1"
                 android:gravity="center"
                 android:orientation="vertical">
@@ -404,8 +417,15 @@
                     android:id="@+id/iv_turntable"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@mipmap/lucky_icon" />
-            </LinearLayout>
+                    android:layout_gravity="center"
+                    android:src="@mipmap/play_game" />
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="top|right"
+                    android:layout_marginRight="6dp"
+                    android:src="@mipmap/game_top" />
+            </FrameLayout>
 
             <FrameLayout
                 android:id="@+id/layout_get_money"
@@ -470,12 +490,12 @@
                 android:text="金币商城" />
 
             <TextView
-                android:id="@+id/tv_turntable"
+                android:id="@+id/tv_play_game"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:text="幸运转盘" />
+                android:text="游戏赚钱" />
 
             <TextView
                 android:layout_width="0dp"
@@ -485,6 +505,56 @@
                 android:text="领钱" />
         </LinearLayout>
     </FrameLayout>
+
+    <!--小游戏-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="48dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="12dp"
+                android:drawableLeft="@mipmap/tuijian_icon"
+                android:drawablePadding="4dp"
+                android:text="玩游戏赚金币"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tv_more_game"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:padding="12dp"
+                android:text="更多>"
+                android:textColor="@color/black2"
+                android:textSize="14sp" />
+        </RelativeLayout>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/mini_game_list_view"
+            android:layout_width="match_parent"
+            android:layout_height="136dp"
+            android:layout_marginLeft="12dp"
+            android:layout_marginRight="12dp"></android.support.v7.widget.RecyclerView>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.3dp"
+            android:layout_marginLeft="12dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginRight="12dp"
+            android:background="@color/line_color"></View>
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"

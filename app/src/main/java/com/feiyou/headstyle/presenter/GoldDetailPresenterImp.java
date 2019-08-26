@@ -31,4 +31,9 @@ public class GoldDetailPresenterImp extends BasePresenterImp<GoldDetailView, Gol
     public void goldDetailList(String uid, String openid,int page, int pageSize) {
         goldDetailModelImp.goldDetailList(uid, openid,page, pageSize, this);
     }
+
+    @Override
+    public void goldCashDetailList(String uid, String openid, int page, int pageSize, int iscash) {
+        goldDetailModelImp.goldCashDetailList(uid, openid,page, pageSize, iscash,this);
+    }
 }

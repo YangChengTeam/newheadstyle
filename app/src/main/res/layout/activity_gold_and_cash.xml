@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:gravity="center"
+    android:orientation="vertical">
+
+    <com.qmuiteam.qmui.widget.QMUITopBar
+        android:id="@+id/topbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/qmui_topbar_height"
+        android:background="@color/white" />
+
+    <View
+        android:id="@+id/top_line_view"
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:layout_below="@+id/topbar"
+        android:background="@color/line_color"></View>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:background="@color/white"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="105dp"
+            android:layout_marginLeft="12dp"
+            android:layout_marginRight="12dp">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tv_type_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="金币收益"
+                    android:textColor="@color/black1"
+                    android:textSize="16sp" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:gravity="left|center">
+
+                    <ImageView
+                        android:id="@+id/iv_gold_icon"
+                        android:layout_width="15dp"
+                        android:visibility="gone"
+                        android:layout_height="wrap_content"
+                        android:src="@mipmap/shouyi_gold" />
+
+                    <TextView
+                        android:id="@+id/tv_my_gold_num"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="4dp"
+                        android:text="0"
+                        android:textColor="@color/profit_color"
+                        android:textSize="30sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/btn_task"
+                android:layout_width="80dp"
+                android:layout_height="35dp"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:background="@drawable/line_border_bg"
+                android:text="去提现" />
+        </RelativeLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:layout_marginLeft="12dp"
+            android:layout_marginRight="12dp"
+            android:background="@color/line_color"></View>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="45dp">
+
+            <LinearLayout
+                android:id="@+id/layout_gold_total"
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:gravity="left|center">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="12dp"
+                    android:text="今日金币："
+                    android:textColor="@color/gray_aaa"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/tv_today_gold_num"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:textColor="@color/profit_color"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="12dp"
+                    android:text="累计赚取："
+                    android:textColor="@color/gray_aaa"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/tv_get_total_gold_num"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:textColor="@color/profit_color"
+                    android:textSize="16sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/layout_cash_total"
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:gravity="left|center"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/tv_turn_scale"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="12dp"
+                    android:text="转换汇率：1000金币≈1元"
+                    android:textColor="@color/gray_aaa"
+                    android:textSize="14sp" />
+            </LinearLayout>
+        </FrameLayout>
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="10dp"
+        android:background="@color/line2_color"></View>
+
+    <RelativeLayout
+        android:id="@+id/layout_my_message_top"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="@color/white">
+
+        <android.support.v4.app.FragmentTabHost
+            android:id="@android:id/tabhost"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_centerVertical="true"
+            android:background="@android:color/white">
+
+            <FrameLayout
+                android:id="@android:id/tabcontent"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="0"></FrameLayout>
+        </android.support.v4.app.FragmentTabHost>
+    </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.3dp"
+        android:background="@color/line_color"></View>
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/view_pager"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_alignParentStart="true"
+        android:layout_weight="1"></android.support.v4.view.ViewPager>
+
+</LinearLayout>

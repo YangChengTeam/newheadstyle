@@ -6,6 +6,9 @@ import java.util.List;
 
 public class EveryDayHbWrapper {
 
+    @SerializedName("hbvideo")
+    private int hbvideo;//1,  红包看视频开关控制(1：打开。2：关闭)
+
     @SerializedName("is_first")
     private int isFirst;//当天是否打开过红包,0为未打开，1为已打开过
 
@@ -17,6 +20,19 @@ public class EveryDayHbWrapper {
     @SerializedName("hb_list")
     public List<ReceiveUserInfo> receiveUserList;
 
+    @SerializedName("game_info")
+    private PlayGameInfo gameInfo;
+
+    @SerializedName("sp_info")
+    private SeeVideoInfo seeVideoInfo;
+
+    public int getHbvideo() {
+        return hbvideo;
+    }
+
+    public void setHbvideo(int hbvideo) {
+        this.hbvideo = hbvideo;
+    }
 
     public int getIsFirst() {
         return isFirst;
@@ -50,4 +66,19 @@ public class EveryDayHbWrapper {
         this.receiveUserList = receiveUserList;
     }
 
+    public PlayGameInfo getGameInfo() {
+        return gameInfo;
+    }
+
+    public void setGameInfo(PlayGameInfo gameInfo) {
+        this.gameInfo = gameInfo;
+    }
+
+    public SeeVideoInfo getSeeVideoInfo() {
+        return seeVideoInfo;
+    }
+
+    public void setSeeVideoInfo(SeeVideoInfo seeVideoInfo) {
+        this.seeVideoInfo = seeVideoInfo;
+    }
 }

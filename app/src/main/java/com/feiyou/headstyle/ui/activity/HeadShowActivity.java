@@ -507,10 +507,12 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
         }
         adapter.notifyDataSetChanged();
 
-        ImageView currentIv = swipeView.getSelectedView().findViewById(R.id.iv_show_head);
-        RequestOptions options = new RequestOptions().skipMemoryCache(true);
-        options.transform(new GlideRoundTransform(this, SizeUtils.dp2px(117)));
-        Glide.with(this).load(currentImageUrl).apply(options).into(currentIv);
+        if(swipeView != null && swipeView.getSelectedView() != null){
+            ImageView currentIv = swipeView.getSelectedView().findViewById(R.id.iv_show_head);
+            RequestOptions options = new RequestOptions().skipMemoryCache(true);
+            options.transform(new GlideRoundTransform(this, SizeUtils.dp2px(117)));
+            Glide.with(this).load(currentImageUrl).apply(options).into(currentIv);
+        }
     }
 
     @OnClick(R.id.layout_share)
@@ -540,7 +542,7 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
                 loginDialog.show();
             }
         } else {
-            if (adapter.getHeads().size() > 0) {
+            if (adapter.getHeads() != null && adapter.getHeads().size() > 0) {
                 addCollectionPresenterImp.addCollection(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", adapter.getHeads().get(0).getId());
             } else {
                 Toasty.normal(this, "系统错误，请重试").show();

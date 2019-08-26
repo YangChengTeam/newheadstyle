@@ -46,8 +46,10 @@ import com.feiyou.headstyle.bean.EveryDayHbRet;
 import com.feiyou.headstyle.bean.HomeDataRet;
 import com.feiyou.headstyle.bean.HomeDataWrapper;
 import com.feiyou.headstyle.bean.MessageEvent;
+import com.feiyou.headstyle.bean.PlayGameInfo;
 import com.feiyou.headstyle.bean.ReceiveUserInfo;
 import com.feiyou.headstyle.bean.ResultInfo;
+import com.feiyou.headstyle.bean.SeeVideoInfo;
 import com.feiyou.headstyle.bean.TaskRecordInfoRet;
 import com.feiyou.headstyle.bean.UserInfo;
 import com.feiyou.headstyle.common.Constants;
@@ -82,6 +84,7 @@ import com.orhanobut.logger.Logger;
 import com.tencent.mm.opensdk.modelbiz.WXLaunchMiniProgram;
 import com.tencent.mm.opensdk.openapi.IWXAPI;
 import com.tencent.mm.opensdk.openapi.WXAPIFactory;
+import com.umeng.analytics.MobclickAgent;
 import com.wang.avi.AVLoadingIndicatorView;
 import com.youth.banner.Banner;
 import com.youth.banner.listener.OnBannerListener;
@@ -218,6 +221,12 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
     private boolean isRefreshHongBao;
 
     private List<ReceiveUserInfo> receiveUserList;
+
+    private PlayGameInfo playGameInfo;
+
+    private SeeVideoInfo gameSeeVideoInfo;
+
+    private boolean clickAnyWhere;
 
     @Override
     protected View onCreateView() {
@@ -470,7 +479,6 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
             cardWindowFragment = new CardWindowFragment();
         }
         cardWindowFragment.setAdDismissListener(this);
-
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -492,7 +500,7 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
-        if (getContext() != null  && isVisibleToUser) {
+        if (getContext() != null && isVisibleToUser) {
             loadAd("920819401", TTAdConstant.VERTICAL, 100);
 
             Logger.i("home fragment setUserVisibleHint--->");
@@ -501,6 +509,24 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
                 everyDayHongBaoPresenterImp.everyDayHongBaoInfo(StringUtils.isEmpty(mUserInfo.getId()) ? "0" : mUserInfo.getId(), StringUtils.isEmpty(mUserInfo.getOpenid()) ? "0" : mUserInfo.getOpenid(), PhoneUtils.getIMEI());
             } catch (SecurityException e) {
                 e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Logger.i("home fragment onResume--->" + isFirstLoad);
+        mUserInfo = App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo() : new UserInfo();
+
+        if(!isFirstLoad){
+            String smallKey = StringUtils.isEmpty(mUserInfo.getId()) ? Constants.SMALL_HONG_BAO_IS_CLOSE : Constants.SMALL_HONG_BAO + mUserInfo.getId();
+            String lastCloseSmallDate = SPUtils.getInstance().getString(smallKey, "");
+
+            if (!lastCloseSmallDate.equals(MyTimeUtil.getYearAndDay())) {
+                mFloatHbLayout.setVisibility(View.VISIBLE);
+            } else {
+                mFloatHbLayout.setVisibility(View.GONE);
             }
         }
     }
@@ -685,7 +711,20 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
 
             //红包记录
             if (tData instanceof EveryDayHbRet) {
+
+                //玩游戏的初始化数据
+                if (((EveryDayHbRet) tData).getData().getGameInfo() != null) {
+                    playGameInfo = ((EveryDayHbRet) tData).getData().getGameInfo();
+                }
+
+                //游戏有关看视频得金币的任务信息
+                if (((EveryDayHbRet) tData).getData().getSeeVideoInfo() != null) {
+                    gameSeeVideoInfo = ((EveryDayHbRet) tData).getData().getSeeVideoInfo();
+                }
+
                 if (((EveryDayHbRet) tData).getData().getIsFinish() == 0) {
+                    clickAnyWhere = ((EveryDayHbRet) tData).getData().getHbvideo() == 1 ? true : false;
+
                     String smallKey = StringUtils.isEmpty(mUserInfo.getId()) ? Constants.SMALL_HONG_BAO_IS_CLOSE : Constants.SMALL_HONG_BAO + mUserInfo.getId();
                     String lastCloseSmallDate = SPUtils.getInstance().getString(smallKey, "");
                     if (((EveryDayHbRet) tData).getData().getIsFirst() == 0) {
@@ -696,6 +735,7 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
                             if (everyDayHongBaoDialog != null && !everyDayHongBaoDialog.isShowing()) {
                                 mFloatHbLayout.setVisibility(View.GONE);
                                 everyDayHongBaoDialog.show();
+                                everyDayHongBaoDialog.setClickAnyWhere(clickAnyWhere);
                             }
                         } else {
                             if (!lastCloseSmallDate.equals(MyTimeUtil.getYearAndDay())) {
@@ -714,6 +754,8 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
                     }
                 } else {
                     mFloatHbLayout.setVisibility(View.GONE);
+                    SPUtils.getInstance().put(StringUtils.isEmpty(mUserInfo.getId()) ? Constants.SMALL_HONG_BAO_IS_CLOSE : Constants.SMALL_HONG_BAO + mUserInfo.getId(), MyTimeUtil.getYearAndDay());
+                    SPUtils.getInstance().put(StringUtils.isEmpty(mUserInfo.getId()) ? Constants.BIG_HONG_BAO_IS_CLOSE : Constants.BIG_HONG_BAO + mUserInfo.getId(), MyTimeUtil.getYearAndDay());
                 }
             }
 
@@ -924,6 +966,8 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
                         Logger.i("rewardVideoAd close");
                         Intent intent = new Intent(getActivity(), EveryDayHongBaoActivity.class);
                         intent.putExtra("record_id", recordId);
+                        intent.putExtra("play_game_info", playGameInfo);
+                        intent.putExtra("game_see_video", gameSeeVideoInfo);
                         startActivity(intent);
                     }
 
@@ -961,28 +1005,28 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
                     public void onDownloadActive(long totalBytes, long currBytes, String fileName, String appName) {
                         if (!mHasShowDownloadActive) {
                             mHasShowDownloadActive = true;
-                            ToastUtils.showLong("下载中，点击下载区域暂停", Toast.LENGTH_LONG);
+                            //ToastUtils.showLong("下载中，点击下载区域暂停", Toast.LENGTH_LONG);
                         }
                     }
 
                     @Override
                     public void onDownloadPaused(long totalBytes, long currBytes, String fileName, String appName) {
-                        ToastUtils.showLong("下载暂停，点击下载区域继续", Toast.LENGTH_LONG);
+                        //ToastUtils.showLong("下载暂停，点击下载区域继续", Toast.LENGTH_LONG);
                     }
 
                     @Override
                     public void onDownloadFailed(long totalBytes, long currBytes, String fileName, String appName) {
-                        ToastUtils.showLong("下载失败，点击下载区域重新下载", Toast.LENGTH_LONG);
+                        //ToastUtils.showLong("下载失败，点击下载区域重新下载", Toast.LENGTH_LONG);
                     }
 
                     @Override
                     public void onDownloadFinished(long totalBytes, String fileName, String appName) {
-                        ToastUtils.showLong("下载完成，点击下载区域重新下载", Toast.LENGTH_LONG);
+                        //ToastUtils.showLong("下载完成，点击下载区域重新下载", Toast.LENGTH_LONG);
                     }
 
                     @Override
                     public void onInstalled(String fileName, String appName) {
-                        ToastUtils.showLong("安装完成，点击下载区域打开", Toast.LENGTH_LONG);
+                        //ToastUtils.showLong("安装完成，点击下载区域打开", Toast.LENGTH_LONG);
                     }
                 });
             }
@@ -991,21 +1035,23 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
 
     @Override
     public void openEveryDayHongBao() {
-        //step6:在获取到广告后展示
-        mttRewardVideoAd.showRewardVideoAd(getActivity());
-        mttRewardVideoAd = null;
-
-        try {
-            recordId = "";
-            taskRecordInfoPresenterImp.addHomeTaskRecord(StringUtils.isEmpty(mUserInfo.getId()) ? "0" : mUserInfo.getId(), StringUtils.isEmpty(mUserInfo.getOpenid()) ? "0" : mUserInfo.getOpenid(), PhoneUtils.getIMEI(), 0, 0, "0");
-        } catch (SecurityException e) {
-            e.printStackTrace();
+        if(mttRewardVideoAd != null){
+            //step6:在获取到广告后展示
+            mttRewardVideoAd.showRewardVideoAd(getActivity());
+            mttRewardVideoAd = null;
+            MobclickAgent.onEvent(getActivity(), "open_hongbao", AppUtils.getAppVersionName());
+            try {
+                recordId = "";
+                taskRecordInfoPresenterImp.addHomeTaskRecord(StringUtils.isEmpty(mUserInfo.getId()) ? "0" : mUserInfo.getId(), StringUtils.isEmpty(mUserInfo.getOpenid()) ? "0" : mUserInfo.getOpenid(), PhoneUtils.getIMEI(), 0, 0, "0");
+            } catch (SecurityException e) {
+                e.printStackTrace();
+            }
         }
-
     }
 
     @Override
     public void closeEveryDayHongBao() {
+        MobclickAgent.onEvent(getActivity(), "close_hongbao", AppUtils.getAppVersionName());
         mFloatHbLayout.setVisibility(View.VISIBLE);
         SPUtils.getInstance().put(StringUtils.isEmpty(mUserInfo.getId()) ? Constants.BIG_HONG_BAO_IS_CLOSE : Constants.BIG_HONG_BAO + mUserInfo.getId(), MyTimeUtil.getYearAndDay());
     }
@@ -1025,6 +1071,7 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
             loadAd("920819401", TTAdConstant.VERTICAL, 100);
             mFloatHbLayout.setVisibility(View.GONE);
             everyDayHongBaoDialog.show();
+            everyDayHongBaoDialog.setClickAnyWhere(clickAnyWhere);
         }
     }
 

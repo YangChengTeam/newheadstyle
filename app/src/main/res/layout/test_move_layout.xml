@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="50dp"
+    android:gravity="center"
+    android:orientation="horizontal">
+
+    <LinearLayout
+        android:id="@+id/layout_profit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@mipmap/game_profit_bg"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="invisible">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="4dp"
+            android:text="今日收益"
+            android:textColor="@color/game_profit_color"
+            android:textSize="13sp" />
+
+        <TextView
+            android:id="@+id/tv_game_profit_num"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:layout_marginRight="4dp"
+            android:drawableLeft="@mipmap/game_profit_icon"
+            android:drawablePadding="2dp"
+            android:gravity="center"
+            android:text="+0"
+            android:textColor="@color/profit_money_num"
+            android:textSize="12dp" />
+    </LinearLayout>
+
+    <FrameLayout
+        android:layout_width="46dp"
+        android:layout_height="46dp"
+        android:layout_marginLeft="4dp"
+        android:background="@mipmap/time_bg"
+        android:gravity="center">
+
+        <ImageView
+            android:id="@+id/iv_close"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:clickable="false"
+            android:src="@mipmap/time_gift" />
+
+        <LinearLayout
+            android:id="@+id/layout_current_profit"
+            android:layout_width="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:visibility="gone"
+            android:orientation="vertical"
+            android:layout_height="wrap_content">
+            <ImageView
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:src="@mipmap/gold_icon"/>
+            <TextView
+                android:id="@+id/tv_show_gold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="11sp"
+                android:text="+5"
+                android:textColor="@color/profit_money_num"/>
+        </LinearLayout>
+
+        <com.feiyou.headstyle.ui.custom.SimpleRoundProgress
+            android:id="@+id/round_progress"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center"
+            app:srp_max="100"
+            app:srp_progressColor="@color/round_progress_color"
+            app:srp_roundColor="@color/round_bg_color"
+            app:srp_roundWidth="3dp"
+            app:srp_startAngle="-90"
+            app:srp_style="STROKE" />
+
+        <ImageView
+            android:id="@+id/iv_game_point"
+            android:layout_width="8dp"
+            android:layout_height="8dp"
+            android:layout_gravity="top|right"
+            android:layout_marginTop="2dp"
+            android:layout_marginRight="2dp"
+            android:src="@mipmap/game_point"
+            android:visibility="gone" />
+    </FrameLayout>
+
+</LinearLayout>

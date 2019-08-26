@@ -196,7 +196,7 @@ public class TestDetailActivity extends BaseFragmentActivity implements TestDeta
         TestMsgInfo testMsgInfo = new TestMsgInfo();
         testMsgInfo.setType(TestMsgInfo.TYPE_RECEIVED);
         testMsgInfo.setImgUrl("");
-        testMsgInfo.setAnswer(answer.get(currentSubjectIndex));
+        testMsgInfo.setAnswer(answer != null && answer.size() > 0 ? answer.get(currentSubjectIndex):null);
 
         testMsgInfo.setContent(question.get(currentSubjectIndex));
         chatListAdapter.addData(testMsgInfo);

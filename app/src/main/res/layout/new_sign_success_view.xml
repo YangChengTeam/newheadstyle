@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:gravity="center"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="280dp"
+        android:layout_height="476dp"
+        android:background="@mipmap/qiandao_bg">
+
+        <TextView
+            android:id="@+id/tv_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="85dp"
+            android:text="签到成功"
+            android:textColor="@color/white"
+            android:textSize="20sp" />
+
+        <LinearLayout
+            android:id="@+id/layout_sign_day"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tv_title"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="12dp"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@mipmap/shouyi_icon" />
+
+                <TextView
+                    android:id="@+id/tv_add_gold_num"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="6dp"
+                    android:text="+0"
+                    android:textColor="@color/profit_color"
+                    android:textSize="40sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="12dp"
+                android:layout_marginRight="12dp"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0.5dp"
+                    android:layout_weight="1"
+                    android:background="@color/line_color"></View>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:text="精品推荐"
+                    android:textColor="@color/delete_bg_color"
+                    android:textSize="14sp" />
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0.5dp"
+                    android:layout_weight="1"
+                    android:background="@color/line_color"></View>
+            </LinearLayout>
+
+            <FrameLayout
+                android:id="@+id/layout_ad"
+                android:layout_width="match_parent"
+                android:layout_height="120dp"
+                android:layout_marginTop="6dp"></FrameLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layout_see_video"
+            android:layout_width="250dp"
+            android:layout_height="100dp"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:gravity="center"
+            android:layout_marginBottom="12dp"
+            android:orientation="vertical">
+
+            <Button
+                android:id="@+id/btn_play_game"
+                android:layout_width="238dp"
+                android:layout_height="40dp"
+                android:layout_marginBottom="10dp"
+                android:background="@drawable/play_game_btn_bg"
+                android:gravity="center"
+                android:text="玩游戏赚金币"
+                android:textColor="@color/white"
+                android:textSize="16sp" />
+
+            <Button
+                android:id="@+id/btn_see_video"
+                android:layout_width="238dp"
+                android:layout_height="40dp"
+                android:layout_marginBottom="6dp"
+                android:background="@drawable/ikonw_bg"
+                android:gravity="center"
+                android:text="看视频金币翻倍"
+                android:textColor="@color/white"
+                android:textSize="16sp" />
+        </LinearLayout>
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="60dp"
+        android:gravity="center">
+
+        <TextView
+            android:id="@+id/tv_close"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="点击关闭"
+            android:textColor="@color/white"
+            android:textSize="12sp" />
+    </LinearLayout>
+</LinearLayout>

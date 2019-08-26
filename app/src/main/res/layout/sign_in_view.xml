@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:gravity="center"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/common_white_bg"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="33dp"
+                android:layout_marginTop="4dp"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="已连续签到"
+                    android:textColor="@color/sign_in_color"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/tv_sign_days"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:textColor="@color/sign_in_color"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="天"
+                    android:textColor="@color/sign_in_color"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="66dp">
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="0.5dp"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="12dp"
+                    android:layout_marginRight="12dp"
+                    android:background="@color/line_color"></View>
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/sign_in_list_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="66dp"
+                    android:layout_marginLeft="12dp"
+                    android:layout_marginRight="12dp"></android.support.v7.widget.RecyclerView>
+            </FrameLayout>
+
+            <ImageView
+                android:id="@+id/iv_sign_in"
+                android:layout_width="294dp"
+                android:layout_height="33dp"
+                android:layout_marginTop="4dp"
+                android:textColor="@color/white" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="连续签到可以领取现金红包"
+                    android:textColor="@color/profit_color"
+                    android:textSize="11sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="12dp"
+            android:background="@color/line2_color"></View>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="38dp"
+            android:background="@drawable/sign_head_bg">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="12dp"
+                android:drawableLeft="@mipmap/tuijian_icon"
+                android:drawablePadding="4dp"
+                android:text="日常任务"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+        </RelativeLayout>
+    </LinearLayout>
+</LinearLayout>

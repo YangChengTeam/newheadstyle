@@ -8,7 +8,7 @@
     <RelativeLayout
         android:layout_width="267dp"
         android:layout_height="294dp"
-        android:background="@mipmap/sign_success_bg">
+        android:background="@mipmap/shouyi_bg">
 
         <LinearLayout
             android:id="@+id/layout_sign_day"

@@ -32,7 +32,9 @@ import com.feiyou.headstyle.base.IBaseView;
 import com.feiyou.headstyle.bean.EveryDayHbRet;
 import com.feiyou.headstyle.bean.EveryDayHbWrapper;
 import com.feiyou.headstyle.bean.MessageEvent;
+import com.feiyou.headstyle.bean.PlayGameInfo;
 import com.feiyou.headstyle.bean.ReceiveUserInfo;
+import com.feiyou.headstyle.bean.SeeVideoInfo;
 import com.feiyou.headstyle.bean.TaskRecordInfoRet;
 import com.feiyou.headstyle.bean.UserInfo;
 import com.feiyou.headstyle.common.Constants;
@@ -41,6 +43,7 @@ import com.feiyou.headstyle.presenter.TaskRecordInfoPresenterImp;
 import com.feiyou.headstyle.ui.adapter.ReceiveUserListAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragmentActivity;
 import com.feiyou.headstyle.ui.custom.LoginDialog;
+import com.feiyou.headstyle.utils.MyTimeUtil;
 import com.feiyou.headstyle.utils.RandomUtils;
 import com.feiyou.headstyle.utils.RomUtils;
 import com.orhanobut.logger.Logger;
@@ -97,6 +100,10 @@ public class EveryDayHongBaoActivity extends BaseFragmentActivity implements IBa
 
     LoginDialog loginDialog;
 
+    private PlayGameInfo playGameInfo;
+
+    private SeeVideoInfo gameSeeVideoInfo;
+
     @Override
     protected int getContextViewId() {
         return R.layout.activity_every_day_hongbao;
@@ -132,6 +139,9 @@ public class EveryDayHongBaoActivity extends BaseFragmentActivity implements IBa
         if (bundle != null) {
             recordId = bundle.getString("record_id");
         }
+
+        playGameInfo = (PlayGameInfo) getIntent().getSerializableExtra("play_game_info");
+        gameSeeVideoInfo = (SeeVideoInfo) getIntent().getSerializableExtra("game_see_video");
 
         if (!StringUtils.isEmpty(SPUtils.getInstance().getString(Constants.USER_INFO))) {
             Logger.i(SPUtils.getInstance().getString(Constants.USER_INFO));
@@ -176,6 +186,8 @@ public class EveryDayHongBaoActivity extends BaseFragmentActivity implements IBa
                 }
 
                 Intent intent = new Intent(EveryDayHongBaoActivity.this, CashActivity.class);
+                intent.putExtra("play_game_info", playGameInfo);
+                intent.putExtra("game_see_video", gameSeeVideoInfo);
                 startActivity(intent);
             }
         });
@@ -267,6 +279,8 @@ public class EveryDayHongBaoActivity extends BaseFragmentActivity implements IBa
                         }
                         mRandomNumTv.setText("已领取" + SPUtils.getInstance().getInt(Constants.GET_MONEY_NUM) + "个");
                         ToastUtils.showLong("获得收益" + seeVideoMoney + "元");
+
+                        SPUtils.getInstance().put(StringUtils.isEmpty(mUserInfo.getId()) ? Constants.SMALL_HONG_BAO_IS_CLOSE : Constants.SMALL_HONG_BAO + mUserInfo.getId(), MyTimeUtil.getYearAndDay());
                     }
                 } else {
                     //finish();

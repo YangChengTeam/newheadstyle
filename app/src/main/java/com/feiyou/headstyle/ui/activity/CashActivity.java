@@ -29,6 +29,8 @@ import com.feiyou.headstyle.base.IBaseView;
 import com.feiyou.headstyle.bean.CashInfoRet;
 import com.feiyou.headstyle.bean.CashMoneyInfoRet;
 import com.feiyou.headstyle.bean.LoginRequest;
+import com.feiyou.headstyle.bean.PlayGameInfo;
+import com.feiyou.headstyle.bean.SeeVideoInfo;
 import com.feiyou.headstyle.bean.UserInfo;
 import com.feiyou.headstyle.bean.UserInfoRet;
 import com.feiyou.headstyle.common.Constants;
@@ -116,6 +118,10 @@ public class CashActivity extends BaseFragmentActivity implements ConfigDialog.C
 
     LackDialog lackDialog;//收益不足
 
+    private PlayGameInfo playGameInfo;
+
+    private SeeVideoInfo gameSeeVideoInfo;
+
     @Override
     protected int getContextViewId() {
         return R.layout.activity_cash;
@@ -155,6 +161,9 @@ public class CashActivity extends BaseFragmentActivity implements ConfigDialog.C
     }
 
     public void initData() {
+        playGameInfo = (PlayGameInfo) getIntent().getSerializableExtra("play_game_info");
+        gameSeeVideoInfo = (SeeVideoInfo) getIntent().getSerializableExtra("game_see_video");
+
         mUserInfo = App.getApp().mUserInfo;
         mShareAPI = UMShareAPI.get(this);
 
@@ -417,7 +426,9 @@ public class CashActivity extends BaseFragmentActivity implements ConfigDialog.C
 
     @Override
     public void lackConfig() {
-        Intent intent = new Intent(this, GoldTaskActivity.class);
+        Intent intent = new Intent(this, GameTestActivity.class);
+        intent.putExtra("play_game_info", playGameInfo);
+        intent.putExtra("game_see_video", gameSeeVideoInfo);
         startActivity(intent);
     }
 

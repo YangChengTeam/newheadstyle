@@ -25,6 +25,9 @@ public class VersionInfo {
     @SerializedName("version_date")
     private String versionDate;
 
+    @SerializedName("app_openad")
+    private int appOpenad;//APP开屏广告,1:打开。2：关闭
+
     public int getVersionCode() {
         return versionCode;
     }
@@ -71,5 +74,13 @@ public class VersionInfo {
 
     public void setVersionDate(String versionDate) {
         this.versionDate = versionDate;
+    }
+
+    public int getAppOpenad() {
+        return appOpenad;
+    }
+
+    public void setAppOpenad(int appOpenad) {
+        this.appOpenad = appOpenad;
     }
 }
