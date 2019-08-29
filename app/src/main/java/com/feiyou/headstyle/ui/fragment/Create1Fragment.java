@@ -76,6 +76,7 @@ import com.feiyou.headstyle.ui.activity.GoldDetailActivity;
 import com.feiyou.headstyle.ui.activity.GoldMailActivity;
 import com.feiyou.headstyle.ui.activity.GoldTaskActivity;
 import com.feiyou.headstyle.ui.activity.GoodDetailActivity;
+import com.feiyou.headstyle.ui.activity.Main1Activity;
 import com.feiyou.headstyle.ui.activity.PushNoteActivity;
 import com.feiyou.headstyle.ui.activity.TestDetailActivity;
 import com.feiyou.headstyle.ui.activity.TestImageDetailActivity;
@@ -306,6 +307,8 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
 
     private boolean isCanSign;
 
+    int currentTabIndex;//当前选择的Tab
+
     public Handler mHandler = new Handler() {
         @Override
         public void handleMessage(android.os.Message msg) {
@@ -316,6 +319,9 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
                     break;
                 case 1:
                     isCanSign = true;
+                    currentTabIndex = ((Main1Activity)getActivity()).getCurrentTabIndex();
+                    Logger.i("currentTabIndex--->" + currentTabIndex);
+                    userSign();
                     break;
                 default:
                     break;
@@ -595,14 +601,18 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
                         GoToScoreUtils.goToMarket(getActivity(), Constants.APP_PACKAGE_NAME);
                         break;
                     case 7:
-                        if (signDays > 0 && (signDays + 1) % 7 == 0) {
-                            //领取红包
-                            if (receiveHongBaoDialog != null && !receiveHongBaoDialog.isShowing()) {
-                                receiveHongBaoDialog.show();
+                        if(isSignToday == 0) {
+                            if (signDays > 0 && (signDays + 1) % 7 == 0) {
+                                //领取红包
+                                if (receiveHongBaoDialog != null && !receiveHongBaoDialog.isShowing()) {
+                                    receiveHongBaoDialog.show();
+                                }
+                            } else {
+                                //提示签到
+                                signDoneInfoPresenterImp.signDone(userInfo != null ? userInfo.getId() : "", userInfo != null ? userInfo.getOpenid() : "", 0);
                             }
-                        } else {
-                            //提示签到
-                            signDoneInfoPresenterImp.signDone(userInfo != null ? userInfo.getId() : "", userInfo != null ? userInfo.getOpenid() : "", 0);
+                        }else{
+                            ToastUtils.showLong("今天已签到");
                         }
                         break;
                     case 8:
@@ -750,12 +760,11 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
 
     }
 
-    @Override
-    public void setUserVisibleHint(boolean isVisibleToUser) {
-        super.setUserVisibleHint(isVisibleToUser);
-        if (getContext() != null && isVisibleToUser && isCanSign) {
+    //当天用户签到
+    public void userSign(){
+        if(currentTabIndex == 2) {
             //自动签到
-            if (signDays > 0 && signDays % 7 == 0) {
+            if (signDays > 0 && (signDays + 1) % 7 == 0) {
                 //领取红包
                 if (receiveHongBaoDialog != null && !receiveHongBaoDialog.isShowing()) {
                     receiveHongBaoDialog.show();
@@ -764,6 +773,18 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
                 //提示签到
                 signDoneInfoPresenterImp.signDone(userInfo != null ? userInfo.getId() : "", userInfo != null ? userInfo.getOpenid() : "", 0);
             }
+        }
+    }
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+
+        if (getContext() != null && isVisibleToUser && isCanSign) {
+            currentTabIndex = ((Main1Activity)getContext()).getCurrentTabIndex();
+            Logger.i("setUserVisibleHint currentTabIndex--->" + currentTabIndex);
+            isCanSign = false;
+            userSign();
         }
     }
 

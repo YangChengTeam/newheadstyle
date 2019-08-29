@@ -8,8 +8,8 @@ android {
         applicationId "com.feiyou.headstyle"
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode 58
-        versionName "4.1.2"
+        versionCode 59
+        versionName "4.1.3"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         ndk {
             abiFilters "armeabi-v7a"
@@ -141,4 +141,5 @@ dependencies {
     implementation name: 'cmgame-sdk-tt2017-1.1.4', ext: 'aar'
     implementation 'com.google.code.gson:gson:2.8.5'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+
 }

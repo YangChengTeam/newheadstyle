@@ -462,7 +462,6 @@ public class Main1Activity extends BaseFragmentActivity implements VersionView, 
 
     }
 
-
     public void downAppFile(String downUrl) {
         final String filePath = PathUtils.getExternalAppFilesPath() + "/new_app.apk";
         Logger.i("down app path --->" + filePath);
@@ -523,4 +522,9 @@ public class Main1Activity extends BaseFragmentActivity implements VersionView, 
 
         task.start();
     }
+
+    public int getCurrentTabIndex() {
+        return viewPager.getCurrentItem();
+    }
+
 }

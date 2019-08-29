@@ -223,18 +223,23 @@ public class GoldTaskActivity extends BaseFragmentActivity implements IBaseView,
         mSingInListView = signView.findViewById(R.id.sign_in_list_view);
         mSignInIv = signView.findViewById(R.id.iv_sign_in);
         mSignDaysTv = signView.findViewById(R.id.tv_sign_days);
-        mSignDaysTv.setText(signDays+"");
+        mSignDaysTv.setText(signDays + "");
         mSignInIv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (signDays > 0 && signDays % 7 == 0 && isSignToday == 0) {
-                    //领取红包
-                    if (receiveHongBaoDialog != null && !receiveHongBaoDialog.isShowing()) {
-                        receiveHongBaoDialog.show();
+                if (isSignToday == 0) {
+                    if (signDays > 0 && (signDays + 1) % 7 == 0) {
+                        //领取红包
+                        if (receiveHongBaoDialog != null && !receiveHongBaoDialog.isShowing()) {
+                            receiveHongBaoDialog.show();
+                        }
+                    } else {
+                        //提示签到
+                        signDoneInfoPresenterImp.signDone(mUserInfo != null ? mUserInfo.getId() : "", mUserInfo != null ? mUserInfo.getOpenid() : "", 0);
                     }
                 } else {
-                    //提示签到
-                    signDoneInfoPresenterImp.signDone(mUserInfo != null ? mUserInfo.getId() : "", mUserInfo != null ? mUserInfo.getOpenid() : "", 0);
+                    ToastUtils.showLong("今天已签到");
+                    return;
                 }
             }
         });
@@ -348,7 +353,7 @@ public class GoldTaskActivity extends BaseFragmentActivity implements IBaseView,
                         //App.getApp().setIsFromTaskSign(1);
                         //finish();
 
-                        if (signDays > 0 && (signDays + 1) % 7 == 0) {
+                        if (signDays > 0 && (signDays + 1) % 7 == 0 && isSignToday == 0) {
                             //领取红包
                             if (receiveHongBaoDialog != null && !receiveHongBaoDialog.isShowing()) {
                                 receiveHongBaoDialog.show();
@@ -554,7 +559,15 @@ public class GoldTaskActivity extends BaseFragmentActivity implements IBaseView,
                     Logger.i("recordId--->" + recordId);
                 } else {
                     if (((TaskRecordInfoRet) tData).getData() != null) {
-                        ToastUtils.showLong("领取成功 +" + ((TaskRecordInfoRet) tData).getData().getGoldnum() + "金币");
+
+                        int tempGold = ((TaskRecordInfoRet) tData).getData().getGoldnum();
+
+                        if (tempGold == 0) {
+                            ToastUtils.showLong("获得收益 +" + ((TaskRecordInfoRet) tData).getData().getCash() + "元");
+                        } else {
+                            ToastUtils.showLong("领取成功 +" + ((TaskRecordInfoRet) tData).getData().getGoldnum() + "金币");
+                        }
+
                     }
 
                     //任务完成后再次刷新页面
@@ -570,6 +583,7 @@ public class GoldTaskActivity extends BaseFragmentActivity implements IBaseView,
             Logger.i("sign done --->" + JSON.toJSONString(tData));
             if (((SignDoneInfoRet) tData).getCode() == Constants.SUCCESS) {
                 Glide.with(this).load(R.mipmap.sign_done_today).into(mSignInIv);
+                isSignToday = 1;
                 if (signDays > 0 && (signDays + 1) % 7 == 0) {
                     receiveHongBaoDialog.updateDialog(randomHongbao);
                 } else {
@@ -836,7 +850,7 @@ public class GoldTaskActivity extends BaseFragmentActivity implements IBaseView,
     }
 
     @OnClick(R.id.iv_back)
-    void back(){
+    void back() {
         popBackStack();
     }
 
@@ -850,8 +864,10 @@ public class GoldTaskActivity extends BaseFragmentActivity implements IBaseView,
         recordId = "";
         String openid = App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getOpenid() : "";
         taskRecordInfoPresenterImp.addTaskRecord(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", openid, taskId, 0, randomHongbao, 0, "0");
-        //step6:在获取到广告后展示
-        mttRewardVideoAd.showRewardVideoAd(this);
-        mttRewardVideoAd = null;
+        if (mttRewardVideoAd != null) {
+            //step6:在获取到广告后展示
+            mttRewardVideoAd.showRewardVideoAd(this);
+            mttRewardVideoAd = null;
+        }
     }
 }
