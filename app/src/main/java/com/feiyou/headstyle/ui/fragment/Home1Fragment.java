@@ -1,14 +1,19 @@
 package com.feiyou.headstyle.ui.fragment;
 
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -40,6 +45,7 @@ import com.bytedance.sdk.openadsdk.TTRewardVideoAd;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
+import com.feiyou.headstyle.base.IBaseView;
 import com.feiyou.headstyle.bean.AdInfo;
 import com.feiyou.headstyle.bean.BannerInfo;
 import com.feiyou.headstyle.bean.EveryDayHbRet;
@@ -52,12 +58,15 @@ import com.feiyou.headstyle.bean.ResultInfo;
 import com.feiyou.headstyle.bean.SeeVideoInfo;
 import com.feiyou.headstyle.bean.TaskRecordInfoRet;
 import com.feiyou.headstyle.bean.UserInfo;
+import com.feiyou.headstyle.bean.VersionInfo;
+import com.feiyou.headstyle.bean.VersionInfoRet;
 import com.feiyou.headstyle.common.Constants;
 import com.feiyou.headstyle.common.GlideImageLoader;
 import com.feiyou.headstyle.presenter.EveryDayHongBaoPresenterImp;
 import com.feiyou.headstyle.presenter.HomeDataPresenterImp;
 import com.feiyou.headstyle.presenter.RecordInfoPresenterImp;
 import com.feiyou.headstyle.presenter.TaskRecordInfoPresenterImp;
+import com.feiyou.headstyle.presenter.VersionPresenterImp;
 import com.feiyou.headstyle.ui.activity.AdActivity;
 import com.feiyou.headstyle.ui.activity.Collection2Activity;
 import com.feiyou.headstyle.ui.activity.CommunityArticleActivity;
@@ -72,7 +81,10 @@ import com.feiyou.headstyle.ui.adapter.HeadTypeAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragment;
 import com.feiyou.headstyle.ui.custom.EveryDayHongBaoDialog;
 import com.feiyou.headstyle.ui.custom.OpenDialog;
+import com.feiyou.headstyle.ui.custom.PrivacyDialog;
 import com.feiyou.headstyle.ui.custom.RoundedCornersTransformation;
+import com.feiyou.headstyle.ui.custom.VersionUpdateDialog;
+import com.feiyou.headstyle.ui.custom.WarmDialog;
 import com.feiyou.headstyle.utils.MyTimeUtil;
 import com.feiyou.headstyle.utils.RandomUtils;
 import com.feiyou.headstyle.utils.TTAdManagerHolder;
@@ -105,7 +117,7 @@ import es.dmoral.toasty.Toasty;
 /**
  * Created by myflying on 2019/1/3.
  */
-public class Home1Fragment extends BaseFragment implements HomeDataView, View.OnClickListener, SwipeRefreshLayout.OnRefreshListener, OpenDialog.ConfigListener, CardWindowFragment.AdDismissListener, EveryDayHongBaoDialog.EveryDayHongBaoListener {
+public class Home1Fragment extends BaseFragment implements IBaseView, View.OnClickListener, SwipeRefreshLayout.OnRefreshListener, OpenDialog.ConfigListener, CardWindowFragment.AdDismissListener, EveryDayHongBaoDialog.EveryDayHongBaoListener, PrivacyDialog.PrivacyListener, WarmDialog.WarmListener, VersionUpdateDialog.UpdateListener {
 
     LinearLayout mSearchLayout;
 
@@ -228,6 +240,46 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
 
     private boolean clickAnyWhere;
 
+    private PrivacyDialog privacyDialog;
+
+    private WarmDialog warmDialog;
+
+    private boolean isAlertHongBao;
+
+    VersionPresenterImp versionPresenterImp;
+
+    private ProgressDialog progressDialog = null;
+
+    private VersionInfo versionInfo;
+
+    VersionUpdateDialog updateDialog;
+
+    private boolean isUpdateVersion;
+
+    private Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(android.os.Message msg) {
+            switch (msg.what) {
+                case 0:
+                    if (isAlertHongBao && everyDayHongBaoDialog != null && !everyDayHongBaoDialog.isShowing()) {
+                        everyDayHongBaoDialog.show();
+                        everyDayHongBaoDialog.setClickAnyWhere(clickAnyWhere);
+                        isAlertHongBao = false;
+                    }else{
+                        //请求版本更新
+                        versionPresenterImp.getVersionInfo(com.feiyou.headstyle.utils.AppUtils.getMetaDataValue(getActivity(), "UMENG_CHANNEL"));
+                    }
+                    break;
+                case 1:
+                    int progress = (Integer) msg.obj;
+                    updateDialog.setProgress(progress);
+                    break;
+                default:
+                    break;
+            }
+        }
+    };
+
     @Override
     protected View onCreateView() {
         View root = LayoutInflater.from(getActivity()).inflate(R.layout.fragment1, null);
@@ -328,12 +380,54 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
             }
         });
 
+        progressDialog = new ProgressDialog(getActivity());
+        progressDialog.setMessage("正在检测新版本");
+        progressDialog.setCanceledOnTouchOutside(false);
+        progressDialog.setOnKeyListener(new DialogInterface.OnKeyListener() {
+            @Override
+            public boolean onKey(DialogInterface dialogInterface, int keyCode, KeyEvent keyEvent) {
+                if (keyCode == KeyEvent.KEYCODE_BACK) {
+                    if (versionInfo != null && versionInfo.getVersionIsChange() == 1) {
+                        return true;//不执行父类点击事件
+                    }
+                    return false;
+                }
+                return false;
+            }
+        });
+
+        updateDialog = new VersionUpdateDialog(getActivity(), R.style.login_dialog);
+        updateDialog.setUpdateListener(this);
+        updateDialog.setOnKeyListener(new DialogInterface.OnKeyListener() {
+            @Override
+            public boolean onKey(DialogInterface dialogInterface, int keyCode, KeyEvent keyEvent) {
+                if (keyCode == KeyEvent.KEYCODE_BACK) {
+                    if (versionInfo != null && versionInfo.getVersionIsChange() == 1) {
+                        return true;//不执行父类点击事件
+                    }
+                    return false;
+                }
+                return false;
+            }
+        });
+
         //加载更多动画
         mLoadingView = footView.findViewById(R.id.iv_loading);
         Glide.with(getActivity()).load(R.drawable.list_loading).into(mLoadingView);
     }
 
     public void initData() {
+        privacyDialog = new PrivacyDialog(getActivity(), R.style.login_dialog);
+        privacyDialog.setPrivacyListener(this);
+
+        if (!SPUtils.getInstance().getBoolean(Constants.SHOW_PRIVARY, false)) {
+            warmDialog = new WarmDialog(getActivity(), R.style.login_dialog);
+            warmDialog.setWarmListener(this);
+
+            privacyDialog.show();
+        }
+
+
         Logger.i("home fragment init data--->");
 
         mUserInfo = App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo() : new UserInfo();
@@ -479,6 +573,8 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
             cardWindowFragment = new CardWindowFragment();
         }
         cardWindowFragment.setAdDismissListener(this);
+
+        versionPresenterImp = new VersionPresenterImp(this, getActivity());
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -519,7 +615,7 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
         Logger.i("home fragment onResume--->" + isFirstLoad);
         mUserInfo = App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo() : new UserInfo();
 
-        if(!isFirstLoad){
+        if (!isFirstLoad) {
             String smallKey = StringUtils.isEmpty(mUserInfo.getId()) ? Constants.SMALL_HONG_BAO_IS_CLOSE : Constants.SMALL_HONG_BAO + mUserInfo.getId();
             String lastCloseSmallDate = SPUtils.getInstance().getString(smallKey, "");
 
@@ -616,19 +712,23 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
     public void dismissProgress() {
         avi.hide();
         mRefreshLayout.setRefreshing(false);
+
+        if (progressDialog != null && progressDialog.isShowing()) {
+            progressDialog.dismiss();
+        }
     }
 
     @Override
-    public void loadDataSuccess(ResultInfo tData) {
+    public void loadDataSuccess(Object tData) {
         Logger.i("home data--->" + JSON.toJSONString(tData));
         avi.hide();
         mRefreshLayout.setRefreshing(false);
-        if (tData != null && tData.getCode() == Constants.SUCCESS) {
+        if (tData != null) {
             mNoDataLayout.setVisibility(View.GONE);
             mHeadInfoListView.setVisibility(View.VISIBLE);
 
             HomeDataWrapper homeDataRet = null;
-            if (tData instanceof HomeDataRet) {
+            if (tData instanceof HomeDataRet && ((HomeDataRet) tData).getCode() == Constants.SUCCESS) {
                 homeDataRet = ((HomeDataRet) tData).getData();
                 if (homeDataRet != null) {
                     currentPage = homeDataRet.getPage();
@@ -710,7 +810,7 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
             }
 
             //红包记录
-            if (tData instanceof EveryDayHbRet) {
+            if (tData instanceof EveryDayHbRet && ((EveryDayHbRet) tData).getCode() == Constants.SUCCESS) {
 
                 //玩游戏的初始化数据
                 if (((EveryDayHbRet) tData).getData().getGameInfo() != null) {
@@ -734,8 +834,13 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
                         if (!lastCloseBigDate.equals(MyTimeUtil.getYearAndDay())) {
                             if (everyDayHongBaoDialog != null && !everyDayHongBaoDialog.isShowing()) {
                                 mFloatHbLayout.setVisibility(View.GONE);
-                                everyDayHongBaoDialog.show();
-                                everyDayHongBaoDialog.setClickAnyWhere(clickAnyWhere);
+                                if (!SPUtils.getInstance().getBoolean(Constants.SHOW_PRIVARY, false)) {
+                                    isAlertHongBao = true;
+                                } else {
+                                    isAlertHongBao = false;
+                                    everyDayHongBaoDialog.show();
+                                    everyDayHongBaoDialog.setClickAnyWhere(clickAnyWhere);
+                                }
                             }
                         } else {
                             if (!lastCloseSmallDate.equals(MyTimeUtil.getYearAndDay())) {
@@ -757,9 +862,15 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
                     SPUtils.getInstance().put(StringUtils.isEmpty(mUserInfo.getId()) ? Constants.SMALL_HONG_BAO_IS_CLOSE : Constants.SMALL_HONG_BAO + mUserInfo.getId(), MyTimeUtil.getYearAndDay());
                     SPUtils.getInstance().put(StringUtils.isEmpty(mUserInfo.getId()) ? Constants.BIG_HONG_BAO_IS_CLOSE : Constants.BIG_HONG_BAO + mUserInfo.getId(), MyTimeUtil.getYearAndDay());
                 }
+
+                //在不弹出红包的情况下检测版本更新
+                if(!isAlertHongBao && SPUtils.getInstance().getBoolean(Constants.SHOW_PRIVARY, false)){
+                    //请求版本更新
+                    versionPresenterImp.getVersionInfo(com.feiyou.headstyle.utils.AppUtils.getMetaDataValue(getActivity(), "UMENG_CHANNEL"));
+                }
             }
 
-            if (tData instanceof TaskRecordInfoRet) {
+            if (tData instanceof TaskRecordInfoRet && ((TaskRecordInfoRet) tData).getCode() == Constants.SUCCESS) {
                 if (StringUtils.isEmpty(recordId)) {
                     if (((TaskRecordInfoRet) tData).getData() != null) {
                         recordId = ((TaskRecordInfoRet) tData).getData().getInfoid();
@@ -767,6 +878,21 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
                     Logger.i("recordId--->" + recordId);
                 }
             }
+
+            //版本更新
+            if (tData instanceof VersionInfoRet && ((VersionInfoRet) tData).getCode() == Constants.SUCCESS) {
+                versionInfo = ((VersionInfoRet) tData).getData();
+                if (versionInfo.getVersionCode() > AppUtils.getAppVersionCode()) {
+                    if (updateDialog != null && !updateDialog.isShowing()) {
+                        isUpdateVersion = true;
+                        updateDialog.setVersionCode(versionInfo.getVersionName());
+                        updateDialog.setVersionContent(versionInfo.getVersionDesc());
+                        updateDialog.setIsForceUpdate(versionInfo.getVersionIsChange());
+                        updateDialog.show();
+                    }
+                }
+            }
+
         } else {
             if (isFirstLoad) {
                 mNoDataLayout.setVisibility(View.VISIBLE);
@@ -802,6 +928,21 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
             mNoDataLayout.setVisibility(View.VISIBLE);
             mHeadInfoListView.setVisibility(View.GONE);
         }
+        if (progressDialog != null && progressDialog.isShowing()) {
+            progressDialog.dismiss();
+        }
+    }
+
+    @Override
+    public void update() {
+        if (versionInfo != null && !StringUtils.isEmpty(versionInfo.getVersionUrl())) {
+            downAppFile(versionInfo.getVersionUrl());
+        }
+    }
+
+    @Override
+    public void updateCancel() {
+
     }
 
     @Override
@@ -873,7 +1014,9 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
                 .setListener(new FileDownloadListener() {
                     @Override
                     protected void pending(BaseDownloadTask task, int soFarBytes, int totalBytes) {
-                        Toasty.normal(getActivity(), "正在下载打开请稍后...").show();
+                        if (!isUpdateVersion) {
+                            Toasty.normal(getActivity(), "正在下载打开请稍后...").show();
+                        }
                     }
 
                     @Override
@@ -882,6 +1025,15 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
 
                     @Override
                     protected void progress(BaseDownloadTask task, int soFarBytes, int totalBytes) {
+                        if (isUpdateVersion) {
+                            int progress = (int) ((soFarBytes * 1.0 / totalBytes) * 100);
+                            Logger.i("progress--->" + soFarBytes + "---" + totalBytes + "---" + progress);
+
+                            Message message = new Message();
+                            message.what = 1;
+                            message.obj = progress;
+                            mHandler.sendMessage(message);
+                        }
                     }
 
                     @Override
@@ -894,6 +1046,9 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
 
                     @Override
                     protected void completed(BaseDownloadTask task) {
+                        if (progressDialog != null && progressDialog.isShowing()) {
+                            progressDialog.dismiss();
+                        }
                         ToastUtils.showLong("下载完成");
                         //install(filePath);
                         AppUtils.installApp(filePath);
@@ -1035,7 +1190,7 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
 
     @Override
     public void openEveryDayHongBao() {
-        if(mttRewardVideoAd != null){
+        if (mttRewardVideoAd != null) {
             //step6:在获取到广告后展示
             mttRewardVideoAd.showRewardVideoAd(getActivity());
             mttRewardVideoAd = null;
@@ -1054,6 +1209,12 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
         MobclickAgent.onEvent(getActivity(), "close_hongbao", AppUtils.getAppVersionName());
         mFloatHbLayout.setVisibility(View.VISIBLE);
         SPUtils.getInstance().put(StringUtils.isEmpty(mUserInfo.getId()) ? Constants.BIG_HONG_BAO_IS_CLOSE : Constants.BIG_HONG_BAO + mUserInfo.getId(), MyTimeUtil.getYearAndDay());
+
+        //在不弹出红包的情况下检测版本更新
+        if(!isAlertHongBao){
+            //请求版本更新
+            versionPresenterImp.getVersionInfo(com.feiyou.headstyle.utils.AppUtils.getMetaDataValue(getActivity(), "UMENG_CHANNEL"));
+        }
     }
 
     @Override
@@ -1079,6 +1240,38 @@ public class Home1Fragment extends BaseFragment implements HomeDataView, View.On
     void closeFloatHb() {
         mFloatHbLayout.setVisibility(View.GONE);
         SPUtils.getInstance().put(StringUtils.isEmpty(mUserInfo.getId()) ? Constants.SMALL_HONG_BAO_IS_CLOSE : Constants.SMALL_HONG_BAO + mUserInfo.getId(), MyTimeUtil.getYearAndDay());
+    }
+
+    @Override
+    public void agree() {
+        SPUtils.getInstance().put(Constants.SHOW_PRIVARY, true);
+
+        Message message = new Message();
+        message.what = 0;
+        mHandler.sendMessage(message);
+    }
+
+    @Override
+    public void notAgree() {
+        if (warmDialog != null && !warmDialog.isShowing()) {
+            warmDialog.show();
+        }
+    }
+
+    @Override
+    public void warnAgree() {
+        SPUtils.getInstance().put(Constants.SHOW_PRIVARY, true);
+        Message message = new Message();
+        message.what = 0;
+        mHandler.sendMessage(message);
+    }
+
+    @Override
+    public void warnNotAgree() {
+        SPUtils.getInstance().put(Constants.SHOW_PRIVARY, true);
+        Message message = new Message();
+        message.what = 0;
+        mHandler.sendMessage(message);
     }
 
     @Override

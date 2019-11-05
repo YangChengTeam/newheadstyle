@@ -506,7 +506,8 @@ public class PushNoteActivity extends BaseFragmentActivity implements IBaseView 
 
                     if (fromNoteType == 2) {
                         MessageEvent addMessage = new MessageEvent("add_note_type");
-                        addMessage.setTopicId(topicId);
+                        //addMessage.setTopicId(topicId);
+                        addMessage.setAddNoteInfo(((AddNoteRet) tData).getData());
                         EventBus.getDefault().post(addMessage);
                     }
 

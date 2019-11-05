@@ -90,4 +90,6 @@ public class Constants {
     public static final String SMALL_HONG_BAO = "small_hong";
 
     public static final String GET_MONEY_NUM = "get_money_num";
+
+    public static final String SHOW_PRIVARY = "show_privary";
 }

@@ -55,7 +55,9 @@ import com.feiyou.headstyle.ui.adapter.MyFragmentAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragmentActivity;
 import com.feiyou.headstyle.ui.custom.EveryDayHongBaoDialog;
 import com.feiyou.headstyle.ui.custom.PraiseDialog;
+import com.feiyou.headstyle.ui.custom.PrivacyDialog;
 import com.feiyou.headstyle.ui.custom.VersionUpdateDialog;
+import com.feiyou.headstyle.ui.custom.WarmDialog;
 import com.feiyou.headstyle.utils.GoToScoreUtils;
 import com.feiyou.headstyle.utils.NotificationUtils;
 import com.feiyou.headstyle.utils.RandomUtils;
@@ -86,7 +88,7 @@ import permissions.dispatcher.RuntimePermissions;
 
 
 @RuntimePermissions
-public class Main1Activity extends BaseFragmentActivity implements VersionView, ViewPager.OnPageChangeListener, RadioGroup.OnCheckedChangeListener, PraiseDialog.PraiseListener, VersionUpdateDialog.UpdateListener {
+public class Main1Activity extends BaseFragmentActivity implements VersionView, ViewPager.OnPageChangeListener, RadioGroup.OnCheckedChangeListener, PraiseDialog.PraiseListener {
 
     @BindView(R.id.viewpager)
     ViewPager viewPager;
@@ -108,36 +110,12 @@ public class Main1Activity extends BaseFragmentActivity implements VersionView, 
 
     PraiseDialog praiseDialog;
 
-    VersionPresenterImp versionPresenterImp;
-
-    private ProgressDialog progressDialog = null;
-
-    private VersionInfo versionInfo;
-
-    BaseDownloadTask task;
-
-    VersionUpdateDialog updateDialog;
-
     private int currentIndex;
 
     @Override
     protected int getContextViewId() {
         return R.layout.activity_main1;
     }
-
-    private Handler mHandler = new Handler() {
-        @Override
-        public void handleMessage(android.os.Message msg) {
-            switch (msg.what) {
-                case 0:
-                    int progress = (Integer) msg.obj;
-                    updateDialog.setProgress(progress);
-                    break;
-                default:
-                    break;
-            }
-        }
-    };
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -212,44 +190,10 @@ public class Main1Activity extends BaseFragmentActivity implements VersionView, 
             }
         });
 
-        progressDialog = new ProgressDialog(this);
-        progressDialog.setMessage("正在检测新版本");
-        progressDialog.setCanceledOnTouchOutside(false);
-        progressDialog.setOnKeyListener(new DialogInterface.OnKeyListener() {
-            @Override
-            public boolean onKey(DialogInterface dialogInterface, int keyCode, KeyEvent keyEvent) {
-                if (keyCode == KeyEvent.KEYCODE_BACK) {
-                    if (versionInfo != null && versionInfo.getVersionIsChange() == 1) {
-                        return true;//不执行父类点击事件
-                    }
-                    return false;
-                }
-                return false;
-            }
-        });
-
-        updateDialog = new VersionUpdateDialog(this, R.style.login_dialog);
-        updateDialog.setUpdateListener(this);
-        updateDialog.setOnKeyListener(new DialogInterface.OnKeyListener() {
-            @Override
-            public boolean onKey(DialogInterface dialogInterface, int keyCode, KeyEvent keyEvent) {
-                if (keyCode == KeyEvent.KEYCODE_BACK) {
-                    if (versionInfo != null && versionInfo.getVersionIsChange() == 1) {
-                        return true;//不执行父类点击事件
-                    }
-                    return false;
-                }
-                return false;
-            }
-        });
-
         if (currentIndex > 0) {
             viewPager.setCurrentItem(currentIndex);
         }
 
-        versionPresenterImp = new VersionPresenterImp(this, this);
-        //请求版本更新
-        versionPresenterImp.getVersionInfo(com.feiyou.headstyle.utils.AppUtils.getMetaDataValue(this, "UMENG_CHANNEL"));
     }
 
     public void showScore() {
@@ -417,9 +361,7 @@ public class Main1Activity extends BaseFragmentActivity implements VersionView, 
 
     @Override
     public void dismissProgress() {
-        if (progressDialog != null && progressDialog.isShowing()) {
-            progressDialog.dismiss();
-        }
+
     }
 
     @Override
@@ -427,100 +369,13 @@ public class Main1Activity extends BaseFragmentActivity implements VersionView, 
         Logger.i("version info ---> " + JSON.toJSONString(tData));
 
         if (tData != null) {
-            if (tData instanceof VersionInfoRet) {
-                if (tData.getCode() == Constants.SUCCESS) {
-                    versionInfo = ((VersionInfoRet) tData).getData();
-                    if (versionInfo.getVersionCode() > AppUtils.getAppVersionCode()) {
-                        if (updateDialog != null && !updateDialog.isShowing()) {
-                            updateDialog.setVersionCode(versionInfo.getVersionName());
-                            updateDialog.setVersionContent(versionInfo.getVersionDesc());
-                            updateDialog.setIsForceUpdate(versionInfo.getVersionIsChange());
-                            updateDialog.show();
-                        }
-                    }
-                }
-            }
+
         }
     }
 
     @Override
     public void loadDataError(Throwable throwable) {
-        if (progressDialog != null && progressDialog.isShowing()) {
-            progressDialog.dismiss();
-        }
-    }
 
-    @Override
-    public void update() {
-        if (versionInfo != null && !StringUtils.isEmpty(versionInfo.getVersionUrl())) {
-            downAppFile(versionInfo.getVersionUrl());
-        }
-    }
-
-    @Override
-    public void updateCancel() {
-
-    }
-
-    public void downAppFile(String downUrl) {
-        final String filePath = PathUtils.getExternalAppFilesPath() + "/new_app.apk";
-        Logger.i("down app path --->" + filePath);
-
-        task = FileDownloader.getImpl().create(downUrl)
-                .setPath(filePath)
-                .setListener(new FileDownloadListener() {
-                    @Override
-                    protected void pending(BaseDownloadTask task, int soFarBytes, int totalBytes) {
-                        //Toasty.normal(SettingActivity.this, "正在更新版本后...").show();
-                    }
-
-                    @Override
-                    protected void connected(BaseDownloadTask task, String etag, boolean isContinue, int soFarBytes, int totalBytes) {
-                    }
-
-                    @Override
-                    protected void progress(BaseDownloadTask task, int soFarBytes, int totalBytes) {
-                        int progress = (int) ((soFarBytes * 1.0 / totalBytes) * 100);
-                        Logger.i("progress--->" + soFarBytes + "---" + totalBytes + "---" + progress);
-
-                        Message message = new Message();
-                        message.what = 0;
-                        message.obj = progress;
-                        mHandler.sendMessage(message);
-                    }
-
-                    @Override
-                    protected void blockComplete(BaseDownloadTask task) {
-                    }
-
-                    @Override
-                    protected void retry(final BaseDownloadTask task, final Throwable ex, final int retryingTimes, final int soFarBytes) {
-                    }
-
-                    @Override
-                    protected void completed(BaseDownloadTask task) {
-                        ToastUtils.showLong("下载完成");
-                        if (progressDialog != null && progressDialog.isShowing()) {
-                            progressDialog.dismiss();
-                        }
-
-                        AppUtils.installApp(filePath);
-                    }
-
-                    @Override
-                    protected void paused(BaseDownloadTask task, int soFarBytes, int totalBytes) {
-                    }
-
-                    @Override
-                    protected void error(BaseDownloadTask task, Throwable e) {
-                    }
-
-                    @Override
-                    protected void warn(BaseDownloadTask task) {
-                    }
-                });
-
-        task.start();
     }
 
     public int getCurrentTabIndex() {

@@ -50,7 +50,6 @@
         android:largeHeap="true"
         android:maxAspectRatio="2.4"
         android:resizeableActivity="true"
-        android:roundIcon="@drawable/app_logo"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
@@ -110,6 +109,7 @@
         <activity android:name=".ui.activity.AboutActivity" />
         <activity android:name=".ui.activity.FeedBackActivity" />
         <activity android:name=".ui.activity.EveryDayHongBaoActivity"></activity>
+        <activity android:name=".ui.activity.PrivaryActivity"></activity>
         <activity
             android:name=".ui.activity.CommunityTypeActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
@@ -227,7 +227,7 @@
             android:value="57ccc92867e58e1e9e000763" />
         <meta-data
             android:name="UMENG_CHANNEL"
-            android:value="qqtn" />
+            android:value="liurenjun" />
 
         <meta-data
             android:name="android.max_aspect"

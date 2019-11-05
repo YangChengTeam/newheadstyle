@@ -663,9 +663,13 @@ public class CommunityType1Activity extends BaseFragmentActivity implements Note
             //发帖后添加到首页
             //noteInfoAdapter.addData(0, messageEvent.getAddNoteInfo());
             //mCommunityTypeListView.scrollToPosition(0);
-            topicId = messageEvent.getTopicId();
-            currentPage = 1;
-            noteTypePresenterImp.getNoteTypeData(topicId, currentPage, 1, App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "");
+
+
+            //topicId = messageEvent.getTopicId();
+            //currentPage = 1;
+            //noteTypePresenterImp.getNoteTypeData(topicId, currentPage, 1, App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "");
+
+            noteInfoAdapter.addData(0, messageEvent.getAddNoteInfo());
         }
     }
 
