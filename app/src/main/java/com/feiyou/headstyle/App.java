@@ -18,9 +18,11 @@ import com.feiyou.headstyle.bean.TopicInfo;
 import com.feiyou.headstyle.bean.UserInfo;
 import com.feiyou.headstyle.ui.custom.CmGameImageLoader;
 import com.feiyou.headstyle.utils.AppContextUtil;
+import com.feiyou.headstyle.utils.AppUtils;
 import com.feiyou.headstyle.utils.TTAdManagerHolder;
 import com.mob.MobSDK;
 import com.orhanobut.logger.Logger;
+import com.umeng.commonsdk.BuildConfig;
 import com.umeng.commonsdk.UMConfigure;
 import com.umeng.socialize.PlatformConfig;
 
@@ -30,7 +32,7 @@ import java.util.List;
  * Created by admin on 2017/3/24.
  */
 
-public class App extends Application  {
+public class App extends Application {
 
     protected static App mInstance;
 
@@ -77,6 +79,12 @@ public class App extends Application  {
     public int userGoldNum;
 
     private int isFromTaskSign;
+
+    public static String appChannel = "1";
+
+    public static String imei;
+
+    public static String androidId;
 
     public App() {
         mInstance = this;
@@ -127,8 +135,9 @@ public class App extends Application  {
 
         cmGameAppInfo.setTtInfo(ttInfo);
 
-        CmGameSdk.INSTANCE.initCmGameSdk(this, cmGameAppInfo, new CmGameImageLoader(), BuildConfig.DEBUG);
-        Log.d("cmgamesdk", "current sdk version : " + CmGameSdk.INSTANCE.getVersion());
+        CmGameSdk.initCmGameSdk(this, cmGameAppInfo, new CmGameImageLoader(), BuildConfig.DEBUG);
+        Log.d("cmgamesdk", "current sdk version : " + CmGameSdk.getVersion());
+        appChannel = AppUtils.getMetaDataValue(this, "UMENG_CHANNEL");
     }
 
     public UserInfo getmUserInfo() {
@@ -202,7 +211,6 @@ public class App extends Application  {
     public void setIsFromTaskSign(int isFromTaskSign) {
         this.isFromTaskSign = isFromTaskSign;
     }
-
 
 
 }

@@ -18,6 +18,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.alibaba.fastjson.JSONObject;
+import com.blankj.utilcode.util.AppUtils;
 import com.blankj.utilcode.util.KeyboardUtils;
 import com.blankj.utilcode.util.SPUtils;
 import com.blankj.utilcode.util.SizeUtils;
@@ -47,6 +48,7 @@ import com.jakewharton.rxbinding.view.RxView;
 import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 import com.qmuiteam.qmui.widget.QMUITopBar;
+import com.umeng.analytics.MobclickAgent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -170,6 +172,8 @@ public class TestImageDetailActivity extends BaseFragmentActivity implements Tes
     }
 
     public void initData() {
+        MobclickAgent.onEvent(this, "test_start", AppUtils.getAppVersionName());
+
         Bundle bundle = getIntent().getExtras();
         if (bundle != null && !StringUtils.isEmpty(bundle.getString("tid"))) {
             tid = bundle.getString("tid");
@@ -332,6 +336,8 @@ public class TestImageDetailActivity extends BaseFragmentActivity implements Tes
             params.setHeadimg(userInfo != null ? userInfo.getUserimg() : "");
             params.setSex(selectSexKey);
             params.setUserId(userInfo != null ? userInfo.getId() : "0");
+
+            MobclickAgent.onEvent(this, "test_commit", AppUtils.getAppVersionName());
             testResultInfoPresenterImp.createImage(params);
         }
     }

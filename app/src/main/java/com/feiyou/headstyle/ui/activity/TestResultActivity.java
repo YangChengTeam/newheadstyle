@@ -23,6 +23,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
+import com.blankj.utilcode.util.AppUtils;
 import com.blankj.utilcode.util.ImageUtils;
 import com.blankj.utilcode.util.PathUtils;
 import com.blankj.utilcode.util.ScreenUtils;
@@ -53,6 +54,7 @@ import com.jakewharton.rxbinding.view.RxView;
 import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 import com.qmuiteam.qmui.widget.QMUITopBar;
+import com.umeng.analytics.MobclickAgent;
 import com.umeng.socialize.ShareAction;
 import com.umeng.socialize.UMShareListener;
 import com.umeng.socialize.bean.SHARE_MEDIA;
@@ -153,6 +155,8 @@ public class TestResultActivity extends BaseFragmentActivity implements IBaseVie
     }
 
     public void initData() {
+        MobclickAgent.onEvent(this, "test_result", AppUtils.getAppVersionName());
+
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
             fromType = bundle.getInt("from_type", 1);

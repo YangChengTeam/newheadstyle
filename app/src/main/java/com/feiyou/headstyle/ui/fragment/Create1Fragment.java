@@ -21,7 +21,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
@@ -29,7 +28,6 @@ import com.blankj.utilcode.constant.TimeConstants;
 import com.blankj.utilcode.util.AppUtils;
 import com.blankj.utilcode.util.BarUtils;
 import com.blankj.utilcode.util.PathUtils;
-import com.blankj.utilcode.util.PhoneUtils;
 import com.blankj.utilcode.util.SPUtils;
 import com.blankj.utilcode.util.SizeUtils;
 import com.blankj.utilcode.util.StringUtils;
@@ -49,7 +47,7 @@ import com.cmcm.cmgame.IAppCallback;
 import com.cmcm.cmgame.IGameAccountCallback;
 import com.cmcm.cmgame.IGameAdCallback;
 import com.cmcm.cmgame.IGamePlayTimeCallback;
-import com.cmcm.cmgame.gamedata.GameInfo;
+import com.cmcm.cmgame.gamedata.bean.GameInfo;
 import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.base.IBaseView;
@@ -72,11 +70,9 @@ import com.feiyou.headstyle.ui.activity.CashActivity;
 import com.feiyou.headstyle.ui.activity.CommunityArticleActivity;
 import com.feiyou.headstyle.ui.activity.GameTestActivity;
 import com.feiyou.headstyle.ui.activity.GoldAndCashActivity;
-import com.feiyou.headstyle.ui.activity.GoldDetailActivity;
 import com.feiyou.headstyle.ui.activity.GoldMailActivity;
 import com.feiyou.headstyle.ui.activity.GoldTaskActivity;
 import com.feiyou.headstyle.ui.activity.GoodDetailActivity;
-import com.feiyou.headstyle.ui.activity.Main1Activity;
 import com.feiyou.headstyle.ui.activity.PushNoteActivity;
 import com.feiyou.headstyle.ui.activity.TestDetailActivity;
 import com.feiyou.headstyle.ui.activity.TestImageDetailActivity;
@@ -86,14 +82,12 @@ import com.feiyou.headstyle.ui.adapter.SignInListAdapter;
 import com.feiyou.headstyle.ui.adapter.TaskListAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragment;
 import com.feiyou.headstyle.ui.custom.DownFileDialog;
-import com.feiyou.headstyle.ui.custom.GameProfitDialog;
 import com.feiyou.headstyle.ui.custom.GlideRoundTransform;
 import com.feiyou.headstyle.ui.custom.LoginDialog;
 import com.feiyou.headstyle.ui.custom.NewSignSuccessDialog;
 import com.feiyou.headstyle.ui.custom.NormalDecoration;
 import com.feiyou.headstyle.ui.custom.ReceiveHongBaoDialog;
 import com.feiyou.headstyle.ui.custom.SeeVideoDialog;
-import com.feiyou.headstyle.ui.custom.SignSuccessDialog;
 import com.feiyou.headstyle.ui.custom.TurnProfitDialog;
 import com.feiyou.headstyle.ui.custom.WeiXinTaskDialog;
 import com.feiyou.headstyle.utils.GoToScoreUtils;
@@ -110,7 +104,6 @@ import com.sunfusheng.marqueeview.MarqueeView;
 import com.tencent.mm.opensdk.modelbiz.WXLaunchMiniProgram;
 import com.tencent.mm.opensdk.openapi.IWXAPI;
 import com.tencent.mm.opensdk.openapi.WXAPIFactory;
-import com.umeng.analytics.MobclickAgent;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -417,13 +410,11 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
     }
 
     public void initData() {
-        MobclickAgent.onEvent(getActivity(), "click_fuli", AppUtils.getAppVersionName());
-
         // 默认游戏中心页面，点击游戏试，触发回调
-        CmGameSdk.INSTANCE.setGameClickCallback(this);
+        CmGameSdk.setGameClickCallback(this);
 
         // 点击游戏右上角或物理返回键，退出游戏时触发回调，并返回游戏时长
-        CmGameSdk.INSTANCE.setGamePlayTimeCallback(this);
+        CmGameSdk.setGamePlayTimeCallback(this);
 
         // 游戏内增加自定义view，提供产品多样性
         //initMoveView();
@@ -433,7 +424,7 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
         // CmGameSdk.INSTANCE.setGameAdCallback(this);
 
         // 账号信息变化时触发回调，若需要支持APP卸载后游戏信息不丢失，需要注册该回调
-        CmGameSdk.INSTANCE.setGameAccountCallback(this);
+        CmGameSdk.setGameAccountCallback(this);
         Logger.i("create init data--->");
 
         mRefreshLayout.setOnRefreshListener(this);
@@ -491,10 +482,10 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
         mTaskListView.setAdapter(taskListAdapter);
 
 
-        if (CmGameSdk.INSTANCE.getGameInfoList().size() > 3) {
-            tempGameInfoList = CmGameSdk.INSTANCE.getGameInfoList().subList(0, 3);
+        if (CmGameSdk.getGameInfoList().size() > 3) {
+            tempGameInfoList = CmGameSdk.getGameInfoList().subList(0, 3);
         } else {
-            tempGameInfoList = CmGameSdk.INSTANCE.getGameInfoList();
+            tempGameInfoList = CmGameSdk.getGameInfoList();
         }
 
         miniGameAdapter = new MiniGameAdapter(getActivity(), tempGameInfoList);
@@ -1566,7 +1557,7 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
     }
 
     @Override
-    public void onGameAccount(long l, String s, String s1) {
+    public void onGameAccount(String s) {
 
     }
 

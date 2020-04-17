@@ -11,6 +11,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.blankj.utilcode.util.AppUtils;
 import com.blankj.utilcode.util.SizeUtils;
 import com.blankj.utilcode.util.StringUtils;
 import com.chad.library.adapter.base.BaseQuickAdapter;
@@ -26,6 +27,7 @@ import com.feiyou.headstyle.ui.custom.NormalDecoration;
 import com.feiyou.headstyle.view.TestInfoView;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 import com.qmuiteam.qmui.widget.QMUITopBar;
+import com.umeng.analytics.MobclickAgent;
 import com.wang.avi.AVLoadingIndicatorView;
 
 import butterknife.BindView;
@@ -76,6 +78,8 @@ public class TestCategoryActivity extends BaseFragmentActivity implements TestIn
     }
 
     private void initTopBar() {
+        MobclickAgent.onEvent(this, "test_category_into", AppUtils.getAppVersionName());
+
         Bundle bundle = getIntent().getExtras();
         if (bundle != null && bundle.getString("cid") != null) {
             cid = bundle.getString("cid");

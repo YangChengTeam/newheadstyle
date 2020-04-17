@@ -4,9 +4,11 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
-import android.media.MediaScannerConnection;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -26,6 +28,7 @@ import android.widget.Toast;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
+import com.blankj.utilcode.util.AppUtils;
 import com.blankj.utilcode.util.ImageUtils;
 import com.blankj.utilcode.util.PathUtils;
 import com.blankj.utilcode.util.SPUtils;
@@ -36,6 +39,13 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
+import com.bytedance.sdk.openadsdk.AdSlot;
+import com.bytedance.sdk.openadsdk.FilterWord;
+import com.bytedance.sdk.openadsdk.TTAdConstant;
+import com.bytedance.sdk.openadsdk.TTAdDislike;
+import com.bytedance.sdk.openadsdk.TTAdNative;
+import com.bytedance.sdk.openadsdk.TTAppDownloadListener;
+import com.bytedance.sdk.openadsdk.TTNativeExpressAd;
 import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.bean.AddCollectionRet;
@@ -54,10 +64,12 @@ import com.feiyou.headstyle.presenter.RecordInfoPresenterImp;
 import com.feiyou.headstyle.presenter.UpdateHeadPresenterImp;
 import com.feiyou.headstyle.ui.adapter.HeadShowItemAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragmentActivity;
+import com.feiyou.headstyle.ui.custom.DislikeDialog;
 import com.feiyou.headstyle.ui.custom.GlideRoundTransform;
 import com.feiyou.headstyle.ui.custom.LoginDialog;
 import com.feiyou.headstyle.ui.custom.qqhead.BaseUIListener;
 import com.feiyou.headstyle.ui.fragment.StickerFragment;
+import com.feiyou.headstyle.utils.TTAdManagerHolder;
 import com.feiyou.headstyle.view.HeadListDataView;
 import com.feiyou.headstyle.view.flingswipe.SwipeFlingAdapterView;
 import com.orhanobut.logger.Logger;
@@ -65,6 +77,7 @@ import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 import com.qmuiteam.qmui.widget.QMUITopBar;
 import com.tencent.connect.avatar.QQAvatar;
 import com.tencent.tauth.Tencent;
+import com.umeng.analytics.MobclickAgent;
 import com.umeng.socialize.ShareAction;
 import com.umeng.socialize.UMAuthListener;
 import com.umeng.socialize.UMShareAPI;
@@ -77,9 +90,10 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -126,6 +140,12 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
 
     @BindView(R.id.iv_float_close)
     ImageView mCloseFloat;
+
+    @BindView(R.id.layout_ad)
+    LinearLayout mAdBannerLayout;
+
+    @BindView(R.id.layout_operation)
+    FrameLayout mOptionLayout;
 
     TextView mTitleTv;
 
@@ -202,6 +222,43 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
     private HeadInfo lastHeadInfo;
 
     private RecordInfoPresenterImp recordInfoPresenterImp;
+
+    @BindView(R.id.express_container)
+    FrameLayout mExpressContainer;
+
+    private TTAdNative mTTAdNative;
+
+    private TTAdDislike mTTAdDislike;
+
+    private TTNativeExpressAd mTTAd;
+
+    private TTNativeExpressAd mChaPingTTAd;
+
+    private int slideCount = 1;
+
+    private int showChaPingCount;
+
+    Timer timer = null;
+
+    public Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case 0:
+                    loadExpressAd("920819599");
+                    break;
+                case 1:
+                    if (mTTAd != null) {
+                        bindAdListener(mTTAd);
+                        startTime = System.currentTimeMillis();
+                        mTTAd.render();
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+    };
 
     @Override
     protected int getContextViewId() {
@@ -327,7 +384,6 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
                         }
                     }
                 });
-
             }
         });
 
@@ -350,6 +406,8 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
     }
 
     public void initData() {
+        MobclickAgent.onEvent(this, "image_head_detail", AppUtils.getAppVersionName());
+
         mShareAPI = UMShareAPI.get(this);
         mTencent = Tencent.createInstance("1105592461", this.getApplicationContext());
 
@@ -459,6 +517,41 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
                 }
             }
         });
+
+        //step3:创建TTAdNative对象,用于调用广告请求接口
+        mTTAdNative = TTAdManagerHolder.get().createAdNative(this);
+
+        //timer = new Timer();
+        //timer.schedule(new BannerTimerTask(), 0, 10 * 1000);
+
+        //new Thread(new BannerThread()).start();
+//        if (android.os.Build.VERSION.SDK_INT >= 23) {
+//
+//        } else {
+//            RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, SizeUtils.dp2px(62));
+//            params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+//            mOptionLayout.setLayoutParams(params);
+//            mAdBannerLayout.setVisibility(View.GONE);
+//        }
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                loadExpressAd("920819599");
+            }
+        }).start();
+        new LoadAdInfoAsyncTask().execute();
+    }
+
+    //定时对象
+    class BannerTimerTask extends TimerTask {
+        @Override
+        public void run() {//需要定时执行的任务
+            //加载banner
+            Message message = new Message();
+            message.what = 0;
+            mHandler.sendMessage(message);
+        }
     }
 
     @OnClick(R.id.float_iv)
@@ -507,7 +600,7 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
         }
         adapter.notifyDataSetChanged();
 
-        if(swipeView != null && swipeView.getSelectedView() != null){
+        if (swipeView != null && swipeView.getSelectedView() != null) {
             ImageView currentIv = swipeView.getSelectedView().findViewById(R.id.iv_show_head);
             RequestOptions options = new RequestOptions().skipMemoryCache(true);
             options.transform(new GlideRoundTransform(this, SizeUtils.dp2px(117)));
@@ -527,6 +620,9 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
         isEdit = !isEdit;
 
         if (adapter.getHeads() != null && adapter.getHeads().size() > 0) {
+
+            MobclickAgent.onEvent(this, "create_image_click", AppUtils.getAppVersionName());
+
             Intent intent = new Intent(HeadShowActivity.this, HeadEditActivity.class);
             intent.putExtra("image_url", adapter.getHeads().get(0).getImgurl());
             startActivity(intent);
@@ -542,6 +638,7 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
                 loginDialog.show();
             }
         } else {
+            MobclickAgent.onEvent(this, "collection_image", AppUtils.getAppVersionName());
             if (adapter.getHeads() != null && adapter.getHeads().size() > 0) {
                 addCollectionPresenterImp.addCollection(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", adapter.getHeads().get(0).getId());
             } else {
@@ -552,6 +649,7 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
 
     @OnClick(R.id.layout_down)
     void downImage() {
+        MobclickAgent.onEvent(this, "down_image", AppUtils.getAppVersionName());
         Glide.with(this).asBitmap().load(currentImageUrl).into(new SimpleTarget<Bitmap>() {
             @Override
             public void onResourceReady(Bitmap resource, Transition<? super Bitmap> transition) {
@@ -638,90 +736,138 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
 
     @Override
     public void removeFirstObjectInAdapter() {
-        if (isLastImage) {
-            adapter.addItemData(lastHeadInfo);
-            adapter.notifyDataSetChanged();
-            Toasty.normal(this, "已经是最后一张了").show();
-            return;
-        }
-        if (fromType != 2) {
-            if (adapter.getCount() < 6) {
-                currentPage++;
-                if (fromType == 1) {
-                    if (StringUtils.isEmpty(tagId)) {
-                        homeDataPresenterImp.getData(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", currentPage + "", "", "", 1);
-                    } else {
-                        headListDataPresenterImp.getDataByTagId(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", tagId, currentPage, pageSize);
+        try {
+            if (isLastImage) {
+                adapter.addItemData(lastHeadInfo);
+                adapter.notifyDataSetChanged();
+                Toasty.normal(this, "已经是最后一张了").show();
+                return;
+            }
+            if (fromType != 2) {
+                if (adapter.getCount() < 6) {
+                    currentPage++;
+                    if (fromType == 1) {
+                        if (StringUtils.isEmpty(tagId)) {
+                            homeDataPresenterImp.getData(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", currentPage + "", "", "", 1);
+                        } else {
+                            headListDataPresenterImp.getDataByTagId(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", tagId, currentPage, pageSize);
+                        }
+                    }
+
+                    if (fromType == 3) {
+                        headListDataPresenterImp.userCollection(currentPage, App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "");
+                    }
+
+                    if (fromType == 4) {
+                        headListDataPresenterImp.getSearchList(currentPage, StringUtils.isEmpty(keyWord) ? "" : keyWord, "");
                     }
                 }
 
+                slideCount++;
+
+                if (showChaPingCount == 0 && slideCount % 4 == 0) {
+                    showChaPingCount++;
+                    if (mChaPingTTAd != null) {
+                        if (mChaPingTTAd.getExpressAdView().getParent() != null) {
+                            ((ViewGroup) mChaPingTTAd.getExpressAdView().getParent()).removeView(mChaPingTTAd.getExpressAdView());
+                        }
+                        mChaPingTTAd.showInteractionExpressAd(HeadShowActivity.this);
+                    }
+                }
+
+//                if (showChaPingCount > 0 && slideCount % (showChaPingCount * 10 + 5) == 0) {
+//                    showChaPingCount++;
+//                    new LoadAdInfoAsyncTask().execute();
+//                }
+
+                //滑动时,移除最上面一个图片
+                if (adapter.getCount() > 0) {
+                    adapter.remove(0);
+                }
+
+                Logger.i("last count--->" + adapter.getCount());
+
+                if (adapter.getCount() == 1 && fromType > 1) {
+                    isLastImage = true;
+                    lastHeadInfo = adapter.getHeads().get(0);
+                    Logger.i("已经是最后一张了");
+                }
+
+                if (adapter.getHeads().size() > 0) {
+
+                    currentImageUrl = adapter.getHeads() != null && adapter.getHeads().size() > 0 ? adapter.getHeads().get(0).getImgurl() : "";
+                    imageId = adapter.getHeads().get(0).getId();
+                    if (shareAction != null) {
+                        if (!StringUtils.isEmpty(currentImageUrl)) {
+                            UMImage image = new UMImage(HeadShowActivity.this, currentImageUrl);
+                            shareAction.withMedia(image);
+                        } else {
+                            shareAction.withMedia(defUmImage);
+                        }
+                    }
+
+                    if (adapter.getHeads().get(0).getIsCollect() == 0) {
+                        mKeepTextView.setCompoundDrawablesWithIntrinsicBounds(null, notCollection, null, null);
+                    } else {
+                        mKeepTextView.setCompoundDrawablesWithIntrinsicBounds(null, isCollection, null, null);
+                    }
+                }
+
+                //我的收藏列表页面，设置所有的图片为收藏
                 if (fromType == 3) {
-                    headListDataPresenterImp.userCollection(currentPage, App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "");
-                }
-
-                if (fromType == 4) {
-                    headListDataPresenterImp.getSearchList(currentPage, StringUtils.isEmpty(keyWord) ? "" : keyWord, "");
-                }
-            }
-
-            //滑动时,移除最上面一个图片
-            adapter.remove(0);
-
-            Logger.i("last count--->" + adapter.getCount());
-
-            if (adapter.getCount() == 1 && fromType > 1) {
-                isLastImage = true;
-                lastHeadInfo = adapter.getHeads().get(0);
-                Logger.i("已经是最后一张了");
-            }
-
-            if (adapter.getHeads().size() > 0) {
-
-                currentImageUrl = adapter.getHeads() != null && adapter.getHeads().size() > 0 ? adapter.getHeads().get(0).getImgurl() : "";
-                imageId = adapter.getHeads().get(0).getId();
-                if (shareAction != null) {
-                    if (!StringUtils.isEmpty(currentImageUrl)) {
-                        UMImage image = new UMImage(HeadShowActivity.this, currentImageUrl);
-                        shareAction.withMedia(image);
-                    } else {
-                        shareAction.withMedia(defUmImage);
-                    }
-                }
-
-                if (adapter.getHeads().get(0).getIsCollect() == 0) {
-                    mKeepTextView.setCompoundDrawablesWithIntrinsicBounds(null, notCollection, null, null);
-                } else {
                     mKeepTextView.setCompoundDrawablesWithIntrinsicBounds(null, isCollection, null, null);
                 }
-            }
 
-            //我的收藏列表页面，设置所有的图片为收藏
-            if (fromType == 3) {
-                mKeepTextView.setCompoundDrawablesWithIntrinsicBounds(null, isCollection, null, null);
-            }
+            } else {
+                slideCount++;
 
-        } else {
-            //滑动时,移除最上面一个图片
-            adapter.remove(0);
-            Logger.i("last count--->" + adapter.getCount());
-            if (adapter.getCount() == 1) {
-                isLastImage = true;
-                lastHeadInfo = adapter.getHeads().get(0);
-                Logger.i("已经是最后一张了");
-            }
+                if (showChaPingCount == 0 && slideCount % 4 == 0) {
+                    showChaPingCount++;
+                    if (mChaPingTTAd != null) {
+                        if (mChaPingTTAd.getExpressAdView().getParent() != null) {
+                            ((ViewGroup) mChaPingTTAd.getExpressAdView().getParent()).removeView(mChaPingTTAd.getExpressAdView());
+                        }
+                        mChaPingTTAd.showInteractionExpressAd(HeadShowActivity.this);
+                    }
+                }
 
-            if (adapter.getHeads().size() > 0) {
-                currentImageUrl = adapter.getHeads().get(0).getImgurl();
-                imageId = adapter.getHeads().get(0).getId();
-                if (shareAction != null) {
-                    if (!StringUtils.isEmpty(currentImageUrl)) {
-                        UMImage image = new UMImage(HeadShowActivity.this, currentImageUrl);
-                        shareAction.withMedia(image);
-                    } else {
-                        shareAction.withMedia(defUmImage);
+//                if (showChaPingCount > 0 && slideCount % (showChaPingCount * 10 + 5) == 0) {
+//                    showChaPingCount++;
+//                    new LoadAdInfoAsyncTask().execute();
+//                }
+
+                if (adapter.getCount() > 0) {
+                    //滑动时,移除最上面一个图片
+                    adapter.remove(0);
+                }
+
+                Logger.i("last count--->" + adapter.getCount());
+
+                if (adapter.getCount() == 1) {
+                    isLastImage = true;
+                    lastHeadInfo = adapter.getHeads().get(0);
+                    Logger.i("已经是最后一张了");
+                }
+
+                if (adapter.getHeads().size() > 0) {
+                    currentImageUrl = adapter.getHeads().get(0).getImgurl();
+                    imageId = adapter.getHeads().get(0).getId();
+                    if (shareAction != null) {
+                        if (!StringUtils.isEmpty(currentImageUrl)) {
+                            UMImage image = new UMImage(HeadShowActivity.this, currentImageUrl);
+                            shareAction.withMedia(image);
+                        } else {
+                            shareAction.withMedia(defUmImage);
+                        }
                     }
                 }
             }
+
+            //统计滑动次数
+            MobclickAgent.onEvent(this, "swipe_image_count", AppUtils.getAppVersionName());
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -924,6 +1070,7 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
 
 
     private void doSetAvatar(Uri uri) {
+        MobclickAgent.onEvent(HeadShowActivity.this, "set_qq_head", AppUtils.getAppVersionName());
         QQAvatar qqAvatar = new QQAvatar(mTencent.getQQToken());
         qqAvatar.setAvatar(this, uri, new BaseUIListener(this), R.anim.zoomout);
     }
@@ -1062,5 +1209,302 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
         if (shareDialog != null && shareDialog.isShowing()) {
             shareDialog.dismiss();
         }
+    }
+
+
+    private void loadExpressAd(String codeId) {
+        mExpressContainer.removeAllViews();
+        float expressViewWidth = 360;
+        float expressViewHeight = 52;
+
+        //step4:创建广告请求参数AdSlot,具体参数含义参考文档
+        AdSlot adSlot = new AdSlot.Builder()
+                .setCodeId(codeId) //广告位id
+                .setSupportDeepLink(true)
+                .setAdCount(3) //请求广告数量为1到3条
+                .setExpressViewAcceptedSize(expressViewWidth, expressViewHeight) //期望模板广告view的size,单位dp
+                .setImageAcceptedSize(640, 100)//这个参数设置即可，不影响模板广告的size
+                .build();
+        //step5:请求广告，对请求回调的广告作渲染处理
+        mTTAdNative.loadBannerExpressAd(adSlot, new TTAdNative.NativeExpressAdListener() {
+            @Override
+            public void onError(int code, String message) {
+                //TToast.show(BannerExpressActivity.this, "load error : " + code + ", " + message);
+                Logger.i("load error : " + code + ", " + message);
+                mExpressContainer.removeAllViews();
+            }
+
+            @Override
+            public void onNativeExpressAdLoad(List<TTNativeExpressAd> ads) {
+                if (ads == null || ads.size() == 0) {
+                    return;
+                }
+                mTTAd = ads.get(0);
+                //mTTAd.setSlideIntervalTime(10 * 1000);
+
+                Message message = new Message();
+                message.what = 1;
+                mHandler.sendMessage(message);
+            }
+        });
+    }
+
+    private long startTime = 0;
+
+    private boolean mHasShowDownloadActive = false;
+
+    private void bindAdListener(TTNativeExpressAd ad) {
+        ad.setExpressInteractionListener(new TTNativeExpressAd.ExpressAdInteractionListener() {
+            @Override
+            public void onAdClicked(View view, int type) {
+                //TToast.show(mContext, "广告被点击");
+            }
+
+            @Override
+            public void onAdShow(View view, int type) {
+                //TToast.show(mContext, "广告展示");
+            }
+
+            @Override
+            public void onRenderFail(View view, String msg, int code) {
+                //Log.e("ExpressView", "render fail:" + (System.currentTimeMillis() - startTime));
+                Logger.i("render fail:" + (System.currentTimeMillis() - startTime));
+                //TToast.show(mContext, msg+" code:"+code);
+            }
+
+            @Override
+            public void onRenderSuccess(View view, float width, float height) {
+                Logger.i("render suc:" + (System.currentTimeMillis() - startTime));
+                //返回view的宽高 单位 dp
+                //TToast.show(mContext, "渲染成功");
+                mExpressContainer.removeAllViews();
+                mExpressContainer.addView(view);
+            }
+        });
+        //dislike设置
+        bindDislike(ad, false);
+        if (ad.getInteractionType() != TTAdConstant.INTERACTION_TYPE_DOWNLOAD) {
+            return;
+        }
+        ad.setDownloadListener(new TTAppDownloadListener() {
+            @Override
+            public void onIdle() {
+                //TToast.show(BannerExpressActivity.this, "点击开始下载", Toast.LENGTH_LONG);
+            }
+
+            @Override
+            public void onDownloadActive(long totalBytes, long currBytes, String fileName, String appName) {
+                if (!mHasShowDownloadActive) {
+                    mHasShowDownloadActive = true;
+                    //TToast.show(BannerExpressActivity.this, "下载中，点击暂停", Toast.LENGTH_LONG);
+                }
+            }
+
+            @Override
+            public void onDownloadPaused(long totalBytes, long currBytes, String fileName, String appName) {
+                //TToast.show(BannerExpressActivity.this, "下载暂停，点击继续", Toast.LENGTH_LONG);
+            }
+
+            @Override
+            public void onDownloadFailed(long totalBytes, long currBytes, String fileName, String appName) {
+                //TToast.show(BannerExpressActivity.this, "下载失败，点击重新下载", Toast.LENGTH_LONG);
+            }
+
+            @Override
+            public void onInstalled(String fileName, String appName) {
+                //TToast.show(BannerExpressActivity.this, "安装完成，点击图片打开", Toast.LENGTH_LONG);
+            }
+
+            @Override
+            public void onDownloadFinished(long totalBytes, String fileName, String appName) {
+                //TToast.show(BannerExpressActivity.this, "点击安装", Toast.LENGTH_LONG);
+            }
+        });
+    }
+
+    /**
+     * 设置广告的不喜欢, 注意：强烈建议设置该逻辑，如果不设置dislike处理逻辑，则模板广告中的 dislike区域不响应dislike事件。
+     *
+     * @param ad
+     * @param customStyle 是否自定义样式，true:样式自定义
+     */
+    private void bindDislike(TTNativeExpressAd ad, boolean customStyle) {
+        if (customStyle) {
+            //使用自定义样式
+            List<FilterWord> words = ad.getFilterWords();
+            if (words == null || words.isEmpty()) {
+                return;
+            }
+
+            final DislikeDialog dislikeDialog = new DislikeDialog(this, words);
+            dislikeDialog.setOnDislikeItemClick(new DislikeDialog.OnDislikeItemClick() {
+                @Override
+                public void onItemClick(FilterWord filterWord) {
+                    //屏蔽广告
+                    //TToast.show(mContext, "点击 " + filterWord.getName());
+                    //用户选择不喜欢原因后，移除广告展示
+                    mExpressContainer.removeAllViews();
+                }
+            });
+            ad.setDislikeDialog(dislikeDialog);
+            return;
+        }
+        //使用默认模板中默认dislike弹出样式
+        ad.setDislikeCallback(this, new TTAdDislike.DislikeInteractionCallback() {
+            @Override
+            public void onSelected(int position, String value) {
+                //TToast.show(mContext, "点击 " + value);
+                //用户选择不喜欢原因后，移除广告展示
+                mExpressContainer.removeAllViews();
+            }
+
+            @Override
+            public void onCancel() {
+                //TToast.show(mContext, "点击取消 ");
+            }
+        });
+    }
+
+
+    private void loadChaPingExpressAd(String codeId) {
+        float expressViewWidth = 300;
+        float expressViewHeight = 450;
+
+        //step4:创建广告请求参数AdSlot,具体参数含义参考文档
+        AdSlot adSlot = new AdSlot.Builder()
+                .setCodeId(codeId) //广告位id
+                .setSupportDeepLink(true)
+                .setAdCount(1) //请求广告数量为1到3条
+                .setExpressViewAcceptedSize(expressViewWidth, expressViewHeight) //期望模板广告view的size,单位dp
+                .setImageAcceptedSize(600, 900)//这个参数设置即可，不影响模板广告的size
+                .build();
+        //step5:请求广告，对请求回调的广告作渲染处理
+        mTTAdNative.loadInteractionExpressAd(adSlot, new TTAdNative.NativeExpressAdListener() {
+            @Override
+            public void onError(int code, String message) {
+                //TToast.show(InteractionExpressActivity.this, "load error : " + code + ", " + message);
+                Logger.i("loadChaPingExpressAd error : " + code + ", " + message);
+            }
+
+            @Override
+            public void onNativeExpressAdLoad(List<TTNativeExpressAd> ads) {
+                //Logger.i("ads list--->" + JSON.toJSONString(ads));
+                if (ads == null || ads.size() == 0) {
+                    return;
+                }
+                mChaPingTTAd = ads.get(0);
+                bindChaPingAdListener(mChaPingTTAd);
+                startTime = System.currentTimeMillis();
+                mChaPingTTAd.render();
+            }
+        });
+    }
+
+    private void bindChaPingAdListener(TTNativeExpressAd ad) {
+        ad.setExpressInteractionListener(new TTNativeExpressAd.ExpressAdInteractionListener() {
+
+            @Override
+            public void onAdClicked(View view, int type) {
+                //TToast.show(mContext, "广告被点击");
+            }
+
+            @Override
+            public void onAdShow(View view, int type) {
+                //TToast.show(mContext, "广告展示");
+            }
+
+            @Override
+            public void onRenderFail(View view, String msg, int code) {
+                //Log.e("ExpressView","render fail:"+(System.currentTimeMillis() - startTime));
+                //TToast.show(mContext, msg+" code:"+code);
+            }
+
+            @Override
+            public void onRenderSuccess(View view, float width, float height) {
+                //Log.e("ExpressView","render suc:"+(System.currentTimeMillis() - startTime));
+                //返回view的宽高 单位 dp
+                // TToast.show(mContext, "渲染成功");
+                //在满足条件时展示
+                Logger.i("chaping渲染成功");
+            }
+        });
+
+        if (ad.getInteractionType() != TTAdConstant.INTERACTION_TYPE_DOWNLOAD) {
+            return;
+        }
+        ad.setDownloadListener(new TTAppDownloadListener() {
+            @Override
+            public void onIdle() {
+                //TToast.show(InteractionExpressActivity.this, "点击开始下载", Toast.LENGTH_LONG);
+            }
+
+            @Override
+            public void onDownloadActive(long totalBytes, long currBytes, String fileName, String appName) {
+                if (!mHasShowDownloadActive) {
+                    mHasShowDownloadActive = true;
+                    //TToast.show(InteractionExpressActivity.this, "下载中，点击暂停", Toast.LENGTH_LONG);
+                }
+            }
+
+            @Override
+            public void onDownloadPaused(long totalBytes, long currBytes, String fileName, String appName) {
+                // TToast.show(InteractionExpressActivity.this, "下载暂停，点击继续", Toast.LENGTH_LONG);
+            }
+
+            @Override
+            public void onDownloadFailed(long totalBytes, long currBytes, String fileName, String appName) {
+                //TToast.show(InteractionExpressActivity.this, "下载失败，点击重新下载", Toast.LENGTH_LONG);
+            }
+
+            @Override
+            public void onInstalled(String fileName, String appName) {
+                //TToast.show(InteractionExpressActivity.this, "安装完成，点击图片打开", Toast.LENGTH_LONG);
+            }
+
+            @Override
+            public void onDownloadFinished(long totalBytes, String fileName, String appName) {
+                //TToast.show(InteractionExpressActivity.this, "点击安装", Toast.LENGTH_LONG);
+            }
+        });
+    }
+
+    private class LoadAdInfoAsyncTask extends AsyncTask<Void, Void, Boolean> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+
+            if (showChaPingCount < 10) {
+                loadChaPingExpressAd("920819143");
+            }
+            return true;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean isSave) {
+            super.onPostExecute(isSave);
+
+            if (mChaPingTTAd != null && showChaPingCount < 10) {
+                if (mChaPingTTAd.getExpressAdView().getParent() != null) {
+                    ((ViewGroup) mChaPingTTAd.getExpressAdView().getParent()).removeView(mChaPingTTAd.getExpressAdView());
+                }
+                mChaPingTTAd.showInteractionExpressAd(HeadShowActivity.this);
+            }
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        if (timer != null) {
+            timer.cancel();
+        }
+        mChaPingTTAd = null;
+        mTTAd = null;
     }
 }

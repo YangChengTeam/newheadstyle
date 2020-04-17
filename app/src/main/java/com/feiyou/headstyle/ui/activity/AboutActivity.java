@@ -232,4 +232,18 @@ public class AboutActivity extends BaseFragmentActivity implements View.OnClickL
             shareDialog.dismiss();
         }
     }
+
+    @OnClick(R.id.tv_user_xieyi)
+    void xieyi() {
+        Intent intent = new Intent(this, PrivaryActivity.class);
+        intent.putExtra("show_type",1);
+        startActivity(intent);
+    }
+
+    @OnClick(R.id.tv_privacy)
+    void privacy() {
+        Intent intent = new Intent(this, PrivaryActivity.class);
+        intent.putExtra("show_type",2);
+        startActivity(intent);
+    }
 }

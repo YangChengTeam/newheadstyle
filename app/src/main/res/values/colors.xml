@@ -147,4 +147,5 @@
     <color name="round_progress_color">#fcc63d</color>
 
     <color name="iknow_color">#febc03</color>
+    <color name="default_window_bg">#ffffff</color>
 </resources>

@@ -28,6 +28,7 @@ import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.blankj.utilcode.util.AppUtils;
 import com.blankj.utilcode.util.BarUtils;
 import com.blankj.utilcode.util.KeyboardUtils;
 import com.blankj.utilcode.util.ScreenUtils;
@@ -71,6 +72,7 @@ import com.feiyou.headstyle.ui.custom.LoginDialog;
 import com.feiyou.headstyle.view.CommentDialog;
 import com.feiyou.headstyle.view.VideoInfoView;
 import com.orhanobut.logger.Logger;
+import com.umeng.analytics.MobclickAgent;
 import com.umeng.socialize.ShareAction;
 import com.umeng.socialize.UMShareListener;
 import com.umeng.socialize.bean.SHARE_MEDIA;
@@ -236,6 +238,8 @@ public class VideoItemShowActivity extends BaseFragmentActivity implements Video
     }
 
     private void initView() {
+
+        MobclickAgent.onEvent(this, "video_first_play", AppUtils.getAppVersionName());
 
         Bundle bundle = getIntent().getExtras();
         if (bundle != null && bundle.getInt("jump_page") > 0) {
@@ -586,7 +590,7 @@ public class VideoItemShowActivity extends BaseFragmentActivity implements Video
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                 switch (newState) {
                     case RecyclerView.SCROLL_STATE_IDLE://停止滚动
-
+                        MobclickAgent.onEvent(VideoItemShowActivity.this, "video_slide_click", AppUtils.getAppVersionName());
                         Logger.i("last video count --->" + videoItemShowAdapter.getData().size());
 
                         View view = snapHelper.findSnapView(layoutManager);
@@ -631,7 +635,7 @@ public class VideoItemShowActivity extends BaseFragmentActivity implements Video
 
     @Override
     public void loadDataSuccess(ResultInfo tData) {
-        Logger.i("data--->" + JSONObject.toJSONString(tData));
+        Logger.i("video detail data--->" + JSONObject.toJSONString(tData));
 
         if (avi != null) {
             avi.hide();

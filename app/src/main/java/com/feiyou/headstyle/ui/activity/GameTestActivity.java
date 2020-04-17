@@ -200,7 +200,7 @@ public class GameTestActivity extends BaseFragmentActivity implements IAppCallba
 
         // 初始化小游戏 sdk 的账号数据，用于存储游戏内部的用户数据，
         // 为避免数据异常，这个方法建议在小游戏列表页面展现前（可以是二级页面）才调用
-        CmGameSdk.INSTANCE.initCmGameAccount();
+        CmGameSdk.initCmGameAccount();
 
         /////////// ///////////////////////////////////////////
         /// 如下为可选功能，如没必要，不要使用
@@ -208,10 +208,10 @@ public class GameTestActivity extends BaseFragmentActivity implements IAppCallba
         /// 如下为可选功能
 
         // 默认游戏中心页面，点击游戏试，触发回调
-        CmGameSdk.INSTANCE.setGameClickCallback(this);
+        CmGameSdk.setGameClickCallback(this);
 
         // 点击游戏右上角或物理返回键，退出游戏时触发回调，并返回游戏时长
-        CmGameSdk.INSTANCE.setGamePlayTimeCallback(this);
+        CmGameSdk.setGamePlayTimeCallback(this);
 
         // 游戏内增加自定义view，提供产品多样性
         //initMoveViewSwitch();
@@ -219,10 +219,10 @@ public class GameTestActivity extends BaseFragmentActivity implements IAppCallba
 
         // 所有广告类型的展示和点击事件回调，仅供参考，数据以广告后台为准
         // 建议不要使用，有阻塞行为会导致程序无法正常使用
-        // CmGameSdk.INSTANCE.setGameAdCallback(this);
+        // CmGameSdk.setGameAdCallback(this);
 
         // 账号信息变化时触发回调，若需要支持APP卸载后游戏信息不丢失，需要注册该回调
-        CmGameSdk.INSTANCE.setGameAccountCallback(this);
+        CmGameSdk.setGameAccountCallback(this);
 
         if (userInfo != null) {
             gameGoldPresenterImp.gameGold(userInfo.getId(), userInfo.getOpenid());
@@ -320,13 +320,11 @@ public class GameTestActivity extends BaseFragmentActivity implements IAppCallba
     /**
      * 游戏账号信息回调，需要接入方保存，下次进入或卸载重装后设置给SDK使用，可以支持APP卸载后，游戏信息不丢失
      *
-     * @param uid       用户UID
      * @param token     用户token
-     * @param gameToken 游戏token
      */
     @Override
-    public void onGameAccount(long uid, String token, String gameToken) {
-        Log.d("cmgamesdk_Main2Activity", "onGameAccount uid: " + uid + " token: " + token + " gameToken: " + gameToken);
+    public void onGameAccount(String token) {
+        //Log.d("cmgamesdk_Main2Activity", "onGameAccount uid: " + uid + " token: " + token + " gameToken: " + gameToken);
 //        SPUtils.getInstance().put("game_uid", uid);
 //        SPUtils.getInstance().put(uid + "token", token);
 //        SPUtils.getInstance().put(uid + "game_token", gameToken);
@@ -336,11 +334,11 @@ public class GameTestActivity extends BaseFragmentActivity implements IAppCallba
     public void onDestroy() {
         super.onDestroy();
 
-        CmGameSdk.INSTANCE.removeGameClickCallback();
-        CmGameSdk.INSTANCE.setMoveView(null);
-        CmGameSdk.INSTANCE.removeGamePlayTimeCallback();
-        CmGameSdk.INSTANCE.removeGameAdCallback();
-        CmGameSdk.INSTANCE.removeGameAccountCallback();
+        CmGameSdk.removeGameClickCallback();
+        CmGameSdk.setMoveView(null);
+        CmGameSdk.removeGamePlayTimeCallback();
+        CmGameSdk.removeGameAdCallback();
+        CmGameSdk.removeGameAccountCallback();
 
         if (closeImage != null) {
             closeImage.clearAnimation();
@@ -575,9 +573,14 @@ public class GameTestActivity extends BaseFragmentActivity implements IAppCallba
                 lastX = event.getX();
                 lastY = event.getY();
             }
+
+            @Override
+            public void onViewVisible() {
+
+            }
         });
 
-        CmGameSdk.INSTANCE.setMoveView(cmGameTopView);
+        CmGameSdk.setMoveView(cmGameTopView);
     }
 
     @Override

@@ -29,6 +29,8 @@ public class PrivaryActivity extends BaseFragmentActivity {
     @BindView(R.id.tv_about_privary)
     TextView mAboutPrivaryTv;
 
+    private int showType =1;
+
     @Override
     protected int getContextViewId() {
         return R.layout.activity_privary;
@@ -42,12 +44,14 @@ public class PrivaryActivity extends BaseFragmentActivity {
     }
 
     private void initTopBar() {
+        showType = getIntent().getExtras().getInt("show_type",1);
+
         QMUIStatusBarHelper.setStatusBarLightMode(this);
-        mTopBar.setTitle("隐私政策");
+        mTopBar.setTitle(showType == 1 ? "用户协议":"隐私政策");
         View topSearchView = getLayoutInflater().inflate(R.layout.common_top_back, null);
         topSearchView.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, SizeUtils.dp2px(48)));
         TextView titleTv = topSearchView.findViewById(R.id.tv_title);
-        titleTv.setText("隐私政策");
+        titleTv.setText(showType == 1 ? "用户协议":"隐私政策");
 
         mTopBar.setCenterView(topSearchView);
         mBackImageView = topSearchView.findViewById(R.id.iv_back);
@@ -60,7 +64,7 @@ public class PrivaryActivity extends BaseFragmentActivity {
     }
 
     public void initData() {
-        String temp = ResourceUtils.readAssets2String("privary.txt");
+        String temp = ResourceUtils.readAssets2String(showType == 1 ? "xieyi.txt":"privary.txt");
         mAboutPrivaryTv.setText(Html.fromHtml(temp));
     }
 

@@ -28,6 +28,9 @@ public class VersionInfo {
     @SerializedName("app_openad")
     private int appOpenad;//APP开屏广告,1:打开。2：关闭
 
+    @SerializedName("app_adtype")
+    private int startType;//1腾讯，2头条
+
     public int getVersionCode() {
         return versionCode;
     }
@@ -82,5 +85,13 @@ public class VersionInfo {
 
     public void setAppOpenad(int appOpenad) {
         this.appOpenad = appOpenad;
+    }
+
+    public int getStartType() {
+        return startType;
+    }
+
+    public void setStartType(int startType) {
+        this.startType = startType;
     }
 }

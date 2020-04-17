@@ -1,69 +1,52 @@
 package com.feiyou.headstyle.ui.activity;
 
-import android.Manifest;
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.os.SystemClock;
-import android.provider.Settings;
 import android.support.annotation.MainThread;
-import android.text.TextUtils;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.alibaba.fastjson.JSON;
 import com.blankj.utilcode.util.RomUtils;
-import com.blankj.utilcode.util.SPUtils;
-import com.blankj.utilcode.util.SizeUtils;
 import com.blankj.utilcode.util.StringUtils;
 import com.bytedance.sdk.openadsdk.AdSlot;
 import com.bytedance.sdk.openadsdk.TTAdConstant;
 import com.bytedance.sdk.openadsdk.TTAdNative;
 import com.bytedance.sdk.openadsdk.TTAppDownloadListener;
 import com.bytedance.sdk.openadsdk.TTSplashAd;
+import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.bean.ResultInfo;
 import com.feiyou.headstyle.bean.VersionInfoRet;
+import com.feiyou.headstyle.common.Constants;
 import com.feiyou.headstyle.presenter.VersionPresenterImp;
-import com.feiyou.headstyle.utils.AppUtils;
 import com.feiyou.headstyle.utils.TTAdManagerHolder;
 import com.feiyou.headstyle.utils.WeakHandler;
 import com.feiyou.headstyle.view.VersionView;
 import com.orhanobut.logger.Logger;
-import com.feiyou.headstyle.common.Constants;
 import com.qq.e.ads.splash.SplashAD;
 import com.qq.e.ads.splash.SplashADListener;
 import com.qq.e.comm.util.AdError;
 
-import java.util.ArrayList;
-import java.util.List;
+public class Splash2Activity extends Activity implements SplashADListener, VersionView, WeakHandler.IHandler {
 
-/**
- * 这是demo工程的入口Activity，在这里会首次调用广点通的SDK。
- * <p>
- * 在调用SDK之前，如果您的App的targetSDKVersion >= 23，那么一定要把"READ_PHONE_STATE"、"WRITE_EXTERNAL_STORAGE"、"ACCESS_FINE_LOCATION"这几个权限申请到，否则SDK将不会工作。
- */
-public class SplashActivity extends Activity implements SplashADListener, VersionView, WeakHandler.IHandler {
+    private ViewGroup container;
+
+    private TextView skipView;
+
+    private ImageView splashHolder;
 
     private SplashAD splashAD;
-    private ViewGroup container;
-    private TextView skipView;
-    private ImageView splashHolder;
-    private static final String SKIP_TEXT = "点击跳过 %d";
 
-    public boolean canJump = false;
+    private static final String SKIP_TEXT = "点击跳过 %d";
 
     /**
      * 为防止无广告时造成视觉上类似于"闪退"的情况，设定无广告时页面跳转根据需要延迟一定时间，demo
@@ -99,59 +82,56 @@ public class SplashActivity extends Activity implements SplashADListener, Versio
 
     VersionPresenterImp versionPresenterImp;
 
-    private String channel = "";
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_splash);
-        container = (ViewGroup) this.findViewById(R.id.splash_container);
-        skipView = (TextView) findViewById(R.id.skip_view);
-        splashHolder = (ImageView) findViewById(R.id.splash_holder);
-        boolean needLogo = getIntent().getBooleanExtra("need_logo", true);
-        if (!needLogo) {
-            findViewById(R.id.app_logo).setVisibility(View.GONE);
-        }
-        //startType = SPUtils.getInstance().getInt("start_type", 2);
+        setContentView(R.layout.activity_splash2);
+
+        container = findViewById(R.id.splash_container);
+        skipView = findViewById(R.id.skip_view);
+        splashHolder = findViewById(R.id.splash_holder);
 
         versionPresenterImp = new VersionPresenterImp(this, this);
-        String channel = AppUtils.getMetaDataValue(this, "UMENG_CHANNEL");
-        versionPresenterImp.getVersionInfo(channel);
+        //请求接口，判断开屏广告使用的类型
+        versionPresenterImp.getVersionInfo(App.appChannel);
     }
 
     public void loadAdInfo() {
         if (startType == 1) {
-            startAd();
+            startTencentAd();
             skipView.setVisibility(View.VISIBLE);
         } else if (startType == 2) {
             //mHandler.sendEmptyMessageDelayed(MSG_GO_MAIN, AD_TIME_OUT);
             startTouTiaoAd();
             skipView.setVisibility(View.GONE);
         } else {
-            startAd();
+            startTencentAd();
             skipView.setVisibility(View.VISIBLE);
         }
     }
 
-    public void startAd() {
-        // 如果targetSDKVersion >= 23，就要申请好权限。如果您的App没有适配到Android6.0（即targetSDKVersion < 23），那么只需要在这里直接调用fetchSplashAD接口。
-        if (Build.VERSION.SDK_INT >= 23) {
-            checkAndRequestPermission();
-        } else {
-            // 如果是Android6.0以下的机器，默认在安装时获得了所有权限，可以直接调用SDK
-            fetchSplashAD(this, container, skipView, Constants.APP_ID, Constants.OPEN_ID, this, 0);
-        }
+    /**
+     * 加载腾讯广告
+     */
+    public void startTencentAd() {
+        //此处不判断权限，直接调用
+        fetchSplashAD(this, container, skipView, Constants.APP_ID, Constants.OPEN_ID, this, 0);
+    }
+
+    private void fetchSplashAD(Activity activity, ViewGroup adContainer, View skipContainer,
+                               String appId, String posId, SplashADListener adListener, int fetchDelay) {
+        fetchSplashADTime = System.currentTimeMillis();
+        splashAD = new SplashAD(activity, skipContainer, appId, posId, adListener, fetchDelay);
+        splashAD.fetchAndShowIn(adContainer);
     }
 
     public void startTouTiaoAd() {
-        if (Build.VERSION.SDK_INT >= 23) {
-            checkAndRequestPermission();
-        } else {
-            // 如果是Android6.0以下的机器，默认在安装时获得了所有权限，可以直接调用SDK
-            loadTouTiaoAd();
-        }
+        loadTouTiaoAd();
     }
 
+    /**
+     * 加载头条的开屏广告
+     */
     public void loadTouTiaoAd() {
         mTTAdNative = TTAdManagerHolder.get().createAdNative(this);
         //step3:创建开屏广告请求参数AdSlot,具体参数含义参考文档
@@ -168,7 +148,7 @@ public class SplashActivity extends Activity implements SplashADListener, Versio
                 mHasLoaded = true;
                 //showToast(message);
                 Logger.i("load error --->" + message);
-                next();
+                goToMainActivity();
             }
 
             @Override
@@ -177,7 +157,7 @@ public class SplashActivity extends Activity implements SplashADListener, Versio
                 mHasLoaded = true;
                 //showToast("开屏广告加载超时");
                 Logger.i("开屏广告加载超时");
-                next();
+                goToMainActivity();
             }
 
             @Override
@@ -199,7 +179,7 @@ public class SplashActivity extends Activity implements SplashADListener, Versio
                     //设置不开启开屏广告倒计时功能以及不显示跳过按钮,如果这么设置，您需要自定义倒计时逻辑
                     //ad.setNotAllowSdkCountdown();
                 } else {
-                    next();
+                    goToMainActivity();
                 }
 
                 //设置SplashView的交互监听器
@@ -218,13 +198,13 @@ public class SplashActivity extends Activity implements SplashADListener, Versio
                     @Override
                     public void onAdSkip() {
                         //showToast("开屏广告跳过");
-                        next();
+                        goToMainActivity();
                     }
 
                     @Override
                     public void onAdTimeOver() {
                         //showToast("开屏广告倒计时结束");
-                        next();
+                        goToMainActivity();
                     }
                 });
                 if (ad.getInteractionType() == TTAdConstant.INTERACTION_TYPE_DOWNLOAD) {
@@ -272,111 +252,6 @@ public class SplashActivity extends Activity implements SplashADListener, Versio
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
-        mForceGoMain = true;
-    }
-
-    /**
-     * ----------非常重要----------
-     * <p>
-     * Android6.0以上的权限适配简单示例：
-     * <p>
-     * 如果targetSDKVersion >= 23，那么必须要申请到所需要的权限，再调用广点通SDK，否则广点通SDK不会工作。
-     * <p>
-     * Demo代码里是一个基本的权限申请示例，请开发者根据自己的场景合理地编写这部分代码来实现权限申请。
-     * 注意：下面的`checkSelfPermission`和`requestPermissions`方法都是在Android6.0的SDK中增加的API，如果您的App还没有适配到Android6.0以上，则不需要调用这些方法，直接调用广点通SDK即可。
-     */
-    @TargetApi(Build.VERSION_CODES.M)
-    private void checkAndRequestPermission() {
-        List<String> lackedPermission = new ArrayList<String>();
-        if (!(checkSelfPermission(Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED)) {
-            lackedPermission.add(Manifest.permission.READ_PHONE_STATE);
-        }
-
-        if (!(checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)) {
-            lackedPermission.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
-        }
-
-        if (!(checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)) {
-            lackedPermission.add(Manifest.permission.ACCESS_FINE_LOCATION);
-        }
-
-        // 权限都已经有了，那么直接调用SDK
-        if (lackedPermission.size() == 0) {
-            if (isHuaWeiClose) {
-                canJump = true;
-                next();
-            } else {
-                if (startType == 1) {
-                    fetchSplashAD(this, container, skipView, Constants.APP_ID, Constants.OPEN_ID, this, 0);
-                    skipView.setVisibility(View.VISIBLE);
-                } else {
-                    loadTouTiaoAd();
-                    skipView.setVisibility(View.GONE);
-                }
-            }
-        } else {
-            // 请求所缺少的权限，在onRequestPermissionsResult中再看是否获得权限，如果获得权限就可以调用SDK，否则不要调用SDK。
-            String[] requestPermissions = new String[lackedPermission.size()];
-            lackedPermission.toArray(requestPermissions);
-            requestPermissions(requestPermissions, 1024);
-        }
-    }
-
-    private boolean hasAllPermissionsGranted(int[] grantResults) {
-        for (int grantResult : grantResults) {
-            if (grantResult == PackageManager.PERMISSION_DENIED) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == 1024 && hasAllPermissionsGranted(grantResults)) {
-            if (isHuaWeiClose) {
-                canJump = true;
-                next();
-            } else {
-                if (startType == 1) {
-                    fetchSplashAD(this, container, skipView, Constants.APP_ID, Constants.OPEN_ID, this, 0);
-                    skipView.setVisibility(View.VISIBLE);
-                } else {
-                    loadTouTiaoAd();
-                    skipView.setVisibility(View.GONE);
-                }
-            }
-        } else {
-            // 如果用户没有授权，那么应该说明意图，引导用户去设置里面授权。
-            Toast.makeText(this, "应用缺少必要的权限！请点击\"权限\"，打开所需要的权限。", Toast.LENGTH_LONG).show();
-            Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-            intent.setData(Uri.parse("package:" + getPackageName()));
-            startActivity(intent);
-            finish();
-        }
-    }
-
-    /**
-     * 拉取开屏广告，开屏广告的构造方法有3种，详细说明请参考开发者文档。
-     *
-     * @param activity      展示广告的activity
-     * @param adContainer   展示广告的大容器
-     * @param skipContainer 自定义的跳过按钮：传入该view给SDK后，SDK会自动给它绑定点击跳过事件。SkipView的样式可以由开发者自由定制，其尺寸限制请参考activity_splash.xml或者接入文档中的说明。
-     * @param appId         应用ID
-     * @param posId         广告位ID
-     * @param adListener    广告状态监听器
-     * @param fetchDelay    拉取广告的超时时长：取值范围[3000, 5000]，设为0表示使用广点通SDK默认的超时时长。
-     */
-    private void fetchSplashAD(Activity activity, ViewGroup adContainer, View skipContainer,
-                               String appId, String posId, SplashADListener adListener, int fetchDelay) {
-        fetchSplashADTime = System.currentTimeMillis();
-        splashAD = new SplashAD(activity, skipContainer, appId, posId, adListener, fetchDelay);
-    }
-
-    @Override
     public void onADPresent() {
         Logger.i("SplashADPresent");
         splashHolder.setVisibility(View.INVISIBLE); // 广告展示后一定要把预设的开屏图片隐藏起来
@@ -396,14 +271,15 @@ public class SplashActivity extends Activity implements SplashADListener, Versio
     @Override
     public void onADTick(long millisUntilFinished) {
         Logger.i("SplashADTick " + millisUntilFinished + "ms");
-        skipView.setText(String.format(SKIP_TEXT, Math.round(millisUntilFinished / 1000f)));
+        if (skipView != null) {
+            skipView.setText(String.format(SKIP_TEXT, Math.round(millisUntilFinished / 1000f)));
+        }
     }
 
     @Override
     public void onADLoaded(long expireTimestamp) {
-        Log.i("AD_DEMO", "SplashADFetch expireTimestamp:"+expireTimestamp);
+        Logger.i("SplashADFetch expireTimestamp:" + expireTimestamp);
     }
-
 
     @Override
     public void onADExposure() {
@@ -413,7 +289,7 @@ public class SplashActivity extends Activity implements SplashADListener, Versio
     @Override
     public void onADDismissed() {
         Logger.i("SplashADDismissed");
-        next();
+        goToMainActivity();
     }
 
     @Override
@@ -431,8 +307,8 @@ public class SplashActivity extends Activity implements SplashADListener, Versio
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                SplashActivity.this.startActivity(new Intent(SplashActivity.this, Main1Activity.class));
-                SplashActivity.this.finish();
+                Splash2Activity.this.startActivity(new Intent(Splash2Activity.this, MainActivity.class));
+                Splash2Activity.this.finish();
             }
         }, shouldDelayMills);
     }
@@ -441,34 +317,26 @@ public class SplashActivity extends Activity implements SplashADListener, Versio
      * 设置一个变量来控制当前开屏页面是否可以跳转，当开屏广告为普链类广告时，点击会打开一个广告落地页，此时开发者还不能打开自己的App主页。当从广告落地页返回以后，
      * 才可以跳转到开发者自己的App主页；当开屏广告是App类广告时只会下载App。
      */
-    private void next() {
-        if (canJump) {
-            this.startActivity(new Intent(this, Main1Activity.class));
-            this.finish();
-        } else {
-            canJump = true;
-        }
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        canJump = false;
+    private void goToMainActivity() {
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
+        container.removeAllViews();
+        this.finish();
     }
 
     @Override
     protected void onResume() {
-        super.onResume();
-        if (canJump) {
-            next();
-        }
-        canJump = true;
-
         //判断是否该跳转到主页面
         if (mForceGoMain) {
-            mHandler.removeCallbacksAndMessages(null);
-            next();
+            goToMainActivity();
         }
+        super.onResume();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mForceGoMain = true;
     }
 
     @Override
@@ -500,25 +368,20 @@ public class SplashActivity extends Activity implements SplashADListener, Versio
 
     @Override
     public void loadDataSuccess(ResultInfo tData) {
+        Logger.i("spa load data--->" + JSON.toJSONString(tData));
+
         if (tData != null && tData.getCode() == Constants.SUCCESS) {
             if (tData instanceof VersionInfoRet) {
                 startType = ((VersionInfoRet) tData).getData().getStartType();
-
-                if (((VersionInfoRet) tData).getData().getAppOpenad() == 1) {
-                    loadAdInfo();
-                } else {
-                    if (!StringUtils.isEmpty(channel) && channel.equals("fanglang")) {
-                        isHuaWeiClose = true;
-                        skipView.setVisibility(View.GONE);
-                        if (Build.VERSION.SDK_INT >= 23) {
-                            checkAndRequestPermission();
-                        } else {
-                            canJump = true;
-                            next();
-                        }
-                    } else {
+                //华为机型
+                if (RomUtils.isHuawei()) {
+                    if (((VersionInfoRet) tData).getData().getAppOpenad() == 1) {
                         loadAdInfo();
+                    } else {
+                        goToMainActivity();
                     }
+                } else {
+                    loadAdInfo();
                 }
             }
         }
@@ -526,13 +389,7 @@ public class SplashActivity extends Activity implements SplashADListener, Versio
 
     @Override
     public void loadDataError(Throwable throwable) {
-        isHuaWeiClose = false;
-        if (Build.VERSION.SDK_INT >= 23) {
-            checkAndRequestPermission();
-        } else {
-            canJump = true;
-            next();
-        }
+        goToMainActivity();
     }
 
     @Override
@@ -540,7 +397,7 @@ public class SplashActivity extends Activity implements SplashADListener, Versio
         if (msg.what == MSG_GO_MAIN) {
             if (!mHasLoaded) {
                 //showToast("广告已超时，跳到主页面");
-                next();
+                goToMainActivity();
             }
         }
     }

@@ -7,7 +7,8 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
-import com.cmcm.cmgame.gamedata.GameInfo;
+
+import com.cmcm.cmgame.gamedata.bean.GameInfo;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.bean.CategoryInfo;
 

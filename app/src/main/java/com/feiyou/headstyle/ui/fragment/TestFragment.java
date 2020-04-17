@@ -106,7 +106,6 @@ public class TestFragment extends BaseFragment implements TestInfoView, View.OnC
     }
 
     public void initViews() {
-        MobclickAgent.onEvent(getActivity(), "click_ceshi", AppUtils.getAppVersionName());
         loginDialog = new LoginDialog(getActivity(), R.style.login_dialog);
         openDialog = new OpenDialog(getActivity(), R.style.login_dialog);
         openDialog.setConfigListener(this);

@@ -150,7 +150,6 @@ public class CommunityFragment extends BaseFragment implements ViewPager.OnPageC
     }
 
     public void initData() {
-        MobclickAgent.onEvent(getActivity(), "click_shequ", AppUtils.getAppVersionName());
         topicDataPresenterImp = new TopicDataPresenterImp(this, getActivity());
         topicDataPresenterImp.getTopicDataList();
     }

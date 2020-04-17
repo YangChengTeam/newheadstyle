@@ -126,7 +126,6 @@ public class MyFragment extends BaseFragment implements UserInfoView, PraiseDial
     }
 
     public void initViews() {
-        MobclickAgent.onEvent(getActivity(), "click_my_info", com.blankj.utilcode.util.AppUtils.getAppVersionName());
         praiseDialog = new PraiseDialog(getActivity(), R.style.login_dialog);
         praiseDialog.setPraiseListener(this);
 

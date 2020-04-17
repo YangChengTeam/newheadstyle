@@ -32,6 +32,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
+import com.blankj.utilcode.util.AppUtils;
 import com.blankj.utilcode.util.SPUtils;
 import com.blankj.utilcode.util.ScreenUtils;
 import com.blankj.utilcode.util.SizeUtils;
@@ -74,6 +75,7 @@ import com.feiyou.headstyle.view.CommentDialog;
 import com.feiyou.headstyle.view.NoteInfoDetailDataView;
 import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
+import com.umeng.analytics.MobclickAgent;
 import com.umeng.socialize.ShareAction;
 import com.umeng.socialize.UMShareAPI;
 import com.umeng.socialize.UMShareListener;
@@ -271,6 +273,8 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
     }
 
     public void initViews() {
+        MobclickAgent.onEvent(this, "note_detail", AppUtils.getAppVersionName());
+
         Bundle bundle = getIntent().getExtras();
         if (bundle != null && !StringUtils.isEmpty(bundle.getString("msg_id"))) {
             messageId = bundle.getString("msg_id");

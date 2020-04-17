@@ -53,6 +53,6 @@
         android:layout_height="match_parent"
         android:layout_above="@id/app_logo"
         android:scaleType="centerCrop"
-        android:visibility="gone"
-        android:src="@mipmap/splash_holder" />
+        android:src="@mipmap/splash_holder"
+        android:visibility="gone" />
 </RelativeLayout>

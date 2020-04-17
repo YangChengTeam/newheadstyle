@@ -20,6 +20,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.VideoView;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.blankj.utilcode.util.AppUtils;
 import com.blankj.utilcode.util.ToastUtils;
@@ -41,6 +42,7 @@ import com.feiyou.headstyle.ui.adapter.VideoListAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragment;
 import com.feiyou.headstyle.view.VideoInfoView;
 import com.orhanobut.logger.Logger;
+import com.umeng.analytics.MobclickAgent;
 import com.wang.avi.AVLoadingIndicatorView;
 
 import org.greenrobot.eventbus.EventBus;
@@ -80,13 +82,13 @@ public class VideoFragment extends BaseFragment implements VideoInfoView, SwipeR
 
     private int randomPage;
 
-    private int pageSize = 30;
+    private int pageSize = 20;
 
     private UserInfo userInfo;
 
     private View rootView;
 
-    private int currentPage = 1;
+    private int currentPage;
 
     public static VideoFragment getInstance() {
         return new VideoFragment();
@@ -103,6 +105,8 @@ public class VideoFragment extends BaseFragment implements VideoInfoView, SwipeR
     }
 
     public void initViews() {
+        MobclickAgent.onEvent(getActivity(), "video_into_page", AppUtils.getAppVersionName());
+
         Logger.i("video info init view--->");
         userInfo = App.getApp().getmUserInfo();
 
@@ -142,12 +146,13 @@ public class VideoFragment extends BaseFragment implements VideoInfoView, SwipeR
         videoListAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
-
                 Logger.i("video_id--->" + videoListAdapter.getData().get(position).getId());
 
                 int jumpPage = randomPage + position / pageSize;
 
                 int jumpPosition = position % pageSize;
+
+                Logger.i("current page jump --->" + jumpPage + "---jump pos--->" + jumpPosition);
 
                 Intent intent = new Intent(getActivity(), VideoItemShowActivity.class);
                 intent.putExtra("jump_page", jumpPage);
@@ -189,24 +194,25 @@ public class VideoFragment extends BaseFragment implements VideoInfoView, SwipeR
     public void loadDataSuccess(ResultInfo tData) {
         avi.hide();
         mRefreshLayout.setRefreshing(false);
-
+        Logger.i("video list --->" + JSON.toJSONString(tData));
         if (tData != null && tData.getCode() == Constants.SUCCESS) {
             mVideoListView.setVisibility(View.VISIBLE);
             noDataLayout.setVisibility(View.GONE);
             if (tData instanceof VideoInfoRet) {
                 if (currentPage == 0) {
-                    randomPage = ((VideoInfoRet) tData).getData().getPage();
-                    currentPage = randomPage;
-
                     if (((VideoInfoRet) tData).getData().getList() != null) {
                         videoListAdapter.setNewData(((VideoInfoRet) tData).getData().getList());
                     }
+
+                    randomPage = ((VideoInfoRet) tData).getData().getPage();
+                    currentPage = randomPage;
                 } else {
                     if (((VideoInfoRet) tData).getData().getList() != null) {
                         videoListAdapter.addData(((VideoInfoRet) tData).getData().getList());
                     }
                 }
 
+                Logger.i("current page --->" + currentPage);
                 if (((VideoInfoRet) tData).getData().getList().size() == pageSize) {
                     videoListAdapter.loadMoreComplete();
                 } else {
@@ -214,7 +220,7 @@ public class VideoFragment extends BaseFragment implements VideoInfoView, SwipeR
                 }
             }
         } else {
-            if (currentPage == 1) {
+            if (currentPage == 0) {
                 mVideoListView.setVisibility(View.GONE);
                 noDataLayout.setVisibility(View.VISIBLE);
             }
@@ -225,7 +231,7 @@ public class VideoFragment extends BaseFragment implements VideoInfoView, SwipeR
     public void loadDataError(Throwable throwable) {
         avi.hide();
         mRefreshLayout.setRefreshing(false);
-        if (currentPage == 1) {
+        if (currentPage == 0) {
             mVideoListView.setVisibility(View.GONE);
             noDataLayout.setVisibility(View.VISIBLE);
         }
@@ -234,7 +240,7 @@ public class VideoFragment extends BaseFragment implements VideoInfoView, SwipeR
     @Override
     public void onRefresh() {
         mRefreshLayout.setRefreshing(true);
-        currentPage = 1;
+        currentPage = 0;
         videoInfoPresenterImp.getDataList(currentPage, userInfo != null ? userInfo.getId() : "");
     }
 

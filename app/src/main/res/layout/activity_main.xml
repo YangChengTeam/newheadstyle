@@ -1,175 +1,132 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
     android:clipChildren="false"
-    android:orientation="vertical"
-    tools:context="com.feiyou.headstyle.ui.activity.Main2Activity">
+    android:orientation="vertical">
 
     <android.support.v4.view.ViewPager
         android:id="@+id/viewpager"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:background="@color/white"></android.support.v4.view.ViewPager>
+        android:layout_height="match_parent"
+        android:background="@color/white"
+        android:clickable="false"></android.support.v4.view.ViewPager>
 
-    <View
+    <FrameLayout
+        android:id="@+id/layout_bottom"
         android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/line_color"></View>
+        android:layout_height="54dp"
+        android:layout_alignParentBottom="true">
 
-    <LinearLayout
-        android:id="@+id/ll_bottom"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:layout_alignParentBottom="true"
-        android:orientation="horizontal">
-
-        <LinearLayout
-            android:id="@+id/layout_home"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
             android:layout_gravity="bottom"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="vertical">
+            android:layout_marginBottom="48dp"
+            android:background="@color/line_color"></View>
 
-            <Button
-                android:id="@+id/iv_home"
-                android:layout_width="22dp"
-                android:layout_height="22dp"
-                android:background="@drawable/home_item_selector"
-                android:clickable="false" />
+        <RadioGroup
+            android:id="@+id/layout_bottom_nav"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_gravity="bottom"
+            android:background="@color/white"
+            android:clickable="true"
+            android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/tv_home"
-                android:layout_width="wrap_content"
+            <RadioButton
+                android:id="@+id/rb_home"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/iv_home"
-                android:layout_marginTop="2dp"
-                android:clickable="false"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:button="@null"
+                android:drawableTop="@drawable/home_item_selector"
+                android:drawablePadding="2dp"
+                android:gravity="center"
                 android:text="首页"
                 android:textColor="@color/tab_normal_color"
                 android:textSize="10dp" />
 
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/layout_community"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_gravity="bottom"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="vertical">
-
-            <Button
-                android:id="@+id/iv_community"
-                android:layout_width="22dp"
-                android:layout_height="22dp"
-                android:background="@drawable/community_item_selector"
-                android:clickable="false" />
-
-            <TextView
-                android:id="@+id/tv_community"
-                android:layout_width="wrap_content"
+            <RadioButton
+                android:id="@+id/rb_community"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/iv_community"
-                android:layout_marginTop="2dp"
-                android:clickable="false"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:button="@null"
+                android:drawableTop="@drawable/community_item_selector"
+                android:drawablePadding="2dp"
+                android:gravity="center"
                 android:text="社区"
                 android:textColor="@color/tab_normal_color"
                 android:textSize="10dp" />
 
-        </LinearLayout>
+            <RadioButton
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:layout_weight="1"
+                android:button="@null"
+                android:clipChildren="false"
+                android:gravity="center"
+                android:textColor="@color/tab_normal_color"
+                android:textSize="10dp" />
+
+            <RadioButton
+                android:id="@+id/rb_test"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:button="@null"
+                android:drawableTop="@drawable/test_item_selector"
+                android:drawablePadding="2dp"
+                android:gravity="center"
+                android:text="测试"
+                android:textColor="@color/tab_normal_color"
+                android:textSize="10dp" />
+
+            <RadioButton
+                android:id="@+id/rb_my"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:button="@null"
+                android:drawableTop="@drawable/my_item_selector"
+                android:drawablePadding="2dp"
+                android:gravity="center"
+                android:text="我的"
+                android:textColor="@color/tab_normal_color"
+                android:textSize="10dp" />
+        </RadioGroup>
 
         <FrameLayout
             android:id="@+id/layout_create"
-            android:layout_width="56dp"
-            android:layout_height="56dp"
-            android:layout_gravity="bottom">
+            android:layout_width="66dp"
+            android:layout_height="66dp"
+            android:layout_marginBottom="2dp"
+            android:layout_gravity="center|bottom">
 
             <ImageView
                 android:id="@+id/iv_create"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
-                android:layout_centerInParent="true"
-                android:layout_marginLeft="3dp"
-                android:src="@mipmap/main_create_icon" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/iv_create"
-                android:layout_centerInParent="true"
-                android:layout_gravity="center|bottom"
-                android:layout_marginBottom="12dp"
-                android:text="制作"
-                android:textColor="@color/white"
-                android:textSize="10dp" />
-
+                android:layout_gravity="center"
+                android:clickable="false"/>
         </FrameLayout>
 
-        <LinearLayout
-            android:id="@+id/layout_test"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_gravity="bottom"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="vertical">
-
-            <Button
-                android:id="@+id/iv_test"
-                android:layout_width="22dp"
-                android:layout_height="22dp"
-                android:background="@drawable/test_item_selector"
-                android:clickable="false" />
-
-            <TextView
-                android:id="@+id/tv_test"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/iv_test"
-                android:layout_marginTop="2dp"
-                android:clickable="false"
-                android:text="测试"
-                android:textColor="@color/tab_normal_color"
-                android:textSize="10dp" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/layout_my"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_gravity="bottom"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="vertical">
-
-            <Button
-                android:id="@+id/iv_my"
-                android:layout_width="22dp"
-                android:layout_height="22dp"
-                android:background="@drawable/my_item_selector"
-                android:clickable="false" />
-
-            <TextView
-                android:id="@+id/tv_my"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/iv_my"
-                android:layout_marginTop="2dp"
-                android:clickable="false"
-                android:text="我的"
-                android:textColor="@color/tab_normal_color"
-                android:textSize="10dp" />
-
-        </LinearLayout>
-
-    </LinearLayout>
-
-</LinearLayout>
+        <ImageView
+            android:id="@+id/iv_home_message_remind"
+            android:layout_width="10dp"
+            android:layout_height="10dp"
+            android:layout_gravity="right|bottom"
+            android:layout_marginRight="18dp"
+            android:layout_marginBottom="30dp"
+            android:visibility="gone"
+            android:src="@mipmap/message_remind_icon" />
+    </FrameLayout>
+</RelativeLayout>

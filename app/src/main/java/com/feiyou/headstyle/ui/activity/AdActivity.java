@@ -140,10 +140,6 @@ public class AdActivity extends BaseFragmentActivity implements IBaseView, SignO
     }
 
     private WebViewClient mWebViewClient = new WebViewClient() {
-        @Override
-        public void onPageStarted(WebView view, String url, Bitmap favicon) {
-            //do you  work
-        }
 
         @Override
         public void onPageFinished(WebView view, String url) {

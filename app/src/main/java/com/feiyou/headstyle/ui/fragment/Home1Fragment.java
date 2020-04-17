@@ -4,12 +4,9 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.content.FileProvider;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -21,7 +18,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
 import com.blankj.utilcode.util.AppUtils;
@@ -54,7 +50,6 @@ import com.feiyou.headstyle.bean.HomeDataWrapper;
 import com.feiyou.headstyle.bean.MessageEvent;
 import com.feiyou.headstyle.bean.PlayGameInfo;
 import com.feiyou.headstyle.bean.ReceiveUserInfo;
-import com.feiyou.headstyle.bean.ResultInfo;
 import com.feiyou.headstyle.bean.SeeVideoInfo;
 import com.feiyou.headstyle.bean.TaskRecordInfoRet;
 import com.feiyou.headstyle.bean.UserInfo;
@@ -73,7 +68,6 @@ import com.feiyou.headstyle.ui.activity.CommunityArticleActivity;
 import com.feiyou.headstyle.ui.activity.EveryDayHongBaoActivity;
 import com.feiyou.headstyle.ui.activity.HeadListActivity;
 import com.feiyou.headstyle.ui.activity.HeadShowActivity;
-import com.feiyou.headstyle.ui.activity.Main1Activity;
 import com.feiyou.headstyle.ui.activity.MoreTypeActivity;
 import com.feiyou.headstyle.ui.activity.SearchActivity;
 import com.feiyou.headstyle.ui.adapter.HeadInfoAdapter;
@@ -88,7 +82,6 @@ import com.feiyou.headstyle.ui.custom.WarmDialog;
 import com.feiyou.headstyle.utils.MyTimeUtil;
 import com.feiyou.headstyle.utils.RandomUtils;
 import com.feiyou.headstyle.utils.TTAdManagerHolder;
-import com.feiyou.headstyle.view.HomeDataView;
 import com.liulishuo.filedownloader.BaseDownloadTask;
 import com.liulishuo.filedownloader.FileDownloadListener;
 import com.liulishuo.filedownloader.FileDownloader;
@@ -105,7 +98,6 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -117,7 +109,7 @@ import es.dmoral.toasty.Toasty;
 /**
  * Created by myflying on 2019/1/3.
  */
-public class Home1Fragment extends BaseFragment implements IBaseView, View.OnClickListener, SwipeRefreshLayout.OnRefreshListener, OpenDialog.ConfigListener, CardWindowFragment.AdDismissListener, EveryDayHongBaoDialog.EveryDayHongBaoListener, PrivacyDialog.PrivacyListener, WarmDialog.WarmListener, VersionUpdateDialog.UpdateListener {
+public class Home1Fragment extends BaseFragment implements IBaseView, View.OnClickListener, SwipeRefreshLayout.OnRefreshListener, OpenDialog.ConfigListener, CardWindowFragment.AdDismissListener, EveryDayHongBaoDialog.EveryDayHongBaoListener, WarmDialog.WarmListener, VersionUpdateDialog.UpdateListener {
 
     LinearLayout mSearchLayout;
 
@@ -240,8 +232,6 @@ public class Home1Fragment extends BaseFragment implements IBaseView, View.OnCli
 
     private boolean clickAnyWhere;
 
-    private PrivacyDialog privacyDialog;
-
     private WarmDialog warmDialog;
 
     private boolean isAlertHongBao;
@@ -265,7 +255,7 @@ public class Home1Fragment extends BaseFragment implements IBaseView, View.OnCli
                         everyDayHongBaoDialog.show();
                         everyDayHongBaoDialog.setClickAnyWhere(clickAnyWhere);
                         isAlertHongBao = false;
-                    }else{
+                    } else {
                         //请求版本更新
                         versionPresenterImp.getVersionInfo(com.feiyou.headstyle.utils.AppUtils.getMetaDataValue(getActivity(), "UMENG_CHANNEL"));
                     }
@@ -417,16 +407,6 @@ public class Home1Fragment extends BaseFragment implements IBaseView, View.OnCli
     }
 
     public void initData() {
-        privacyDialog = new PrivacyDialog(getActivity(), R.style.login_dialog);
-        privacyDialog.setPrivacyListener(this);
-
-        if (!SPUtils.getInstance().getBoolean(Constants.SHOW_PRIVARY, false)) {
-            warmDialog = new WarmDialog(getActivity(), R.style.login_dialog);
-            warmDialog.setWarmListener(this);
-
-            privacyDialog.show();
-        }
-
 
         Logger.i("home fragment init data--->");
 
@@ -864,7 +844,7 @@ public class Home1Fragment extends BaseFragment implements IBaseView, View.OnCli
                 }
 
                 //在不弹出红包的情况下检测版本更新
-                if(!isAlertHongBao && SPUtils.getInstance().getBoolean(Constants.SHOW_PRIVARY, false)){
+                if (!isAlertHongBao && SPUtils.getInstance().getBoolean(Constants.SHOW_PRIVARY, false)) {
                     //请求版本更新
                     versionPresenterImp.getVersionInfo(com.feiyou.headstyle.utils.AppUtils.getMetaDataValue(getActivity(), "UMENG_CHANNEL"));
                 }
@@ -882,6 +862,9 @@ public class Home1Fragment extends BaseFragment implements IBaseView, View.OnCli
             //版本更新
             if (tData instanceof VersionInfoRet && ((VersionInfoRet) tData).getCode() == Constants.SUCCESS) {
                 versionInfo = ((VersionInfoRet) tData).getData();
+                if (versionInfo != null) {
+                    SPUtils.getInstance().put("start_type", versionInfo.getStartType());
+                }
                 if (versionInfo.getVersionCode() > AppUtils.getAppVersionCode()) {
                     if (updateDialog != null && !updateDialog.isShowing()) {
                         isUpdateVersion = true;
@@ -1211,7 +1194,7 @@ public class Home1Fragment extends BaseFragment implements IBaseView, View.OnCli
         SPUtils.getInstance().put(StringUtils.isEmpty(mUserInfo.getId()) ? Constants.BIG_HONG_BAO_IS_CLOSE : Constants.BIG_HONG_BAO + mUserInfo.getId(), MyTimeUtil.getYearAndDay());
 
         //在不弹出红包的情况下检测版本更新
-        if(!isAlertHongBao){
+        if (!isAlertHongBao) {
             //请求版本更新
             versionPresenterImp.getVersionInfo(com.feiyou.headstyle.utils.AppUtils.getMetaDataValue(getActivity(), "UMENG_CHANNEL"));
         }
@@ -1243,22 +1226,6 @@ public class Home1Fragment extends BaseFragment implements IBaseView, View.OnCli
     }
 
     @Override
-    public void agree() {
-        SPUtils.getInstance().put(Constants.SHOW_PRIVARY, true);
-
-        Message message = new Message();
-        message.what = 0;
-        mHandler.sendMessage(message);
-    }
-
-    @Override
-    public void notAgree() {
-        if (warmDialog != null && !warmDialog.isShowing()) {
-            warmDialog.show();
-        }
-    }
-
-    @Override
     public void warnAgree() {
         SPUtils.getInstance().put(Constants.SHOW_PRIVARY, true);
         Message message = new Message();
@@ -1268,7 +1235,8 @@ public class Home1Fragment extends BaseFragment implements IBaseView, View.OnCli
 
     @Override
     public void warnNotAgree() {
-        SPUtils.getInstance().put(Constants.SHOW_PRIVARY, true);
+        SPUtils.getInstance().put(Constants.SHOW_PRIVARY, false);
+        //getActivity().finish();
         Message message = new Message();
         message.what = 0;
         mHandler.sendMessage(message);
