@@ -10,10 +10,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.design.widget.BottomSheetDialog;
-import android.support.v4.content.ContextCompat;
+
+import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -72,6 +71,7 @@ import com.feiyou.headstyle.ui.fragment.StickerFragment;
 import com.feiyou.headstyle.utils.TTAdManagerHolder;
 import com.feiyou.headstyle.view.HeadListDataView;
 import com.feiyou.headstyle.view.flingswipe.SwipeFlingAdapterView;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 import com.qmuiteam.qmui.widget.QMUITopBar;
@@ -348,7 +348,7 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
                     if (App.isLoginAuth) {
                         Glide.with(HeadShowActivity.this).asBitmap().load(currentImageUrl).into(new SimpleTarget<Bitmap>() {
                             @Override
-                            public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                            public void onResourceReady(@NonNull Bitmap resource, Transition<? super Bitmap> transition) {
                                 Uri uri = Uri.parse(MediaStore.Images.Media.insertImage(getContentResolver(), resource, null, null));
                                 doSetAvatar(uri);
                             }
@@ -1102,7 +1102,7 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
             App.isLoginAuth = true;
             Glide.with(HeadShowActivity.this).asBitmap().load(currentImageUrl).into(new SimpleTarget<Bitmap>() {
                 @Override
-                public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                public void onResourceReady(@NonNull Bitmap resource, Transition<? super Bitmap> transition) {
                     Uri uri = Uri.parse(MediaStore.Images.Media.insertImage(getContentResolver(), resource, null, null));
                     doSetAvatar(uri);
                 }

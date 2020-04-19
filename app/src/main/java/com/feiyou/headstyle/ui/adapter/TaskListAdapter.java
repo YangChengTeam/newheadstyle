@@ -1,7 +1,7 @@
 package com.feiyou.headstyle.ui.adapter;
 
 import android.content.Context;
-import android.support.v4.content.ContextCompat;
+import androidx.core.content.ContextCompat;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;

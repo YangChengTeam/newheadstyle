@@ -19,9 +19,10 @@ package com.feiyou.headstyle.ui.adapter;
 
 import android.content.Context;
 import android.os.Parcelable;
-import android.support.v4.view.PagerAdapter;
 import android.view.View;
 import android.view.ViewGroup;
+
+import androidx.viewpager.widget.PagerAdapter;
 
 import com.feiyou.headstyle.ui.custom.GalleryViewPager;
 

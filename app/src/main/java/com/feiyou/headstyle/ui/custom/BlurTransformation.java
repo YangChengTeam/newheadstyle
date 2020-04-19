@@ -3,7 +3,6 @@ package com.feiyou.headstyle.ui.custom;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.support.annotation.NonNull;
 
 import com.bumptech.glide.load.engine.bitmap_recycle.BitmapPool;
 import com.bumptech.glide.load.resource.bitmap.BitmapTransformation;
@@ -37,7 +36,7 @@ public class BlurTransformation extends BitmapTransformation {
     }
 
     @Override
-    protected Bitmap transform(@NonNull BitmapPool pool, @NonNull Bitmap toTransform, int outWidth, int outHeight) {
+    protected Bitmap transform(BitmapPool pool, Bitmap toTransform, int outWidth, int outHeight) {
         int width = toTransform.getWidth();
         int height = toTransform.getHeight();
         int scaledWidth = width / sampling;
@@ -73,7 +72,7 @@ public class BlurTransformation extends BitmapTransformation {
     }
 
     @Override
-    public void updateDiskCacheKey(@NonNull MessageDigest messageDigest) {
+    public void updateDiskCacheKey(MessageDigest messageDigest) {
         messageDigest.update((ID + radius + sampling).getBytes(CHARSET));
     }
 }

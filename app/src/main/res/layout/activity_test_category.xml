@@ -23,13 +23,13 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <android.support.v7.widget.RecyclerView
+        <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/test_list"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="top|center"
             android:paddingLeft="12dp"
-            android:paddingRight="12dp"></android.support.v7.widget.RecyclerView>
+            android:paddingRight="12dp"></androidx.recyclerview.widget.RecyclerView>
 
         <com.wang.avi.AVLoadingIndicatorView
             android:id="@+id/avi"

@@ -123,11 +123,11 @@
             android:textColor="@color/profit_color"
             android:textSize="18sp" />
 
-        <android.support.v7.widget.RecyclerView
+        <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/exchange_list_view"
             android:layout_width="match_parent"
             android:layout_height="144dp"
-            android:nestedScrollingEnabled="false"></android.support.v7.widget.RecyclerView>
+            android:nestedScrollingEnabled="false"></androidx.recyclerview.widget.RecyclerView>
     </LinearLayout>
 
     <!--<View-->

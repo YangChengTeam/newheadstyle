@@ -2,16 +2,15 @@ package com.feiyou.headstyle.ui.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.TabLayout;
-import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.view.ViewPager;
-import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.viewpager.widget.ViewPager;
 
 import com.blankj.utilcode.util.StringUtils;
 import com.blankj.utilcode.util.ToastUtils;
@@ -28,15 +27,11 @@ import com.feiyou.headstyle.presenter.FollowInfoPresenterImp;
 import com.feiyou.headstyle.presenter.NoteTypePresenterImp;
 import com.feiyou.headstyle.ui.adapter.DetailFragmentAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragmentActivity;
-import com.feiyou.headstyle.ui.custom.JudgeNestedScrollView;
 import com.feiyou.headstyle.ui.custom.LoginDialog;
-import com.feiyou.headstyle.ui.fragment.sub.FollowFragment;
 import com.feiyou.headstyle.ui.fragment.sub.NewFragment;
-import com.feiyou.headstyle.ui.fragment.sub.RecommendFragment;
-import com.feiyou.headstyle.ui.fragment.sub.VideoFragment;
-import com.feiyou.headstyle.ui.fragment.sub.WonderfulFragment;
 import com.feiyou.headstyle.view.NoteTypeView;
-import com.jcodecraeer.xrecyclerview.AppBarStateChangeListener;
+import com.google.android.material.appbar.AppBarLayout;
+import com.google.android.material.tabs.TabLayout;
 import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 

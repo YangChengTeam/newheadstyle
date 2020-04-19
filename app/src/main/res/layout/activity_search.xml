@@ -82,11 +82,11 @@
                     android:textFontWeight="600"
                     android:textSize="20dp" />
 
-                <android.support.v7.widget.RecyclerView
+                <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/hot_search_word_list"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"></android.support.v7.widget.RecyclerView>
+                    android:layout_marginTop="8dp"></androidx.recyclerview.widget.RecyclerView>
             </LinearLayout>
 
             <LinearLayout
@@ -135,11 +135,11 @@
                     </LinearLayout>
                 </RelativeLayout>
 
-                <android.support.v7.widget.RecyclerView
+                <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/hot_search_history_list"
                     android:layout_width="match_parent"
                     android:layout_height="200dp"
-                    android:layout_marginTop="8dp"></android.support.v7.widget.RecyclerView>
+                    android:layout_marginTop="8dp"></androidx.recyclerview.widget.RecyclerView>
             </LinearLayout>
         </LinearLayout>
 
@@ -150,12 +150,12 @@
             android:gravity="center"
             android:visibility="gone">
 
-            <android.support.v7.widget.RecyclerView
+            <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/search_result_list"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginLeft="12dp"
-                android:layout_marginRight="12dp"></android.support.v7.widget.RecyclerView>
+                android:layout_marginRight="12dp"></androidx.recyclerview.widget.RecyclerView>
         </LinearLayout>
 
         <LinearLayout

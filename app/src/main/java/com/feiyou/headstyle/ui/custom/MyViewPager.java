@@ -1,11 +1,10 @@
 package com.feiyou.headstyle.ui.custom;
 
 import android.content.Context;
-import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
-import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
+
+import androidx.viewpager.widget.ViewPager;
 
 public class MyViewPager extends ViewPager {
 

@@ -6,12 +6,10 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.os.Bundle;
-import android.support.design.widget.BottomSheetBehavior;
-import android.support.design.widget.BottomSheetDialog;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.OrientationHelper;
-import android.support.v7.widget.RecyclerView;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.OrientationHelper;
+import androidx.recyclerview.widget.RecyclerView;
 import android.text.Html;
 import android.util.Log;
 import android.view.Gravity;
@@ -47,7 +45,6 @@ import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.bean.AddCollectionRet;
 import com.feiyou.headstyle.bean.FollowInfoRet;
 import com.feiyou.headstyle.bean.MessageEvent;
-import com.feiyou.headstyle.bean.NoteCommentRet;
 import com.feiyou.headstyle.bean.NoteItem;
 import com.feiyou.headstyle.bean.NoteSubCommentRet;
 import com.feiyou.headstyle.bean.ReplyParams;
@@ -73,6 +70,8 @@ import com.feiyou.headstyle.ui.custom.GlideRoundTransform;
 import com.feiyou.headstyle.ui.custom.LoginDialog;
 import com.feiyou.headstyle.view.CommentDialog;
 import com.feiyou.headstyle.view.VideoInfoView;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.orhanobut.logger.Logger;
 import com.umeng.socialize.ShareAction;
 import com.umeng.socialize.UMShareListener;
@@ -828,8 +827,8 @@ public class VideoShowActivity extends BaseFragmentActivity implements VideoInfo
     @Override
     public void onPause() {
         super.onPause();
-        Jzvd.resetAllVideos();
-        JzvdStd.resetAllVideos();
+        Jzvd.releaseAllVideos();
+        JzvdStd.releaseAllVideos();
     }
 
     @Override
@@ -886,7 +885,7 @@ public class VideoShowActivity extends BaseFragmentActivity implements VideoInfo
     protected void onDestroy() {
         super.onDestroy();
         EventBus.getDefault().unregister(this);
-        JzvdStd.resetAllVideos();
+        JzvdStd.releaseAllVideos();
     }
 
 
@@ -988,7 +987,7 @@ public class VideoShowActivity extends BaseFragmentActivity implements VideoInfo
                 startActivity(intent);
                 break;
             case R.id.layout_to_home:
-                Intent intent1 = new Intent(this, Main1Activity.class);
+                Intent intent1 = new Intent(this, MainActivity.class);
                 startActivity(intent1);
                 finish();
                 break;

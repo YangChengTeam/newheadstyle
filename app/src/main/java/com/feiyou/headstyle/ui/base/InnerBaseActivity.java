@@ -3,7 +3,7 @@ package com.feiyou.headstyle.ui.base;
 import android.annotation.SuppressLint;
 import android.content.res.Configuration;
 import android.os.Build;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 
 import com.feiyou.headstyle.utils.Utils;

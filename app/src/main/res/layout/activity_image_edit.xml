@@ -88,13 +88,13 @@
                 android:background="@color/white"
                 android:orientation="horizontal">
 
-                <android.support.v7.widget.RecyclerView
+                <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/sticker_type_list"
                     android:layout_width="80dp"
                     android:layout_height="wrap_content"
-                    android:background="@color/white"></android.support.v7.widget.RecyclerView>
+                    android:background="@color/white"></androidx.recyclerview.widget.RecyclerView>
 
-                <android.support.v7.widget.RecyclerView
+                <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/sticker_list_view"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
@@ -103,7 +103,7 @@
                     android:background="@color/sticker_item_bg_color"
                     android:paddingLeft="4dp"
                     android:paddingRight="4dp"
-                    android:scrollbars="none"></android.support.v7.widget.RecyclerView>
+                    android:scrollbars="none"></androidx.recyclerview.widget.RecyclerView>
             </LinearLayout>
 
             <LinearLayout
@@ -115,14 +115,14 @@
                 android:orientation="vertical"
                 android:visibility="gone">
 
-                <android.support.v7.widget.RecyclerView
+                <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/filter_list_view"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
                     android:layout_marginTop="12dp"
                     android:background="@color/white"
-                    android:scrollbars="none"></android.support.v7.widget.RecyclerView>
+                    android:scrollbars="none"></androidx.recyclerview.widget.RecyclerView>
             </LinearLayout>
         </LinearLayout>
     </RelativeLayout>

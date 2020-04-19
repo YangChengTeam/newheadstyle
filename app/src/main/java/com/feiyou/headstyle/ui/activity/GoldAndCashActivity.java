@@ -2,9 +2,6 @@ package com.feiyou.headstyle.ui.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.FragmentTabHost;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,20 +13,19 @@ import android.widget.TabHost;
 import android.widget.TabWidget;
 import android.widget.TextView;
 
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.FragmentTabHost;
+import androidx.viewpager.widget.ViewPager;
+
 import com.blankj.utilcode.util.SizeUtils;
 import com.bumptech.glide.Glide;
-import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.bean.PlayGameInfo;
 import com.feiyou.headstyle.bean.SeeVideoInfo;
 import com.feiyou.headstyle.ui.adapter.GoldAndCashAdapter;
-import com.feiyou.headstyle.ui.adapter.MyCommentFragmentAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragmentActivity;
 import com.feiyou.headstyle.ui.fragment.CashDetailFragment;
 import com.feiyou.headstyle.ui.fragment.GoldDetailFragment;
-import com.feiyou.headstyle.ui.fragment.sub.MyAtMessageFragment;
-import com.feiyou.headstyle.ui.fragment.sub.MyCommentFragment;
-import com.feiyou.headstyle.ui.fragment.sub.SystemInfoFragment;
 import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 import com.qmuiteam.qmui.widget.QMUITopBar;

@@ -1,17 +1,12 @@
 package com.feiyou.headstyle.ui.adapter;
 
 import android.content.Context;
-import android.support.v4.content.ContextCompat;
-import android.widget.ImageView;
+import androidx.core.content.ContextCompat;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.RequestOptions;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
 import com.feiyou.headstyle.R;
-import com.feiyou.headstyle.bean.HeadInfo;
 import com.feiyou.headstyle.bean.StickerTypeInfo;
-import com.feiyou.headstyle.ui.custom.GlideRoundTransform;
 
 import java.util.List;
 

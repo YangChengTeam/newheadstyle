@@ -13,8 +13,6 @@ import android.os.Looper;
 import android.os.Message;
 import android.os.SystemClock;
 import android.provider.Settings;
-import android.support.annotation.MainThread;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -23,6 +21,8 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.MainThread;
 
 import com.blankj.utilcode.util.RomUtils;
 import com.blankj.utilcode.util.SPUtils;
@@ -431,7 +431,7 @@ public class SplashActivity extends Activity implements SplashADListener, Versio
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                SplashActivity.this.startActivity(new Intent(SplashActivity.this, Main1Activity.class));
+                SplashActivity.this.startActivity(new Intent(SplashActivity.this, MainActivity.class));
                 SplashActivity.this.finish();
             }
         }, shouldDelayMills);
@@ -443,7 +443,7 @@ public class SplashActivity extends Activity implements SplashADListener, Versio
      */
     private void next() {
         if (canJump) {
-            this.startActivity(new Intent(this, Main1Activity.class));
+            this.startActivity(new Intent(this, MainActivity.class));
             this.finish();
         } else {
             canJump = true;

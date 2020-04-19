@@ -7,11 +7,9 @@ import android.graphics.drawable.Drawable;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
-import android.support.annotation.Nullable;
-import android.support.design.widget.BottomSheetDialog;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -44,6 +42,7 @@ import com.feiyou.headstyle.ui.adapter.ForecastListAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragmentActivity;
 import com.feiyou.headstyle.utils.StatusBarUtil;
 import com.feiyou.headstyle.view.ForecastView;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.orhanobut.logger.Logger;
 import com.umeng.socialize.ShareAction;
 import com.umeng.socialize.UMShareAPI;
@@ -53,7 +52,6 @@ import com.umeng.socialize.media.UMImage;
 import com.willy.ratingbar.ScaleRatingBar;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -319,7 +317,7 @@ public class StarDetailActivity extends BaseFragmentActivity implements Forecast
             }
 
             @Override
-            public void onLoadFailed(@Nullable Drawable errorDrawable) {
+            public void onLoadFailed(Drawable errorDrawable) {
                 super.onLoadFailed(errorDrawable);
                 ToastUtils.showLong("生成失败");
             }

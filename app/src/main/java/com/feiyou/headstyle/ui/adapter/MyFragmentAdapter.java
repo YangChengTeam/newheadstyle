@@ -1,21 +1,21 @@
 package com.feiyou.headstyle.ui.adapter;
 
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.view.ViewGroup;
 
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentPagerAdapter;
+
 import com.feiyou.headstyle.ui.fragment.Create1Fragment;
-import com.feiyou.headstyle.ui.fragment.Home1Fragment;
+import com.feiyou.headstyle.ui.fragment.HomeFragment;
 import com.feiyou.headstyle.ui.fragment.CommunityFragment;
-import com.feiyou.headstyle.ui.fragment.CreateFragment;
 import com.feiyou.headstyle.ui.fragment.MyFragment;
 import com.feiyou.headstyle.ui.fragment.TestFragment;
 
 
 public class MyFragmentAdapter extends FragmentPagerAdapter {
 
-    private final Fragment[] FRAGMENTS = new Fragment[]{new Home1Fragment(), new CommunityFragment(), new Create1Fragment(), new TestFragment(), new MyFragment()};
+    private final Fragment[] FRAGMENTS = new Fragment[]{new HomeFragment(), new CommunityFragment(), new Create1Fragment(), new TestFragment(), new MyFragment()};
 
     public MyFragmentAdapter(FragmentManager fragmentManager) {
         super(fragmentManager);

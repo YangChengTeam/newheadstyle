@@ -8,11 +8,12 @@ import android.graphics.Color;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -73,6 +74,7 @@ import com.feiyou.headstyle.ui.activity.GoldAndCashActivity;
 import com.feiyou.headstyle.ui.activity.GoldMailActivity;
 import com.feiyou.headstyle.ui.activity.GoldTaskActivity;
 import com.feiyou.headstyle.ui.activity.GoodDetailActivity;
+import com.feiyou.headstyle.ui.activity.MainActivity;
 import com.feiyou.headstyle.ui.activity.PushNoteActivity;
 import com.feiyou.headstyle.ui.activity.TestDetailActivity;
 import com.feiyou.headstyle.ui.activity.TestImageDetailActivity;
@@ -312,7 +314,7 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
                     break;
                 case 1:
                     isCanSign = true;
-                    currentTabIndex = ((Main1Activity)getActivity()).getCurrentTabIndex();
+                    currentTabIndex = ((MainActivity)getActivity()).getCurrentTabIndex();
                     Logger.i("currentTabIndex--->" + currentTabIndex);
                     userSign();
                     break;
@@ -772,7 +774,7 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
         super.setUserVisibleHint(isVisibleToUser);
 
         if (getContext() != null && isVisibleToUser && isCanSign) {
-            currentTabIndex = ((Main1Activity)getContext()).getCurrentTabIndex();
+            currentTabIndex = ((MainActivity)getContext()).getCurrentTabIndex();
             Logger.i("setUserVisibleHint currentTabIndex--->" + currentTabIndex);
             isCanSign = false;
             userSign();

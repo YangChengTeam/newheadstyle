@@ -15,7 +15,7 @@ import rx.Observable;
 
 public interface VideoInfoServiceApi {
 
-    @POST("v2.vedio/vedioList")
+    @POST("v1.vedio/vedioList")
     Observable<VideoInfoRet> getDataList(@Body RequestBody requestBody);
 
     @POST("v1.vedio/vedioCommentDetail")

@@ -33,9 +33,9 @@ public class Constants {
 
     public static final String APP_PACKAGE_NAME = "com.feiyou.headstyle";
 
-    public static final String BASE_URL = "http://ytx.bshu.com/api/";
+    public static final String BASE_URL = "http://ytx.wk2.com/api/";
 
-    public static final String BASE_SCORE_URL = "http://ytx.bshu.com/api/";
+    public static final String BASE_SCORE_URL = "http://ytx.wk2.com/api/";
 
     public static final String BASE_TEST_URL = "https://cj.197854.com/api/";
 
@@ -92,4 +92,7 @@ public class Constants {
     public static final String GET_MONEY_NUM = "get_money_num";
 
     public static final String SHOW_PRIVARY = "show_privary";
+
+    public static final String CLOSE_HB_DATA = "close_hb_date";
+
 }

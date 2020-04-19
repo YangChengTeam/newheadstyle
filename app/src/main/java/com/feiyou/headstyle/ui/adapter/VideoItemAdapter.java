@@ -2,16 +2,13 @@ package com.feiyou.headstyle.ui.adapter;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
-import android.media.MediaPlayer;
-import android.net.Uri;
-import android.support.v4.content.ContextCompat;
-import android.util.Log;
+
+import androidx.core.content.ContextCompat;
+
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.VideoView;
 
-import com.blankj.utilcode.util.AppUtils;
 import com.blankj.utilcode.util.ScreenUtils;
 import com.blankj.utilcode.util.SizeUtils;
 import com.blankj.utilcode.util.StringUtils;
@@ -20,7 +17,6 @@ import com.bumptech.glide.request.RequestOptions;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
 import com.feiyou.headstyle.R;
-import com.feiyou.headstyle.bean.HeadInfo;
 import com.feiyou.headstyle.bean.VideoInfo;
 import com.feiyou.headstyle.ui.custom.FullScreenVideoView;
 import com.feiyou.headstyle.ui.custom.GlideRoundTransform;

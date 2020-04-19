@@ -148,4 +148,9 @@
 
     <color name="iknow_color">#febc03</color>
     <color name="default_window_bg">#ffffff</color>
+    <color name="max_value_color">#fede84</color>
+    <color name="max_color">#e92629</color>
+    <color name="cash_today">#f6c4be</color>
+    <color name="money_hb_color">#835105</color>
+    <color name="money_hb_value_color">#e7252c</color>
 </resources>

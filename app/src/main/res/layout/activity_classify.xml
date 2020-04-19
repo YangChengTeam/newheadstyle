@@ -21,7 +21,7 @@
         android:layout_below="@+id/topbar"
         android:background="@color/line_color"></View>
 
-    <android.support.v4.widget.NestedScrollView
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/white"
@@ -70,5 +70,5 @@
             <!--cmgame_view_background 整个View背景，demo使用的是8dp圆角白底-->
         </LinearLayout>
 
-    </android.support.v4.widget.NestedScrollView>
+    </androidx.core.widget.NestedScrollView>
 </LinearLayout>

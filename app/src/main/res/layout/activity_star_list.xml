@@ -38,12 +38,12 @@
             android:layout_marginTop="160dp"
             android:orientation="vertical">
 
-            <android.support.v7.widget.RecyclerView
+            <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/star_list"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingLeft="12dp"
-                android:paddingRight="12dp"></android.support.v7.widget.RecyclerView>
+                android:paddingRight="12dp"></androidx.recyclerview.widget.RecyclerView>
         </LinearLayout>
     </FrameLayout>
 </LinearLayout>

@@ -69,4 +69,7 @@
 1.您在登录和使用个性头像时，将会提供与使用服务相关的个人信息。<br />
 2.未经您同意，我们不会出售或出租您的任何信息。<br />
 3.您可以对上述信息进行访问、修改及删除。<br />更多详细信息，欢迎您点击查看<font style='color:#ff5555'>隐私政策</font>，感谢您的信任!</string>
+    <string name="new_person_hongbao">恭喜收到新人红包</string>
+    <string name="login_hongbao">恭喜收到登录红包</string>
+    <string name="money_hb_txt">恭喜你获得现金红包</string>
 </resources>

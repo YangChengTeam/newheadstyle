@@ -24,12 +24,12 @@
         android:layout_weight="1"
         android:orientation="vertical">
 
-        <android.support.v7.widget.RecyclerView
+        <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/chat_list"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:background="@color/my_info_bg_color"></android.support.v7.widget.RecyclerView>
+            android:background="@color/my_info_bg_color"></androidx.recyclerview.widget.RecyclerView>
 
         <LinearLayout
             android:id="@+id/layout_comment"

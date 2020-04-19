@@ -3,14 +3,10 @@ package com.feiyou.headstyle.ui.fragment;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,14 +14,11 @@ import android.view.Window;
 import android.widget.ImageView;
 
 import com.blankj.utilcode.util.SPUtils;
-import com.blankj.utilcode.util.SizeUtils;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
-import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
-import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.ui.activity.AdActivity;
 
@@ -69,7 +62,7 @@ public class CardWindowFragment extends DialogFragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.open_window_dialog, container);
 
         closeImageView = view.findViewById(R.id.iv_close);
@@ -77,7 +70,7 @@ public class CardWindowFragment extends DialogFragment {
 
         Glide.with(getActivity()).load(popImageUrl).listener(new RequestListener<Drawable>() {
             @Override
-            public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+            public boolean onLoadFailed(GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
                 return false;
             }
 
@@ -102,7 +95,7 @@ public class CardWindowFragment extends DialogFragment {
                 SPUtils.getInstance().put("show_ad_window", false);
                 Intent intent = new Intent(getActivity(), AdActivity.class);
                 intent.putExtra("open_url", jumpPath);
-                intent.putExtra("ad_title",adTitle);
+                intent.putExtra("ad_title", adTitle);
                 startActivity(intent);
             }
         });

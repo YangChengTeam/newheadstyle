@@ -4,10 +4,11 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Message;
-import android.support.annotation.MainThread;
 import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
+
+import androidx.annotation.MainThread;
 
 import com.blankj.utilcode.util.ToastUtils;
 import com.bytedance.sdk.openadsdk.AdSlot;
@@ -198,7 +199,7 @@ public class Splash1Activity extends Activity implements WeakHandler.IHandler {
      * 跳转到主页面
      */
     private void goToMainActivity() {
-        Intent intent = new Intent(Splash1Activity.this, Main1Activity.class);
+        Intent intent = new Intent(Splash1Activity.this, MainActivity.class);
         startActivity(intent);
         mSplashContainer.removeAllViews();
         this.finish();

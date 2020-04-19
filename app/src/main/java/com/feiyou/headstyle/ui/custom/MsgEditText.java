@@ -3,20 +3,16 @@ package com.feiyou.headstyle.ui.custom;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.support.v7.widget.AppCompatEditText;
+import androidx.appcompat.widget.AppCompatEditText;
 import android.text.Spannable;
-import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.TextPaint;
 import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.MetricAffectingSpan;
-import android.text.style.URLSpan;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
-
-import com.feiyou.headstyle.view.MyEditText;
 
 /**
  * 模仿微信的@功能 整块删除 可编辑

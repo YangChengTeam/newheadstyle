@@ -325,12 +325,12 @@
                 android:layout_marginRight="12dp"
                 android:background="@color/line_color"></View>
 
-            <android.support.v7.widget.RecyclerView
+            <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/sign_in_list_view"
                 android:layout_width="match_parent"
                 android:layout_height="66dp"
                 android:layout_marginLeft="12dp"
-                android:layout_marginRight="12dp"></android.support.v7.widget.RecyclerView>
+                android:layout_marginRight="12dp"></androidx.recyclerview.widget.RecyclerView>
         </FrameLayout>
 
         <ImageView
@@ -540,12 +540,12 @@
                 android:textSize="14sp" />
         </RelativeLayout>
 
-        <android.support.v7.widget.RecyclerView
+        <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/mini_game_list_view"
             android:layout_width="match_parent"
             android:layout_height="136dp"
             android:layout_marginLeft="12dp"
-            android:layout_marginRight="12dp"></android.support.v7.widget.RecyclerView>
+            android:layout_marginRight="12dp"></androidx.recyclerview.widget.RecyclerView>
 
         <View
             android:layout_width="match_parent"
@@ -589,12 +589,12 @@
                 android:textSize="14sp" />
         </RelativeLayout>
 
-        <android.support.v7.widget.RecyclerView
+        <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/task_list_view"
             android:layout_width="match_parent"
             android:layout_height="186dp"
             android:layout_marginLeft="12dp"
-            android:layout_marginRight="12dp"></android.support.v7.widget.RecyclerView>
+            android:layout_marginRight="12dp"></androidx.recyclerview.widget.RecyclerView>
 
         <View
             android:layout_width="match_parent"

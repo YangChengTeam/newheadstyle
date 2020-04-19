@@ -3,8 +3,8 @@ package com.feiyou.headstyle.ui.custom;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+
+import androidx.annotation.NonNull;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.SimpleTarget;
@@ -17,17 +17,17 @@ public class GlideSimpleLoader implements ImageWatcher.Loader {
         Glide.with(context).load(uri)
                 .into(new SimpleTarget<Drawable>() {
                     @Override
-                    public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
+                    public void onResourceReady(@NonNull Drawable resource, Transition<? super Drawable> transition) {
                         lc.onResourceReady(resource);
                     }
 
                     @Override
-                    public void onLoadFailed(@Nullable Drawable errorDrawable) {
+                    public void onLoadFailed(Drawable errorDrawable) {
                         lc.onLoadFailed(errorDrawable);
                     }
 
                     @Override
-                    public void onLoadStarted(@Nullable Drawable placeholder) {
+                    public void onLoadStarted(Drawable placeholder) {
                         lc.onLoadStarted(placeholder);
                     }
                 });

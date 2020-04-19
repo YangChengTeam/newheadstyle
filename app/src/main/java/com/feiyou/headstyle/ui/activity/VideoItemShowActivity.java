@@ -5,17 +5,14 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.support.design.widget.BottomSheetBehavior;
-import android.support.design.widget.BottomSheetDialog;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.PagerSnapHelper;
-import android.support.v7.widget.RecyclerView;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.PagerSnapHelper;
+import androidx.recyclerview.widget.RecyclerView;
 import android.text.Html;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -71,6 +68,8 @@ import com.feiyou.headstyle.ui.custom.GlideRoundTransform;
 import com.feiyou.headstyle.ui.custom.LoginDialog;
 import com.feiyou.headstyle.view.CommentDialog;
 import com.feiyou.headstyle.view.VideoInfoView;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.orhanobut.logger.Logger;
 import com.umeng.analytics.MobclickAgent;
 import com.umeng.socialize.ShareAction;
@@ -594,7 +593,7 @@ public class VideoItemShowActivity extends BaseFragmentActivity implements Video
                         Logger.i("last video count --->" + videoItemShowAdapter.getData().size());
 
                         View view = snapHelper.findSnapView(layoutManager);
-                        Jzvd.resetAllVideos();
+                        Jzvd.releaseAllVideos();
                         RecyclerView.ViewHolder viewHolder = recyclerView.getChildViewHolder(view);
                         if (viewHolder != null && viewHolder instanceof BaseViewHolder) {
                             JzvdStd jzvdStd = ((BaseViewHolder) viewHolder).getView(R.id.videoplayer);
@@ -813,7 +812,7 @@ public class VideoItemShowActivity extends BaseFragmentActivity implements Video
     @Override
     public void onPause() {
         super.onPause();
-        Jzvd.resetAllVideos();
+        Jzvd.releaseAllVideos();
     }
 
     @OnClick(R.id.iv_back)
@@ -984,7 +983,7 @@ public class VideoItemShowActivity extends BaseFragmentActivity implements Video
                 startActivity(intent);
                 break;
             case R.id.layout_to_home:
-                Intent intent1 = new Intent(this, Main1Activity.class);
+                Intent intent1 = new Intent(this, MainActivity.class);
                 startActivity(intent1);
                 finish();
                 break;

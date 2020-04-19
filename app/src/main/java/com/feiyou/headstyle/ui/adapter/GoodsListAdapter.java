@@ -1,7 +1,6 @@
 package com.feiyou.headstyle.ui.adapter;
 
 import android.content.Context;
-import android.support.v4.content.ContextCompat;
 import android.widget.ImageView;
 
 import com.blankj.utilcode.util.SizeUtils;
@@ -11,7 +10,6 @@ import com.bumptech.glide.request.RequestOptions;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
 import com.feiyou.headstyle.R;
-import com.feiyou.headstyle.bean.AnswerInfo;
 import com.feiyou.headstyle.bean.GoodInfo;
 import com.feiyou.headstyle.ui.custom.LeftRightCornersTransform;
 

@@ -1,15 +1,9 @@
 package com.feiyou.headstyle.ui.adapter;
 
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
-import android.view.ViewGroup;
 
-import com.feiyou.headstyle.ui.fragment.CommunityFragment;
-import com.feiyou.headstyle.ui.fragment.HomeFragment;
-import com.feiyou.headstyle.ui.fragment.sub.FollowFragment;
-import com.feiyou.headstyle.ui.fragment.sub.RecommendFragment;
-import com.feiyou.headstyle.ui.fragment.sub.VideoFragment;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentPagerAdapter;
 
 import java.util.List;
 
@@ -18,7 +12,7 @@ public class SubFragmentAdapter extends FragmentPagerAdapter {
 
     private List<Fragment> FRAGMENTS;
 
-    public SubFragmentAdapter(FragmentManager fragmentManager,List<Fragment> fragments) {
+    public SubFragmentAdapter(FragmentManager fragmentManager, List<Fragment> fragments) {
         super(fragmentManager);
         this.FRAGMENTS = fragments;
     }

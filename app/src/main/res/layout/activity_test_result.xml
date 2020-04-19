@@ -18,7 +18,7 @@
         android:layout_height="0.5dp"
         android:background="@color/line_color"></View>
 
-    <android.support.v4.widget.NestedScrollView
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fillViewport="true">
@@ -115,15 +115,15 @@
                         android:textSize="14dp" />
                 </RelativeLayout>
 
-                <android.support.v7.widget.RecyclerView
+                <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/recommend_list"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:nestedScrollingEnabled="false"
                     android:paddingLeft="6dp"
-                    android:paddingRight="6dp"></android.support.v7.widget.RecyclerView>
+                    android:paddingRight="6dp"></androidx.recyclerview.widget.RecyclerView>
             </LinearLayout>
 
         </LinearLayout>
-    </android.support.v4.widget.NestedScrollView>
+    </androidx.core.widget.NestedScrollView>
 </LinearLayout>

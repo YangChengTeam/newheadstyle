@@ -28,12 +28,12 @@
         android:background="@color/white"
         android:orientation="vertical">
 
-        <android.support.v7.widget.RecyclerView
+        <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/exchange_list_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginLeft="12dp"
-            android:layout_marginRight="12dp"></android.support.v7.widget.RecyclerView>
+            android:layout_marginRight="12dp"></androidx.recyclerview.widget.RecyclerView>
 
         <LinearLayout
             android:id="@+id/layout_no_data"

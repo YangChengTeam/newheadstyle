@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.graphics.Canvas;
-import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.Window;
@@ -20,7 +19,7 @@ class SwipeBackgroundView extends View {
         super(context);
     }
 
-    public SwipeBackgroundView(Context context, @Nullable AttributeSet attrs) {
+    public SwipeBackgroundView(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 

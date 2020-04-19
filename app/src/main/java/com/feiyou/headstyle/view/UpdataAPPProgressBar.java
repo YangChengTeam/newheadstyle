@@ -5,7 +5,6 @@ import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.RectF;
-import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.View;
@@ -89,11 +88,11 @@ public class UpdataAPPProgressBar extends View {
         this(context, null);
     }
 
-    public UpdataAPPProgressBar(Context context, @Nullable AttributeSet attrs) {
+    public UpdataAPPProgressBar(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public UpdataAPPProgressBar(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    public UpdataAPPProgressBar(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         initAttrs(context, attrs);
         initPainters();

@@ -6,12 +6,13 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.StringRes;
+import androidx.appcompat.app.AlertDialog;
+import androidx.viewpager.widget.ViewPager;
+
 import android.os.Message;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
-import android.support.v4.view.ViewPager;
-import android.support.v7.app.AlertDialog;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ImageView;
@@ -61,8 +62,7 @@ import permissions.dispatcher.PermissionRequest;
 import permissions.dispatcher.RuntimePermissions;
 
 
-@RuntimePermissions
-public class MainActivity extends BaseFragmentActivity implements VersionView, ViewPager.OnPageChangeListener, RadioGroup.OnCheckedChangeListener, PraiseDialog.PraiseListener, PrivacyDialog.PrivacyListener {
+public class MainActivity extends BaseFragmentActivity implements VersionView, ViewPager.OnPageChangeListener, RadioGroup.OnCheckedChangeListener, PraiseDialog.PraiseListener {
 
     @BindView(R.id.viewpager)
     ViewPager viewPager;
@@ -88,11 +88,9 @@ public class MainActivity extends BaseFragmentActivity implements VersionView, V
 
     private String[] YM_TITLES = {"home_tab_click", "click_shequ", "click_fuli", "click_ceshi", "click_my_info"};
 
-    private PrivacyDialog privacyDialog;
-
     private Handler mHandler = new Handler() {
         @Override
-        public void handleMessage(android.os.Message msg) {
+        public void handleMessage(Message msg) {
             switch (msg.what) {
                 case 0:
                     break;
@@ -108,102 +106,14 @@ public class MainActivity extends BaseFragmentActivity implements VersionView, V
     }
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        initTopBar();
+        initViews();
         initData();
     }
 
-    /*@Override
-    public void onRequestPermissionsResult(int requestCode, @androidx.annotation.NonNull String[] permissions, @androidx.annotation.NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        //SpaActivityPermissionsDispatcher.onRequestPermissionsResult(this, requestCode, grantResults);
-    }*/
-
-    @NeedsPermission(Manifest.permission.READ_PHONE_STATE)
-    public void showReadPhone() {
-        App.imei = PhoneUtils.getIMEI();
-        App.androidId = DeviceUtils.getAndroidID();
-        Logger.i("imei --->" + App.imei + "---androidId--->" + App.androidId);
-
-        //SpaActivityPermissionsDispatcher.showReadStorageWithPermissionCheck(this);
-    }
-
-    @OnPermissionDenied(Manifest.permission.READ_PHONE_STATE)
-    public void onReadPhoneDenied() {
-        App.androidId = DeviceUtils.getAndroidID();
-        //SpaActivityPermissionsDispatcher.showReadStorageWithPermissionCheck(this);
-    }
-
-    @OnShowRationale(Manifest.permission.READ_PHONE_STATE)
-    public void showRationaleForReadPhone(PermissionRequest request) {
-        request.proceed();
-    }
-
-    @OnNeverAskAgain(Manifest.permission.READ_PHONE_STATE)
-    public void onReadPhoneNeverAskAgain() {
-
-    }
-
-    @NeedsPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-    void showReadStorage() {
-        //SpaActivityPermissionsDispatcher.showReadLocationWithPermissionCheck(this);
-    }
-
-    @OnPermissionDenied(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-    void onReadStorageDenied() {
-        //SpaActivityPermissionsDispatcher.showReadLocationWithPermissionCheck(this);
-    }
-
-    @OnShowRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-    void showRationaleForReadStorage(PermissionRequest request) {
-        request.proceed();
-    }
-
-    @OnNeverAskAgain(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-    void onReadStorageNeverAskAgain() {
-    }
-
-    //读取地理位置权限
-    @NeedsPermission(Manifest.permission.ACCESS_COARSE_LOCATION)
-    void showReadLocation() {
-        //homeInitData();
-    }
-
-    @OnPermissionDenied(Manifest.permission.ACCESS_COARSE_LOCATION)
-    void onReadLocationDenied() {
-        //homeInitData();
-
-    }
-
-    @OnShowRationale(Manifest.permission.ACCESS_COARSE_LOCATION)
-    void showRationaleForReadLocation(PermissionRequest request) {
-        request.proceed();
-    }
-
-    @OnNeverAskAgain(Manifest.permission.ACCESS_COARSE_LOCATION)
-    void onReadLocationNeverAskAgain() {
-
-    }
-
-    private void initTopBar() {
+    private void initViews() {
         QMUIStatusBarHelper.setStatusBarLightMode(this);
-
-        privacyDialog = new PrivacyDialog(this, R.style.login_dialog);
-        privacyDialog.setPrivacyListener(this);
-
-        if (!SPUtils.getInstance().getBoolean(Constants.SHOW_PRIVARY, false)) {
-            privacyDialog.show();
-            privacyDialog.setOnKeyListener(new DialogInterface.OnKeyListener() {
-                @Override
-                public boolean onKey(DialogInterface dialogInterface, int keyCode, KeyEvent keyEvent) {
-                    if (keyCode == KeyEvent.KEYCODE_BACK) {
-                        return true;//不执行父类点击事件
-                    }
-                    return false;
-                }
-            });
-        }
     }
 
     public void initData() {
@@ -423,20 +333,6 @@ public class MainActivity extends BaseFragmentActivity implements VersionView, V
     @Override
     public void loadDataError(Throwable throwable) {
 
-    }
-
-    @Override
-    public void agree() {
-        SPUtils.getInstance().put(Constants.SHOW_PRIVARY, true);
-
-        /*Message message = new Message();
-        message.what = 0;
-        mHandler.sendMessage(message);*/
-    }
-
-    @Override
-    public void notAgree() {
-        finish();
     }
 
     public int getCurrentTabIndex() {

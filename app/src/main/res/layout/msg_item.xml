@@ -103,11 +103,11 @@
             android:orientation="horizontal"
             android:visibility="gone">
 
-            <android.support.v7.widget.RecyclerView
+            <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/answer_list"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="54dp"></android.support.v7.widget.RecyclerView>
+                android:layout_marginLeft="54dp"></androidx.recyclerview.widget.RecyclerView>
         </LinearLayout>
     </LinearLayout>
 

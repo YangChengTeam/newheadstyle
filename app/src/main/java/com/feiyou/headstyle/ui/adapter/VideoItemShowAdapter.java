@@ -2,12 +2,12 @@ package com.feiyou.headstyle.ui.adapter;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
-import android.support.v4.content.ContextCompat;
+
+import androidx.core.content.ContextCompat;
+
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.blankj.utilcode.util.ScreenUtils;
 import com.blankj.utilcode.util.SizeUtils;
 import com.blankj.utilcode.util.StringUtils;
 import com.bumptech.glide.Glide;
@@ -16,11 +16,11 @@ import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.bean.VideoInfo;
-import com.feiyou.headstyle.ui.custom.FullScreenVideoView;
 import com.feiyou.headstyle.ui.custom.GlideRoundTransform;
 
 import java.util.List;
 
+import cn.jzvd.JZDataSource;
 import cn.jzvd.Jzvd;
 import cn.jzvd.JzvdStd;
 
@@ -40,7 +40,10 @@ public class VideoItemShowAdapter extends BaseQuickAdapter<VideoInfo, BaseViewHo
     @Override
     protected void convert(final BaseViewHolder helper, final VideoInfo item) {
         JzvdStd jzvdStd = helper.getView(R.id.videoplayer);
-        jzvdStd.setUp(item.getVideoPath(), "", Jzvd.CURRENT_STATE_NORMAL);
+        JZDataSource jzDataSource = new JZDataSource(item.getVideoPath());
+        jzDataSource.looping = true;
+
+        jzvdStd.setUp(jzDataSource, Jzvd.SCREEN_FULLSCREEN);
         if (helper.getAdapterPosition() == 0) {
             jzvdStd.startVideo();
         }

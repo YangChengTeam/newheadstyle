@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
+import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.api.CollectionDataServiceApi;
 import com.feiyou.headstyle.api.EveryDayServiceApi;
 import com.feiyou.headstyle.base.BaseModel;
@@ -42,6 +43,7 @@ public class EveryDayHongBaoModelImp extends BaseModel implements EveryDayHongBa
             params.put("user_id", uid);
             params.put("openid", openid);
             params.put("imei", imei);
+            params.put("android_id", App.androidId);
         } catch (JSONException e) {
             e.printStackTrace();
         }

@@ -1,15 +1,11 @@
 package com.feiyou.headstyle.ui.custom;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.widget.NestedScrollView;
-import android.util.AttributeSet;
-import android.util.Log;
-import android.view.MotionEvent;
-import android.view.ViewConfiguration;
 
-import com.orhanobut.logger.Logger;
+import androidx.annotation.NonNull;
+import androidx.core.widget.NestedScrollView;
+import android.util.AttributeSet;
+import android.view.MotionEvent;
 
 /**
  * @Created SiberiaDante
@@ -28,11 +24,11 @@ public class JudgeNestedScrollView extends NestedScrollView {
         super(context);
     }
 
-    public JudgeNestedScrollView(@NonNull Context context, @Nullable AttributeSet attrs) {
+    public JudgeNestedScrollView(@NonNull Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public JudgeNestedScrollView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    public JudgeNestedScrollView(@NonNull Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
     }
 

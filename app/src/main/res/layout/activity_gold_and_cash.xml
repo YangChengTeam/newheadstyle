@@ -161,7 +161,7 @@
         android:layout_height="48dp"
         android:background="@color/white">
 
-        <android.support.v4.app.FragmentTabHost
+        <androidx.fragment.app.FragmentTabHost
             android:id="@android:id/tabhost"
             android:layout_width="200dp"
             android:layout_height="wrap_content"
@@ -174,7 +174,7 @@
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:layout_weight="0"></FrameLayout>
-        </android.support.v4.app.FragmentTabHost>
+        </androidx.fragment.app.FragmentTabHost>
     </RelativeLayout>
 
     <View
@@ -182,11 +182,11 @@
         android:layout_height="0.3dp"
         android:background="@color/line_color"></View>
 
-    <android.support.v4.view.ViewPager
+    <androidx.viewpager.widget.ViewPager
         android:id="@+id/view_pager"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_alignParentStart="true"
-        android:layout_weight="1"></android.support.v4.view.ViewPager>
+        android:layout_weight="1"></androidx.viewpager.widget.ViewPager>
 
 </LinearLayout>

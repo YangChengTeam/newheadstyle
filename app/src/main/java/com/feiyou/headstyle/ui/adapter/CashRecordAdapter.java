@@ -1,14 +1,13 @@
 package com.feiyou.headstyle.ui.adapter;
 
 import android.content.Context;
-import android.support.v4.content.ContextCompat;
+import androidx.core.content.ContextCompat;
 import android.widget.TextView;
 
 import com.blankj.utilcode.util.TimeUtils;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
 import com.feiyou.headstyle.R;
-import com.feiyou.headstyle.bean.AnswerInfo;
 import com.feiyou.headstyle.bean.CashRecord;
 
 import java.util.List;

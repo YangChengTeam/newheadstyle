@@ -6,9 +6,9 @@ import android.content.pm.ActivityInfo;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.text.InputFilter;
 import android.text.Spanned;
 import android.text.TextUtils;
@@ -24,7 +24,6 @@ import com.blankj.utilcode.util.PathUtils;
 import com.blankj.utilcode.util.SPUtils;
 import com.blankj.utilcode.util.SizeUtils;
 import com.blankj.utilcode.util.StringUtils;
-import com.blankj.utilcode.util.TimeUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.feiyou.headstyle.App;
@@ -40,8 +39,6 @@ import com.feiyou.headstyle.ui.adapter.AddNoteImageAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragmentActivity;
 import com.feiyou.headstyle.ui.custom.Glide4Engine;
 import com.feiyou.headstyle.ui.custom.MsgEditText;
-import com.feiyou.headstyle.utils.MyTimeUtil;
-import com.feiyou.headstyle.view.AddNoteView;
 import com.jakewharton.rxbinding.view.RxView;
 import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
@@ -512,7 +509,7 @@ public class PushNoteActivity extends BaseFragmentActivity implements IBaseView 
                     }
 
                     if (fromNoteType == 3) {
-                        Intent intent = new Intent(this, Main1Activity.class);
+                        Intent intent = new Intent(this, MainActivity.class);
                         intent.putExtra("home_index", 1);
                         startActivity(intent);
                     }
