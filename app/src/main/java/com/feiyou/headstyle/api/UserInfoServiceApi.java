@@ -19,7 +19,7 @@ import rx.Observable;
 
 public interface UserInfoServiceApi {
 
-    @POST("v1.userinfo/login")
+    @POST("v2.userinfo/login")
     Observable<UserInfoRet> login(@Body RequestBody requestBody);
 
     @POST("v1.userinfo/userImageWallAdd")

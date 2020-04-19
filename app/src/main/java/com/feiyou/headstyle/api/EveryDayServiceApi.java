@@ -19,6 +19,6 @@ public interface EveryDayServiceApi {
     @POST("v1.welfare/dlhb")
     Observable<EveryDayHbRet> everyDayHongBaoInfo(@Body RequestBody requestBody);
 
-    @POST("v2.welfare/dlhb")
+    @POST("v2.userinfo/init")
     Observable<HongBaoInfoRet> getHBInfo(@Body RequestBody requestBody);
 }

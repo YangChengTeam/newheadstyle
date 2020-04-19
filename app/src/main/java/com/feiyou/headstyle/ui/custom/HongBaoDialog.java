@@ -119,6 +119,11 @@ public class HongBaoDialog extends Dialog implements View.OnClickListener {
 
     public void updateHBState(int state, double doubleMoney) {
         hbState = state;
+        if(hbState == 1){
+            mHBBeforeLayout.setVisibility(View.GONE);
+            mHBAfterLayout.setVisibility(View.VISIBLE);
+            mGetMoneyTv.setText(doubleMoney+"");
+        }
     }
 
     @Override

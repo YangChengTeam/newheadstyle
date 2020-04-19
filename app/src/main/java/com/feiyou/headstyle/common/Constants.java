@@ -33,9 +33,9 @@ public class Constants {
 
     public static final String APP_PACKAGE_NAME = "com.feiyou.headstyle";
 
-    public static final String BASE_URL = "http://ytx.wk2.com/api/";
+    public static final String BASE_URL = "http://ytx.bshu.com/api/";
 
-    public static final String BASE_SCORE_URL = "http://ytx.wk2.com/api/";
+    public static final String BASE_SCORE_URL = "http://ytx.bshu.com/api/";
 
     public static final String BASE_TEST_URL = "https://cj.197854.com/api/";
 

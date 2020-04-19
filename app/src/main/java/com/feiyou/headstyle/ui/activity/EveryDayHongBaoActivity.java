@@ -250,7 +250,7 @@ public class EveryDayHongBaoActivity extends BaseFragmentActivity implements IBa
                         Logger.i("recordId--->" + recordId);
                         if (!StringUtils.isEmpty(recordId) && mUserInfo != null) {
                             try {
-                                taskRecordInfoPresenterImp.addHomeTaskRecord(mUserInfo.getId(), mUserInfo.getOpenid(), PhoneUtils.getIMEI(), seeVideoMoney, 1, recordId);
+                                //taskRecordInfoPresenterImp.addHomeTaskRecord(mUserInfo.getId(), mUserInfo.getOpenid(), PhoneUtils.getIMEI(), seeVideoMoney, 1, recordId);
                             } catch (SecurityException e) {
                                 e.printStackTrace();
                             }

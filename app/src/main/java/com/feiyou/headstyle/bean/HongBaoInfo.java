@@ -1,9 +1,21 @@
 package com.feiyou.headstyle.bean;
 
+import com.google.gson.annotations.SerializedName;
+
 public class HongBaoInfo {
+    @SerializedName("user_id")
+    private String userId;
     private int hbvideo;
     private int type;//弹红包类型 0不弹出 1新人红包 2登录红包
     private String cashindex;//"0.05/0.15"
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
 
     public int getHbvideo() {
         return hbvideo;

@@ -174,26 +174,6 @@ public class AppUtils {
         }
     }
 
-
-    @SuppressLint("NewApi")
-    public static boolean isValidContext(Context ctx) {
-        Activity activity = (Activity) ctx;
-
-        if (Build.VERSION.SDK_INT > 17) {
-            if (activity == null || activity.isDestroyed() || activity.isFinishing()) {
-                return false;
-            } else {
-                return true;
-            }
-        } else {
-            if (activity == null || activity.isFinishing()) {
-                return false;
-            } else {
-                return true;
-            }
-        }
-    }
-
     /**
      * 获取设备 AndroidID
      *

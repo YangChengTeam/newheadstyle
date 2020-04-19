@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
+import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.api.SignDoneInfoServiceApi;
 import com.feiyou.headstyle.api.TaskRecordInfoServiceApi;
 import com.feiyou.headstyle.base.BaseModel;
@@ -84,15 +85,15 @@ public class TaskRecordInfoModelImp extends BaseModel implements TaskRecordInfoM
     }
 
     @Override
-    public void addHomeTaskRecord(String uid, String openid, String imei, double cash, int status, String recordId, IBaseRequestCallBack<TaskRecordInfoRet> iBaseRequestCallBack) {
+    public void addHomeTaskRecord(String uid, String openid, String imei, double cash, int type, IBaseRequestCallBack<TaskRecordInfoRet> iBaseRequestCallBack) {
         JSONObject params = new JSONObject();
         try {
             params.put("user_id", uid);
             params.put("openid",openid);
             params.put("imei", imei);
+            params.put("android_id", App.androidId);
             params.put("cash", cash + "");
-            params.put("status", status + "");
-            params.put("infoid", recordId);
+            params.put("type", type + "");
         } catch (JSONException e) {
             e.printStackTrace();
         }

@@ -89,6 +89,7 @@ import com.feiyou.headstyle.ui.custom.PrivacyDialog;
 import com.feiyou.headstyle.ui.custom.RoundedCornersTransformation;
 import com.feiyou.headstyle.ui.custom.VersionUpdateDialog;
 import com.feiyou.headstyle.ui.custom.WarmDialog;
+import com.feiyou.headstyle.utils.AppContextUtil;
 import com.feiyou.headstyle.utils.MyTimeUtil;
 import com.feiyou.headstyle.utils.RandomUtils;
 import com.feiyou.headstyle.utils.TTAdManagerHolder;
@@ -108,6 +109,7 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -266,15 +268,21 @@ public class HomeFragment extends BaseFragment implements IBaseView, View.OnClic
 
     private WarmDialog warmDialog;
 
+    private String[] seeVideoMoneys;
+
+    private double seeVideoMoney;//看视频可得到的收益
+
+    private int showHBType;
+
+    private String newPersonId;
+
     private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(android.os.Message msg) {
             switch (msg.what) {
                 case 0:
-                    if (isAlertHongBao && everyDayHongBaoDialog != null && !everyDayHongBaoDialog.isShowing()) {
-                        everyDayHongBaoDialog.show();
-                        everyDayHongBaoDialog.setClickAnyWhere(clickAnyWhere);
-                        isAlertHongBao = false;
+                    if (hongBaoDialog != null && hongBaoDialog.isShowing()) {
+                        hongBaoDialog.updateHBState(1, seeVideoMoney);
                     } else {
                         //请求版本更新
                         versionPresenterImp.getVersionInfo(com.feiyou.headstyle.utils.AppUtils.getMetaDataValue(getActivity(), "UMENG_CHANNEL"));
@@ -693,10 +701,35 @@ public class HomeFragment extends BaseFragment implements IBaseView, View.OnClic
         }
 
         if (messageEvent.getMessage().equals("login_success")) {
-            isRefreshHongBao = true;
+            Logger.i("home login success--->");
+            isAlertHongBao = true;
+            if (App.getApp().getmUserInfo() != null) {
+                Logger.i(JSON.toJSONString(App.getApp().getmUserInfo()));
+            }
         }
     }
 
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if (isVisibleToUser) {
+            if (AppContextUtil.isValidContext(getActivity()) && App.getApp().getmUserInfo() != null && isAlertHongBao) {
+                //今日是否关闭过红包
+                String lastDate = SPUtils.getInstance().getString(Constants.CLOSE_HB_DATA, "");
+                boolean todayIsCloseHB = false;
+                if (lastDate.equals(todayDate)) {
+                    todayIsCloseHB = true;
+                }
+
+                if (!todayIsCloseHB) {
+                    if (hongBaoDialog != null && !hongBaoDialog.isShowing()) {
+                        hongBaoDialog.show();
+                        hongBaoDialog.setHBConfigInfo(2, clickAnyWhere);
+                    }
+                }
+            }
+        }
+    }
 
     @Override
     public void onResume() {
@@ -793,6 +826,14 @@ public class HomeFragment extends BaseFragment implements IBaseView, View.OnClic
         if (progressDialog != null && progressDialog.isShowing()) {
             progressDialog.dismiss();
         }
+    }
+
+    public void randomMoney() {
+        Logger.i("videoMoneys--->" + JSON.toJSONString(seeVideoMoneys));
+        double temp = RandomUtils.nextDouble(Double.parseDouble(seeVideoMoneys[0]), Double.parseDouble(seeVideoMoneys[1]));
+        BigDecimal tempBd = new BigDecimal(temp);
+        seeVideoMoney = tempBd.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+        Logger.i("see video money value --->" + seeVideoMoney);
     }
 
     @Override
@@ -932,6 +973,10 @@ public class HomeFragment extends BaseFragment implements IBaseView, View.OnClic
             if (tData instanceof HongBaoInfoRet) {
                 Logger.i("hongbao data--->" + JSON.toJSONString(tData));
 
+                seeVideoMoneys = ((HongBaoInfoRet) tData).getData().getCashindex().split("/");
+                //根据返回的金额范围，随机产生获得奖励值
+                randomMoney();
+
                 //今日是否关闭过红包
                 String lastDate = SPUtils.getInstance().getString(Constants.CLOSE_HB_DATA, "");
                 boolean todayIsCloseHB = false;
@@ -940,23 +985,21 @@ public class HomeFragment extends BaseFragment implements IBaseView, View.OnClic
                 }
 
                 if (((HongBaoInfoRet) tData).getCode() == Constants.SUCCESS) {
-                    int hbType = ((HongBaoInfoRet) tData).getData().getType();
-                    boolean clickAnyWhere = ((HongBaoInfoRet) tData).getData().getHbvideo() == 1 ? true : false;
-                    if (hbType > 0 && !todayIsCloseHB) {
+                    newPersonId = ((HongBaoInfoRet) tData).getData().getUserId();
+                    showHBType = ((HongBaoInfoRet) tData).getData().getType();
+                    clickAnyWhere = ((HongBaoInfoRet) tData).getData().getHbvideo() == 1 ? true : false;
+                    if (showHBType > 0 && !todayIsCloseHB) {
                         if (hongBaoDialog != null && !hongBaoDialog.isShowing()) {
                             hongBaoDialog.show();
-                            hongBaoDialog.setHBConfigInfo(hbType, clickAnyWhere);
+                            hongBaoDialog.setHBConfigInfo(showHBType, clickAnyWhere);
                         }
                     }
                 }
             }
 
-            if (tData instanceof TaskRecordInfoRet && ((TaskRecordInfoRet) tData).getCode() == Constants.SUCCESS) {
-                if (StringUtils.isEmpty(recordId)) {
-                    if (((TaskRecordInfoRet) tData).getData() != null) {
-                        recordId = ((TaskRecordInfoRet) tData).getData().getInfoid();
-                    }
-                    Logger.i("recordId--->" + recordId);
+            if (tData instanceof TaskRecordInfoRet) {
+                if (((TaskRecordInfoRet) tData).getCode() == Constants.SUCCESS) {
+
                 }
             }
 
@@ -1203,11 +1246,10 @@ public class HomeFragment extends BaseFragment implements IBaseView, View.OnClic
                     @Override
                     public void onAdClose() {
                         Logger.i("rewardVideoAd close");
-                        Intent intent = new Intent(getActivity(), EveryDayHongBaoActivity.class);
-                        intent.putExtra("record_id", recordId);
-                        intent.putExtra("play_game_info", playGameInfo);
-                        intent.putExtra("game_see_video", gameSeeVideoInfo);
-                        startActivity(intent);
+
+                        Message message = new Message();
+                        message.what = 0;
+                        mHandler.sendMessage(message);
                     }
 
                     //视频播放完成回调
@@ -1224,9 +1266,12 @@ public class HomeFragment extends BaseFragment implements IBaseView, View.OnClic
                     //视频播放完成后，奖励验证回调，rewardVerify：是否有效，rewardAmount：奖励梳理，rewardName：奖励名称
                     @Override
                     public void onRewardVerify(boolean rewardVerify, int rewardAmount, String rewardName) {
-                        if (rewardVerify) {
 
+                        String userId = mUserInfo != null ? mUserInfo.getId() : "";
+                        if (showHBType == 1) {
+                            userId = newPersonId;
                         }
+                        taskRecordInfoPresenterImp.addHomeTaskRecord(userId, mUserInfo != null ? mUserInfo.getOpenid() : "", App.imei, seeVideoMoney, showHBType);
                     }
 
                     @Override
@@ -1281,7 +1326,7 @@ public class HomeFragment extends BaseFragment implements IBaseView, View.OnClic
             MobclickAgent.onEvent(getActivity(), "open_hongbao", AppUtils.getAppVersionName());
             try {
                 recordId = "";
-                taskRecordInfoPresenterImp.addHomeTaskRecord(StringUtils.isEmpty(mUserInfo.getId()) ? "0" : mUserInfo.getId(), StringUtils.isEmpty(mUserInfo.getOpenid()) ? "0" : mUserInfo.getOpenid(), PhoneUtils.getIMEI(), 0, 0, "0");
+                //taskRecordInfoPresenterImp.addHomeTaskRecord(StringUtils.isEmpty(mUserInfo.getId()) ? "0" : mUserInfo.getId(), StringUtils.isEmpty(mUserInfo.getOpenid()) ? "0" : mUserInfo.getOpenid(), PhoneUtils.getIMEI(), 0, 0, "0");
             } catch (SecurityException e) {
                 e.printStackTrace();
             }
@@ -1310,7 +1355,14 @@ public class HomeFragment extends BaseFragment implements IBaseView, View.OnClic
 
     @Override
     public void openHB() {
-        ToastUtils.showLong("点击了开启红包");
+        //ToastUtils.showLong("点击了开启红包");
+
+        if (mttRewardVideoAd != null) {
+            //step6:在获取到广告后展示
+            mttRewardVideoAd.showRewardVideoAd(getActivity());
+            mttRewardVideoAd = null;
+            MobclickAgent.onEvent(getActivity(), "open_hongbao", AppUtils.getAppVersionName());
+        }
     }
 
     @Override

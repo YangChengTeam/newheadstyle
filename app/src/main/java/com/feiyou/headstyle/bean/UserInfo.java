@@ -79,6 +79,9 @@ public class UserInfo {
 
     private String background;
 
+    @SerializedName("get_dlhb")
+    private int getDlhb;
+
     public String getId() {
         return id;
     }
@@ -334,5 +337,13 @@ public class UserInfo {
 
     public void setTxnickname(String txnickname) {
         this.txnickname = txnickname;
+    }
+
+    public int getGetDlhb() {
+        return getDlhb;
+    }
+
+    public void setGetDlhb(int getDlhb) {
+        this.getDlhb = getDlhb;
     }
 }

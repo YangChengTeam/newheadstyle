@@ -32,7 +32,7 @@ public class TaskRecordInfoPresenterImp extends BasePresenterImp<IBaseView, Task
     }
 
     @Override
-    public void addHomeTaskRecord(String uid, String openid, String imei, double cash, int status, String recordId) {
-        taskRecordInfoModelImp.addHomeTaskRecord(uid, openid, imei, cash, status, recordId, this);
+    public void addHomeTaskRecord(String uid, String openid, String imei, double cash, int type) {
+        taskRecordInfoModelImp.addHomeTaskRecord(uid, openid, imei, cash, type, this);
     }
 }
