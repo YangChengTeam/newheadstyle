@@ -3,8 +3,10 @@ package com.feiyou.headstyle.ui.activity;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
@@ -15,23 +17,33 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.blankj.utilcode.util.ScreenUtils;
 import com.blankj.utilcode.util.SizeUtils;
 import com.blankj.utilcode.util.StringUtils;
+import com.bytedance.sdk.openadsdk.AdSlot;
+import com.bytedance.sdk.openadsdk.TTAdManager;
+import com.bytedance.sdk.openadsdk.TTAdNative;
+import com.bytedance.sdk.openadsdk.TTNativeExpressAd;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
+import com.feiyou.headstyle.bean.HeadInfo;
 import com.feiyou.headstyle.bean.HeadInfoRet;
 import com.feiyou.headstyle.bean.ResultInfo;
 import com.feiyou.headstyle.common.Constants;
 import com.feiyou.headstyle.presenter.HeadListDataPresenterImp;
 import com.feiyou.headstyle.ui.adapter.HeadInfoAdapter;
+import com.feiyou.headstyle.ui.adapter.HeadMultipleAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragmentActivity;
 import com.feiyou.headstyle.utils.StatusBarUtil;
+import com.feiyou.headstyle.utils.TTAdManagerHolder;
 import com.feiyou.headstyle.view.HeadListDataView;
 import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 import com.qmuiteam.qmui.widget.QMUITopBar;
 import com.wang.avi.AVLoadingIndicatorView;
+
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -61,7 +73,7 @@ public class HeadListActivity extends BaseFragmentActivity implements HeadListDa
 
     ImageView mBackImageView;
 
-    HeadInfoAdapter headInfoAdapter;
+    //HeadInfoAdapter headInfoAdapter;
 
     private HeadListDataPresenterImp headListDataPresenterImp;
 
@@ -73,6 +85,14 @@ public class HeadListActivity extends BaseFragmentActivity implements HeadListDa
 
     private String tagName;
 
+    HeadMultipleAdapter headMultipleAdapter;
+
+    private TTAdNative mTTAdNative;
+
+    private int LIST_LINE = 10;//广告加载一页，为10行（暂定）
+
+    private GridLayoutManager gridLayoutManager;
+
     @Override
     protected int getContextViewId() {
         return R.layout.activity_head_list;
@@ -81,11 +101,11 @@ public class HeadListActivity extends BaseFragmentActivity implements HeadListDa
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        initTopBar();
+        initView();
         initData();
     }
 
-    private void initTopBar() {
+    private void initView() {
         Bundle bundle = getIntent().getExtras();
         if (bundle != null && !StringUtils.isEmpty(bundle.getString("tag_id"))) {
             tagId = bundle.getString("tag_id");
@@ -94,6 +114,10 @@ public class HeadListActivity extends BaseFragmentActivity implements HeadListDa
         if (bundle != null && !StringUtils.isEmpty(bundle.getString("tag_name"))) {
             tagName = bundle.getString("tag_name");
         }
+
+        //step1:初始化sdk
+        TTAdManager ttAdManager = TTAdManagerHolder.get();
+        mTTAdNative = ttAdManager.createAdNative(getApplicationContext());
 
         View topView = getLayoutInflater().inflate(R.layout.common_top_back, null);
         topView.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, SizeUtils.dp2px(48)));
@@ -133,15 +157,28 @@ public class HeadListActivity extends BaseFragmentActivity implements HeadListDa
 
         headListDataPresenterImp = new HeadListDataPresenterImp(this, this);
 
-        headInfoAdapter = new HeadInfoAdapter(this, null);
-        mHeadInfoListView.setLayoutManager(new GridLayoutManager(this, 3));
-        mHeadInfoListView.setAdapter(headInfoAdapter);
+        headMultipleAdapter = new HeadMultipleAdapter(null);
+        //headInfoAdapter = new HeadInfoAdapter(this, null);
 
-        View topEmptyView = new View(this);
+        gridLayoutManager = new GridLayoutManager(this, 3);
+        gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+            @Override
+            public int getSpanSize(int position) {
+                if (position > 0 && position % 9 == 0) {
+                    return 3;
+                }
+                return 1;
+            }
+        });
+
+        mHeadInfoListView.setLayoutManager(gridLayoutManager);
+        mHeadInfoListView.setAdapter(headMultipleAdapter);
+
+        /*View topEmptyView = new View(this);
         topEmptyView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, SizeUtils.dp2px(12)));
-        headInfoAdapter.setHeaderView(topEmptyView);
+        headMultipleAdapter.setHeaderView(topEmptyView);*/
 
-        headInfoAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
+        headMultipleAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
                 int jumpPage = position / pageSize;
@@ -158,7 +195,7 @@ public class HeadListActivity extends BaseFragmentActivity implements HeadListDa
             }
         });
 
-        headInfoAdapter.setOnLoadMoreListener(new BaseQuickAdapter.RequestLoadMoreListener() {
+        headMultipleAdapter.setOnLoadMoreListener(new BaseQuickAdapter.RequestLoadMoreListener() {
             @Override
             public void onLoadMoreRequested() {
                 currentPage++;
@@ -198,16 +235,34 @@ public class HeadListActivity extends BaseFragmentActivity implements HeadListDa
                     mHeadInfoListView.setVisibility(View.VISIBLE);
                     mNoDataLayout.setVisibility(View.GONE);
                     if (currentPage == 1) {
-                        headInfoAdapter.setNewData(((HeadInfoRet) tData).getData());
+
+                        List<HeadInfo> tempList = ((HeadInfoRet) tData).getData();
+                        for (HeadInfo headInfo : tempList) {
+                            headInfo.setItemType(HeadInfo.HEAD_IMG);
+                        }
+
+                        for (int i = 0; i < 3; i++) {
+                            int tempIndex = (currentPage - 1) * pageSize + (i + 1) * 9 + i;
+                            HeadInfo tempHeadInfo = new HeadInfo(HeadInfo.HEAD_AD);
+                            tempList.add(tempIndex, tempHeadInfo);
+                        }
+
+                        headMultipleAdapter.setNewData(tempList);
                     } else {
-                        headInfoAdapter.addData(((HeadInfoRet) tData).getData());
+                        List<HeadInfo> tempList = ((HeadInfoRet) tData).getData();
+                        for (HeadInfo headInfo : tempList) {
+                            headInfo.setItemType(HeadInfo.HEAD_IMG);
+                        }
+                        headMultipleAdapter.addData((tempList));
                     }
 
                     if (((HeadInfoRet) tData).getData().size() == pageSize) {
-                        headInfoAdapter.loadMoreComplete();
+                        headMultipleAdapter.loadMoreComplete();
                     } else {
-                        headInfoAdapter.loadMoreEnd(true);
+                        headMultipleAdapter.loadMoreEnd(true);
                     }
+                    //TODO
+                    loadListAd();
                 } else {
                     mHeadInfoListView.setVisibility(View.GONE);
                     mNoDataLayout.setVisibility(View.VISIBLE);
@@ -243,4 +298,95 @@ public class HeadListActivity extends BaseFragmentActivity implements HeadListDa
     void reLoad() {
         onRefresh();
     }
+
+    /**
+     * 加载feed广告
+     */
+    private void loadListAd() {
+        float expressViewWidth = ScreenUtils.getScreenDensityDpi();
+        float expressViewHeight = 0;
+
+        //step4:创建feed广告请求类型参数AdSlot,具体参数含义参考文档
+        AdSlot adSlot = new AdSlot.Builder()
+                .setCodeId("945142340")
+                .setSupportDeepLink(true)
+                .setExpressViewAcceptedSize(expressViewWidth, expressViewHeight) //期望模板广告view的size,单位dp
+                .setAdCount(3) //请求广告数量为1到3条
+                .build();
+        //step5:请求广告，调用feed广告异步请求接口，加载到广告后，拿到广告素材自定义渲染
+        mTTAdNative.loadNativeExpressAd(adSlot, new TTAdNative.NativeExpressAdListener() {
+            @Override
+            public void onError(int code, String message) {
+                Logger.i("feed error--->" + code + "---message--->" + message);
+                //TToast.show(NativeExpressListActivity.this, message);
+            }
+
+            @Override
+            public void onNativeExpressAdLoad(List<TTNativeExpressAd> ads) {
+                if (ads == null || ads.isEmpty()) {
+                    Logger.i("on FeedAdLoaded: ad is null!");
+                    //TToast.show(NativeExpressListActivity.this, "on FeedAdLoaded: ad is null!");
+                    return;
+                }
+                bindAdListener(ads);
+            }
+        });
+    }
+
+    private void bindAdListener(final List<TTNativeExpressAd> ads) {
+        Logger.i("feed ads --->" + ads.size());
+
+        for (int i = 0; i < ads.size(); i++) {
+            final TTNativeExpressAd adTmp = ads.get(i);
+            int tempIndex = (currentPage - 1) * pageSize + (i + 1) * 9 + i;
+            HeadInfo tempHeadInfo = headMultipleAdapter.getData().get(tempIndex);
+            tempHeadInfo.setTtNativeExpressAd(adTmp);
+            headMultipleAdapter.getData().set(tempIndex, tempHeadInfo);
+
+            //headMultipleAdapter.notifyDataSetChanged();
+
+            adTmp.setExpressInteractionListener(new TTNativeExpressAd.ExpressAdInteractionListener() {
+                @Override
+                public void onAdClicked(View view, int type) {
+                    //TToast.show(NativeExpressListActivity.this, "广告被点击");
+                }
+
+                @Override
+                public void onAdShow(View view, int type) {
+                    //TToast.show(NativeExpressListActivity.this, "广告展示");
+                }
+
+                @Override
+                public void onRenderFail(View view, String msg, int code) {
+                    //TToast.show(NativeExpressListActivity.this, msg + " code:" + code);
+                }
+
+                @Override
+                public void onRenderSuccess(View view, float width, float height) {
+                    Logger.i("feed render success--->");
+                    //返回view的宽高 单位 dp
+                    //TToast.show(NativeExpressListActivity.this, "渲染成功");
+                    //headMultipleAdapter.notifyDataSetChanged();
+                    //刷新指定的item
+                    headMultipleAdapter.notifyItemChanged(tempIndex);
+                }
+            });
+            adTmp.render();
+
+            gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+                @Override
+                public int getSpanSize(int position) {
+                    if (position == 9 || (position > 10 && (position - 9) % 10 == 0)) {
+                        Logger.i("ad pos--->" + position);
+                        return 3;
+                    }
+                    return 1;
+                }
+            });
+        }
+
+        Logger.i("total size--->" + headMultipleAdapter.getData().size());
+
+    }
+
 }

@@ -49,7 +49,7 @@ public class CollectionActivity extends BaseFragmentActivity {
         List<HeadInfo> headInfoList = new ArrayList<>();
 
         for (int m = 0; m < 60; m++) {
-            headInfoList.add(new HeadInfo());
+            headInfoList.add(new HeadInfo(HeadInfo.HEAD_IMG));
         }
 
         headInfoAdapter = new HeadInfoAdapter(this, headInfoList);
