@@ -1,7 +1,10 @@
 package com.feiyou.headstyle.bean;
 
+import android.view.View;
+
 import com.bytedance.sdk.openadsdk.TTNativeExpressAd;
 import com.chad.library.adapter.base.entity.MultiItemEntity;
+import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 /**
@@ -23,6 +26,7 @@ public class HeadInfo implements MultiItemEntity {
     private int isCollect;
 
     private TTNativeExpressAd ttNativeExpressAd;
+
     public HeadInfo(){}
     public HeadInfo(int type) {
         this.itemType = type;

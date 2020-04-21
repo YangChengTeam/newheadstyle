@@ -42,7 +42,7 @@ public class HomeDataModelImp extends BaseModel implements HomeDataModel<HomeDat
         try {
             params.put("user_id", uid);
             params.put("page", page);
-            params.put("pageSize", pageSize);
+            params.put("pagesize", pageSize);
             params.put("change", change);
             params.put("is_detail", isDetail + "");
         } catch (JSONException e) {

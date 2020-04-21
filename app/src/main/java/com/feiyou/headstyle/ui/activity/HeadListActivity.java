@@ -48,9 +48,6 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.OnClick;
 
-/**
- * Created by myflying on 2018/11/23.
- */
 public class HeadListActivity extends BaseFragmentActivity implements HeadListDataView, SwipeRefreshLayout.OnRefreshListener {
 
     @BindView(R.id.topbar)
@@ -73,13 +70,11 @@ public class HeadListActivity extends BaseFragmentActivity implements HeadListDa
 
     ImageView mBackImageView;
 
-    //HeadInfoAdapter headInfoAdapter;
-
     private HeadListDataPresenterImp headListDataPresenterImp;
 
     private int currentPage = 1;
 
-    private int pageSize = 30;
+    private int pageSize = 21;
 
     private String tagId;
 
@@ -88,8 +83,6 @@ public class HeadListActivity extends BaseFragmentActivity implements HeadListDa
     HeadMultipleAdapter headMultipleAdapter;
 
     private TTAdNative mTTAdNative;
-
-    private int LIST_LINE = 10;//广告加载一页，为10行（暂定）
 
     private GridLayoutManager gridLayoutManager;
 
@@ -159,12 +152,11 @@ public class HeadListActivity extends BaseFragmentActivity implements HeadListDa
 
         headMultipleAdapter = new HeadMultipleAdapter(null);
         //headInfoAdapter = new HeadInfoAdapter(this, null);
-
         gridLayoutManager = new GridLayoutManager(this, 3);
         gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
             @Override
             public int getSpanSize(int position) {
-                if (position == 9 || (position > 10 && (position - 9) % 10 == 0)) {
+                if (position == pageSize || (position > (pageSize + 1) && (position - pageSize) % (pageSize + 1) == 0)) {
                     Logger.i("ad pos--->" + position);
                     return 3;
                 }
@@ -175,7 +167,7 @@ public class HeadListActivity extends BaseFragmentActivity implements HeadListDa
         mHeadInfoListView.setLayoutManager(gridLayoutManager);
         mHeadInfoListView.setAdapter(headMultipleAdapter);
 
-        /*View topEmptyView = new View(this);
+       /* View topEmptyView = new View(this);
         topEmptyView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, SizeUtils.dp2px(12)));
         headMultipleAdapter.setHeaderView(topEmptyView);*/
 
@@ -213,10 +205,8 @@ public class HeadListActivity extends BaseFragmentActivity implements HeadListDa
         popBackStack();
     }
 
-
     @Override
     public void showProgress() {
-
     }
 
     @Override
@@ -231,7 +221,7 @@ public class HeadListActivity extends BaseFragmentActivity implements HeadListDa
         mRefreshLayout.setRefreshing(false);
         if (tData != null && tData.getCode() == Constants.SUCCESS) {
             if (tData instanceof HeadInfoRet) {
-
+                Logger.i("head list page size --->" + ((HeadInfoRet) tData).getData().size());
                 if (((HeadInfoRet) tData).getData() != null && ((HeadInfoRet) tData).getData().size() > 0) {
                     mHeadInfoListView.setVisibility(View.VISIBLE);
                     mNoDataLayout.setVisibility(View.GONE);
@@ -241,32 +231,25 @@ public class HeadListActivity extends BaseFragmentActivity implements HeadListDa
                         for (HeadInfo headInfo : tempList) {
                             headInfo.setItemType(HeadInfo.HEAD_IMG);
                         }
-
-                        for (int i = 0; i < 3; i++) {
-                            int tempIndex = (currentPage - 1) * pageSize + (i + 1) * 9 + i;
-                            HeadInfo tempHeadInfo = new HeadInfo(HeadInfo.HEAD_AD);
-                            tempList.add(tempIndex, tempHeadInfo);
-                        }
-
+                        //在集合后添加广告位的对象
+                        HeadInfo tempHeadInfo = new HeadInfo(HeadInfo.HEAD_AD);
+                        tempList.add(tempHeadInfo);
                         headMultipleAdapter.setNewData(tempList);
                     } else {
                         List<HeadInfo> tempList = ((HeadInfoRet) tData).getData();
                         for (HeadInfo headInfo : tempList) {
                             headInfo.setItemType(HeadInfo.HEAD_IMG);
                         }
-
                         headMultipleAdapter.addData((tempList));
 
-                        for (int i = 0; i < 3; i++) {
-                            int tempIndex = (currentPage - 1) * pageSize + (i + 1) * 9 + i;
-                            HeadInfo tempHeadInfo = new HeadInfo(HeadInfo.HEAD_AD);
-                            headMultipleAdapter.getData().add(tempIndex, tempHeadInfo);
-                        }
+                        HeadInfo tempHeadInfo = new HeadInfo(HeadInfo.HEAD_AD);
+                        headMultipleAdapter.getData().add(tempHeadInfo);
+
+                        headMultipleAdapter.notifyItemChanged(headMultipleAdapter.getData().size() - 1);
                     }
-                    Logger.i("current page--->" + currentPage);
 
                     if (currentPage == 1) {
-                        if (((HeadInfoRet) tData).getData().size() == pageSize + 3) {
+                        if (((HeadInfoRet) tData).getData().size() == pageSize + 1) {
                             headMultipleAdapter.loadMoreComplete();
                         } else {
                             headMultipleAdapter.loadMoreEnd(true);
@@ -282,7 +265,7 @@ public class HeadListActivity extends BaseFragmentActivity implements HeadListDa
                     gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
                         @Override
                         public int getSpanSize(int position) {
-                            if (position == 9 || (position > 10 && (position - 9) % 10 == 0)) {
+                            if (position == pageSize || (position > (pageSize + 1) && (position - pageSize) % (pageSize + 1) == 0)) {
                                 Logger.i("ad pos--->" + position);
                                 return 3;
                             }
@@ -290,7 +273,7 @@ public class HeadListActivity extends BaseFragmentActivity implements HeadListDa
                         }
                     });
 
-                    //TODO
+                    //TODO,此处加载一条广告
                     loadListAd();
                 } else {
                     mHeadInfoListView.setVisibility(View.GONE);
@@ -332,8 +315,8 @@ public class HeadListActivity extends BaseFragmentActivity implements HeadListDa
      * 加载feed广告
      */
     private void loadListAd() {
-        Logger.i("dpi--->" + ScreenUtils.getScreenDensityDpi() + "demnsi" + ScreenUtils.getScreenDensity());
-        float expressViewWidth = ScreenUtils.getScreenDensityDpi();
+        Logger.i("dpi--->" + ScreenUtils.getScreenDensityDpi() + "density--->" + ScreenUtils.getScreenDensity());
+        float expressViewWidth = ScreenUtils.getScreenDensityDpi() <= 320 ? 340 : ScreenUtils.getScreenDensityDpi();
         float expressViewHeight = 0;
 
         //step4:创建feed广告请求类型参数AdSlot,具体参数含义参考文档
@@ -341,21 +324,19 @@ public class HeadListActivity extends BaseFragmentActivity implements HeadListDa
                 .setCodeId("945142340")
                 .setSupportDeepLink(true)
                 .setExpressViewAcceptedSize(expressViewWidth, expressViewHeight) //期望模板广告view的size,单位dp
-                .setAdCount(3) //请求广告数量为1到3条
+                .setAdCount(1) //请求广告数量为1到3条
                 .build();
         //step5:请求广告，调用feed广告异步请求接口，加载到广告后，拿到广告素材自定义渲染
         mTTAdNative.loadNativeExpressAd(adSlot, new TTAdNative.NativeExpressAdListener() {
             @Override
             public void onError(int code, String message) {
                 Logger.i("feed error--->" + code + "---message--->" + message);
-                //TToast.show(NativeExpressListActivity.this, message);
             }
 
             @Override
             public void onNativeExpressAdLoad(List<TTNativeExpressAd> ads) {
                 if (ads == null || ads.isEmpty()) {
                     Logger.i("on FeedAdLoaded: ad is null!");
-                    //TToast.show(NativeExpressListActivity.this, "on FeedAdLoaded: ad is null!");
                     return;
                 }
                 bindAdListener(ads);
@@ -364,16 +345,16 @@ public class HeadListActivity extends BaseFragmentActivity implements HeadListDa
     }
 
     private void bindAdListener(final List<TTNativeExpressAd> ads) {
-        Logger.i("feed ads --->" + ads.size());
-
         for (int i = 0; i < ads.size(); i++) {
             final TTNativeExpressAd adTmp = ads.get(i);
-            int tempIndex = (currentPage - 1) * pageSize + (i + 1) * 9 + i;
+            int tempIndex = currentPage * 21 + currentPage - 1;
+            if (tempIndex >= headMultipleAdapter.getData().size()) {
+                return;
+            }
+
             HeadInfo tempHeadInfo = headMultipleAdapter.getData().get(tempIndex);
             tempHeadInfo.setTtNativeExpressAd(adTmp);
             headMultipleAdapter.getData().set(tempIndex, tempHeadInfo);
-
-            //headMultipleAdapter.notifyDataSetChanged();
 
             adTmp.setExpressInteractionListener(new TTNativeExpressAd.ExpressAdInteractionListener() {
                 @Override
@@ -394,10 +375,6 @@ public class HeadListActivity extends BaseFragmentActivity implements HeadListDa
                 @Override
                 public void onRenderSuccess(View view, float width, float height) {
                     Logger.i("feed render success--->");
-                    //返回view的宽高 单位 dp
-                    //TToast.show(NativeExpressListActivity.this, "渲染成功");
-                    //headMultipleAdapter.notifyDataSetChanged();
-                    //刷新指定的item
                     headMultipleAdapter.notifyItemChanged(tempIndex);
                 }
             });
@@ -405,7 +382,6 @@ public class HeadListActivity extends BaseFragmentActivity implements HeadListDa
         }
 
         Logger.i("total size--->" + headMultipleAdapter.getData().size());
-
     }
 
 }

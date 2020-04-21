@@ -14,6 +14,6 @@ import rx.Observable;
 
 public interface HomeDataServiceApi {
 
-    @POST("v1.show/index")
+    @POST("v2.show/index")
     Observable<HomeDataRet> getData(@Body RequestBody requestBody);
 }

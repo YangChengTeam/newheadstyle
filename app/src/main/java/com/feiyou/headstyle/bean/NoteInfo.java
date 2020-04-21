@@ -1,11 +1,17 @@
 package com.feiyou.headstyle.bean;
 
+import com.bytedance.sdk.openadsdk.TTNativeExpressAd;
+import com.chad.library.adapter.base.entity.MultiItemEntity;
 import com.google.gson.annotations.SerializedName;
 
 /**
  * Created by myflying on 2018/11/27.
  */
-public class NoteInfo {
+public class NoteInfo implements MultiItemEntity {
+
+    public static final int NOTE_NORMAL = 1;
+
+    public static final int NOTE_AD = 2;
 
     @SerializedName("comment_time")
     private Long commentTime;
@@ -40,6 +46,16 @@ public class NoteInfo {
 
     @SerializedName("is_guan")
     private int isGuan;
+
+    private int itemType;
+
+    private TTNativeExpressAd ttNativeExpressAd;
+
+    public NoteInfo(){}
+    public NoteInfo(int type) {
+        this.itemType = type;
+    }
+
 
     public Long getAddTime() {
         return addTime;
@@ -143,5 +159,22 @@ public class NoteInfo {
 
     public void setCommentTime(Long commentTime) {
         this.commentTime = commentTime;
+    }
+
+    public TTNativeExpressAd getTtNativeExpressAd() {
+        return ttNativeExpressAd;
+    }
+
+    public void setTtNativeExpressAd(TTNativeExpressAd ttNativeExpressAd) {
+        this.ttNativeExpressAd = ttNativeExpressAd;
+    }
+
+    public void setItemType(int itemType) {
+        this.itemType = itemType;
+    }
+
+    @Override
+    public int getItemType() {
+        return itemType;
     }
 }

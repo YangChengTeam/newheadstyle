@@ -44,6 +44,7 @@ import com.bytedance.sdk.openadsdk.TTAdConstant;
 import com.bytedance.sdk.openadsdk.TTAdManager;
 import com.bytedance.sdk.openadsdk.TTAdNative;
 import com.bytedance.sdk.openadsdk.TTAppDownloadListener;
+import com.bytedance.sdk.openadsdk.TTNativeExpressAd;
 import com.bytedance.sdk.openadsdk.TTRewardVideoAd;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.feiyou.headstyle.App;
@@ -52,6 +53,8 @@ import com.feiyou.headstyle.base.IBaseView;
 import com.feiyou.headstyle.bean.AdInfo;
 import com.feiyou.headstyle.bean.BannerInfo;
 import com.feiyou.headstyle.bean.EveryDayHbRet;
+import com.feiyou.headstyle.bean.HeadInfo;
+import com.feiyou.headstyle.bean.HeadInfoRet;
 import com.feiyou.headstyle.bean.HomeDataRet;
 import com.feiyou.headstyle.bean.HomeDataWrapper;
 import com.feiyou.headstyle.bean.HongBaoInfoRet;
@@ -80,6 +83,7 @@ import com.feiyou.headstyle.ui.activity.HeadShowActivity;
 import com.feiyou.headstyle.ui.activity.MoreTypeActivity;
 import com.feiyou.headstyle.ui.activity.SearchActivity;
 import com.feiyou.headstyle.ui.adapter.HeadInfoAdapter;
+import com.feiyou.headstyle.ui.adapter.HeadMultipleAdapter;
 import com.feiyou.headstyle.ui.adapter.HeadTypeAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragment;
 import com.feiyou.headstyle.ui.custom.EveryDayHongBaoDialog;
@@ -175,7 +179,7 @@ public class HomeFragment extends BaseFragment implements IBaseView, View.OnClic
 
     HeadTypeAdapter headTypeAdapter;
 
-    HeadInfoAdapter headInfoAdapter;
+    //HeadInfoAdapter headInfoAdapter;
 
     private int searchLayoutTop;
 
@@ -187,7 +191,7 @@ public class HomeFragment extends BaseFragment implements IBaseView, View.OnClic
 
     private int currentPage = 1;
 
-    private int pageSize = 30;
+    private int pageSize = 21;
 
     private boolean isFirstLoad = true;
 
@@ -275,6 +279,12 @@ public class HomeFragment extends BaseFragment implements IBaseView, View.OnClic
     private int showHBType;
 
     private String newPersonId;
+
+    HeadMultipleAdapter headMultipleAdapter;
+
+    private int loadPage = 1;
+
+    private int firstIndex = 9;
 
     private Handler mHandler = new Handler() {
         @Override
@@ -555,6 +565,7 @@ public class HomeFragment extends BaseFragment implements IBaseView, View.OnClic
         headTypeAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
+
                 if (position == headTypeAdapter.getData().size() - 1) {
                     Intent intent = new Intent(getActivity(), MoreTypeActivity.class);
                     startActivity(intent);
@@ -568,10 +579,22 @@ public class HomeFragment extends BaseFragment implements IBaseView, View.OnClic
         });
 
         gridLayoutManager = new GridLayoutManager(getActivity(), 3);
-        headInfoAdapter = new HeadInfoAdapter(getActivity(), null);
+        /*gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+            @Override
+            public int getSpanSize(int position) {
+                if (position == 0 || position == 10 || position == 43) {
+                    Logger.i("ad pos--->" + position);
+                    return 3;
+                }
+                return 1;
+            }
+        });*/
+
+
+        headMultipleAdapter = new HeadMultipleAdapter(null);
         mHeadInfoListView.setLayoutManager(gridLayoutManager);
-        headInfoAdapter.addHeaderView(topView);
-        mHeadInfoListView.setAdapter(headInfoAdapter);
+        headMultipleAdapter.addHeaderView(topView);
+        mHeadInfoListView.setAdapter(headMultipleAdapter);
 
         FrameLayout.LayoutParams listParams = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
         listParams.setMargins(0, 0, 0, SizeUtils.dp2px(48));
@@ -585,23 +608,6 @@ public class HomeFragment extends BaseFragment implements IBaseView, View.OnClic
                 if (null != gridLayoutManager) {
                     //当前条目索引
                     int position = gridLayoutManager.findFirstVisibleItemPosition();
-
-//
-//                    int position = gridLayoutManager.findFirstVisibleItemPosition();
-//                    //根据当前条目索引做判断处理。例如：如果在索引是0，
-//                    //隐藏显示某个布局，索引大于0显示出来
-//                    if (position > 0) {
-//                        //做显示布局操作
-//                        //view.setVisibility(View.VISIBLE);
-//                        refreshLayout1.setVisibility(View.VISIBLE);
-//                        refreshLayout2.setVisibility(View.INVISIBLE);
-//                    } else {
-//                        //做隐藏布局操作
-//                        //view.setVisibility(View.GONE);
-//                        refreshLayout1.setVisibility(View.INVISIBLE);
-//                        refreshLayout2.setVisibility(View.VISIBLE);
-//                    }
-
 
                     //根据索引来获取对应的itemView
                     View firstVisiableChildView = gridLayoutManager.findViewByPosition(position);
@@ -636,9 +642,10 @@ public class HomeFragment extends BaseFragment implements IBaseView, View.OnClic
             }
         });
 
-        headInfoAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
+        headMultipleAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
+                Logger.i("current pos--->" + position);
 
                 int jumpPage = randomPage + position / pageSize;
                 int jumpPosition = position % pageSize;
@@ -653,17 +660,18 @@ public class HomeFragment extends BaseFragment implements IBaseView, View.OnClic
             }
         });
 
-        headInfoAdapter.setOnLoadMoreListener(new BaseQuickAdapter.RequestLoadMoreListener() {
+        headMultipleAdapter.setOnLoadMoreListener(new BaseQuickAdapter.RequestLoadMoreListener() {
             @Override
             public void onLoadMoreRequested() {
                 isFirstLoad = false;
                 isChange = "";
                 currentPage++;
-                homeDataPresenterImp.getData(mUserInfo != null ? mUserInfo.getId() : "", currentPage + "", "", "", 0);
+                loadPage++;
+                homeDataPresenterImp.getData(mUserInfo != null ? mUserInfo.getId() : "", currentPage + "", pageSize + "", "", 0);
             }
         }, mHeadInfoListView);
 
-        homeDataPresenterImp.getData(mUserInfo != null ? mUserInfo.getId() : "", "", "", "", 0);
+        homeDataPresenterImp.getData(mUserInfo != null ? mUserInfo.getId() : "", "", pageSize + "", "", 0);
 
         if (cardWindowFragment == null) {
             cardWindowFragment = new CardWindowFragment();
@@ -788,6 +796,7 @@ public class HomeFragment extends BaseFragment implements IBaseView, View.OnClic
         mRefreshLayout.setRefreshing(true);
         isFirstLoad = false;
         isChange = "1";
+        loadPage = 1;
         homeDataPresenterImp.getData(mUserInfo != null ? mUserInfo.getId() : "", "", "", isChange, 0);
         gridLayoutManager.scrollToPosition(0);
     }
@@ -904,22 +913,61 @@ public class HomeFragment extends BaseFragment implements IBaseView, View.OnClic
                         }
                     }
                     SPUtils.getInstance().put(Constants.TOTAL_COUNT, homeDataRet.getMyTotalNum());
-
+                    Logger.i("home head pagesize--->" + homeDataRet.getImagesList().size());
                     if (homeDataRet.getImagesList() != null && homeDataRet.getImagesList().size() > 0) {
                         if (isFirstLoad || isChange.equals("1")) {
-                            headInfoAdapter.setNewData(homeDataRet.getImagesList());
                             isFirstLoad = false;
                             //刷新或者加载完数据后，设置ischange =""
                             isChange = "";
+
+                            List<HeadInfo> tempList = homeDataRet.getImagesList();
+                            for (HeadInfo headInfo : tempList) {
+                                headInfo.setItemType(HeadInfo.HEAD_IMG);
+                            }
+                            //在集合后添加广告位的对象
+                            HeadInfo tempHeadInfo = new HeadInfo(HeadInfo.HEAD_AD);
+                            tempList.add(firstIndex, tempHeadInfo);
+                            headMultipleAdapter.setNewData(tempList);
                         } else {
-                            headInfoAdapter.addData(homeDataRet.getImagesList());
+
+                            List<HeadInfo> tempList = homeDataRet.getImagesList();
+                            for (HeadInfo headInfo : tempList) {
+                                headInfo.setItemType(HeadInfo.HEAD_IMG);
+                            }
+                            headMultipleAdapter.addData((tempList));
+
+                            HeadInfo tempHeadInfo = new HeadInfo(HeadInfo.HEAD_AD);
+                            int addIndex = firstIndex + (loadPage - 1) * pageSize + loadPage - 1;
+                            headMultipleAdapter.getData().add(addIndex, tempHeadInfo);
+                            Logger.i("current index1111--->" + addIndex + "---load page--->" + loadPage);
+                            headMultipleAdapter.notifyItemChanged(addIndex);
                         }
 
-                        if (homeDataRet.getImagesList().size() == pageSize) {
-                            headInfoAdapter.loadMoreComplete();
+                        if (loadPage == 1) {
+                            if (homeDataRet.getImagesList().size() == pageSize + 1) {
+                                headMultipleAdapter.loadMoreComplete();
+                            } else {
+                                headMultipleAdapter.loadMoreEnd(true);
+                            }
                         } else {
-                            headInfoAdapter.loadMoreEnd(true);
+                            if (homeDataRet.getImagesList().size() == pageSize) {
+                                headMultipleAdapter.loadMoreComplete();
+                            } else {
+                                headMultipleAdapter.loadMoreEnd(true);
+                            }
                         }
+
+                        gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+                            @Override
+                            public int getSpanSize(int position) {
+                                if (position == 0 || position == 10 || position == 22) {
+                                    return 3;
+                                }
+                                return 1;
+                            }
+                        });
+
+                        loadListAd();
                     }
                 } else {
                     mNoDataLayout.setVisibility(View.VISIBLE);
@@ -1399,6 +1447,83 @@ public class HomeFragment extends BaseFragment implements IBaseView, View.OnClic
         SPUtils.getInstance().put(Constants.SHOW_PRIVARY, false);
         getActivity().finish();
     }
+
+    /**
+     * 加载feed广告
+     */
+    private void loadListAd() {
+        Logger.i("dpi--->" + ScreenUtils.getScreenDensityDpi() + "density--->" + ScreenUtils.getScreenDensity());
+        float expressViewWidth = ScreenUtils.getScreenDensityDpi() <= 320 ? 340 : ScreenUtils.getScreenDensityDpi();
+        float expressViewHeight = 0;
+
+        //step4:创建feed广告请求类型参数AdSlot,具体参数含义参考文档
+        AdSlot adSlot = new AdSlot.Builder()
+                .setCodeId("945142340")
+                .setSupportDeepLink(true)
+                .setExpressViewAcceptedSize(expressViewWidth, expressViewHeight) //期望模板广告view的size,单位dp
+                .setAdCount(1) //请求广告数量为1到3条
+                .build();
+        //step5:请求广告，调用feed广告异步请求接口，加载到广告后，拿到广告素材自定义渲染
+        mTTAdNative.loadNativeExpressAd(adSlot, new TTAdNative.NativeExpressAdListener() {
+            @Override
+            public void onError(int code, String message) {
+                Logger.i("feed error--->" + code + "---message--->" + message);
+            }
+
+            @Override
+            public void onNativeExpressAdLoad(List<TTNativeExpressAd> ads) {
+                if (ads == null || ads.isEmpty()) {
+                    Logger.i("on FeedAdLoaded: ad is null!");
+                    return;
+                }
+                bindAdListener(ads);
+            }
+        });
+    }
+
+    private void bindAdListener(final List<TTNativeExpressAd> ads) {
+        for (int i = 0; i < ads.size(); i++) {
+            final TTNativeExpressAd adTmp = ads.get(i);
+            int tempIndex = loadPage == 1 ? firstIndex : firstIndex + loadPage * 10 + loadPage;
+
+            Logger.i("current index2222--->" + tempIndex + "---load page --->" + loadPage);
+
+            if (tempIndex >= headMultipleAdapter.getData().size()) {
+                return;
+            }
+
+            HeadInfo tempHeadInfo = headMultipleAdapter.getData().get(tempIndex);
+            tempHeadInfo.setTtNativeExpressAd(adTmp);
+            headMultipleAdapter.getData().set(tempIndex, tempHeadInfo);
+
+            adTmp.setExpressInteractionListener(new TTNativeExpressAd.ExpressAdInteractionListener() {
+                @Override
+                public void onAdClicked(View view, int type) {
+                    //TToast.show(NativeExpressListActivity.this, "广告被点击");
+                }
+
+                @Override
+                public void onAdShow(View view, int type) {
+                    //TToast.show(NativeExpressListActivity.this, "广告展示");
+                }
+
+                @Override
+                public void onRenderFail(View view, String msg, int code) {
+                    //TToast.show(NativeExpressListActivity.this, msg + " code:" + code);
+                }
+
+                @Override
+                public void onRenderSuccess(View view, float width, float height) {
+                    Logger.i("feed render success--->");
+                    headMultipleAdapter.notifyItemChanged(tempIndex);
+                }
+            });
+            adTmp.render();
+        }
+
+        Logger.i("total size--->" + headMultipleAdapter.getData().size());
+    }
+
 
     @Override
     public void onDestroy() {

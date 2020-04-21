@@ -34,7 +34,7 @@
                 android:id="@+id/head_info_list"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_gravity="top|center"></androidx.recyclerview.widget.RecyclerView>
+                android:layout_gravity="top|center" />
         </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
         <com.wang.avi.AVLoadingIndicatorView
