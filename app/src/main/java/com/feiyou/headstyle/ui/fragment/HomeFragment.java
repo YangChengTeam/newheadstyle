@@ -937,10 +937,13 @@ public class HomeFragment extends BaseFragment implements IBaseView, View.OnClic
                             headMultipleAdapter.addData((tempList));
 
                             HeadInfo tempHeadInfo = new HeadInfo(HeadInfo.HEAD_AD);
-                            int addIndex = firstIndex + (loadPage - 1) * pageSize + loadPage - 1;
-                            headMultipleAdapter.getData().add(addIndex, tempHeadInfo);
-                            Logger.i("current index1111--->" + addIndex + "---load page--->" + loadPage);
-                            headMultipleAdapter.notifyItemChanged(addIndex);
+                            headMultipleAdapter.getData().add(tempHeadInfo);
+                            headMultipleAdapter.notifyItemChanged(headMultipleAdapter.getData().size() - 1);
+                            Logger.i("current index1111--->" + (headMultipleAdapter.getData().size() - 1) + "---load page--->" + loadPage);
+                            for (int i = 0; i < headMultipleAdapter.getData().size(); i++) {
+                                Logger.i("item--->" + i + "---->" + headMultipleAdapter.getData().get(i).getItemType());
+                            }
+
                         }
 
                         if (loadPage == 1) {
@@ -960,7 +963,8 @@ public class HomeFragment extends BaseFragment implements IBaseView, View.OnClic
                         gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
                             @Override
                             public int getSpanSize(int position) {
-                                if (position == 0 || position == 10 || position == 22) {
+                                if (position == 0 || position == 10 || (position > (loadPage * pageSize) && (position % (loadPage * pageSize + loadPage -1) == 0))) {
+                                    Logger.i("pppp--->" + position);
                                     return 3;
                                 }
                                 return 1;
@@ -1484,7 +1488,7 @@ public class HomeFragment extends BaseFragment implements IBaseView, View.OnClic
     private void bindAdListener(final List<TTNativeExpressAd> ads) {
         for (int i = 0; i < ads.size(); i++) {
             final TTNativeExpressAd adTmp = ads.get(i);
-            int tempIndex = loadPage == 1 ? firstIndex : firstIndex + loadPage * 10 + loadPage;
+            int tempIndex = loadPage == 1 ? firstIndex : firstIndex + (loadPage - 1) * pageSize + (loadPage - 1);
 
             Logger.i("current index2222--->" + tempIndex + "---load page --->" + loadPage);
 
