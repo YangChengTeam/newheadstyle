@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -53,6 +54,10 @@ public class HeadMultipleAdapter extends BaseMultiItemQuickAdapter<HeadInfo, Bas
         if (helper.getItemViewType() == HeadInfo.HEAD_AD) {
 
             FrameLayout tempView = helper.getView(R.id.iv_listitem_express);
+            /*RelativeLayout.LayoutParams itemParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ScreenUtils.getScreenWidth() / 3);
+            itemParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
+            tempView.setLayoutParams(itemParams);*/
+
             if (item.getTtNativeExpressAd() != null) {
                 bindData(tempView, helper, item.getTtNativeExpressAd());
                 //tempView.removeAllViews();
@@ -60,6 +65,9 @@ public class HeadMultipleAdapter extends BaseMultiItemQuickAdapter<HeadInfo, Bas
                 if (adView.getParent() != null) {
                     ((ViewGroup) adView.getParent()).removeView(adView);
                 }
+                FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ScreenUtils.getScreenWidth() / 3);
+                params.setMargins(0, 0, 0, 0);
+                adView.setLayoutParams(params);
                 tempView.addView(adView);
             }
 
@@ -72,7 +80,7 @@ public class HeadMultipleAdapter extends BaseMultiItemQuickAdapter<HeadInfo, Bas
             options.placeholder(R.mipmap.image_def).error(R.mipmap.image_def);
             options.override(tempWidth - 8, tempWidth - 8);
             //options.transform(new GlideRoundTransform(mContext, 5));
-            options.transform(new RoundedCornersTransformation(SizeUtils.dp2px(5),0));
+            options.transform(new RoundedCornersTransformation(SizeUtils.dp2px(5), 0));
             Glide.with(mContext).load(item.getImgurl()).apply(options).into((ImageView) helper.getView(R.id.iv_head_info));
         }
     }

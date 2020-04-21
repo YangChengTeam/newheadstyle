@@ -164,7 +164,8 @@ public class HeadListActivity extends BaseFragmentActivity implements HeadListDa
         gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
             @Override
             public int getSpanSize(int position) {
-                if (position > 0 && position % 9 == 0) {
+                if (position == 9 || (position > 10 && (position - 9) % 10 == 0)) {
+                    Logger.i("ad pos--->" + position);
                     return 3;
                 }
                 return 1;
@@ -253,14 +254,42 @@ public class HeadListActivity extends BaseFragmentActivity implements HeadListDa
                         for (HeadInfo headInfo : tempList) {
                             headInfo.setItemType(HeadInfo.HEAD_IMG);
                         }
+
                         headMultipleAdapter.addData((tempList));
+
+                        for (int i = 0; i < 3; i++) {
+                            int tempIndex = (currentPage - 1) * pageSize + (i + 1) * 9 + i;
+                            HeadInfo tempHeadInfo = new HeadInfo(HeadInfo.HEAD_AD);
+                            headMultipleAdapter.getData().add(tempIndex, tempHeadInfo);
+                        }
+                    }
+                    Logger.i("current page--->" + currentPage);
+
+                    if (currentPage == 1) {
+                        if (((HeadInfoRet) tData).getData().size() == pageSize + 3) {
+                            headMultipleAdapter.loadMoreComplete();
+                        } else {
+                            headMultipleAdapter.loadMoreEnd(true);
+                        }
+                    } else {
+                        if (((HeadInfoRet) tData).getData().size() == pageSize) {
+                            headMultipleAdapter.loadMoreComplete();
+                        } else {
+                            headMultipleAdapter.loadMoreEnd(true);
+                        }
                     }
 
-                    if (((HeadInfoRet) tData).getData().size() == pageSize) {
-                        headMultipleAdapter.loadMoreComplete();
-                    } else {
-                        headMultipleAdapter.loadMoreEnd(true);
-                    }
+                    gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+                        @Override
+                        public int getSpanSize(int position) {
+                            if (position == 9 || (position > 10 && (position - 9) % 10 == 0)) {
+                                Logger.i("ad pos--->" + position);
+                                return 3;
+                            }
+                            return 1;
+                        }
+                    });
+
                     //TODO
                     loadListAd();
                 } else {
@@ -303,6 +332,7 @@ public class HeadListActivity extends BaseFragmentActivity implements HeadListDa
      * 加载feed广告
      */
     private void loadListAd() {
+        Logger.i("dpi--->" + ScreenUtils.getScreenDensityDpi() + "demnsi" + ScreenUtils.getScreenDensity());
         float expressViewWidth = ScreenUtils.getScreenDensityDpi();
         float expressViewHeight = 0;
 
@@ -372,17 +402,6 @@ public class HeadListActivity extends BaseFragmentActivity implements HeadListDa
                 }
             });
             adTmp.render();
-
-            gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
-                @Override
-                public int getSpanSize(int position) {
-                    if (position == 9 || (position > 10 && (position - 9) % 10 == 0)) {
-                        Logger.i("ad pos--->" + position);
-                        return 3;
-                    }
-                    return 1;
-                }
-            });
         }
 
         Logger.i("total size--->" + headMultipleAdapter.getData().size());
