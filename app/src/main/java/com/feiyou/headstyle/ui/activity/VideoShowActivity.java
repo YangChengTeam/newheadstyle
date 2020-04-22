@@ -827,8 +827,8 @@ public class VideoShowActivity extends BaseFragmentActivity implements VideoInfo
     @Override
     public void onPause() {
         super.onPause();
-        Jzvd.releaseAllVideos();
-        JzvdStd.releaseAllVideos();
+        Jzvd.resetAllVideos();
+        JzvdStd.resetAllVideos();
     }
 
     @Override
@@ -885,7 +885,7 @@ public class VideoShowActivity extends BaseFragmentActivity implements VideoInfo
     protected void onDestroy() {
         super.onDestroy();
         EventBus.getDefault().unregister(this);
-        JzvdStd.releaseAllVideos();
+        JzvdStd.resetAllVideos();
     }
 
 

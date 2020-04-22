@@ -36,10 +36,11 @@ public class NoteDataModelImp extends BaseModel implements NoteDataModel<NoteInf
         mCompositeSubscription = new CompositeSubscription();
     }
     @Override
-    public void getNoteData(int page, int type, String userid, final IBaseRequestCallBack<NoteInfoRet> iBaseRequestCallBack) {
+    public void getNoteData(int page,int pageSize, int type, String userid, final IBaseRequestCallBack<NoteInfoRet> iBaseRequestCallBack) {
         JSONObject params = new JSONObject();
         try {
             params.put("page", page + "");
+            params.put("pagesize", pageSize + "");
             params.put("type", type + "");
             params.put("user_id", userid);
         } catch (JSONException e) {

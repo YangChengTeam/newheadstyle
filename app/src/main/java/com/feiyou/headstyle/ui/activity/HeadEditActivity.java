@@ -1,5 +1,6 @@
 package com.feiyou.headstyle.ui.activity;
 
+import android.Manifest;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -9,6 +10,8 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
+
+import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -68,13 +71,21 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.OnClick;
+import es.dmoral.toasty.Toasty;
 import jp.co.cyberagent.android.gpuimage.GPUImage;
 import jp.co.cyberagent.android.gpuimage.GPUImageFilter;
 import jp.co.cyberagent.android.gpuimage.GPUImageView;
+import permissions.dispatcher.NeedsPermission;
+import permissions.dispatcher.OnNeverAskAgain;
+import permissions.dispatcher.OnPermissionDenied;
+import permissions.dispatcher.OnShowRationale;
+import permissions.dispatcher.PermissionRequest;
+import permissions.dispatcher.RuntimePermissions;
 
 /**
  * Created by myflying on 2019/2/19.
  */
+@RuntimePermissions
 public class HeadEditActivity extends BaseFragmentActivity implements StickerDataView {
 
     @BindView(R.id.topbar)
@@ -162,6 +173,33 @@ public class HeadEditActivity extends BaseFragmentActivity implements StickerDat
     private int tempHeight;
 
     @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        HeadEditActivityPermissionsDispatcher.onRequestPermissionsResult(this, requestCode, grantResults);
+    }
+
+    @NeedsPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+    void showReadStorage() {
+        savePicture();
+    }
+
+    @OnPermissionDenied(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+    void onReadStorageDenied() {
+        Toasty.normal(this, "请授权存储权限后保存图片").show();
+    }
+
+    @OnShowRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+    void showRationaleForReadStorage(PermissionRequest request) {
+        request.proceed();
+    }
+
+    @OnNeverAskAgain(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+    void onReadStorageNeverAskAgain() {
+        Toasty.normal(this, "请手动开启存储权限后保存图片").show();
+    }
+
+
+    @Override
     protected int getContextViewId() {
         return R.layout.activity_image_edit;
     }
@@ -195,7 +233,7 @@ public class HeadEditActivity extends BaseFragmentActivity implements StickerDat
         mConfigTv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                savePicture();
+                HeadEditActivityPermissionsDispatcher.showReadStorageWithPermissionCheck(HeadEditActivity.this);
             }
         });
     }

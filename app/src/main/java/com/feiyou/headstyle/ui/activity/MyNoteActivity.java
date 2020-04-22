@@ -203,7 +203,7 @@ public class MyNoteActivity extends BaseFragmentActivity implements NoteDataView
             @Override
             public void onLoadMoreRequested() {
                 currentPage++;
-                noteDataPresenterImp.getMyNoteList(currentPage, userInfo != null ? userInfo.getId() : "");
+                noteDataPresenterImp.getMyNoteList(currentPage,pageSize, userInfo != null ? userInfo.getId() : "");
             }
         }, mNoteListView);
 
@@ -254,7 +254,7 @@ public class MyNoteActivity extends BaseFragmentActivity implements NoteDataView
     @Override
     public void onResume() {
         super.onResume();
-        noteDataPresenterImp.getMyNoteList(currentPage, userInfo != null ? userInfo.getId() : "");
+        noteDataPresenterImp.getMyNoteList(currentPage,pageSize, userInfo != null ? userInfo.getId() : "");
     }
 
     @OnClick(R.id.tv_send_note)
@@ -330,7 +330,7 @@ public class MyNoteActivity extends BaseFragmentActivity implements NoteDataView
                 ToastUtils.showLong("删除成功");
                 currentPage = 1;
                 isMakeDelete = false;
-                noteDataPresenterImp.getMyNoteList(currentPage, userInfo != null ? userInfo.getId() : "");
+                noteDataPresenterImp.getMyNoteList(currentPage,pageSize, userInfo != null ? userInfo.getId() : "");
             }
 
         } else {
@@ -356,7 +356,7 @@ public class MyNoteActivity extends BaseFragmentActivity implements NoteDataView
     public void onRefresh() {
         mRefreshLayout.setRefreshing(true);
         currentPage = 1;
-        noteDataPresenterImp.getMyNoteList(currentPage, userInfo != null ? userInfo.getId() : "");
+        noteDataPresenterImp.getMyNoteList(currentPage,pageSize, userInfo != null ? userInfo.getId() : "");
     }
 
     @Override

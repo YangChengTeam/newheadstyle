@@ -200,7 +200,7 @@ public class FollowFragment extends BaseFragment implements NoteDataView, SwipeR
             @Override
             public void onLoadMoreRequested() {
                 currentPage++;
-                noteDataPresenterImp.getNoteData(currentPage, 1, userInfo != null ? userInfo.getId() : "");
+                noteDataPresenterImp.getNoteData(currentPage,pageSize, 1, userInfo != null ? userInfo.getId() : "");
             }
         }, mRecommendListView);
 
@@ -235,7 +235,7 @@ public class FollowFragment extends BaseFragment implements NoteDataView, SwipeR
         }
 
         userInfo = App.getApp().getmUserInfo();
-        noteDataPresenterImp.getNoteData(currentPage, 1, userInfo != null ? userInfo.getId() : "");
+        noteDataPresenterImp.getNoteData(currentPage,pageSize, 1, userInfo != null ? userInfo.getId() : "");
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -394,6 +394,6 @@ public class FollowFragment extends BaseFragment implements NoteDataView, SwipeR
     public void onRefresh() {
         mRefreshLayout.setRefreshing(true);
         currentPage = 1;
-        noteDataPresenterImp.getNoteData(currentPage, 1, userInfo != null ? userInfo.getId() : "");
+        noteDataPresenterImp.getNoteData(currentPage,pageSize, 1, userInfo != null ? userInfo.getId() : "");
     }
 }

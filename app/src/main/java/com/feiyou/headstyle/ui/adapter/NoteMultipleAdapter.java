@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -70,8 +71,8 @@ public class NoteMultipleAdapter extends BaseMultiItemQuickAdapter<NoteInfo, Bas
 
         if (helper.getItemViewType() == NoteInfo.NOTE_AD) {
 
-            RelativeLayout adItemLayout = helper.getView(R.id.layout_ad_item);
-            RelativeLayout.LayoutParams itemParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            LinearLayout adItemLayout = helper.getView(R.id.layout_ad_item);
+            LinearLayout.LayoutParams itemParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             adItemLayout.setLayoutParams(itemParams);
 
             FrameLayout tempView = helper.getView(R.id.iv_listitem_express);

@@ -7,5 +7,5 @@ import com.feiyou.headstyle.base.IBaseRequestCallBack;
  */
 
 public interface NoteTypeModel<T> {
-    void getNoteTypeData(String topicId, int page, int type, String userId, IBaseRequestCallBack<T> iBaseRequestCallBack);
+    void getNoteTypeData(String topicId, int page, int pageSize,int type, String userId, IBaseRequestCallBack<T> iBaseRequestCallBack);
 }

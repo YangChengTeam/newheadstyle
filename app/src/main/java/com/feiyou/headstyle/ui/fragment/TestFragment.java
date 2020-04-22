@@ -1,9 +1,11 @@
 package com.feiyou.headstyle.ui.fragment;
 
 import android.content.Intent;
+
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -179,6 +181,10 @@ public class TestFragment extends BaseFragment implements TestInfoView, View.OnC
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
 
+                if (!com.feiyou.headstyle.utils.AppUtils.isNotFastClick()) {
+                    return;
+                }
+
                 if (!App.getApp().isLogin) {
                     if (loginDialog != null && !loginDialog.isShowing()) {
                         loginDialog.show();
@@ -259,6 +265,10 @@ public class TestFragment extends BaseFragment implements TestInfoView, View.OnC
 
     @Override
     public void onClick(View view) {
+        if (!com.feiyou.headstyle.utils.AppUtils.isNotFastClick()) {
+            return;
+        }
+
         switch (view.getId()) {
             case R.id.layout_funs:
                 testCategory("1", "趣味测试");

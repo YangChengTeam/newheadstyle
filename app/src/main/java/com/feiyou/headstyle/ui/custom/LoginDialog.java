@@ -151,6 +151,7 @@ public class LoginDialog extends Dialog implements View.OnClickListener, UserInf
                 ToastUtils.showLong("登录成功");
                 App.getApp().setmUserInfo(userInfo);
                 App.getApp().setLogin(true);
+                SPUtils.getInstance().remove(Constants.NO_LOGIN_MONEY);
                 SPUtils.getInstance().put(Constants.USER_INFO, JSONObject.toJSONString(((UserInfoRet) tData).getData()));
                 EventBus.getDefault().post(new MessageEvent("login_success"));
             }

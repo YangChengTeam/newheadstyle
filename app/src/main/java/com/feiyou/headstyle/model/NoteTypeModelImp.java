@@ -36,12 +36,13 @@ public class NoteTypeModelImp extends BaseModel implements NoteTypeModel<NoteTyp
     }
 
     @Override
-    public void getNoteTypeData(String topicId, int page, int type, String userId, final IBaseRequestCallBack<NoteTypeRet> iBaseRequestCallBack) {
+    public void getNoteTypeData(String topicId, int page, int pageSize, int type, String userId, final IBaseRequestCallBack<NoteTypeRet> iBaseRequestCallBack) {
 
         JSONObject params = new JSONObject();
         try {
             params.put("topic_id", topicId);
             params.put("page", page + "");
+            params.put("pagesize", pageSize + "");
             params.put("type", type + "");
             params.put("user_id", userId);
         } catch (JSONException e) {

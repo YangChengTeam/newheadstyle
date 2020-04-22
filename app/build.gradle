@@ -124,7 +124,7 @@ dependencies {
     implementation 'com.github.GrenderG:Toasty:1.4.1'
     implementation 'com.liulishuo.filedownloader:library:1.7.6'
     implementation 'me.yuqirong:cardswipelayout:1.0.0'
-    implementation 'cn.jzvd:jiaozivideoplayer:7.2.4'
+    implementation 'cn.jzvd:jiaozivideoplayer:7.0_preview'
 
     implementation 'com.jakewharton.rxbinding:rxbinding:+'
     implementation 'com.jakewharton.rxbinding:rxbinding-appcompat-v7:+'

@@ -150,7 +150,7 @@ public class HeadListActivity extends BaseFragmentActivity implements HeadListDa
 
         headListDataPresenterImp = new HeadListDataPresenterImp(this, this);
 
-        headMultipleAdapter = new HeadMultipleAdapter(null);
+        headMultipleAdapter = new HeadMultipleAdapter(null, 2);
         //headInfoAdapter = new HeadInfoAdapter(this, null);
         gridLayoutManager = new GridLayoutManager(this, 3);
         gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
@@ -316,7 +316,7 @@ public class HeadListActivity extends BaseFragmentActivity implements HeadListDa
      */
     private void loadListAd() {
         Logger.i("dpi--->" + ScreenUtils.getScreenDensityDpi() + "density--->" + ScreenUtils.getScreenDensity());
-        float expressViewWidth = ScreenUtils.getScreenDensityDpi() <= 320 ? 340 : ScreenUtils.getScreenDensityDpi();
+        float expressViewWidth = (ScreenUtils.getScreenWidth() / ScreenUtils.getScreenDensity()) - 12;
         float expressViewHeight = 0;
 
         //step4:创建feed广告请求类型参数AdSlot,具体参数含义参考文档

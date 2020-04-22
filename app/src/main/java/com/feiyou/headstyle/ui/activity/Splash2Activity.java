@@ -385,6 +385,13 @@ public class Splash2Activity extends Activity implements SplashADListener, Versi
                     loadAdInfo();
                 }
             }
+        } else {
+            if (RomUtils.isHuawei()) {
+                goToMainActivity();
+            } else {
+                startType = 1;
+                loadAdInfo();
+            }
         }
     }
 

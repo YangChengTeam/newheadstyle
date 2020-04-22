@@ -24,7 +24,7 @@
             android:layout_marginLeft="12dp"
             android:src="@mipmap/common_back_icon" />
 
-        <androidx.core.app.FragmentTabHost
+        <androidx.fragment.app.FragmentTabHost
             android:id="@android:id/tabhost"
             android:layout_width="136dp"
             android:layout_height="wrap_content"
@@ -37,7 +37,7 @@
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:layout_weight="0"></FrameLayout>
-        </androidx.core.app.FragmentTabHost>
+        </androidx.fragment.app.FragmentTabHost>
     </RelativeLayout>
 
     <View

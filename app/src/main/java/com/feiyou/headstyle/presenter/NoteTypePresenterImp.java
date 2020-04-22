@@ -28,7 +28,7 @@ public class NoteTypePresenterImp extends BasePresenterImp<NoteTypeView, NoteTyp
     }
 
     @Override
-    public void getNoteTypeData(String topicId, int page, int type, String userId) {
-        noteTypeModelImp.getNoteTypeData(topicId, page, type, userId, this);
+    public void getNoteTypeData(String topicId, int page, int pageSize, int type, String userId) {
+        noteTypeModelImp.getNoteTypeData(topicId, page, pageSize,type, userId, this);
     }
 }

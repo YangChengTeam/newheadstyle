@@ -3,6 +3,7 @@ package com.feiyou.headstyle.ui.custom;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
@@ -14,6 +15,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.feiyou.headstyle.R;
+import com.feiyou.headstyle.ui.activity.CashActivity;
+import com.feiyou.headstyle.utils.RxCountDown;
+import com.orhanobut.logger.Logger;
+
+import rx.Subscriber;
+import rx.functions.Action0;
 
 
 public class HongBaoDialog extends Dialog implements View.OnClickListener {
@@ -44,6 +51,10 @@ public class HongBaoDialog extends Dialog implements View.OnClickListener {
         void openHB();
 
         void directClose();//直接关闭
+
+        void showClose();
+
+        void toCash();
     }
 
     public HongBaoListener hongBaoListener;
@@ -107,7 +118,7 @@ public class HongBaoDialog extends Dialog implements View.OnClickListener {
         dialogWindow.setAttributes(lp);
     }
 
-    public void setHBConfigInfo(int hbType,boolean clickAnyWhere) {
+    public void setHBConfigInfo(int hbType, boolean clickAnyWhere) {
         mHBTitleTv.setText(hbType == 1 ? "恭喜收到新人红包" : "恭喜收到登录红包");
         mMaxValueTv.setText(hbType == 1 ? "18.8" : "8.8");
 
@@ -115,15 +126,76 @@ public class HongBaoDialog extends Dialog implements View.OnClickListener {
         if (!isClickAnyWhere) {
             mHBBeforeLayout.setClickable(false);
         }
+
+        RxCountDown.countdown(3)
+                .doOnSubscribe(new Action0() {
+                    @Override
+                    public void call() {
+                        //appendLog("开始计时");
+                        //ToastUtils.showLong("开始倒计时");
+                        mCloseHbIv.setClickable(false);
+                        mCloseHbIv.setVisibility(View.GONE);
+                    }
+                })
+                .subscribe(new Subscriber<Integer>() {
+                    @Override
+                    public void onCompleted() {
+                        //appendLog("计时完成");
+                        mCloseHbIv.setClickable(true);
+                        mCloseHbIv.setVisibility(View.VISIBLE);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        mCloseHbIv.setClickable(true);
+                        mCloseHbIv.setVisibility(View.VISIBLE);
+                    }
+
+                    @Override
+                    public void onNext(Integer integer) {
+                        Logger.i("current time--->" + integer);
+                    }
+                });
+
     }
 
     public void updateHBState(int state, double doubleMoney) {
         hbState = state;
-        if(hbState == 1){
+        if (hbState == 1) {
             mHBBeforeLayout.setVisibility(View.GONE);
             mHBAfterLayout.setVisibility(View.VISIBLE);
-            mGetMoneyTv.setText(doubleMoney+"");
+            mGetMoneyTv.setText(doubleMoney + "");
         }
+
+        RxCountDown.countdown(3)
+                .doOnSubscribe(new Action0() {
+                    @Override
+                    public void call() {
+                        //appendLog("开始计时");
+                        //ToastUtils.showLong("开始倒计时");
+                        mCloseHbIv.setClickable(false);
+                        mCloseHbIv.setVisibility(View.GONE);
+                    }
+                })
+                .subscribe(new Subscriber<Integer>() {
+                    @Override
+                    public void onCompleted() {
+                        //appendLog("计时完成");
+                        mCloseHbIv.setClickable(true);
+                        mCloseHbIv.setVisibility(View.VISIBLE);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        mCloseHbIv.setClickable(true);
+                        mCloseHbIv.setVisibility(View.VISIBLE);
+                    }
+
+                    @Override
+                    public void onNext(Integer integer) {
+                        Logger.i("current time--->" + integer);
+                    }
+                });
     }
 
     @Override
@@ -137,8 +209,11 @@ public class HongBaoDialog extends Dialog implements View.OnClickListener {
                 if (hbState == 0) {
                     this.hongBaoListener.directClose();
                 } else {
-                    dismiss();
+                    this.hongBaoListener.showClose();
                 }
+                break;
+            case R.id.iv_to_cash:
+                this.hongBaoListener.toCash();
                 break;
             default:
                 break;

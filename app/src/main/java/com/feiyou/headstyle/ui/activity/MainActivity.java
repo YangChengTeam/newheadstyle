@@ -152,6 +152,11 @@ public class MainActivity extends BaseFragmentActivity implements VersionView, V
         }
     }
 
+    public void setViewPagerItem(int pos){
+        viewPager.setCurrentItem(pos);
+        currentIndex = pos;
+    }
+
     public void showScore() {
         long lastTime = SPUtils.getInstance().getLong(Constants.SCORE_CLOSE_TIME, 0);
         if (lastTime > 0) {

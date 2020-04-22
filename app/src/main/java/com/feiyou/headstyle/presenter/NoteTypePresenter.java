@@ -5,5 +5,5 @@ package com.feiyou.headstyle.presenter;
  */
 
 public interface NoteTypePresenter {
-    void getNoteTypeData(String topicId, int page, int type, String userId);
+    void getNoteTypeData(String topicId, int page, int pageSize, int type, String userId);
 }

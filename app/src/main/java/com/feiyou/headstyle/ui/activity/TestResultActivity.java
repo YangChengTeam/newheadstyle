@@ -1,14 +1,19 @@
 package com.feiyou.headstyle.ui.activity;
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,6 +49,7 @@ import com.feiyou.headstyle.presenter.TaskRecordInfoPresenterImp;
 import com.feiyou.headstyle.presenter.TestInfoPresenterImp;
 import com.feiyou.headstyle.ui.adapter.TestInfoAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragmentActivity;
+import com.feiyou.headstyle.ui.custom.Glide4Engine;
 import com.feiyou.headstyle.ui.custom.NormalDecoration;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.jakewharton.rxbinding.view.RxView;
@@ -55,17 +61,27 @@ import com.umeng.socialize.ShareAction;
 import com.umeng.socialize.UMShareListener;
 import com.umeng.socialize.bean.SHARE_MEDIA;
 import com.umeng.socialize.media.UMImage;
+import com.zhihu.matisse.Matisse;
+import com.zhihu.matisse.MimeType;
 
 import java.io.File;
 import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.OnClick;
+import es.dmoral.toasty.Toasty;
+import permissions.dispatcher.NeedsPermission;
+import permissions.dispatcher.OnNeverAskAgain;
+import permissions.dispatcher.OnPermissionDenied;
+import permissions.dispatcher.OnShowRationale;
+import permissions.dispatcher.PermissionRequest;
+import permissions.dispatcher.RuntimePermissions;
 import rx.functions.Action1;
 
 /**
  * Created by myflying on 2018/11/23.
  */
+@RuntimePermissions
 public class TestResultActivity extends BaseFragmentActivity implements IBaseView, View.OnClickListener {
 
     @BindView(R.id.topbar)
@@ -118,6 +134,33 @@ public class TestResultActivity extends BaseFragmentActivity implements IBaseVie
     TaskRecordInfoPresenterImp taskRecordInfoPresenterImp;
 
     private String recordId;
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        TestResultActivityPermissionsDispatcher.onRequestPermissionsResult(this, requestCode, grantResults);
+    }
+
+    @NeedsPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+    void showReadStorage() {
+        save();
+    }
+
+    @OnPermissionDenied(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+    void onReadStorageDenied() {
+        Toasty.normal(this, "请授权存储权限后保存图片").show();
+    }
+
+    @OnShowRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+    void showRationaleForReadStorage(PermissionRequest request) {
+        request.proceed();
+    }
+
+    @OnNeverAskAgain(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+    void onReadStorageNeverAskAgain() {
+        Toasty.normal(this, "请手动开启存储权限后保存图片").show();
+    }
+
 
     @Override
     protected int getContextViewId() {
@@ -252,10 +295,7 @@ public class TestResultActivity extends BaseFragmentActivity implements IBaseVie
         RxView.clicks(mSaveButton).throttleFirst(300, TimeUnit.MILLISECONDS).subscribe(new Action1<Void>() {
             @Override
             public void call(Void aVoid) {
-                if (progressDialog != null && !progressDialog.isShowing()) {
-                    progressDialog.show();
-                }
-                save();
+                TestResultActivityPermissionsDispatcher.showReadStorageWithPermissionCheck(TestResultActivity.this);
             }
         });
 
@@ -264,7 +304,7 @@ public class TestResultActivity extends BaseFragmentActivity implements IBaseVie
 
         if (!StringUtils.isEmpty(recordId)) {
             String openid = App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getOpenid() : "";
-            taskRecordInfoPresenterImp.addTaskRecord(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "",openid, taskId, goldNum, 0, 1, recordId);
+            taskRecordInfoPresenterImp.addTaskRecord(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", openid, taskId, goldNum, 0, 1, recordId);
         }
     }
 
@@ -283,7 +323,11 @@ public class TestResultActivity extends BaseFragmentActivity implements IBaseVie
     }
 
     //保存图片
-    void save() {
+    public void save() {
+        if (progressDialog != null && !progressDialog.isShowing()) {
+            progressDialog.show();
+        }
+
         Glide.with(this).asBitmap().load(imageUrl).into(new SimpleTarget<Bitmap>() {
             @Override
             public void onResourceReady(Bitmap resource, Transition<? super Bitmap> transition) {

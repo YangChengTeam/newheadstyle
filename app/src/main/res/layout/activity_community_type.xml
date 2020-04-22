@@ -8,7 +8,7 @@
     android:fitsSystemWindows="true"
     tools:context=".ui.activity.CommunityTypeActivity">
 
-    <android.support.design.widget.AppBarLayout
+    <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/app_bar_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -16,7 +16,7 @@
         android:background="@color/white"
         android:theme="@style/AppTheme.AppBarOverlay">
 
-        <android.support.design.widget.CollapsingToolbarLayout
+        <com.google.android.material.appbar.CollapsingToolbarLayout
             android:layout_width="match_parent"
             android:layout_height="230dp"
             android:fitsSystemWindows="true"
@@ -166,7 +166,7 @@
                 </LinearLayout>
             </RelativeLayout>
 
-            <android.support.v7.widget.Toolbar
+            <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
@@ -206,10 +206,10 @@
                         android:padding="12dp"
                         android:src="@mipmap/top_share_white" />
                 </RelativeLayout>
-            </android.support.v7.widget.Toolbar>
-        </android.support.design.widget.CollapsingToolbarLayout>
+            </androidx.appcompat.widget.Toolbar>
+        </com.google.android.material.appbar.CollapsingToolbarLayout>
 
-    </android.support.design.widget.AppBarLayout>
+    </com.google.android.material.appbar.AppBarLayout>
 
 
     <LinearLayout
@@ -226,11 +226,11 @@
             android:background="@color/white"
             android:gravity="center">
 
-            <android.support.design.widget.TabLayout
+            <com.google.android.material.tabs.TabLayout
                 android:id="@+id/tab_layout"
                 android:layout_width="150dp"
                 android:layout_height="48dp"
-                app:tabIndicatorColor="@color/tab_select_color"></android.support.design.widget.TabLayout>
+                app:tabIndicatorColor="@color/tab_select_color"/>
         </LinearLayout>
 
         <androidx.viewpager.widget.ViewPager

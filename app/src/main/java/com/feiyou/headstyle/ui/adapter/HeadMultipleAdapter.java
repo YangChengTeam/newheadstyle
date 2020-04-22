@@ -44,12 +44,15 @@ public class HeadMultipleAdapter extends BaseMultiItemQuickAdapter<HeadInfo, Bas
 
     private int tempWidth;
 
-    public HeadMultipleAdapter(List<HeadInfo> data) {
+    private int showType;
+
+    public HeadMultipleAdapter(List<HeadInfo> data, int type) {
         super(data);
         this.headData = data;
         addItemType(HeadInfo.HEAD_IMG, R.layout.head_info_item);
         addItemType(HeadInfo.HEAD_AD, R.layout.head_info_ad_item);
-        tempWidth = (ScreenUtils.getScreenWidth() - SizeUtils.dp2px(12)) / 3;
+        tempWidth = (ScreenUtils.getScreenWidth() - SizeUtils.dp2px(24)) / 3;
+        this.showType = type;
     }
 
     @Override
@@ -58,7 +61,7 @@ public class HeadMultipleAdapter extends BaseMultiItemQuickAdapter<HeadInfo, Bas
         if (helper.getItemViewType() == HeadInfo.HEAD_AD) {
 
             RelativeLayout adItemLayout = helper.getView(R.id.layout_ad_item);
-            RelativeLayout.LayoutParams itemParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ScreenUtils.getScreenWidth() / 3);
+            RelativeLayout.LayoutParams itemParams = new RelativeLayout.LayoutParams(ScreenUtils.getScreenWidth() - SizeUtils.dp2px(showType == 1 ? 24 : 12), (ScreenUtils.getScreenWidth() - SizeUtils.dp2px(showType == 1 ? 24 : 12)) / 3 + SizeUtils.dp2px(12));
             adItemLayout.setLayoutParams(itemParams);
 
             FrameLayout tempView = helper.getView(R.id.iv_listitem_express);
@@ -69,7 +72,7 @@ public class HeadMultipleAdapter extends BaseMultiItemQuickAdapter<HeadInfo, Bas
                 if (adView.getParent() != null) {
                     ((ViewGroup) adView.getParent()).removeView(adView);
                 }
-                RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ScreenUtils.getScreenWidth() / 3);
+                RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
                 params.addRule(RelativeLayout.CENTER_IN_PARENT);
                 adView.setLayoutParams(params);
                 tempView.addView(adView);

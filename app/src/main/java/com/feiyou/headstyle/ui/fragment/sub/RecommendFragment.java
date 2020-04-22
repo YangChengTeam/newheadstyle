@@ -53,6 +53,7 @@ import com.feiyou.headstyle.ui.adapter.NoteMultipleAdapter;
 import com.feiyou.headstyle.ui.adapter.TopicAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragment;
 import com.feiyou.headstyle.ui.custom.LoginDialog;
+import com.feiyou.headstyle.utils.AppUtils;
 import com.feiyou.headstyle.utils.TTAdManagerHolder;
 import com.feiyou.headstyle.view.NoteDataView;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
@@ -121,7 +122,7 @@ public class RecommendFragment extends BaseFragment implements NoteDataView, Swi
 
     private int currentPage = 1;
 
-    private int pageSize = 20;
+    private int pageSize = 6;
 
     private int currentClickIndex;
 
@@ -226,6 +227,10 @@ public class RecommendFragment extends BaseFragment implements NoteDataView, Swi
             topicAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
                 @Override
                 public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
+                    if (!AppUtils.isNotFastClick()) {
+                        return;
+                    }
+
                     Intent intent = new Intent(getActivity(), CommunityType1Activity.class);
                     intent.putExtra("topic_id", topicAdapter.getData().get(position).getId());
                     intent.putExtra("topic_index", position);
@@ -288,7 +293,7 @@ public class RecommendFragment extends BaseFragment implements NoteDataView, Swi
             @Override
             public void onLoadMoreRequested() {
                 currentPage++;
-                noteDataPresenterImp.getNoteData(currentPage, 2, userInfo != null ? userInfo.getId() : "");
+                noteDataPresenterImp.getNoteData(currentPage, pageSize, 2, userInfo != null ? userInfo.getId() : "");
             }
         }, mRecommendListView);
 
@@ -313,7 +318,7 @@ public class RecommendFragment extends BaseFragment implements NoteDataView, Swi
         followInfoPresenterImp = new FollowInfoPresenterImp(this, getActivity());
         addZanPresenterImp = new AddZanPresenterImp(this, getActivity());
 
-        noteDataPresenterImp.getNoteData(currentPage, 2, userInfo != null ? userInfo.getId() : "");
+        noteDataPresenterImp.getNoteData(currentPage, pageSize, 2, userInfo != null ? userInfo.getId() : "");
     }
 
     @Override
@@ -337,7 +342,9 @@ public class RecommendFragment extends BaseFragment implements NoteDataView, Swi
             onResume();
         } else if (messageEvent.getMessage().equals("add_note")) {
             //发帖后添加到首页
-            noteMultipleAdapter.addData(0, messageEvent.getAddNoteInfo());
+            NoteInfo addNote = messageEvent.getAddNoteInfo();
+            addNote.setItemType(NoteInfo.NOTE_NORMAL);
+            noteMultipleAdapter.addData(0, addNote);
         } else {
             if (communityType == 2) {
                 topicAdapter.setNewData(App.topicInfoList);
@@ -406,11 +413,8 @@ public class RecommendFragment extends BaseFragment implements NoteDataView, Swi
                             noteInfo.setItemType(NoteInfo.NOTE_NORMAL);
                         }
 
-                        //在集合后添加广告位的对象
-                        for (int i = 0; i < 3; i++) {
-                            NoteInfo tempNoteInfo = new NoteInfo(NoteInfo.NOTE_AD);
-                            tempList.add(currentPage * 6 * (i + 1), tempNoteInfo);
-                        }
+                        NoteInfo tempNoteInfo = new NoteInfo(NoteInfo.NOTE_AD);
+                        tempList.add(tempNoteInfo);
 
                         noteMultipleAdapter.setNewData(tempList);
                     } else {
@@ -421,16 +425,13 @@ public class RecommendFragment extends BaseFragment implements NoteDataView, Swi
 
                         noteMultipleAdapter.addData(tempList);
                         //在集合后添加广告位的对象
-
-                        for (int i = 0; i < 3; i++) {
-                            NoteInfo tempNoteInfo = new NoteInfo(NoteInfo.NOTE_AD);
-                            noteMultipleAdapter.getData().add(currentPage * 6 * (i + 1), tempNoteInfo);
-                            noteMultipleAdapter.notifyItemChanged(currentPage * 6 * (i + 1));
-                        }
+                        NoteInfo tempNoteInfo = new NoteInfo(NoteInfo.NOTE_AD);
+                        noteMultipleAdapter.getData().add(tempNoteInfo);
+                        noteMultipleAdapter.notifyItemChanged(noteMultipleAdapter.getData().size() - 1);
                     }
 
                     if (currentPage == 1) {
-                        if (((NoteInfoRet) tData).getData().size() == pageSize + 3) {
+                        if (((NoteInfoRet) tData).getData().size() == pageSize + 1) {
                             noteMultipleAdapter.loadMoreComplete();
                         } else {
                             noteMultipleAdapter.loadMoreEnd(true);
@@ -519,7 +520,7 @@ public class RecommendFragment extends BaseFragment implements NoteDataView, Swi
     public void onRefresh() {
         mRefreshLayout.setRefreshing(true);
         currentPage = 1;
-        noteDataPresenterImp.getNoteData(currentPage, 2, userInfo != null ? userInfo.getId() : "");
+        noteDataPresenterImp.getNoteData(currentPage, pageSize, 2, userInfo != null ? userInfo.getId() : "");
     }
 
     private UMShareListener shareListener = new UMShareListener() {
@@ -614,7 +615,7 @@ public class RecommendFragment extends BaseFragment implements NoteDataView, Swi
      */
     private void loadListAd() {
         Logger.i("dpi--->" + ScreenUtils.getScreenDensityDpi() + "density--->" + ScreenUtils.getScreenDensity());
-        float expressViewWidth = ScreenUtils.getScreenDensityDpi() <= 320 ? 340 : ScreenUtils.getScreenDensityDpi();
+        float expressViewWidth = ScreenUtils.getScreenWidth() / ScreenUtils.getScreenDensity();
         float expressViewHeight = 0;
 
         //step4:创建feed广告请求类型参数AdSlot,具体参数含义参考文档
@@ -622,7 +623,7 @@ public class RecommendFragment extends BaseFragment implements NoteDataView, Swi
                 .setCodeId("945144473")
                 .setSupportDeepLink(true)
                 .setExpressViewAcceptedSize(expressViewWidth, expressViewHeight) //期望模板广告view的size,单位dp
-                .setAdCount(3) //请求广告数量为1到3条
+                .setAdCount(1) //请求广告数量为1到3条
                 .build();
         //step5:请求广告，调用feed广告异步请求接口，加载到广告后，拿到广告素材自定义渲染
         mTTAdNative.loadNativeExpressAd(adSlot, new TTAdNative.NativeExpressAdListener() {
@@ -645,7 +646,7 @@ public class RecommendFragment extends BaseFragment implements NoteDataView, Swi
     private void bindAdListener(final List<TTNativeExpressAd> ads) {
         for (int i = 0; i < ads.size(); i++) {
             final TTNativeExpressAd adTmp = ads.get(i);
-            int tempIndex = currentPage * 6 * (i + 1);
+            int tempIndex = currentPage * pageSize * (i + 1);
             if (tempIndex >= noteMultipleAdapter.getData().size()) {
                 return;
             }
@@ -672,7 +673,7 @@ public class RecommendFragment extends BaseFragment implements NoteDataView, Swi
 
                 @Override
                 public void onRenderSuccess(View view, float width, float height) {
-                    Logger.i("feed render success--->");
+                    Logger.i("feed render success--->" + tempIndex + "---hashcode--->" + adTmp.hashCode());
                     noteMultipleAdapter.notifyItemChanged(tempIndex);
                 }
             });

@@ -5,6 +5,7 @@ package com.feiyou.headstyle.presenter;
  */
 
 public interface NoteDataPresenter {
-    void getNoteData(int page, int type,String userid);
-    void getMyNoteList(int page, String userid);
+    void getNoteData(int page, int pageSize, int type, String userid);
+
+    void getMyNoteList(int page, int pageSize, String userid);
 }

@@ -7,7 +7,7 @@ import com.feiyou.headstyle.base.IBaseRequestCallBack;
  */
 
 public interface NoteDataModel<T> {
-    void getNoteData(int page, int type, String userid, IBaseRequestCallBack<T> iBaseRequestCallBack);
+    void getNoteData(int page,int pageSize, int type, String userid, IBaseRequestCallBack<T> iBaseRequestCallBack);
 
     void getMyNoteList(int page, String userid, IBaseRequestCallBack<T> iBaseRequestCallBack);
 

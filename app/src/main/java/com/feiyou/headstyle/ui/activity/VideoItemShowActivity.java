@@ -593,7 +593,7 @@ public class VideoItemShowActivity extends BaseFragmentActivity implements Video
                         Logger.i("last video count --->" + videoItemShowAdapter.getData().size());
 
                         View view = snapHelper.findSnapView(layoutManager);
-                        Jzvd.releaseAllVideos();
+                        Jzvd.resetAllVideos();
                         RecyclerView.ViewHolder viewHolder = recyclerView.getChildViewHolder(view);
                         if (viewHolder != null && viewHolder instanceof BaseViewHolder) {
                             JzvdStd jzvdStd = ((BaseViewHolder) viewHolder).getView(R.id.videoplayer);
@@ -812,7 +812,7 @@ public class VideoItemShowActivity extends BaseFragmentActivity implements Video
     @Override
     public void onPause() {
         super.onPause();
-        Jzvd.releaseAllVideos();
+        Jzvd.resetAllVideos();
     }
 
     @OnClick(R.id.iv_back)

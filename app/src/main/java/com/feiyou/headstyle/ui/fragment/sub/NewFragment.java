@@ -161,7 +161,7 @@ public class NewFragment extends BaseFragment implements NoteTypeView, SwipeRefr
             @Override
             public void onLoadMoreRequested() {
                 currentPage++;
-                noteTypePresenterImp.getNoteTypeData(topicId, currentPage, queryType, App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "");
+                noteTypePresenterImp.getNoteTypeData(topicId, currentPage, pageSize,queryType, App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "");
             }
         }, mNewsListView);
 
@@ -184,7 +184,7 @@ public class NewFragment extends BaseFragment implements NoteTypeView, SwipeRefr
         followInfoPresenterImp = new FollowInfoPresenterImp(this, getActivity());
         addZanPresenterImp = new AddZanPresenterImp(this, getActivity());
 
-        noteTypePresenterImp.getNoteTypeData(topicId, currentPage, queryType, App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "");
+        noteTypePresenterImp.getNoteTypeData(topicId, currentPage, pageSize,queryType, App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "");
     }
 
     void followUser() {
@@ -277,6 +277,6 @@ public class NewFragment extends BaseFragment implements NoteTypeView, SwipeRefr
     public void onRefresh() {
         mRefreshLayout.setRefreshing(true);
         currentPage = 1;
-        noteTypePresenterImp.getNoteTypeData(topicId, currentPage, queryType, App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "");
+        noteTypePresenterImp.getNoteTypeData(topicId, currentPage, pageSize,queryType, App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "");
     }
 }

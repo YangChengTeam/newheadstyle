@@ -28,12 +28,12 @@ public class NoteDataPresenterImp extends BasePresenterImp<NoteDataView, NoteInf
     }
 
     @Override
-    public void getNoteData(int page, int type, String userid) {
-        noteDataModelImp.getNoteData(page, type, userid, this);
+    public void getNoteData(int page,int pageSize, int type, String userid) {
+        noteDataModelImp.getNoteData(page, pageSize,type, userid, this);
     }
 
     @Override
-    public void getMyNoteList(int page, String userid) {
+    public void getMyNoteList(int page,int pageSize, String userid) {
         noteDataModelImp.getMyNoteList(page, userid, this);
     }
 }

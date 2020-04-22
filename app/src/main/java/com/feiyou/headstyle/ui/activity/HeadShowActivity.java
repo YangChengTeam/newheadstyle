@@ -1,5 +1,6 @@
 package com.feiyou.headstyle.ui.activity;
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -13,6 +14,7 @@ import android.provider.MediaStore;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
+
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -99,10 +101,17 @@ import butterknife.BindView;
 import butterknife.OnClick;
 import es.dmoral.toasty.Toasty;
 import lib.kingja.switchbutton.SwitchMultiButton;
+import permissions.dispatcher.NeedsPermission;
+import permissions.dispatcher.OnNeverAskAgain;
+import permissions.dispatcher.OnPermissionDenied;
+import permissions.dispatcher.OnShowRationale;
+import permissions.dispatcher.PermissionRequest;
+import permissions.dispatcher.RuntimePermissions;
 
 /**
  * Created by myflying on 2018/11/23.
  */
+@RuntimePermissions
 public class HeadShowActivity extends BaseFragmentActivity implements SwipeFlingAdapterView.onFlingListener,
         SwipeFlingAdapterView.OnItemClickListener, HeadListDataView, View.OnClickListener {
 
@@ -163,7 +172,7 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
 
     private int currentPage = 1;
 
-    private int pageSize = 30;
+    private int pageSize = 21;
 
     private int startPosition;
 
@@ -259,6 +268,45 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
             }
         }
     };
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        //HomeFragmentPermissionsDispatcher.onRequestPermissionsResult(this, requestCode, grantResults);
+        HeadShowActivityPermissionsDispatcher.onRequestPermissionsResult(this, requestCode, grantResults);
+    }
+
+    @NeedsPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+    void showReadStorage() {
+        MobclickAgent.onEvent(this, "down_image", AppUtils.getAppVersionName());
+        Glide.with(this).asBitmap().load(currentImageUrl).into(new SimpleTarget<Bitmap>() {
+            @Override
+            public void onResourceReady(Bitmap resource, Transition<? super Bitmap> transition) {
+                //加载成功，resource为加载到的bitmap
+                filePath = PathUtils.getExternalPicturesPath() + File.separator + TimeUtils.getNowMills() + ".jpg";
+                Logger.i("show page save path --->" + filePath);
+                boolean isSave = ImageUtils.save(resource, filePath, Bitmap.CompressFormat.JPEG);
+                if (isSave) {
+                    saveImageToGallery();
+                }
+            }
+        });
+    }
+
+    @OnPermissionDenied(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+    void onReadStorageDenied() {
+        Toasty.normal(this, "请授权存储权限后保存图片").show();
+    }
+
+    @OnShowRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+    void showRationaleForReadStorage(PermissionRequest request) {
+        request.proceed();
+    }
+
+    @OnNeverAskAgain(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+    void onReadStorageNeverAskAgain() {
+        Toasty.normal(this, "请手动开启存储权限后保存图片").show();
+    }
 
     @Override
     protected int getContextViewId() {
@@ -477,7 +525,7 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
 
         if (fromType == 1) {
             if (StringUtils.isEmpty(tagId)) {
-                homeDataPresenterImp.getData(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", currentPage + "", "", "", 1);
+                homeDataPresenterImp.getData(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", currentPage + "", pageSize + "", "", 1);
             } else {
                 headListDataPresenterImp.getDataByTagId(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", tagId, currentPage, pageSize);
             }
@@ -649,20 +697,7 @@ public class HeadShowActivity extends BaseFragmentActivity implements SwipeFling
 
     @OnClick(R.id.layout_down)
     void downImage() {
-        MobclickAgent.onEvent(this, "down_image", AppUtils.getAppVersionName());
-        Glide.with(this).asBitmap().load(currentImageUrl).into(new SimpleTarget<Bitmap>() {
-            @Override
-            public void onResourceReady(Bitmap resource, Transition<? super Bitmap> transition) {
-                //加载成功，resource为加载到的bitmap
-                filePath = PathUtils.getExternalPicturesPath() + File.separator + TimeUtils.getNowMills() + ".jpg";
-                Logger.i("show page save path --->" + filePath);
-                boolean isSave = ImageUtils.save(resource, filePath, Bitmap.CompressFormat.JPEG);
-                if (isSave) {
-                    saveImageToGallery();
-                }
-            }
-        });
-
+        HeadShowActivityPermissionsDispatcher.showReadStorageWithPermissionCheck(this);
     }
 
     @OnClick(R.id.layout_setting_head)

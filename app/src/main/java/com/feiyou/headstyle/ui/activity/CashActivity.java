@@ -6,6 +6,7 @@ import android.os.Bundle;
 
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import android.text.Html;
 import android.view.View;
 import android.widget.ImageView;
@@ -38,6 +39,7 @@ import com.feiyou.headstyle.ui.adapter.PriceListAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragmentActivity;
 import com.feiyou.headstyle.ui.custom.ConfigDialog;
 import com.feiyou.headstyle.ui.custom.LackDialog;
+import com.feiyou.headstyle.ui.custom.LoginDialog;
 import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 import com.qmuiteam.qmui.widget.QMUITopBar;
@@ -52,7 +54,7 @@ import butterknife.BindView;
 import butterknife.OnClick;
 import es.dmoral.toasty.Toasty;
 
-public class CashActivity extends BaseFragmentActivity implements ConfigDialog.ConfigListener, IBaseView ,LackDialog.LackListener{
+public class CashActivity extends BaseFragmentActivity implements ConfigDialog.ConfigListener, IBaseView, LackDialog.LackListener {
 
     @BindView(R.id.topbar)
     QMUITopBar mTopBar;
@@ -117,6 +119,10 @@ public class CashActivity extends BaseFragmentActivity implements ConfigDialog.C
 
     private SeeVideoInfo gameSeeVideoInfo;
 
+    private String tempUserId = "";
+
+    LoginDialog loginDialog;
+
     @Override
     protected int getContextViewId() {
         return R.layout.activity_cash;
@@ -162,6 +168,8 @@ public class CashActivity extends BaseFragmentActivity implements ConfigDialog.C
         mUserInfo = App.getApp().mUserInfo;
         mShareAPI = UMShareAPI.get(this);
 
+        loginDialog = new LoginDialog(this, R.style.login_dialog);
+
         lackDialog = new LackDialog(this, R.style.login_dialog);
         lackDialog.setLackListener(this);
 
@@ -172,8 +180,18 @@ public class CashActivity extends BaseFragmentActivity implements ConfigDialog.C
         userInfoPresenterImp = new UserInfoPresenterImp(this, this);
         cashInfoPresenterImp = new CashInfoPresenterImp(this, this);
         cashMoneyInfoPresenterImp = new CashMoneyInfoPresenterImp(this, this);
+
+        Bundle bundle = getIntent().getExtras();
+        if (bundle != null && !StringUtils.isEmpty(bundle.getString("temp_user_id"))) {
+            tempUserId = bundle.getString("temp_user_id");
+        }
+
+        if (mUserInfo != null) {
+            tempUserId = mUserInfo.getId();
+        }
+
         try {
-            cashMoneyInfoPresenterImp.cashMoneyList(mUserInfo != null ? mUserInfo.getId() : "", mUserInfo != null ? mUserInfo.getOpenid() : "", PhoneUtils.getIMEI());
+            cashMoneyInfoPresenterImp.cashMoneyList(tempUserId, mUserInfo != null ? mUserInfo.getOpenid() : "", App.androidId);
         } catch (SecurityException e) {
             e.printStackTrace();
         }
@@ -204,8 +222,22 @@ public class CashActivity extends BaseFragmentActivity implements ConfigDialog.C
 
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        mUserInfo = App.getApp().mUserInfo;
+    }
+
     @OnClick({R.id.tv_cash_weixin, R.id.tv_change_number})
     void bindWeiXin() {
+
+        if (!App.getApp().isLogin) {
+            if (loginDialog != null && !loginDialog.isShowing()) {
+                loginDialog.show();
+            }
+            return;
+        }
+
         if (progressDialog != null && !progressDialog.isShowing()) {
             progressDialog.show();
         }
@@ -226,6 +258,13 @@ public class CashActivity extends BaseFragmentActivity implements ConfigDialog.C
     @OnClick(R.id.btn_cash_now)
     void cashNow() {
 
+        if (!App.getApp().isLogin) {
+            if (loginDialog != null && !loginDialog.isShowing()) {
+                loginDialog.show();
+            }
+            return;
+        }
+
         if (StringUtils.isEmpty(openId)) {
             ToastUtils.showLong("请先绑定微信账号后提现");
             return;
@@ -234,7 +273,7 @@ public class CashActivity extends BaseFragmentActivity implements ConfigDialog.C
         if (myProfitMoney < realCashMoney) {
             if (lackDialog != null && !lackDialog.isShowing()) {
                 lackDialog.show();
-                lackDialog.setLackInfo("收益提示","你的收益不足，请先赚取收益");
+                lackDialog.setLackInfo("收益提示", "你的收益不足，请先赚取收益");
             }
             return;
         }
@@ -252,7 +291,7 @@ public class CashActivity extends BaseFragmentActivity implements ConfigDialog.C
                 progressDialog.setMessage("正在提现");
                 progressDialog.show();
             }
-            cashInfoPresenterImp.startCash(mUserInfo != null ? mUserInfo.getId() : "", openId, realCashMoney, cashType, PhoneUtils.getIMEI());
+            cashInfoPresenterImp.startCash(mUserInfo != null ? mUserInfo.getId() : "", openId, realCashMoney, cashType, App.androidId);
         } catch (SecurityException e) {
             e.printStackTrace();
         }
@@ -399,7 +438,7 @@ public class CashActivity extends BaseFragmentActivity implements ConfigDialog.C
                 if (((CashInfoRet) tData).getCode() == Constants.SUCCESS) {
                     ToastUtils.showLong("提现已申请");
                     try {
-                        cashMoneyInfoPresenterImp.cashMoneyList(mUserInfo != null ? mUserInfo.getId() : "", mUserInfo != null ? mUserInfo.getOpenid() : "", PhoneUtils.getIMEI());
+                        cashMoneyInfoPresenterImp.cashMoneyList(mUserInfo != null ? mUserInfo.getId() : "", mUserInfo != null ? mUserInfo.getOpenid() : "", App.androidId);
                     } catch (SecurityException e) {
                         e.printStackTrace();
                     }
@@ -430,5 +469,11 @@ public class CashActivity extends BaseFragmentActivity implements ConfigDialog.C
     @Override
     public void lackCancel() {
 
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        UMShareAPI.get(this).onActivityResult(requestCode, resultCode, data);
     }
 }

@@ -15,7 +15,7 @@ import rx.Observable;
 
 public interface CashInfoServiceApi {
 
-    @POST("v1.pay/appwxpay")
+    @POST("v2.pay/appwxpay")
     Observable<CashInfoRet> startCash(@Body RequestBody requestBody);
 
     @POST("v1.welfare/txinfo")

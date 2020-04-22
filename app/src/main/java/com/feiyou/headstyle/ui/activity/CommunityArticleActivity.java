@@ -475,128 +475,137 @@ public class CommunityArticleActivity extends BaseFragmentActivity implements No
         Drawable isZan = ContextCompat.getDrawable(this, R.mipmap.is_zan);
         Drawable notZan = ContextCompat.getDrawable(this, R.mipmap.note_zan);
 
-        if (tData != null && tData.getCode() == Constants.SUCCESS) {
-
+        if (tData != null) {
             if (tData instanceof NoteInfoDetailRet) {
-                currentNoteInfo = ((NoteInfoDetailRet) tData).getData();
+                if(tData.getCode() == Constants.SUCCESS) {
+                    currentNoteInfo = ((NoteInfoDetailRet) tData).getData();
 
-                commentNum = currentNoteInfo.getCommentNum();
-                RequestOptions options = new RequestOptions();
-                options.transform(new GlideRoundTransform(this, 21));
-                options.placeholder(R.mipmap.head_def).error(R.mipmap.head_def);
-                Glide.with(this).load(currentNoteInfo.getUserimg()).apply(options).into(mUserHeadImageView);
+                    commentNum = currentNoteInfo.getCommentNum();
+                    RequestOptions options = new RequestOptions();
+                    options.transform(new GlideRoundTransform(this, 21));
+                    options.placeholder(R.mipmap.head_def).error(R.mipmap.head_def);
+                    Glide.with(this).load(currentNoteInfo.getUserimg()).apply(options).into(mUserHeadImageView);
 
-                if (currentNoteInfo.getUserId().equals("1")) {
-                    mSystemUserIv.setVisibility(View.VISIBLE);
-                } else {
-                    mSystemUserIv.setVisibility(View.GONE);
-                }
-
-                String nickName = "火星用户";
-                if (!StringUtils.isEmpty(currentNoteInfo.getNickname())) {
-                    nickName = currentNoteInfo.getNickname().replace("\r", "").replace("\n", "");
-                }
-
-                mNickNameTextView.setText(nickName);
-                mTopicNameTextView.setText(currentNoteInfo.getName());
-                mAddDateTextView.setText(TimeUtils.millis2String(currentNoteInfo.getAddTime() != null ? currentNoteInfo.getAddTime() * 1000 : 0));
-
-                //设置帖子内容
-                //mNoteContentTextView.setText(Html.fromHtml(currentNoteInfo.getContent()));
-                mWebView = new MyWebView(CommunityArticleActivity.this);
-                mWebView.setScrollbarFadingEnabled(true);
-                mWebView.loadData(getNewContent(currentNoteInfo.getContent()), "text/html; charset=UTF-8", null);
-                mWebViewLayout.addView(mWebView);
-
-                mMessageCountTextView.setText(commentNum > 0 ? commentNum + "" : "");
-                mZanCountTextView.setText(currentNoteInfo.getZanNum() > 0 ? currentNoteInfo.getZanNum() + "" : "0");
-
-                if (currentNoteInfo.getIsZan() == 0) {
-                    mZanCountTextView.setCompoundDrawablesWithIntrinsicBounds(notZan, null, null, null);
-                } else {
-                    mZanCountTextView.setCompoundDrawablesWithIntrinsicBounds(isZan, null, null, null);
-                }
-                mZanCountTextView.setCompoundDrawablePadding(SizeUtils.dp2px(4));
-
-                //设置帖子图片
-                List<HeadInfo> headInfos = new ArrayList<>();
-                String[] tempImg = currentNoteInfo.getImageArr();
-                imageUrls = new ArrayList<>();
-
-                for (int i = 0; i < tempImg.length; i++) {
-                    if (!StringUtils.isEmpty(tempImg[i])) {
-                        HeadInfo headInfo = new HeadInfo();
-                        headInfo.setImgurl(tempImg[i]);
-                        headInfos.add(headInfo);
-                        imageUrls.add(tempImg[i]);
+                    if (currentNoteInfo.getUserId() != null && currentNoteInfo.getUserId().equals("1")) {
+                        mSystemUserIv.setVisibility(View.VISIBLE);
+                    } else {
+                        mSystemUserIv.setVisibility(View.GONE);
                     }
-                }
-                if (headInfos.size() > 0) {
-                    mNoteImageListView.setVisibility(View.VISIBLE);
-                    int temp = imageUrls.size() % 3 == 0 ? imageUrls.size() / 3 : imageUrls.size() / 3 + 1;
-                    mNoteImageListView.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, SizeUtils.dp2px(112 * temp)));
-                    communityItemAdapter.setNewData(headInfos);
-                } else {
-                    mNoteImageListView.setVisibility(View.GONE);
-                }
 
-                int tempResult = currentNoteInfo.getIsGuan();
-                mFollowLayout.setBackgroundResource(tempResult == 0 ? R.drawable.into_bg : R.drawable.is_follow_bg);
-                mFollowTv.setTextColor(ContextCompat.getColor(this, tempResult == 0 ? R.color.tab_select_color : R.color.black2));
-                mFollowTv.setText(tempResult == 0 ? "+关注" : "已关注");
+                    String nickName = "火星用户";
+                    if (!StringUtils.isEmpty(currentNoteInfo.getNickname())) {
+                        nickName = currentNoteInfo.getNickname().replace("\r", "").replace("\n", "");
+                    }
 
-                //自己对自己发的贴，隐藏相关操作按钮
-                if (userInfo != null && userInfo.getId().equals(currentNoteInfo.getUserId())) {
-                    isMyNote = true;
-                    mReportLayout.setVisibility(View.GONE);
-                    mFollowLayout.setVisibility(View.GONE);
-                    mFollowTv.setVisibility(View.GONE);
+                    mNickNameTextView.setText(nickName);
+                    mTopicNameTextView.setText(currentNoteInfo.getName());
+                    mAddDateTextView.setText(TimeUtils.millis2String(currentNoteInfo.getAddTime() != null ? currentNoteInfo.getAddTime() * 1000 : 0));
+
+                    //设置帖子内容
+                    //mNoteContentTextView.setText(Html.fromHtml(currentNoteInfo.getContent()));
+                    mWebView = new MyWebView(CommunityArticleActivity.this);
+                    mWebView.setScrollbarFadingEnabled(true);
+                    mWebView.loadData(getNewContent(currentNoteInfo.getContent()), "text/html; charset=UTF-8", null);
+                    mWebViewLayout.addView(mWebView);
+
+                    mMessageCountTextView.setText(commentNum > 0 ? commentNum + "" : "");
+                    mZanCountTextView.setText(currentNoteInfo.getZanNum() > 0 ? currentNoteInfo.getZanNum() + "" : "0");
+
+                    if (currentNoteInfo.getIsZan() == 0) {
+                        mZanCountTextView.setCompoundDrawablesWithIntrinsicBounds(notZan, null, null, null);
+                    } else {
+                        mZanCountTextView.setCompoundDrawablesWithIntrinsicBounds(isZan, null, null, null);
+                    }
+                    mZanCountTextView.setCompoundDrawablePadding(SizeUtils.dp2px(4));
+
+                    //设置帖子图片
+                    List<HeadInfo> headInfos = new ArrayList<>();
+                    String[] tempImg = currentNoteInfo.getImageArr();
+                    imageUrls = new ArrayList<>();
+
+                    for (int i = 0; i < tempImg.length; i++) {
+                        if (!StringUtils.isEmpty(tempImg[i])) {
+                            HeadInfo headInfo = new HeadInfo();
+                            headInfo.setImgurl(tempImg[i]);
+                            headInfos.add(headInfo);
+                            imageUrls.add(tempImg[i]);
+                        }
+                    }
+                    if (headInfos.size() > 0) {
+                        mNoteImageListView.setVisibility(View.VISIBLE);
+                        int temp = imageUrls.size() % 3 == 0 ? imageUrls.size() / 3 : imageUrls.size() / 3 + 1;
+                        mNoteImageListView.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, SizeUtils.dp2px(112 * temp)));
+                        communityItemAdapter.setNewData(headInfos);
+                    } else {
+                        mNoteImageListView.setVisibility(View.GONE);
+                    }
+
+                    int tempResult = currentNoteInfo.getIsGuan();
+                    mFollowLayout.setBackgroundResource(tempResult == 0 ? R.drawable.into_bg : R.drawable.is_follow_bg);
+                    mFollowTv.setTextColor(ContextCompat.getColor(this, tempResult == 0 ? R.color.tab_select_color : R.color.black2));
+                    mFollowTv.setText(tempResult == 0 ? "+关注" : "已关注");
+
+                    //自己对自己发的贴，隐藏相关操作按钮
+                    if (userInfo != null && userInfo.getId().equals(currentNoteInfo.getUserId())) {
+                        isMyNote = true;
+                        mReportLayout.setVisibility(View.GONE);
+                        mFollowLayout.setVisibility(View.GONE);
+                        mFollowTv.setVisibility(View.GONE);
+                    }
                 }
             }
 
             if (tData instanceof ReplyResultInfoRet) {
-                //ToastUtils.showLong("回复成功");
-                commentNum++;
-                mMessageCountTextView.setText(commentNum > 0 ? commentNum + "" : "");
+                if(tData.getCode() == Constants.SUCCESS) {
+                    //ToastUtils.showLong("回复成功");
+                    commentNum++;
+                    mMessageCountTextView.setText(commentNum > 0 ? commentNum + "" : "");
 
-                EventBus.getDefault().post(new MessageEvent("更新精彩评论"));
+                    EventBus.getDefault().post(new MessageEvent("更新精彩评论"));
 
-                if (isAddTaskRecord) {
-                    String openid = App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getOpenid() : "";
-                    taskRecordInfoPresenterImp.addTaskRecord(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", openid, taskId, goldNum, 0, 1, recordId);
+                    if (isAddTaskRecord) {
+                        String openid = App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getOpenid() : "";
+                        taskRecordInfoPresenterImp.addTaskRecord(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", openid, taskId, goldNum, 0, 1, recordId);
+                    }
                 }
             }
 
             if (tData instanceof ZanResultRet) {
-                if (((ZanResultRet) tData).getData().getIsZan() == 0) {
-                    mZanCountTextView.setText((((ZanResultRet) tData).getData().getZanNum()) + "");
-                    mZanCountTextView.setCompoundDrawablesWithIntrinsicBounds(notZan, null, null, null);
-                    mZanCountTextView.setCompoundDrawablePadding(SizeUtils.dp2px(4));
-                } else {
-                    mZanCountTextView.setText((((ZanResultRet) tData).getData().getZanNum()) + "");
-                    mZanCountTextView.setCompoundDrawablesWithIntrinsicBounds(isZan, null, null, null);
-                    mZanCountTextView.setCompoundDrawablePadding(SizeUtils.dp2px(4));
+                if(tData.getCode() == Constants.SUCCESS) {
+                    if (((ZanResultRet) tData).getData().getIsZan() == 0) {
+                        mZanCountTextView.setText((((ZanResultRet) tData).getData().getZanNum()) + "");
+                        mZanCountTextView.setCompoundDrawablesWithIntrinsicBounds(notZan, null, null, null);
+                        mZanCountTextView.setCompoundDrawablePadding(SizeUtils.dp2px(4));
+                    } else {
+                        mZanCountTextView.setText((((ZanResultRet) tData).getData().getZanNum()) + "");
+                        mZanCountTextView.setCompoundDrawablesWithIntrinsicBounds(isZan, null, null, null);
+                        mZanCountTextView.setCompoundDrawablePadding(SizeUtils.dp2px(4));
+                    }
                 }
             }
 
             if (tData instanceof FollowInfoRet) {
-                int tempResult = ((FollowInfoRet) tData).getData().getIsGuan();
+                if(tData.getCode() == Constants.SUCCESS) {
+                    int tempResult = ((FollowInfoRet) tData).getData().getIsGuan();
 
-                ToastUtils.showLong(tempResult == 0 ? "已取消" : "已关注");
-                mFollowLayout.setBackgroundResource(tempResult == 0 ? R.drawable.into_bg : R.drawable.is_follow_bg);
-                mFollowTv.setTextColor(ContextCompat.getColor(this, tempResult == 0 ? R.color.tab_select_color : R.color.black2));
-                mFollowTv.setText(tempResult == 0 ? "+关注" : "已关注");
+                    ToastUtils.showLong(tempResult == 0 ? "已取消" : "已关注");
+                    mFollowLayout.setBackgroundResource(tempResult == 0 ? R.drawable.into_bg : R.drawable.is_follow_bg);
+                    mFollowTv.setTextColor(ContextCompat.getColor(this, tempResult == 0 ? R.color.tab_select_color : R.color.black2));
+                    mFollowTv.setText(tempResult == 0 ? "+关注" : "已关注");
+                }
             }
 
             if (tData instanceof TaskRecordInfoRet) {
-                if (StringUtils.isEmpty(recordId)) {
-                    isAddTaskRecord = true;
-                    if (((TaskRecordInfoRet) tData).getData() != null) {
-                        recordId = ((TaskRecordInfoRet) tData).getData().getInfoid();
-                    }
-                } else {
-                    if (((TaskRecordInfoRet) tData).getData() != null) {
-                        ToastUtils.showLong("领取成功 +" + ((TaskRecordInfoRet) tData).getData().getGoldnum() + "金币");
+                if(tData.getCode() == Constants.SUCCESS) {
+                    if (StringUtils.isEmpty(recordId)) {
+                        isAddTaskRecord = true;
+                        if (((TaskRecordInfoRet) tData).getData() != null) {
+                            recordId = ((TaskRecordInfoRet) tData).getData().getInfoid();
+                        }
+                    } else {
+                        if (((TaskRecordInfoRet) tData).getData() != null) {
+                            ToastUtils.showLong("领取成功 +" + ((TaskRecordInfoRet) tData).getData().getGoldnum() + "金币");
+                        }
                     }
                 }
             }

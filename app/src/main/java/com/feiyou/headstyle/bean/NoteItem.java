@@ -91,6 +91,9 @@ public class NoteItem {
     }
 
     public String getUserId() {
+        if (userId == null) {
+            return "";
+        }
         return userId;
     }
 

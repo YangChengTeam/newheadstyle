@@ -20,7 +20,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_centerHorizontal="true"
-                android:overScrollMode="never"></androidx.recyclerview.widget.RecyclerView>
+                android:overScrollMode="never"/>
         </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
         <com.wang.avi.AVLoadingIndicatorView

@@ -31,6 +31,10 @@ import java.util.List;
  */
 public class AppUtils {
 
+    public static final int DELAY = 1000;
+
+    private static long lastClickTime = 0;
+
     private AppUtils() {
         throw new AssertionError();
     }
@@ -218,5 +222,20 @@ public class AppUtils {
 
     public static boolean checkBits(int status, int checkBit) {
         return (status & checkBit) == checkBit;
+    }
+
+    /**
+     * 判断是否是快速点击
+     *
+     * @return
+     */
+    public static boolean isNotFastClick() {
+        long currentTime = System.currentTimeMillis();
+        if (currentTime - lastClickTime > DELAY) {
+            lastClickTime = currentTime;
+            return true;
+        } else {
+            return false;
+        }
     }
 }

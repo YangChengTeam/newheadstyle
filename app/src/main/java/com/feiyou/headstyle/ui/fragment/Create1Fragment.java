@@ -8,12 +8,14 @@ import android.graphics.Color;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Message;
+
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -30,6 +32,7 @@ import com.blankj.utilcode.util.AppUtils;
 import com.blankj.utilcode.util.BarUtils;
 import com.blankj.utilcode.util.PathUtils;
 import com.blankj.utilcode.util.SPUtils;
+import com.blankj.utilcode.util.ScreenUtils;
 import com.blankj.utilcode.util.SizeUtils;
 import com.blankj.utilcode.util.StringUtils;
 import com.blankj.utilcode.util.TimeUtils;
@@ -41,6 +44,7 @@ import com.bytedance.sdk.openadsdk.TTAdConstant;
 import com.bytedance.sdk.openadsdk.TTAdManager;
 import com.bytedance.sdk.openadsdk.TTAdNative;
 import com.bytedance.sdk.openadsdk.TTAppDownloadListener;
+import com.bytedance.sdk.openadsdk.TTNativeExpressAd;
 import com.bytedance.sdk.openadsdk.TTRewardVideoAd;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.cmcm.cmgame.CmGameSdk;
@@ -304,6 +308,10 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
 
     int currentTabIndex;//当前选择的Tab
 
+    private TTNativeExpressAd mBannerTTAd;
+
+    private View signAdView;
+
     public Handler mHandler = new Handler() {
         @Override
         public void handleMessage(android.os.Message msg) {
@@ -314,7 +322,7 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
                     break;
                 case 1:
                     isCanSign = true;
-                    currentTabIndex = ((MainActivity)getActivity()).getCurrentTabIndex();
+                    currentTabIndex = ((MainActivity) getActivity()).getCurrentTabIndex();
                     Logger.i("currentTabIndex--->" + currentTabIndex);
                     userSign();
                     break;
@@ -520,6 +528,9 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
         weiXinTaskDialog = new WeiXinTaskDialog(getActivity());
         weiXinTaskDialog.setOpenWeixinListener(this);
 
+        //加载广告
+        loadBannerExpressAd("945147445");
+
         taskListAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
@@ -594,7 +605,7 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
                         GoToScoreUtils.goToMarket(getActivity(), Constants.APP_PACKAGE_NAME);
                         break;
                     case 7:
-                        if(isSignToday == 0) {
+                        if (isSignToday == 0) {
                             if (signDays > 0 && (signDays + 1) % 7 == 0) {
                                 //领取红包
                                 if (receiveHongBaoDialog != null && !receiveHongBaoDialog.isShowing()) {
@@ -604,7 +615,7 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
                                 //提示签到
                                 signDoneInfoPresenterImp.signDone(userInfo != null ? userInfo.getId() : "", userInfo != null ? userInfo.getOpenid() : "", 0);
                             }
-                        }else{
+                        } else {
                             ToastUtils.showLong("今天已签到");
                         }
                         break;
@@ -703,7 +714,7 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
             Glide.with(getActivity()).load(R.mipmap.head_def).apply(options).into(mUserHeadIv);
             mUserNameTv.setText("点击登录");
             mGoldBalanceTv.setText("0");
-            mMyProfitTv.setText("0.0");
+            mMyProfitTv.setText(SPUtils.getInstance().getString(Constants.NO_LOGIN_MONEY, "0.0"));
         }
 
         welfareInfoPresenterImp.getWelfareData(userInfo != null ? userInfo.getId() : "");
@@ -754,8 +765,8 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
     }
 
     //当天用户签到
-    public void userSign(){
-        if(currentTabIndex == 2) {
+    public void userSign() {
+        if (currentTabIndex == 2) {
             //自动签到
             if (signDays > 0 && (signDays + 1) % 7 == 0) {
                 //领取红包
@@ -774,7 +785,7 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
         super.setUserVisibleHint(isVisibleToUser);
 
         if (getContext() != null && isVisibleToUser && isCanSign) {
-            currentTabIndex = ((MainActivity)getContext()).getCurrentTabIndex();
+            currentTabIndex = ((MainActivity) getContext()).getCurrentTabIndex();
             Logger.i("setUserVisibleHint currentTabIndex--->" + currentTabIndex);
             isCanSign = false;
             userSign();
@@ -995,8 +1006,11 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
                     if (welfareInfo.getGoldUser() != null) {
                         userGoldNum = welfareInfo.getGoldUser().getGoldnum();
                         myProfitMoney = welfareInfo.getGoldUser().getCash();
+                        /*if (StringUtils.isEmpty(myProfitMoney + "")) {
+
+                        }*/
                         mGoldBalanceTv.setText(userGoldNum + "");
-                        mMyProfitTv.setText(myProfitMoney + "");
+                        mMyProfitTv.setText(userInfo == null ? SPUtils.getInstance().getString(Constants.NO_LOGIN_MONEY, "0.0") : myProfitMoney + "");
                         App.getApp().setUserGoldNum(userGoldNum);
                     }
                     if (welfareInfo.getCashInfoList() != null && welfareInfo.getCashInfoList().size() > 0) {
@@ -1109,7 +1123,7 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
                     Message message = new Message();
                     message.what = 1;
                     mHandler.sendMessage(message);
-                }else{
+                } else {
                     isCanSign = false;
                 }
             }
@@ -1133,6 +1147,9 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
 
                             newSignSuccessDialog.show();
                             newSignSuccessDialog.setSignInfo(((SignDoneInfoRet) tData).getData().getGoldnum());
+                            if (signAdView != null) {
+                                newSignSuccessDialog.updateSignAdView(signAdView);
+                            }
                         }
                     }
 
@@ -1406,7 +1423,7 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
         getGoldNum = 0;
         String openid = App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getOpenid() : "";
         taskRecordInfoPresenterImp.addTaskRecord(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", openid, taskId, getGoldNum, 0, 0, "0");
-        if(mttRewardVideoAd != null) {
+        if (mttRewardVideoAd != null) {
             //step6:在获取到广告后展示
             mttRewardVideoAd.showRewardVideoAd(getActivity());
             mttRewardVideoAd = null;
@@ -1585,7 +1602,7 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
             newSignSuccessDialog.dismiss();
         }
         recordId = "";
-        if(mttRewardVideoAd != null) {
+        if (mttRewardVideoAd != null) {
             String openid = App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getOpenid() : "";
             taskRecordInfoPresenterImp.addTaskRecord(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", openid, taskId, getGoldNum, 0, 0, "0");
             //step6:在获取到广告后展示
@@ -1601,4 +1618,125 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
         intent.putExtra("game_see_video", gameSeeVideoInfo);
         startActivity(intent);
     }
+
+
+    private void loadBannerExpressAd(String codeId) {
+        Logger.i("load ad home banner ID--->--->" + codeId);
+
+        float expressViewWidth = 280;
+        float expressViewHeight = 100;
+
+        //step4:创建广告请求参数AdSlot,具体参数含义参考文档
+        AdSlot adSlot = new AdSlot.Builder()
+                .setCodeId(codeId) //广告位id
+                .setSupportDeepLink(true)
+                .setAdCount(3) //请求广告数量为1到3条
+                .setExpressViewAcceptedSize(expressViewWidth, expressViewHeight) //期望模板广告view的size,单位dp
+                .setImageAcceptedSize(640, 320)//这个参数设置即可，不影响模板广告的size
+                .build();
+        //step5:请求广告，对请求回调的广告作渲染处理
+        mTTAdNative.loadBannerExpressAd(adSlot, new TTAdNative.NativeExpressAdListener() {
+            @Override
+            public void onError(int code, String message) {
+                Logger.i("load error : " + code + ", " + message);
+                if (signAdView != null) {
+                    signAdView = null;
+                }
+            }
+
+            @Override
+            public void onNativeExpressAdLoad(List<TTNativeExpressAd> ads) {
+                Logger.i("home_banner load--->");
+                if (ads == null || ads.size() == 0) {
+                    return;
+                }
+                mBannerTTAd = ads.get(0);
+                //mBannerTTAd.setSlideIntervalTime(30 * 1000);
+                bindBannerAdListener(mBannerTTAd);
+                startBannerTime = System.currentTimeMillis();
+                if (mBannerTTAd != null) {
+                    mBannerTTAd.render();
+                }
+            }
+        });
+    }
+
+    private long startBannerTime = 0;
+
+    private boolean mBannerHasShowDownloadActive = false;
+
+    private void bindBannerAdListener(TTNativeExpressAd ad) {
+        ad.setExpressInteractionListener(new TTNativeExpressAd.ExpressAdInteractionListener() {
+            @Override
+            public void onAdClicked(View view, int type) {
+                Logger.i("home_banner广告被点击");
+            }
+
+            @Override
+            public void onAdShow(View view, int type) {
+                Logger.i("home_banner广告展示");
+            }
+
+            @Override
+            public void onRenderFail(View view, String msg, int code) {
+                Log.e("home_bannerExpressView", "render fail:" + (System.currentTimeMillis() - startBannerTime));
+                Logger.i(msg + " code:" + code);
+            }
+
+            @Override
+            public void onRenderSuccess(View view, float width, float height) {
+                Log.e("home_bannerExpressView", "home_banner_render suc:" + (System.currentTimeMillis() - startBannerTime));
+                //返回view的宽高 单位 dp
+                Logger.i("common banner渲染成功");
+                if (signAdView != null) {
+                    signAdView = null;
+                }
+                signAdView = view;
+
+                if (signAdView != null && newSignSuccessDialog != null && newSignSuccessDialog.isShowing()) {
+                    newSignSuccessDialog.updateSignAdView(signAdView);
+                }
+            }
+        });
+
+        if (ad.getInteractionType() != TTAdConstant.INTERACTION_TYPE_DOWNLOAD) {
+            return;
+        }
+        ad.setDownloadListener(new TTAppDownloadListener() {
+            @Override
+            public void onIdle() {
+                Logger.i("home_banner点击开始下载");
+                //logInfoPresenterImp.addLogInfo(App.mUserInfo != null ? App.mUserInfo.getId() : "", "", "", "home_bottom_banner", "click");
+            }
+
+            @Override
+            public void onDownloadActive(long totalBytes, long currBytes, String fileName, String appName) {
+                if (!mBannerHasShowDownloadActive) {
+                    mBannerHasShowDownloadActive = true;
+                    Logger.i("home_banner下载中，点击暂停");
+                }
+            }
+
+            @Override
+            public void onDownloadPaused(long totalBytes, long currBytes, String fileName, String appName) {
+                Logger.i("home_banner下载暂停，点击继续");
+            }
+
+            @Override
+            public void onDownloadFailed(long totalBytes, long currBytes, String fileName, String appName) {
+                Logger.i("home_banner下载失败，点击重新下载");
+            }
+
+            @Override
+            public void onInstalled(String fileName, String appName) {
+                Logger.i("home_banner安装完成，点击图片打开");
+            }
+
+            @Override
+            public void onDownloadFinished(long totalBytes, String fileName, String appName) {
+                Logger.i("home_banner点击安装");
+            }
+        });
+    }
+
 }

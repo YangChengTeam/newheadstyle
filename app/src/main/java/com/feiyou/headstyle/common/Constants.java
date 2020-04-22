@@ -95,4 +95,6 @@ public class Constants {
 
     public static final String CLOSE_HB_DATA = "close_hb_date";
 
+    public static final String NO_LOGIN_MONEY = "no_login_money";//不登录时本地的收益
+
 }

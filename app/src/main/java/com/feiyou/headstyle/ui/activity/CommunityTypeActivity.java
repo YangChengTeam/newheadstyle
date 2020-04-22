@@ -157,7 +157,7 @@ public class CommunityTypeActivity extends BaseFragmentActivity implements NoteT
 
         followInfoPresenterImp = new FollowInfoPresenterImp(this, this);
         noteTypePresenterImp = new NoteTypePresenterImp(this, this);
-        noteTypePresenterImp.getNoteTypeData(topicId, currentPage, 1, App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "");
+        noteTypePresenterImp.getNoteTypeData(topicId, currentPage,pageSize, 1, App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "");
     }
 
     //设置折叠展开状态

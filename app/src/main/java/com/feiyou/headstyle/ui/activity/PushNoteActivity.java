@@ -1,11 +1,15 @@
 package com.feiyou.headstyle.ui.activity;
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
+
+import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -20,11 +24,17 @@ import android.widget.TextView;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.blankj.utilcode.util.AppUtils;
+import com.blankj.utilcode.util.ImageUtils;
 import com.blankj.utilcode.util.PathUtils;
 import com.blankj.utilcode.util.SPUtils;
 import com.blankj.utilcode.util.SizeUtils;
 import com.blankj.utilcode.util.StringUtils;
+import com.blankj.utilcode.util.TimeUtils;
 import com.blankj.utilcode.util.ToastUtils;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
@@ -43,6 +53,7 @@ import com.jakewharton.rxbinding.view.RxView;
 import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 import com.qmuiteam.qmui.widget.QMUITopBar;
+import com.umeng.analytics.MobclickAgent;
 import com.zhihu.matisse.Matisse;
 import com.zhihu.matisse.MimeType;
 
@@ -61,6 +72,12 @@ import java.util.regex.Pattern;
 import butterknife.BindView;
 import butterknife.OnClick;
 import es.dmoral.toasty.Toasty;
+import permissions.dispatcher.NeedsPermission;
+import permissions.dispatcher.OnNeverAskAgain;
+import permissions.dispatcher.OnPermissionDenied;
+import permissions.dispatcher.OnShowRationale;
+import permissions.dispatcher.PermissionRequest;
+import permissions.dispatcher.RuntimePermissions;
 import rx.functions.Action1;
 import top.zibin.luban.CompressionPredicate;
 import top.zibin.luban.Luban;
@@ -69,6 +86,7 @@ import top.zibin.luban.OnCompressListener;
 /**
  * Created by myflying on 2018/11/23.
  */
+@RuntimePermissions
 public class PushNoteActivity extends BaseFragmentActivity implements IBaseView {
 
     public static final int REQUEST_CODE_CHOOSE = 23;
@@ -150,6 +168,39 @@ public class PushNoteActivity extends BaseFragmentActivity implements IBaseView 
     private String recordId;
 
     private int isFromTask = 0;
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        PushNoteActivityPermissionsDispatcher.onRequestPermissionsResult(this, requestCode, grantResults);
+    }
+
+    @NeedsPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+    void showReadStorage() {
+        Matisse.from(PushNoteActivity.this)
+                .choose(MimeType.ofImage())
+                .countable(true)
+                .maxSelectable(maxTotal)
+                .restrictOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED)
+                .thumbnailScale(0.85f)
+                .imageEngine(new Glide4Engine())
+                .forResult(REQUEST_CODE_CHOOSE);
+    }
+
+    @OnPermissionDenied(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+    void onReadStorageDenied() {
+        Toasty.normal(this, "请授权存储权限后选择图片").show();
+    }
+
+    @OnShowRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+    void showRationaleForReadStorage(PermissionRequest request) {
+        request.proceed();
+    }
+
+    @OnNeverAskAgain(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+    void onReadStorageNeverAskAgain() {
+        Toasty.normal(this, "请手动开启存储权限后选择图片").show();
+    }
 
     @Override
     protected int getContextViewId() {
@@ -264,15 +315,7 @@ public class PushNoteActivity extends BaseFragmentActivity implements IBaseView 
         addNoteImageAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
-
-                Matisse.from(PushNoteActivity.this)
-                        .choose(MimeType.ofImage())
-                        .countable(true)
-                        .maxSelectable(maxTotal)
-                        .restrictOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED)
-                        .thumbnailScale(0.85f)
-                        .imageEngine(new Glide4Engine())
-                        .forResult(REQUEST_CODE_CHOOSE);
+                PushNoteActivityPermissionsDispatcher.showReadStorageWithPermissionCheck(PushNoteActivity.this);
             }
         });
 

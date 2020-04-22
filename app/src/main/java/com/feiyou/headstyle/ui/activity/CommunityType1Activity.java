@@ -18,14 +18,20 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.alibaba.fastjson.JSON;
+import com.blankj.utilcode.util.ScreenUtils;
 import com.blankj.utilcode.util.StringUtils;
 import com.blankj.utilcode.util.ToastUtils;
+import com.bytedance.sdk.openadsdk.AdSlot;
+import com.bytedance.sdk.openadsdk.TTAdManager;
+import com.bytedance.sdk.openadsdk.TTAdNative;
+import com.bytedance.sdk.openadsdk.TTNativeExpressAd;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.R;
 import com.feiyou.headstyle.bean.FollowInfoRet;
 import com.feiyou.headstyle.bean.MessageEvent;
 import com.feiyou.headstyle.bean.NoteInfo;
+import com.feiyou.headstyle.bean.NoteInfoRet;
 import com.feiyou.headstyle.bean.NoteTypeRet;
 import com.feiyou.headstyle.bean.NoteTypeWrapper;
 import com.feiyou.headstyle.bean.ResultInfo;
@@ -34,9 +40,10 @@ import com.feiyou.headstyle.common.Constants;
 import com.feiyou.headstyle.presenter.AddZanPresenterImp;
 import com.feiyou.headstyle.presenter.FollowInfoPresenterImp;
 import com.feiyou.headstyle.presenter.NoteTypePresenterImp;
-import com.feiyou.headstyle.ui.adapter.NoteInfoAdapter;
+import com.feiyou.headstyle.ui.adapter.NoteMultipleAdapter;
 import com.feiyou.headstyle.ui.base.BaseFragmentActivity;
 import com.feiyou.headstyle.ui.custom.LoginDialog;
+import com.feiyou.headstyle.utils.TTAdManagerHolder;
 import com.feiyou.headstyle.view.NoteTypeView;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
@@ -52,6 +59,8 @@ import com.wang.avi.AVLoadingIndicatorView;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -109,11 +118,13 @@ public class CommunityType1Activity extends BaseFragmentActivity implements Note
     @BindView(R.id.community_type_list)
     RecyclerView mCommunityTypeListView;
 
-    NoteInfoAdapter noteInfoAdapter;
+    //noteMultipleAdapter noteMultipleAdapter;
+
+    NoteMultipleAdapter noteMultipleAdapter;
 
     private int currentPage = 1;
 
-    private int pageSize = 10;
+    private int pageSize = 6;
 
     private FollowInfoPresenterImp followInfoPresenterImp;
 
@@ -158,6 +169,8 @@ public class CommunityType1Activity extends BaseFragmentActivity implements Note
     BottomSheetDialog normalShareDialog;
 
     private int topicDefIndex = -1;
+
+    private TTAdNative mTTAdNative;
 
     @Override
     protected int getContextViewId() {
@@ -219,6 +232,10 @@ public class CommunityType1Activity extends BaseFragmentActivity implements Note
             topicId = bundle.getString("topic_id");
         }
 
+        //step1:初始化sdk
+        TTAdManager ttAdManager = TTAdManagerHolder.get();
+        mTTAdNative = ttAdManager.createAdNative(this);
+
         mRefreshLayout.setOnRefreshListener(this);
         //设置进度View样式的大小，只有两个值DEFAULT和LARGE
         //设置进度View下拉的起始点和结束点，scale 是指设置是否需要放大或者缩小动画
@@ -242,20 +259,20 @@ public class CommunityType1Activity extends BaseFragmentActivity implements Note
         noteTypePresenterImp = new NoteTypePresenterImp(this, this);
         addZanPresenterImp = new AddZanPresenterImp(this, this);
 
-        noteInfoAdapter = new NoteInfoAdapter(this, null, 1);
+        noteMultipleAdapter = new NoteMultipleAdapter(null, 1);
         mCommunityTypeListView.setLayoutManager(new LinearLayoutManager(this));
-        mCommunityTypeListView.setAdapter(noteInfoAdapter);
+        mCommunityTypeListView.setAdapter(noteMultipleAdapter);
 
-        noteInfoAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
+        noteMultipleAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
                 Intent intent = new Intent(CommunityType1Activity.this, CommunityArticleActivity.class);
-                intent.putExtra("msg_id", noteInfoAdapter.getData().get(position).getId());
+                intent.putExtra("msg_id", noteMultipleAdapter.getData().get(position).getId());
                 startActivity(intent);
             }
         });
 
-        noteInfoAdapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
+        noteMultipleAdapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
             @Override
             public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
 
@@ -270,15 +287,15 @@ public class CommunityType1Activity extends BaseFragmentActivity implements Note
 
                 if (view.getId() == R.id.layout_follow) {
                     followTopic = false;
-                    followInfoPresenterImp.addFollow(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", noteInfoAdapter.getData().get(position).getUserId());
+                    followInfoPresenterImp.addFollow(App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", noteMultipleAdapter.getData().get(position).getUserId());
                 }
                 if (view.getId() == R.id.layout_item_zan) {
-                    String messageId = noteInfoAdapter.getData().get(position).getId();
-                    addZanPresenterImp.addZan(1, App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", noteInfoAdapter.getData().get(position).getUserId(), messageId, "", "", 1);
+                    String messageId = noteMultipleAdapter.getData().get(position).getId();
+                    addZanPresenterImp.addZan(1, App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "", noteMultipleAdapter.getData().get(position).getUserId(), messageId, "", "", 1);
                 }
                 if (view.getId() == R.id.iv_user_head) {
                     Intent intent = new Intent(CommunityType1Activity.this, UserInfoActivity.class);
-                    intent.putExtra("user_id", noteInfoAdapter.getData().get(position).getUserId());
+                    intent.putExtra("user_id", noteMultipleAdapter.getData().get(position).getUserId());
                     startActivity(intent);
                 }
 
@@ -291,11 +308,11 @@ public class CommunityType1Activity extends BaseFragmentActivity implements Note
             }
         });
 
-        noteInfoAdapter.setOnLoadMoreListener(new BaseQuickAdapter.RequestLoadMoreListener() {
+        noteMultipleAdapter.setOnLoadMoreListener(new BaseQuickAdapter.RequestLoadMoreListener() {
             @Override
             public void onLoadMoreRequested() {
                 currentPage++;
-                noteTypePresenterImp.getNoteTypeData(topicId, currentPage, 1, App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "");
+                noteTypePresenterImp.getNoteTypeData(topicId, currentPage, pageSize, 1, App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "");
             }
         }, mCommunityTypeListView);
 
@@ -312,7 +329,7 @@ public class CommunityType1Activity extends BaseFragmentActivity implements Note
             }
         });
 
-        noteTypePresenterImp.getNoteTypeData(topicId, currentPage, 1, App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "");
+        noteTypePresenterImp.getNoteTypeData(topicId, currentPage, pageSize, 1, App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "");
     }
 
     @OnClick(R.id.fab)
@@ -406,17 +423,46 @@ public class CommunityType1Activity extends BaseFragmentActivity implements Note
 
                 if (noteTypeWrapper != null && noteTypeWrapper.getList() != null) {
                     if (currentPage == 1) {
-                        noteInfoAdapter.setNewData(noteTypeWrapper.getList());
+
+                        List<NoteInfo> tempList = noteTypeWrapper.getList();
+                        for (NoteInfo noteInfo : tempList) {
+                            noteInfo.setItemType(NoteInfo.NOTE_NORMAL);
+                        }
+
+                        NoteInfo tempNoteInfo = new NoteInfo(NoteInfo.NOTE_AD);
+                        tempList.add(tempNoteInfo);
+
+                        noteMultipleAdapter.setNewData(tempList);
                     } else {
-                        noteInfoAdapter.addData(noteTypeWrapper.getList());
+                        List<NoteInfo> tempList = noteTypeWrapper.getList();
+                        for (NoteInfo noteInfo : tempList) {
+                            noteInfo.setItemType(NoteInfo.NOTE_NORMAL);
+                        }
+
+                        noteMultipleAdapter.addData(tempList);
+
+                        NoteInfo tempNoteInfo = new NoteInfo(NoteInfo.NOTE_AD);
+                        noteMultipleAdapter.getData().add(tempNoteInfo);
+                        noteMultipleAdapter.notifyItemChanged(noteMultipleAdapter.getData().size() - 1);
                     }
                 }
 
-                if (noteTypeWrapper != null && noteTypeWrapper.getList().size() == pageSize) {
-                    noteInfoAdapter.loadMoreComplete();
+                if (currentPage == 1) {
+                    if (noteTypeWrapper != null && noteTypeWrapper.getList().size() == pageSize + 1) {
+                        noteMultipleAdapter.loadMoreComplete();
+                    } else {
+                        noteMultipleAdapter.loadMoreEnd(true);
+                    }
                 } else {
-                    noteInfoAdapter.loadMoreEnd(true);
+                    if (noteTypeWrapper != null && noteTypeWrapper.getList().size() == pageSize) {
+                        noteMultipleAdapter.loadMoreComplete();
+                    } else {
+                        noteMultipleAdapter.loadMoreEnd(true);
+                    }
                 }
+
+                //TODO，加载广告
+                loadListAd();
 
                 if (noteTypeWrapper.getIsGuan() == 0) {
                     mCommunityFollowLayout.setBackgroundResource(R.mipmap.not_follow_topic);
@@ -446,14 +492,14 @@ public class CommunityType1Activity extends BaseFragmentActivity implements Note
                         //关注用户
                         int isGuan = ((FollowInfoRet) tData).getData().getIsGuan();
                         Toasty.normal(this, isGuan == 0 ? "已取消" : "已关注").show();
-                        noteInfoAdapter.getData().get(currentClickIndex).setIsGuan(isGuan);
-                        String gUserId = noteInfoAdapter.getData().get(currentClickIndex).getUserId();
-                        for (NoteInfo noteInfo : noteInfoAdapter.getData()) {
+                        noteMultipleAdapter.getData().get(currentClickIndex).setIsGuan(isGuan);
+                        String gUserId = noteMultipleAdapter.getData().get(currentClickIndex).getUserId();
+                        for (NoteInfo noteInfo : noteMultipleAdapter.getData()) {
                             if (noteInfo.getUserId().equals(gUserId)) {
                                 noteInfo.setIsGuan(isGuan);
                             }
                         }
-                        noteInfoAdapter.notifyDataSetChanged();
+                        noteMultipleAdapter.notifyDataSetChanged();
                     }
                 } else {
                     ToastUtils.showLong(StringUtils.isEmpty(tData.getMsg()) ? "操作错误" : tData.getMsg());
@@ -461,16 +507,16 @@ public class CommunityType1Activity extends BaseFragmentActivity implements Note
             }
 
             if (tData instanceof ZanResultRet) {
-                int tempNum = noteInfoAdapter.getData().get(currentClickIndex).getZanNum();
+                int tempNum = noteMultipleAdapter.getData().get(currentClickIndex).getZanNum();
                 if (((ZanResultRet) tData).getData().getIsZan() == 0) {
                     tempNum = tempNum - 1;
                 } else {
                     tempNum = tempNum + 1;
                 }
 
-                noteInfoAdapter.getData().get(currentClickIndex).setZanNum(tempNum);
-                noteInfoAdapter.getData().get(currentClickIndex).setIsZan(((ZanResultRet) tData).getData().getIsZan());
-                noteInfoAdapter.notifyDataSetChanged();
+                noteMultipleAdapter.getData().get(currentClickIndex).setZanNum(tempNum);
+                noteMultipleAdapter.getData().get(currentClickIndex).setIsZan(((ZanResultRet) tData).getData().getIsZan());
+                noteMultipleAdapter.notifyDataSetChanged();
             }
         } else {
 
@@ -540,8 +586,8 @@ public class CommunityType1Activity extends BaseFragmentActivity implements Note
         String shareTitle = "一位神秘人士对你发出邀请";
         String shareContent = "这里的老哥老姐个个都是人才，说话又好听，我超喜欢这里...";
         String tempStr = "一位神秘人士对你发出邀请";
-        if(noteInfoAdapter.getData() != null && noteInfoAdapter.getData().size() > 0){
-            tempStr = StringUtils.isEmpty(noteInfoAdapter.getData().get(currentClickIndex).getContent()) ? "一位神秘人士对你发出邀请" : noteInfoAdapter.getData().get(currentClickIndex).getContent();
+        if (noteMultipleAdapter.getData() != null && noteMultipleAdapter.getData().size() > 0) {
+            tempStr = StringUtils.isEmpty(noteMultipleAdapter.getData().get(currentClickIndex).getContent()) ? "一位神秘人士对你发出邀请" : noteMultipleAdapter.getData().get(currentClickIndex).getContent();
         }
 
         UMWeb web = new UMWeb("http://gx.qqtn.com");
@@ -553,15 +599,15 @@ public class CommunityType1Activity extends BaseFragmentActivity implements Note
         }
 
         UMImage normalImage = null;
-        if(noteInfoAdapter.getData() != null && noteInfoAdapter.getData().size() > 0) {
-            if (noteInfoAdapter.getData().get(currentClickIndex).getImageArr() != null && noteInfoAdapter.getData().get(currentClickIndex).getImageArr().length > 0) {
-                normalImage = new UMImage(CommunityType1Activity.this, noteInfoAdapter.getData().get(currentClickIndex).getImageArr()[0]);
+        if (noteMultipleAdapter.getData() != null && noteMultipleAdapter.getData().size() > 0) {
+            if (noteMultipleAdapter.getData().get(currentClickIndex).getImageArr() != null && noteMultipleAdapter.getData().get(currentClickIndex).getImageArr().length > 0) {
+                normalImage = new UMImage(CommunityType1Activity.this, noteMultipleAdapter.getData().get(currentClickIndex).getImageArr()[0]);
                 normalImage.compressStyle = UMImage.CompressStyle.QUALITY;
             } else {
                 normalImage = new UMImage(CommunityType1Activity.this, R.drawable.app_share);
                 normalImage.compressStyle = UMImage.CompressStyle.QUALITY;
             }
-        }else {
+        } else {
             normalImage = new UMImage(CommunityType1Activity.this, R.drawable.app_share);
             normalImage.compressStyle = UMImage.CompressStyle.QUALITY;
         }
@@ -651,7 +697,7 @@ public class CommunityType1Activity extends BaseFragmentActivity implements Note
     public void Event(MessageEvent messageEvent) {
         if (messageEvent.getMessage().equals("add_note_type")) {
             //发帖后添加到首页
-            //noteInfoAdapter.addData(0, messageEvent.getAddNoteInfo());
+            //noteMultipleAdapter.addData(0, messageEvent.getAddNoteInfo());
             //mCommunityTypeListView.scrollToPosition(0);
 
 
@@ -659,7 +705,7 @@ public class CommunityType1Activity extends BaseFragmentActivity implements Note
             //currentPage = 1;
             //noteTypePresenterImp.getNoteTypeData(topicId, currentPage, 1, App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "");
 
-            noteInfoAdapter.addData(0, messageEvent.getAddNoteInfo());
+            noteMultipleAdapter.addData(0, messageEvent.getAddNoteInfo());
         }
     }
 
@@ -668,6 +714,80 @@ public class CommunityType1Activity extends BaseFragmentActivity implements Note
         super.onActivityResult(requestCode, resultCode, data);
         UMShareAPI.get(this).onActivityResult(requestCode, resultCode, data);
     }
+
+    /**
+     * 加载feed广告
+     */
+    private void loadListAd() {
+        Logger.i("dpi--->" + ScreenUtils.getScreenDensityDpi() + "density--->" + ScreenUtils.getScreenDensity());
+        float expressViewWidth = ScreenUtils.getScreenWidth() / ScreenUtils.getScreenDensity();
+        float expressViewHeight = 0;
+
+        //step4:创建feed广告请求类型参数AdSlot,具体参数含义参考文档
+        AdSlot adSlot = new AdSlot.Builder()
+                .setCodeId("945144473")
+                .setSupportDeepLink(true)
+                .setExpressViewAcceptedSize(expressViewWidth, expressViewHeight) //期望模板广告view的size,单位dp
+                .setAdCount(1) //请求广告数量为1到3条
+                .build();
+        //step5:请求广告，调用feed广告异步请求接口，加载到广告后，拿到广告素材自定义渲染
+        mTTAdNative.loadNativeExpressAd(adSlot, new TTAdNative.NativeExpressAdListener() {
+            @Override
+            public void onError(int code, String message) {
+                Logger.i("feed error--->" + code + "---message--->" + message);
+            }
+
+            @Override
+            public void onNativeExpressAdLoad(List<TTNativeExpressAd> ads) {
+                if (ads == null || ads.isEmpty()) {
+                    Logger.i("on FeedAdLoaded: ad is null!");
+                    return;
+                }
+                bindAdListener(ads);
+            }
+        });
+    }
+
+    private void bindAdListener(final List<TTNativeExpressAd> ads) {
+        for (int i = 0; i < ads.size(); i++) {
+            final TTNativeExpressAd adTmp = ads.get(i);
+            int tempIndex = currentPage * pageSize * (i + 1);
+            if (tempIndex >= noteMultipleAdapter.getData().size()) {
+                return;
+            }
+
+            NoteInfo tempHeadInfo = noteMultipleAdapter.getData().get(tempIndex);
+            tempHeadInfo.setTtNativeExpressAd(adTmp);
+            noteMultipleAdapter.getData().set(tempIndex, tempHeadInfo);
+
+            adTmp.setExpressInteractionListener(new TTNativeExpressAd.ExpressAdInteractionListener() {
+                @Override
+                public void onAdClicked(View view, int type) {
+                    //TToast.show(NativeExpressListActivity.this, "广告被点击");
+                }
+
+                @Override
+                public void onAdShow(View view, int type) {
+                    //TToast.show(NativeExpressListActivity.this, "广告展示");
+                }
+
+                @Override
+                public void onRenderFail(View view, String msg, int code) {
+                    //TToast.show(NativeExpressListActivity.this, msg + " code:" + code);
+                }
+
+                @Override
+                public void onRenderSuccess(View view, float width, float height) {
+                    Logger.i("feed render success--->" + tempIndex);
+                    noteMultipleAdapter.notifyItemChanged(tempIndex);
+                }
+            });
+            adTmp.render();
+        }
+
+        Logger.i("total size--->" + noteMultipleAdapter.getData().size());
+    }
+
 
     /**
      * 关闭分享窗口
@@ -691,6 +811,6 @@ public class CommunityType1Activity extends BaseFragmentActivity implements Note
     public void onRefresh() {
         mRefreshLayout.setRefreshing(true);
         currentPage = 1;
-        noteTypePresenterImp.getNoteTypeData(topicId, currentPage, 1, App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "");
+        noteTypePresenterImp.getNoteTypeData(topicId, currentPage, pageSize, 1, App.getApp().getmUserInfo() != null ? App.getApp().getmUserInfo().getId() : "");
     }
 }

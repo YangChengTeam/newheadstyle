@@ -5,6 +5,7 @@ import android.graphics.drawable.Drawable;
 
 import androidx.core.content.ContextCompat;
 
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -42,8 +43,7 @@ public class VideoItemShowAdapter extends BaseQuickAdapter<VideoInfo, BaseViewHo
         JzvdStd jzvdStd = helper.getView(R.id.videoplayer);
         JZDataSource jzDataSource = new JZDataSource(item.getVideoPath());
         jzDataSource.looping = true;
-
-        jzvdStd.setUp(jzDataSource, Jzvd.SCREEN_FULLSCREEN);
+        jzvdStd.setUp(jzDataSource, Jzvd.SCREEN_WINDOW_FULLSCREEN);
         if (helper.getAdapterPosition() == 0) {
             jzvdStd.startVideo();
         }

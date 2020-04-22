@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
 
@@ -75,11 +76,13 @@ import com.feiyou.headstyle.presenter.RecordInfoPresenterImp;
 import com.feiyou.headstyle.presenter.TaskRecordInfoPresenterImp;
 import com.feiyou.headstyle.presenter.VersionPresenterImp;
 import com.feiyou.headstyle.ui.activity.AdActivity;
+import com.feiyou.headstyle.ui.activity.CashActivity;
 import com.feiyou.headstyle.ui.activity.Collection2Activity;
 import com.feiyou.headstyle.ui.activity.CommunityArticleActivity;
 import com.feiyou.headstyle.ui.activity.EveryDayHongBaoActivity;
 import com.feiyou.headstyle.ui.activity.HeadListActivity;
 import com.feiyou.headstyle.ui.activity.HeadShowActivity;
+import com.feiyou.headstyle.ui.activity.MainActivity;
 import com.feiyou.headstyle.ui.activity.MoreTypeActivity;
 import com.feiyou.headstyle.ui.activity.SearchActivity;
 import com.feiyou.headstyle.ui.adapter.HeadInfoAdapter;
@@ -286,6 +289,8 @@ public class HomeFragment extends BaseFragment implements IBaseView, View.OnClic
 
     private int firstIndex = 9;
 
+    private boolean isCheckVersion;
+
     private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(android.os.Message msg) {
@@ -302,6 +307,8 @@ public class HomeFragment extends BaseFragment implements IBaseView, View.OnClic
                     int progress = (Integer) msg.obj;
                     updateDialog.setProgress(progress);
                     break;
+                case 2:
+                    break;
                 default:
                     break;
             }
@@ -316,7 +323,10 @@ public class HomeFragment extends BaseFragment implements IBaseView, View.OnClic
 
     @NeedsPermission(Manifest.permission.READ_PHONE_STATE)
     public void showReadPhone() {
-        App.imei = PhoneUtils.getIMEI();
+        if (android.os.Build.VERSION.SDK_INT < 29) {
+            App.imei = PhoneUtils.getIMEI();
+        }
+
         App.androidId = DeviceUtils.getAndroidID();
         Logger.i("imei --->" + App.imei + "---androidId--->" + App.androidId);
         HomeFragmentPermissionsDispatcher.showReadStorageWithPermissionCheck(this);
@@ -566,6 +576,10 @@ public class HomeFragment extends BaseFragment implements IBaseView, View.OnClic
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
 
+                if (!com.feiyou.headstyle.utils.AppUtils.isNotFastClick()) {
+                    return;
+                }
+
                 if (position == headTypeAdapter.getData().size() - 1) {
                     Intent intent = new Intent(getActivity(), MoreTypeActivity.class);
                     startActivity(intent);
@@ -579,19 +593,8 @@ public class HomeFragment extends BaseFragment implements IBaseView, View.OnClic
         });
 
         gridLayoutManager = new GridLayoutManager(getActivity(), 3);
-        /*gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
-            @Override
-            public int getSpanSize(int position) {
-                if (position == 0 || position == 10 || position == 43) {
-                    Logger.i("ad pos--->" + position);
-                    return 3;
-                }
-                return 1;
-            }
-        });*/
 
-
-        headMultipleAdapter = new HeadMultipleAdapter(null);
+        headMultipleAdapter = new HeadMultipleAdapter(null, 1);
         mHeadInfoListView.setLayoutManager(gridLayoutManager);
         headMultipleAdapter.addHeaderView(topView);
         mHeadInfoListView.setAdapter(headMultipleAdapter);
@@ -646,6 +649,15 @@ public class HomeFragment extends BaseFragment implements IBaseView, View.OnClic
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
                 Logger.i("current pos--->" + position);
+
+                if (position > 8) {
+                    if (position <= firstIndex + pageSize) {
+                        position = position - 1;
+                    } else {
+                        int tempPage = position / pageSize;
+                        position = position - 1 - (position - firstIndex - 3) / pageSize;
+                    }
+                }
 
                 int jumpPage = randomPage + position / pageSize;
                 int jumpPosition = position % pageSize;
@@ -721,19 +733,25 @@ public class HomeFragment extends BaseFragment implements IBaseView, View.OnClic
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
         if (isVisibleToUser) {
-            if (AppContextUtil.isValidContext(getActivity()) && App.getApp().getmUserInfo() != null && isAlertHongBao) {
-                //今日是否关闭过红包
-                String lastDate = SPUtils.getInstance().getString(Constants.CLOSE_HB_DATA, "");
-                boolean todayIsCloseHB = false;
-                if (lastDate.equals(todayDate)) {
-                    todayIsCloseHB = true;
-                }
-
-                if (!todayIsCloseHB) {
-                    if (hongBaoDialog != null && !hongBaoDialog.isShowing()) {
-                        hongBaoDialog.show();
-                        hongBaoDialog.setHBConfigInfo(2, clickAnyWhere);
+            if (AppContextUtil.isValidContext(getActivity())) {
+                if (App.getApp().getmUserInfo() != null && isAlertHongBao) {
+                    //今日是否关闭过红包
+                    String lastDate = SPUtils.getInstance().getString(Constants.CLOSE_HB_DATA, "");
+                    boolean todayIsCloseHB = false;
+                    if (lastDate.equals(todayDate)) {
+                        todayIsCloseHB = true;
                     }
+
+                    if (!todayIsCloseHB && App.getApp().getmUserInfo().getGetDlhb() == 0) {
+                        if (hongBaoDialog != null && !hongBaoDialog.isShowing()) {
+                            hongBaoDialog.show();
+                            hongBaoDialog.setHBConfigInfo(2, clickAnyWhere);
+                        }
+                    }
+                }
+                if (isCheckVersion) {
+                    isCheckVersion = false;
+                    versionPresenterImp.getVersionInfo(com.feiyou.headstyle.utils.AppUtils.getMetaDataValue(getActivity(), "UMENG_CHANNEL"));
                 }
             }
         }
@@ -797,7 +815,7 @@ public class HomeFragment extends BaseFragment implements IBaseView, View.OnClic
         isFirstLoad = false;
         isChange = "1";
         loadPage = 1;
-        homeDataPresenterImp.getData(mUserInfo != null ? mUserInfo.getId() : "", "", "", isChange, 0);
+        homeDataPresenterImp.getData(mUserInfo != null ? mUserInfo.getId() : "", "", pageSize + "", isChange, 0);
         gridLayoutManager.scrollToPosition(0);
     }
 
@@ -806,7 +824,8 @@ public class HomeFragment extends BaseFragment implements IBaseView, View.OnClic
         mRefreshLayout.setRefreshing(true);
         isFirstLoad = true;
         isChange = "1";
-        homeDataPresenterImp.getData(mUserInfo != null ? mUserInfo.getId() : "", "", "", isChange, 0);
+        loadPage = 1;
+        homeDataPresenterImp.getData(mUserInfo != null ? mUserInfo.getId() : "", "", pageSize + "", isChange, 0);
         gridLayoutManager.scrollToPosition(0);
     }
 
@@ -838,7 +857,11 @@ public class HomeFragment extends BaseFragment implements IBaseView, View.OnClic
     }
 
     public void randomMoney() {
-        Logger.i("videoMoneys--->" + JSON.toJSONString(seeVideoMoneys));
+        if (seeVideoMoneys == null) {
+            seeVideoMoney = 0.01;
+            return;
+        }
+        //Logger.i("videoMoneys--->" + JSON.toJSONString(seeVideoMoneys));
         double temp = RandomUtils.nextDouble(Double.parseDouble(seeVideoMoneys[0]), Double.parseDouble(seeVideoMoneys[1]));
         BigDecimal tempBd = new BigDecimal(temp);
         seeVideoMoney = tempBd.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
@@ -936,14 +959,15 @@ public class HomeFragment extends BaseFragment implements IBaseView, View.OnClic
                             }
                             headMultipleAdapter.addData((tempList));
 
+                            int addIndex = firstIndex + (loadPage - 1) * pageSize + (loadPage - 1);
                             HeadInfo tempHeadInfo = new HeadInfo(HeadInfo.HEAD_AD);
-                            headMultipleAdapter.getData().add(tempHeadInfo);
-                            headMultipleAdapter.notifyItemChanged(headMultipleAdapter.getData().size() - 1);
-                            Logger.i("current index1111--->" + (headMultipleAdapter.getData().size() - 1) + "---load page--->" + loadPage);
+                            headMultipleAdapter.getData().add(addIndex, tempHeadInfo);
+
+                            headMultipleAdapter.notifyItemChanged(addIndex);
+                            Logger.i("current index1111--->" + addIndex + "---load page--->" + loadPage);
                             for (int i = 0; i < headMultipleAdapter.getData().size(); i++) {
                                 Logger.i("item--->" + i + "---->" + headMultipleAdapter.getData().get(i).getItemType());
                             }
-
                         }
 
                         if (loadPage == 1) {
@@ -960,10 +984,11 @@ public class HomeFragment extends BaseFragment implements IBaseView, View.OnClic
                             }
                         }
 
-                        gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+                        headMultipleAdapter.setSpanSizeLookup(new BaseQuickAdapter.SpanSizeLookup() {
                             @Override
-                            public int getSpanSize(int position) {
-                                if (position == 0 || position == 10 || (position > (loadPage * pageSize) && (position % (loadPage * pageSize + loadPage -1) == 0))) {
+                            public int getSpanSize(GridLayoutManager gridLayoutManager, int position) {
+                                HeadInfo headInfo = headMultipleAdapter.getData().get(position);
+                                if (headInfo != null && headInfo.getItemType() == 2) {
                                     Logger.i("pppp--->" + position);
                                     return 3;
                                 }
@@ -1014,18 +1039,14 @@ public class HomeFragment extends BaseFragment implements IBaseView, View.OnClic
                         }
                     }
                 }
-
-                //在不弹出红包的情况下检测版本更新
-                if (!isAlertHongBao && SPUtils.getInstance().getBoolean(Constants.SHOW_PRIVARY, false)) {
-                    //请求版本更新
-                    versionPresenterImp.getVersionInfo(com.feiyou.headstyle.utils.AppUtils.getMetaDataValue(getActivity(), "UMENG_CHANNEL"));
-                }
             }
 
             if (tData instanceof HongBaoInfoRet) {
                 Logger.i("hongbao data--->" + JSON.toJSONString(tData));
+                if (!StringUtils.isEmpty(((HongBaoInfoRet) tData).getData().getCashindex())) {
+                    seeVideoMoneys = ((HongBaoInfoRet) tData).getData().getCashindex().split("/");
+                }
 
-                seeVideoMoneys = ((HongBaoInfoRet) tData).getData().getCashindex().split("/");
                 //根据返回的金额范围，随机产生获得奖励值
                 randomMoney();
 
@@ -1045,13 +1066,21 @@ public class HomeFragment extends BaseFragment implements IBaseView, View.OnClic
                             hongBaoDialog.show();
                             hongBaoDialog.setHBConfigInfo(showHBType, clickAnyWhere);
                         }
+                    } else {
+                        //在不弹出红包的情况下检测版本更新
+                        if (SPUtils.getInstance().getBoolean(Constants.SHOW_PRIVARY, false)) {
+                            //请求版本更新
+                            versionPresenterImp.getVersionInfo(com.feiyou.headstyle.utils.AppUtils.getMetaDataValue(getActivity(), "UMENG_CHANNEL"));
+                        }
                     }
                 }
             }
 
             if (tData instanceof TaskRecordInfoRet) {
                 if (((TaskRecordInfoRet) tData).getCode() == Constants.SUCCESS) {
-
+                    Message message = new Message();
+                    message.what = 2;
+                    mHandler.sendMessage(message);
                 }
             }
 
@@ -1322,6 +1351,7 @@ public class HomeFragment extends BaseFragment implements IBaseView, View.OnClic
                         String userId = mUserInfo != null ? mUserInfo.getId() : "";
                         if (showHBType == 1) {
                             userId = newPersonId;
+                            SPUtils.getInstance().put(Constants.NO_LOGIN_MONEY, seeVideoMoney + "");
                         }
                         taskRecordInfoPresenterImp.addHomeTaskRecord(userId, mUserInfo != null ? mUserInfo.getOpenid() : "", App.imei, seeVideoMoney, showHBType);
                     }
@@ -1424,8 +1454,32 @@ public class HomeFragment extends BaseFragment implements IBaseView, View.OnClic
         if (hongBaoDialog != null && hongBaoDialog.isShowing()) {
             hongBaoDialog.dismiss();
         }
+
+        //在不弹出红包的情况下检测版本更新
+        if (SPUtils.getInstance().getBoolean(Constants.SHOW_PRIVARY, false)) {
+            //请求版本更新
+            versionPresenterImp.getVersionInfo(com.feiyou.headstyle.utils.AppUtils.getMetaDataValue(getActivity(), "UMENG_CHANNEL"));
+        }
     }
 
+
+    @Override
+    public void showClose() {
+        directClose();
+    }
+
+    @Override
+    public void toCash() {
+        SPUtils.getInstance().put(Constants.CLOSE_HB_DATA, todayDate);
+        Intent intent = new Intent(getActivity(), CashActivity.class);
+        intent.putExtra("temp_user_id", newPersonId);
+        startActivity(intent);
+
+        isCheckVersion = true;
+        if (hongBaoDialog != null && hongBaoDialog.isShowing()) {
+            hongBaoDialog.dismiss();
+        }
+    }
 
     @Override
     public void agree() {
@@ -1456,8 +1510,8 @@ public class HomeFragment extends BaseFragment implements IBaseView, View.OnClic
      * 加载feed广告
      */
     private void loadListAd() {
-        Logger.i("dpi--->" + ScreenUtils.getScreenDensityDpi() + "density--->" + ScreenUtils.getScreenDensity());
-        float expressViewWidth = ScreenUtils.getScreenDensityDpi() <= 320 ? 340 : ScreenUtils.getScreenDensityDpi();
+        Logger.i("dpi--->" + ScreenUtils.getScreenWidth() / ScreenUtils.getScreenDensity());
+        float expressViewWidth = (ScreenUtils.getScreenWidth() / ScreenUtils.getScreenDensity()) - 24;
         float expressViewHeight = 0;
 
         //step4:创建feed广告请求类型参数AdSlot,具体参数含义参考文档
