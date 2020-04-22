@@ -211,6 +211,8 @@ public class RecommendFragment extends BaseFragment implements NoteDataView, Swi
         Logger.i("communityType" + communityType);
 
         noteMultipleAdapter = new NoteMultipleAdapter(null, 1);
+        //TODO
+        noteMultipleAdapter.setHasStableIds(true);
         mRecommendListView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecommendListView.setAdapter(noteMultipleAdapter);
 

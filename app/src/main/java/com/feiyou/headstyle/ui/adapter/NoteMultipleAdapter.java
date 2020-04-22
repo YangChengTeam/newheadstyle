@@ -40,6 +40,7 @@ import com.feiyou.headstyle.ui.activity.ShowImageListActivity;
 import com.feiyou.headstyle.ui.custom.DislikeDialog;
 import com.feiyou.headstyle.ui.custom.RoundedCornersTransformation;
 import com.feiyou.headstyle.utils.MyTimeUtil;
+import com.orhanobut.logger.Logger;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -67,11 +68,25 @@ public class NoteMultipleAdapter extends BaseMultiItemQuickAdapter<NoteInfo, Bas
     }
 
     @Override
+    public long getItemId(int position) {
+        return position;
+    }
+
+    @Override
     protected void convert(@NonNull BaseViewHolder helper, NoteInfo item) {
 
         if (helper.getItemViewType() == NoteInfo.NOTE_AD) {
 
-            LinearLayout adItemLayout = helper.getView(R.id.layout_ad_item);
+            LinearLayout adItemLayout = null;
+            if (helper.getView(R.id.layout_ad_item).getTag(R.id.layout_ad_item) != null) {
+                Logger.i("note ad item 111---->" + helper.getAdapterPosition());
+                adItemLayout = (LinearLayout) helper.getView(R.id.layout_ad_item).getTag(R.id.layout_ad_item);
+            } else {
+                Logger.i("note ad item 222---->" + helper.getAdapterPosition());
+                adItemLayout = helper.getView(R.id.layout_ad_item);
+                helper.getView(R.id.layout_ad_item).setTag(R.id.layout_ad_item, adItemLayout);
+            }
+
             LinearLayout.LayoutParams itemParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             adItemLayout.setLayoutParams(itemParams);
 
