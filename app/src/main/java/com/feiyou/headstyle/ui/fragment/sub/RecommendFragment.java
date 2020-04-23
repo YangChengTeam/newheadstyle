@@ -462,7 +462,7 @@ public class RecommendFragment extends BaseFragment implements NoteDataView, Swi
                     noteMultipleAdapter.getData().get(currentClickIndex).setIsGuan(isGuan);
                     String gUserId = noteMultipleAdapter.getData().get(currentClickIndex).getUserId();
                     for (NoteInfo noteInfo : noteMultipleAdapter.getData()) {
-                        noteInfo.setItemType(NoteInfo.NOTE_NORMAL);
+                        //noteInfo.setItemType(NoteInfo.NOTE_NORMAL);
                         if (gUserId != null && noteInfo.getUserId().equals(gUserId)) {
                             noteInfo.setIsGuan(isGuan);
                         }
