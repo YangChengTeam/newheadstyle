@@ -648,15 +648,12 @@ public class HomeFragment extends BaseFragment implements IBaseView, View.OnClic
         headMultipleAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
-                Logger.i("current pos--->" + position);
 
                 if (position > 8) {
-                    if (position <= firstIndex + pageSize) {
-                        position = position - 1;
-                    } else {
-                        int tempPage = position / pageSize;
-                        position = position - 1 - (position - firstIndex - 3) / pageSize;
-                    }
+                    int tempPos = position - firstIndex -1;
+                    Logger.i("current tempPos--->" + tempPos);
+                    int temp = tempPos / pageSize;
+                    position = position - temp -1;
                 }
 
                 int jumpPage = randomPage + position / pageSize;

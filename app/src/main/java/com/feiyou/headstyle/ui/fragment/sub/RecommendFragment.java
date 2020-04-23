@@ -648,14 +648,14 @@ public class RecommendFragment extends BaseFragment implements NoteDataView, Swi
     private void bindAdListener(final List<TTNativeExpressAd> ads) {
         for (int i = 0; i < ads.size(); i++) {
             final TTNativeExpressAd adTmp = ads.get(i);
-            int tempIndex = currentPage * pageSize * (i + 1);
+            /*int tempIndex = currentPage * pageSize + (currentPage - 1);
             if (tempIndex >= noteMultipleAdapter.getData().size()) {
                 return;
-            }
+            }*/
 
-            NoteInfo tempHeadInfo = noteMultipleAdapter.getData().get(tempIndex);
+            NoteInfo tempHeadInfo = noteMultipleAdapter.getData().get(noteMultipleAdapter.getData().size()-1);
             tempHeadInfo.setTtNativeExpressAd(adTmp);
-            noteMultipleAdapter.getData().set(tempIndex, tempHeadInfo);
+            noteMultipleAdapter.getData().set(noteMultipleAdapter.getData().size()-1, tempHeadInfo);
 
             adTmp.setExpressInteractionListener(new TTNativeExpressAd.ExpressAdInteractionListener() {
                 @Override
@@ -675,8 +675,8 @@ public class RecommendFragment extends BaseFragment implements NoteDataView, Swi
 
                 @Override
                 public void onRenderSuccess(View view, float width, float height) {
-                    Logger.i("feed render success--->" + tempIndex + "---hashcode--->" + adTmp.hashCode());
-                    noteMultipleAdapter.notifyItemChanged(tempIndex);
+                    noteMultipleAdapter.notifyItemChanged(noteMultipleAdapter.getData().size() - 1);
+                    Logger.i("feed render success--->" + (noteMultipleAdapter.getData().size() - 1) + "---hashcode--->" + adTmp.hashCode());
                 }
             });
             adTmp.render();

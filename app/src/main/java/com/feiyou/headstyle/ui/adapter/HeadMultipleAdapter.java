@@ -72,6 +72,8 @@ public class HeadMultipleAdapter extends BaseMultiItemQuickAdapter<HeadInfo, Bas
                 if (adView.getParent() != null) {
                     ((ViewGroup) adView.getParent()).removeView(adView);
                 }
+
+                tempView.removeAllViews();
                 RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
                 params.addRule(RelativeLayout.CENTER_IN_PARENT);
                 adView.setLayoutParams(params);

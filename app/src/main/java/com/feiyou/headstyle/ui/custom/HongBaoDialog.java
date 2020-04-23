@@ -166,36 +166,6 @@ public class HongBaoDialog extends Dialog implements View.OnClickListener {
             mHBAfterLayout.setVisibility(View.VISIBLE);
             mGetMoneyTv.setText(doubleMoney + "");
         }
-
-        RxCountDown.countdown(3)
-                .doOnSubscribe(new Action0() {
-                    @Override
-                    public void call() {
-                        //appendLog("开始计时");
-                        //ToastUtils.showLong("开始倒计时");
-                        mCloseHbIv.setClickable(false);
-                        mCloseHbIv.setVisibility(View.GONE);
-                    }
-                })
-                .subscribe(new Subscriber<Integer>() {
-                    @Override
-                    public void onCompleted() {
-                        //appendLog("计时完成");
-                        mCloseHbIv.setClickable(true);
-                        mCloseHbIv.setVisibility(View.VISIBLE);
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        mCloseHbIv.setClickable(true);
-                        mCloseHbIv.setVisibility(View.VISIBLE);
-                    }
-
-                    @Override
-                    public void onNext(Integer integer) {
-                        Logger.i("current time--->" + integer);
-                    }
-                });
     }
 
     @Override
