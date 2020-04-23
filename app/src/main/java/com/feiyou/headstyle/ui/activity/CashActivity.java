@@ -242,6 +242,8 @@ public class CashActivity extends BaseFragmentActivity implements ConfigDialog.C
             progressDialog.show();
         }
 
+        mUserInfo = App.getApp().mUserInfo;
+
         UMShareConfig config = new UMShareConfig();
         config.isNeedAuthOnGetUserInfo(true);
         mShareAPI.setShareConfig(config);
@@ -389,7 +391,7 @@ public class CashActivity extends BaseFragmentActivity implements ConfigDialog.C
         }
 
         if (tData != null) {
-
+            Logger.i("cash bind data--->" + JSON.toJSONString(tData));
             if (tData instanceof UserInfoRet) {
                 if (((UserInfoRet) tData).getCode() == Constants.SUCCESS) {
                     ToastUtils.showLong("绑定成功");

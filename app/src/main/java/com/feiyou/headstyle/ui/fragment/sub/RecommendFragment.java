@@ -462,10 +462,13 @@ public class RecommendFragment extends BaseFragment implements NoteDataView, Swi
                     noteMultipleAdapter.getData().get(currentClickIndex).setIsGuan(isGuan);
                     String gUserId = noteMultipleAdapter.getData().get(currentClickIndex).getUserId();
                     for (NoteInfo noteInfo : noteMultipleAdapter.getData()) {
-                        if (noteInfo.getUserId().equals(gUserId)) {
+                        noteInfo.setItemType(NoteInfo.NOTE_NORMAL);
+                        if (gUserId != null && noteInfo.getUserId().equals(gUserId)) {
                             noteInfo.setIsGuan(isGuan);
                         }
                     }
+                    mRecommendListView.setVisibility(View.VISIBLE);
+                    noDataLayout.setVisibility(View.GONE);
                     noteMultipleAdapter.notifyDataSetChanged();
                 } else {
                     Toasty.normal(getActivity(), StringUtils.isEmpty(tData.getMsg()) ? "操作错误" : tData.getMsg()).show();

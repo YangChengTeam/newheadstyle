@@ -54,7 +54,7 @@
                 android:imeOptions="actionSearch"
                 android:inputType="text"
                 android:textColor="@color/gray999"
-                android:textSize="@dimen/sp_12" />
+                android:textSize="12sp" />
         </LinearLayout>
     </LinearLayout>
 

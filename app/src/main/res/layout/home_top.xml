@@ -31,7 +31,7 @@
                 android:layout_marginLeft="8dp"
                 android:text="@string/search_txt"
                 android:textColor="@color/gray999"
-                android:textSize="@dimen/sp_12" />
+                android:textSize="12sp" />
         </LinearLayout>
     </LinearLayout>
 

@@ -174,6 +174,15 @@ public class HeadListActivity extends BaseFragmentActivity implements HeadListDa
         headMultipleAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
+
+                if (position > 21) {
+                    int tempPos = position - 21 - (position / pageSize);
+                    Logger.i("current tempPos--->" + tempPos);
+                    int temp = tempPos / pageSize;
+
+                    position = position - temp - 1;
+                }
+
                 int jumpPage = position / pageSize;
                 int jumpPosition = position % pageSize;
 

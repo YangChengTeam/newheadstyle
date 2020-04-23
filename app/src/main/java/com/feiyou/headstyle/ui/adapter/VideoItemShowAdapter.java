@@ -43,7 +43,7 @@ public class VideoItemShowAdapter extends BaseQuickAdapter<VideoInfo, BaseViewHo
         JzvdStd jzvdStd = helper.getView(R.id.videoplayer);
         JZDataSource jzDataSource = new JZDataSource(item.getVideoPath());
         jzDataSource.looping = true;
-        jzvdStd.setUp(jzDataSource, Jzvd.SCREEN_WINDOW_FULLSCREEN);
+        jzvdStd.setUp(jzDataSource, Jzvd.CURRENT_STATE_NORMAL);
         if (helper.getAdapterPosition() == 0) {
             jzvdStd.startVideo();
         }

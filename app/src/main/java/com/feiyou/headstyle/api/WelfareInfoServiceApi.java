@@ -15,6 +15,6 @@ import rx.Observable;
 
 public interface WelfareInfoServiceApi {
 
-    @POST("v1.welfare/index")
+    @POST("v2.welfare/index")
     Observable<WelfareInfoRet> getWelfareData(@Body RequestBody requestBody);
 }

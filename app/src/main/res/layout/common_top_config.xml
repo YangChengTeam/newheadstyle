@@ -20,7 +20,7 @@
         android:layout_centerInParent="true"
         android:text="@string/friends_select_txt"
         android:textColor="@color/black"
-        android:textSize="@dimen/sp_16" />
+        android:textSize="16sp" />
 
     <TextView
         android:id="@+id/tv_config"

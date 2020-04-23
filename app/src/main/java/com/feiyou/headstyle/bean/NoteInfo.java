@@ -114,6 +114,9 @@ public class NoteInfo implements MultiItemEntity {
     }
 
     public String getUserId() {
+        if(userId == null){
+            return "";
+        }
         return userId;
     }
 
