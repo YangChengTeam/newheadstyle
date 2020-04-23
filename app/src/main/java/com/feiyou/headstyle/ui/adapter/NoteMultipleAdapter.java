@@ -77,33 +77,34 @@ public class NoteMultipleAdapter extends BaseMultiItemQuickAdapter<NoteInfo, Bas
 
         if (helper.getItemViewType() == NoteInfo.NOTE_AD) {
 
-            LinearLayout adItemLayout = null;
-            if (helper.getView(R.id.layout_ad_item).getTag(R.id.layout_ad_item) != null) {
-                Logger.i("note ad item 111---->" + helper.getAdapterPosition());
-                adItemLayout = (LinearLayout) helper.getView(R.id.layout_ad_item).getTag(R.id.layout_ad_item);
-            } else {
-                Logger.i("note ad item 222---->" + helper.getAdapterPosition());
-                adItemLayout = helper.getView(R.id.layout_ad_item);
-                helper.getView(R.id.layout_ad_item).setTag(R.id.layout_ad_item, adItemLayout);
-            }
-
+            LinearLayout adItemLayout = helper.getView(R.id.layout_ad_item);
             LinearLayout.LayoutParams itemParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             adItemLayout.setLayoutParams(itemParams);
 
-            FrameLayout tempView = helper.getView(R.id.iv_listitem_express);
-            if (item.getTtNativeExpressAd() != null) {
-                bindData(tempView, helper, item.getTtNativeExpressAd());
-                //tempView.removeAllViews();
-                View adView = item.getTtNativeExpressAd().getExpressAdView();
-                if (adView.getParent() != null) {
-                    ((ViewGroup) adView.getParent()).removeView(adView);
-                }
-                RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                params.addRule(RelativeLayout.CENTER_IN_PARENT);
-                adView.setLayoutParams(params);
-                tempView.addView(adView);
-            }
+            FrameLayout tempView = null;
 
+            if (helper.getView(R.id.iv_listitem_express).getTag(R.id.iv_listitem_express) != null) {
+                Logger.i("note ad item 111---->" + helper.getAdapterPosition());
+                tempView = (FrameLayout) helper.getView(R.id.iv_listitem_express).getTag(R.id.iv_listitem_express);
+            } else {
+                Logger.i("note ad item 222---->" + helper.getAdapterPosition());
+                tempView = helper.getView(R.id.iv_listitem_express);
+                helper.getView(R.id.iv_listitem_express).setTag(R.id.iv_listitem_express, tempView);
+
+                //TODO
+                if (item.getTtNativeExpressAd() != null) {
+                    bindData(tempView, helper, item.getTtNativeExpressAd());
+                    //tempView.removeAllViews();
+                    View adView = item.getTtNativeExpressAd().getExpressAdView();
+                    if (adView.getParent() != null) {
+                        ((ViewGroup) adView.getParent()).removeView(adView);
+                    }
+                    RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                    params.addRule(RelativeLayout.CENTER_IN_PARENT);
+                    adView.setLayoutParams(params);
+                    tempView.addView(adView);
+                }
+            }
         } else {
             Date currentDate = TimeUtils.millis2Date(item.getCommentTime() != null ? item.getCommentTime() * 1000 : 0);
             String tempDateStr = MyTimeUtil.isOutMouth(currentDate) ? TimeUtils.millis2String(item.getCommentTime() != null ? item.getCommentTime() * 1000 : 0) : MyTimeUtil.getTimeFormatText(currentDate);
