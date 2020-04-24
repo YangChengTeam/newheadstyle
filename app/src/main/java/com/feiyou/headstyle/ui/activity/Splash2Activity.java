@@ -79,7 +79,7 @@ public class Splash2Activity extends Activity implements SplashADListener, Versi
     //是否强制跳转到主页面
     private boolean mForceGoMain;
 
-    private int startType = 1;
+    private int startType = 2;//默认穿山甲
 
     VersionPresenterImp versionPresenterImp;
 
@@ -389,7 +389,7 @@ public class Splash2Activity extends Activity implements SplashADListener, Versi
             if (RomUtils.isHuawei()) {
                 goToMainActivity();
             } else {
-                startType = 1;
+                startType = 2;
                 loadAdInfo();
             }
         }
