@@ -14,7 +14,7 @@ import rx.Observable;
 
 public interface TaskRecordInfoServiceApi {
 
-    @POST("v1.welfare/addusertask")
+    @POST("v2.welfare/addusertask")
     Observable<TaskRecordInfoRet> addTaskRecord(@Body RequestBody requestBody);
 
     @POST("v2.welfare/addhbtask")

@@ -505,6 +505,10 @@ public class Create1Fragment extends BaseFragment implements View.OnClickListene
         miniGameAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
+                if(!com.feiyou.headstyle.utils.AppUtils.isNotFastClick()){
+                    return;
+                }
+
                 if (!App.getApp().isLogin) {
                     if (loginDialog != null && !loginDialog.isShowing()) {
                         loginDialog.show();

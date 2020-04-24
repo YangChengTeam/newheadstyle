@@ -14,7 +14,7 @@ import rx.Observable;
 
 public interface TaskInfoServiceApi {
 
-    @POST("v1.welfare/gettaskinfo")
+    @POST("v2.welfare/gettaskinfo")
     Observable<TaskInfoRet> taskList(@Body RequestBody requestBody);
 
 }

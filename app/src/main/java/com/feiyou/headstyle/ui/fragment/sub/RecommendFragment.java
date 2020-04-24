@@ -360,6 +360,10 @@ public class RecommendFragment extends BaseFragment implements NoteDataView, Swi
     public void Event(MessageEvent messageEvent) {
         if (messageEvent.getMessage().equals("login_success")) {
             onResume();
+            userInfo = App.getApp().getmUserInfo();
+            currentPage = 1;
+            noteDataPresenterImp.getNoteData(currentPage, pageSize, 2, userInfo != null ? userInfo.getId() : "");
+            mRecommendListView.scrollToPosition(0);
         } else if (messageEvent.getMessage().equals("add_note")) {
             //发帖后添加到首页
             NoteInfo addNote = messageEvent.getAddNoteInfo();

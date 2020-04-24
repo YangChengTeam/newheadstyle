@@ -22,34 +22,34 @@ public interface UserInfoServiceApi {
     @POST("v2.userinfo/login")
     Observable<UserInfoRet> login(@Body RequestBody requestBody);
 
-    @POST("v1.userinfo/userImageWallAdd")
+    @POST("v2.userinfo/userImageWallAdd")
     Observable<PhotoWallRet> uploadPhotoWall(@Body MultipartBody multipartBody);
 
-    @POST("v1.userinfo/userImageWallDel")
+    @POST("v2.userinfo/userImageWallDel")
     Observable<PhotoWallRet> deletePhoto(@Body RequestBody requestBody);
 
-    @POST("v1.imchat/getUserSig")
+    @POST("v2.imchat/getUserSig")
     Observable<UserInfoRet> getUserSig(@Body RequestBody requestBody);
 
-    @POST("v1.userinfo/friendAddList")
+    @POST("v2.userinfo/friendAddList")
     Observable<UserInfoListRet> addFriendsList(@Body RequestBody requestBody);
 
-    @POST("v1.userinfo/friendAddSearchList")
+    @POST("v2.userinfo/friendAddSearchList")
     Observable<UserInfoListRet> searchFriendsList(@Body RequestBody requestBody);
 
-    @POST("v1.userinfo/userGuanFenList")
+    @POST("v2.userinfo/userGuanFenList")
     Observable<UserInfoListRet> getMyGuanFenList(@Body RequestBody requestBody);
 
-    @POST("v1.userinfo/updSetUpInfo")
+    @POST("v2.userinfo/updSetUpInfo")
     Observable<UserInfoRet> updateUserInfo(@Body RequestBody requestBody);
 
-    @POST("v1.userinfo/userImgupload")
+    @POST("v2.userinfo/userImgupload")
     Observable<UpdateHeadRet> updateHead(@Body MultipartBody multipartBody);
 
-    @POST("v1.userinfo/userBackgroundupload")
+    @POST("v2.userinfo/userBackgroundupload")
     Observable<UpdateHeadRet> updateBackground(@Body MultipartBody multipartBody);
 
-    @POST("v1.userinfo/userInfo")
+    @POST("v2.userinfo/userInfo")
     Observable<UserInfoRet> getUserInfo(@Body RequestBody requestBody);
 
     @POST("v2.userinfo/updSetUpSingleInfo")

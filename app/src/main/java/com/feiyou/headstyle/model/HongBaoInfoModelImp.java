@@ -4,6 +4,9 @@ import android.content.Context;
 
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
+import com.blankj.utilcode.util.AppUtils;
+import com.blankj.utilcode.util.DeviceUtils;
+import com.blankj.utilcode.util.PhoneUtils;
 import com.feiyou.headstyle.App;
 import com.feiyou.headstyle.api.EveryDayServiceApi;
 import com.feiyou.headstyle.base.BaseModel;
@@ -44,6 +47,9 @@ public class HongBaoInfoModelImp extends BaseModel implements HongBaoInfoModel<H
             params.put("openid", openid);
             params.put("imei", imei);
             params.put("android_id", App.androidId);
+            params.put("versioncode", AppUtils.getAppVersionCode() + "");
+            params.put("versionname", AppUtils.getAppVersionName());
+            params.put("phone_version_name", DeviceUtils.getSDKVersionName());
         } catch (JSONException e) {
             e.printStackTrace();
         }

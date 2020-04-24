@@ -14,6 +14,6 @@ import rx.Observable;
 
 public interface CollectDataServiceApi {
 
-    @POST("v1.show/banner_view_list")
+    @POST("v2.show/banner_view_list")
     Observable<CollectInfoRet> getDataById(@Body RequestBody requestBody);
 }

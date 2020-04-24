@@ -14,6 +14,6 @@ import rx.Observable;
 
 public interface GoldDetailServiceApi {
 
-    @POST("v1.welfare/selgoldinfo")
+    @POST("v2.welfare/selgoldinfo")
     Observable<GoldDetailRet> getGoldDetailList(@Body RequestBody requestBody);
 }

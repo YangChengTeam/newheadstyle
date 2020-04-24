@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -67,6 +68,8 @@ public class GameProfitDialog extends Dialog implements View.OnClickListener {
         void startVideo();
 
         void endVideo();
+
+        void closeProfit();
     }
 
     public GameProfitDialog(Context context) {
@@ -107,7 +110,7 @@ public class GameProfitDialog extends Dialog implements View.OnClickListener {
         moreGoldGif.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(mttRewardVideoAd != null) {
+                if (mttRewardVideoAd != null) {
                     //step6:在获取到广告后展示
                     mttRewardVideoAd.showRewardVideoAd((Activity) mContext);
                     //mttRewardVideoAd = null;
@@ -118,90 +121,21 @@ public class GameProfitDialog extends Dialog implements View.OnClickListener {
         });
 
         setCanceledOnTouchOutside(true);
-        loadBannerAd("920819188");
         loadAd("920819888", TTAdConstant.VERTICAL, 1);
     }
 
-    private void loadBannerAd(String codeId) {
-        //step4:创建广告请求参数AdSlot,具体参数含义参考文档
-        final AdSlot adSlot = new AdSlot.Builder()
-                .setCodeId(codeId)
-                .setSupportDeepLink(true)
-                .setImageAcceptedSize(600, 300)
-                .setNativeAdType(AdSlot.TYPE_BANNER) //请求原生广告时候，请务必调用该方法，设置参数为TYPE_BANNER或TYPE_INTERACTION_AD
-                .setAdCount(1)
-                .build();
-        //step5:请求广告，对请求回调的广告作渲染处理
-        mTTAdNative.loadNativeAd(adSlot, new TTAdNative.NativeAdListener() {
-            @Override
-            public void onError(int code, String message) {
-                //TToast.show(NativeBannerActivity.this, "load error : " + code + ", " + message);
-                Logger.i("load error : " + code + ", " + message);
+    public void updateSignAdView(View view) {
+        if (view != null) {
+            if (view.getParent() != null) {
+                ((ViewGroup) view).removeView(view);
             }
+            mBannerContainer.removeAllViews();
 
-            @Override
-            public void onNativeAdLoad(List<TTNativeAd> ads) {
-                if (ads.get(0) == null) {
-                    return;
-                }
-                View bannerView = LayoutInflater.from(mContext).inflate(R.layout.native_ad, mBannerContainer, false);
-                if (bannerView == null) {
-                    return;
-                }
-
-                mBannerContainer.removeAllViews();
-                mBannerContainer.addView(bannerView);
-
-                //绑定原生广告的数据
-                setAdData(bannerView, ads.get(0));
-            }
-        });
-    }
-
-    @SuppressWarnings("RedundantCast")
-    private void setAdData(View nativeView, TTNativeAd nativeAd) {
-
-        if (nativeAd.getImageList() != null && !nativeAd.getImageList().isEmpty()) {
-            TTImage image = nativeAd.getImageList().get(0);
-            if (image != null && image.isValid()) {
-                ImageView im = nativeView.findViewById(R.id.iv_native_image);
-                Glide.with(mContext).load(image.getImageUrl()).into(im);
-            }
+            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            view.setLayoutParams(params);
+            params.gravity = Gravity.CENTER;
+            mBannerContainer.addView(view);
         }
-
-        //可以被点击的view, 也可以把nativeView放进来意味整个广告区域可被点击
-        List<View> clickViewList = new ArrayList<>();
-        clickViewList.add(nativeView);
-
-        //触发创意广告的view（点击下载或拨打电话）
-        List<View> creativeViewList = new ArrayList<>();
-        //如果需要点击图文区域也能进行下载或者拨打电话动作，请将图文区域的view传入
-        //creativeViewList.add(nativeView);
-        //creativeViewList.add(mCreativeButton);
-
-        //重要! 这个涉及到广告计费，必须正确调用。convertView必须使用ViewGroup。
-        nativeAd.registerViewForInteraction((ViewGroup) nativeView, clickViewList, creativeViewList, null, new TTNativeAd.AdInteractionListener() {
-            @Override
-            public void onAdClicked(View view, TTNativeAd ad) {
-                if (ad != null) {
-                    //TToast.show(mContext, "广告" + ad.getTitle() + "被点击");
-                }
-            }
-
-            @Override
-            public void onAdCreativeClick(View view, TTNativeAd ad) {
-                if (ad != null) {
-                    //TToast.show(mContext, "广告" + ad.getTitle() + "被创意按钮被点击");
-                }
-            }
-
-            @Override
-            public void onAdShow(TTNativeAd ad) {
-                if (ad != null) {
-                    //TToast.show(mContext, "广告" + ad.getTitle() + "展示");
-                }
-            }
-        });
     }
 
     private void loadAd(String codeId, int orientation, int goldNum) {
@@ -325,7 +259,7 @@ public class GameProfitDialog extends Dialog implements View.OnClickListener {
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.tv_close:
-                this.dismiss();
+                this.gameSeeVideoListener.closeProfit();
                 break;
             default:
                 break;

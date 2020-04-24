@@ -15,9 +15,9 @@ import rx.Observable;
 
 public interface RecordServiceApi {
 
-    @POST("v1.images/userImageSet")
+    @POST("v2.images/userImageSet")
     Observable<RecordInfoRet> headSetInfo(@Body RequestBody requestBody);
 
-    @POST("v1.images/adClickLog")
+    @POST("v2.images/adClickLog")
     Observable<RecordInfoRet> adClickInfo(@Body RequestBody requestBody);
 }

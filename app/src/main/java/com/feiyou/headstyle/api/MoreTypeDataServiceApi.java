@@ -13,6 +13,6 @@ import rx.Observable;
 
 public interface MoreTypeDataServiceApi {
 
-    @POST("v1.show/moreImagesTagsList")
+    @POST("v2.show/moreImagesTagsList")
     Observable<MoreTypeInfoRet> getMoreTypeList(@Body RequestBody requestBody);
 }

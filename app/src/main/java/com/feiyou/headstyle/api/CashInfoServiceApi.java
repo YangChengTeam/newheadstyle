@@ -18,7 +18,7 @@ public interface CashInfoServiceApi {
     @POST("v2.pay/appwxpay")
     Observable<CashInfoRet> startCash(@Body RequestBody requestBody);
 
-    @POST("v1.welfare/txinfo")
+    @POST("v2.welfare/txinfo")
     Observable<CashRecordRet> cashList(@Body RequestBody requestBody);
 
 }

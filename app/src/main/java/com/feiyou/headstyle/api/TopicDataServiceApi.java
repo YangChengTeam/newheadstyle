@@ -15,10 +15,10 @@ import rx.Observable;
 
 public interface TopicDataServiceApi {
 
-    @POST("v1.show/topicList")
+    @POST("v2.show/topicList")
     Observable<TopicInfoRet> getTopicDataList(@Body RequestBody requestBody);
 
     //关注话题
-    @POST("v1.message/userTopicGuan")
+    @POST("v2.message/userTopicGuan")
     Observable<FollowInfoRet> topicFollow(@Body RequestBody requestBody);
 }

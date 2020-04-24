@@ -30,48 +30,48 @@ public interface NoteDataServiceApi {
     @POST("v2.message/messageList")
     Observable<NoteInfoRet> getNoteData(@Body RequestBody requestBody);
 
-    @POST("v1.userinfo/userMessageList")
+    @POST("v2.userinfo/userMessageList")
     Observable<NoteInfoRet> getMyNoteList(@Body RequestBody requestBody);
 
     @POST("v2.message/messageTypeList")
     Observable<NoteTypeRet> getNoteTypeData(@Body RequestBody requestBody);
 
-    @POST("v1.message/messageInfoDetail")
+    @POST("v2.message/messageInfoDetail")
     Observable<NoteInfoDetailRet> getNoteInfoDetailData(@Body RequestBody requestBody);
 
     //评论的回复列表
-    @POST("v1.message/messageCommentDetail")
+    @POST("v2.message/messageCommentDetail")
     Observable<NoteCommentRet> getNoteCommentData(@Body RequestBody requestBody);
 
-    @POST("v1.message/setMessageInfo")
+    @POST("v2.message/setMessageInfo")
     Observable<AddNoteRet> addNote(@Body MultipartBody multipartBody);
 
-    @POST("v1.message/messageDetailCommentRepeat")
+    @POST("v2.message/messageDetailCommentRepeat")
     Observable<ReplyResultInfoRet> replyComment(@Body RequestBody requestBody);
 
     //回复下面的子回复列表
-    @POST("v1.message/messageCommentRepeatDetail")
+    @POST("v2.message/messageCommentRepeatDetail")
     Observable<NoteSubCommentRet> getNoteSubCommentData(@Body RequestBody requestBody);
 
     //帖子点赞
-    @POST("v1.message/messageDetailCommentZan")
+    @POST("v2.message/messageDetailCommentZan")
     Observable<ZanResultRet> addZan(@Body RequestBody requestBody);
 
-    @POST("v1.vedio/vedioDetailCommentRepeat")
+    @POST("v2.vedio/vedioDetailCommentRepeat")
     Observable<ReplyResultInfoRet> replyVideoComment(@Body RequestBody requestBody);
 
     //回复下面的子回复列表
-    @POST("v1.vedio/vedioCommentRepeatDetail")
+    @POST("v2.vedio/vedioCommentRepeatDetail")
     Observable<NoteSubCommentRet> getVideoNoteSubCommentData(@Body RequestBody requestBody);
 
     //帖子点赞
-    @POST("v1.vedio/vedioDetailCommentZan")
+    @POST("v2.vedio/vedioDetailCommentZan")
     Observable<ZanResultRet> addVideoZan(@Body RequestBody requestBody);
 
     //关注用户
-    @POST("v1.message/userFriendsGuan")
+    @POST("v2.message/userFriendsGuan")
     Observable<FollowInfoRet> userFollow(@Body RequestBody requestBody);
 
-    @POST("v1.userinfo/delMyMessage")
+    @POST("v2.userinfo/delMyMessage")
     Observable<ResultInfo> deleteNote(@Body RequestBody requestBody);
 }

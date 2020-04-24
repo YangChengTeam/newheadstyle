@@ -4,6 +4,8 @@ import android.content.Context;
 
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
+import com.blankj.utilcode.util.AppUtils;
+import com.blankj.utilcode.util.DeviceUtils;
 import com.feiyou.headstyle.api.VersionServiceApi;
 import com.feiyou.headstyle.api.VideoInfoServiceApi;
 import com.feiyou.headstyle.base.BaseModel;
@@ -40,6 +42,9 @@ public class VersionModelImp extends BaseModel implements VersionModel<VersionIn
         JSONObject params = new JSONObject();
         try {
             params.put("channel", channel);
+            params.put("versioncode", AppUtils.getAppVersionCode() + "");
+            params.put("versionname", AppUtils.getAppVersionName());
+            params.put("phone_version_name", DeviceUtils.getSDKVersionName());
         } catch (JSONException e) {
             e.printStackTrace();
         }

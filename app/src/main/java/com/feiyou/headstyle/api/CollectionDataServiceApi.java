@@ -14,9 +14,9 @@ import rx.Observable;
 
 public interface CollectionDataServiceApi {
 
-    @POST("v1.images/userImageCollect")
+    @POST("v2.images/userImageCollect")
     Observable<AddCollectionRet> addCollection(@Body RequestBody requestBody);
 
-    @POST("v1.vedio/userVedioCollect")
+    @POST("v2.vedio/userVedioCollect")
     Observable<AddCollectionRet> addVideoCollection(@Body RequestBody requestBody);
 }

@@ -13,6 +13,6 @@ import rx.Observable;
 
 public interface HotWordServiceApi {
 
-    @POST("v1.images/searchTagList")
+    @POST("v2.images/searchTagList")
     Observable<SearchHotWordRet> getTagData(@Body RequestBody requestBody);
 }

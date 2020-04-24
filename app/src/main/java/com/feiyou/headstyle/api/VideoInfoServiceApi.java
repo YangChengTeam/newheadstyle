@@ -18,6 +18,6 @@ public interface VideoInfoServiceApi {
     @POST("v2.vedio/vedioList")
     Observable<VideoInfoRet> getDataList(@Body RequestBody requestBody);
 
-    @POST("v1.vedio/vedioCommentDetail")
+    @POST("v2.vedio/vedioCommentDetail")
     Observable<VideoCommentRet> getCommentList(@Body RequestBody requestBody);
 }

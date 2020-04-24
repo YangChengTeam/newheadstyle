@@ -14,6 +14,6 @@ import rx.Observable;
 
 public interface BindAccountInfoServiceApi {
 
-    @POST("v1.welfare/addgoodsaccount")
+    @POST("v2.welfare/addgoodsaccount")
     Observable<BindAccountInfoRet> bindAccount(@Body RequestBody requestBody);
 }

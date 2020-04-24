@@ -14,6 +14,6 @@ import rx.Observable;
 
 public interface ReportDataServiceApi {
 
-    @POST("v1.message/complain")
+    @POST("v2.message/complain")
     Observable<ResultInfo> takeReport(@Body RequestBody requestBody);
 }

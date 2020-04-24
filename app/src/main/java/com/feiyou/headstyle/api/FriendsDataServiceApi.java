@@ -14,6 +14,6 @@ import rx.Observable;
 
 public interface FriendsDataServiceApi {
 
-    @POST("v1.show/friendsList")
+    @POST("v2.show/friendsList")
     Observable<FriendsGroupRet> getFriendsByUserId(@Body RequestBody requestBody);
 }

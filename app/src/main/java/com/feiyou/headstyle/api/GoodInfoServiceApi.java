@@ -14,6 +14,6 @@ import rx.Observable;
 
 public interface GoodInfoServiceApi {
 
-    @POST("v1.welfare/goods_list")
+    @POST("v2.welfare/goods_list")
     Observable<GoodInfoRet> getGoodListData(@Body RequestBody requestBody);
 }

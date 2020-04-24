@@ -14,6 +14,6 @@ import rx.Observable;
 
 public interface GameGoldServiceApi {
 
-    @POST("v1.welfare/getgamegold")
+    @POST("v2.welfare/getgamegold")
     Observable<GameGoldInfoRet> gameGold(@Body RequestBody requestBody);
 }

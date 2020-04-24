@@ -147,7 +147,7 @@ public class EveryDayHongBaoActivity extends BaseFragmentActivity implements IBa
         mCashMoneyIv = topView.findViewById(R.id.iv_cash_money);
         mRandomNumTv = topView.findViewById(R.id.tv_random_num);
 
-        Glide.with(this).load(R.drawable.iv_get_money).into(mCashMoneyIv);
+        //Glide.with(this).load(R.drawable.iv_get_money).into(mCashMoneyIv);
 
         loginDialog = new LoginDialog(this, R.style.login_dialog);
         loginDialog.setLoginCloseListener(this);

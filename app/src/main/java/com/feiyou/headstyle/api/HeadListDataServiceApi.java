@@ -13,12 +13,12 @@ import rx.Observable;
 
 public interface HeadListDataServiceApi {
 
-    @POST("v1.show/imagesTagsList")
+    @POST("v2.show/imagesTagsList")
     Observable<HeadInfoRet> getDataByTagId(@Body RequestBody requestBody);
 
-    @POST("v1.images/searchResult")
+    @POST("v2.images/searchResult")
     Observable<HeadInfoRet> searchList(@Body RequestBody requestBody);
 
-    @POST("v1.userinfo/userImagesCollect")
+    @POST("v2.userinfo/userImagesCollect")
     Observable<HeadInfoRet> userCollection(@Body RequestBody requestBody);
 }

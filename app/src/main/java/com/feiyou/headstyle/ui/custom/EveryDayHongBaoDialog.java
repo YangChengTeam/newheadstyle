@@ -67,7 +67,7 @@ public class EveryDayHongBaoDialog extends Dialog implements View.OnClickListene
         mOpenHongBaoIv.setOnClickListener(this);
         mCloseIv.setOnClickListener(this);
         mReceiveBeforeLayout.setOnClickListener(this);
-        Glide.with(mContext).load(R.drawable.every_day_open_hb).into(mOpenHongBaoIv);
+        //Glide.with(mContext).load(R.drawable.every_day_open_hb).into(mOpenHongBaoIv);
     }
 
     public void setClickAnyWhere(boolean clickAnyWhere) {

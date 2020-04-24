@@ -13,6 +13,6 @@ import rx.Observable;
  */
 
 public interface SignDoneInfoServiceApi {
-    @POST("v1.welfare/addusersign")
+    @POST("v2.welfare/addusersign")
     Observable<SignDoneInfoRet> signDone(@Body RequestBody requestBody);
 }

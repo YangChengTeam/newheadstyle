@@ -23,6 +23,6 @@ import rx.Observable;
  */
 
 public interface FeedBackServiceApi {
-    @POST("v1.userinfo/userOpinoin")
+    @POST("v2.userinfo/userOpinoin")
     Observable<FeedBackRet> addFeedBack(@Body MultipartBody multipartBody);
 }

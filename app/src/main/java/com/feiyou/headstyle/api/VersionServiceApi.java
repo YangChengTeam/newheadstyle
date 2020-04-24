@@ -14,6 +14,6 @@ import rx.Observable;
 
 public interface VersionServiceApi {
 
-    @POST("v1.show/versionInfo")
+    @POST("v2.show/versionInfo")
     Observable<VersionInfoRet> getVersionInfo(@Body RequestBody requestBody);
 }

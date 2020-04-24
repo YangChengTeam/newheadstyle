@@ -26,7 +26,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/tv_title"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="16dp"
             android:layout_centerHorizontal="true"
             android:layout_marginBottom="12dp"
             android:gravity="center"
@@ -86,8 +86,8 @@
             <FrameLayout
                 android:id="@+id/layout_ad"
                 android:layout_width="match_parent"
-                android:layout_marginTop="6dp"
-                android:layout_height="120dp"></FrameLayout>
+                android:layout_marginTop="2dp"
+                android:layout_height="145dp"></FrameLayout>
         </LinearLayout>
 
         <LinearLayout

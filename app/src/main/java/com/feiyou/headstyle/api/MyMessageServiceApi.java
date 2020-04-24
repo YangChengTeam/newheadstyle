@@ -25,12 +25,12 @@ import rx.Observable;
 
 public interface MyMessageServiceApi {
 
-    @POST("v1.userinfo/myNoticeList")
+    @POST("v2.userinfo/myNoticeList")
     Observable<MyCommentRet> getMyCommentList(@Body RequestBody requestBody);
 
-    @POST("v1.userinfo/myNoticeList")
+    @POST("v2.userinfo/myNoticeList")
     Observable<MyAtMessageRet> getMyAtMessageList(@Body RequestBody requestBody);
 
-    @POST("v1.userinfo/myNoticeList")
+    @POST("v2.userinfo/myNoticeList")
     Observable<SystemInfoRet> getSystemInfoList(@Body RequestBody requestBody);
 }

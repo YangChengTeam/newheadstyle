@@ -14,6 +14,6 @@ import rx.Observable;
 
 public interface StickerServiceApi {
 
-    @POST("v1.show/tiezhiList")
+    @POST("v2.show/tiezhiList")
     Observable<StickerInfoRet> getDataList(@Body RequestBody requestBody);
 }

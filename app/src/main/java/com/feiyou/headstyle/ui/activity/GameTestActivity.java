@@ -31,6 +31,12 @@ import com.blankj.utilcode.util.StringUtils;
 import com.blankj.utilcode.util.TimeUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.bumptech.glide.Glide;
+import com.bytedance.sdk.openadsdk.AdSlot;
+import com.bytedance.sdk.openadsdk.TTAdConstant;
+import com.bytedance.sdk.openadsdk.TTAdManager;
+import com.bytedance.sdk.openadsdk.TTAdNative;
+import com.bytedance.sdk.openadsdk.TTAppDownloadListener;
+import com.bytedance.sdk.openadsdk.TTNativeExpressAd;
 import com.cmcm.cmgame.CmGameSdk;
 import com.cmcm.cmgame.GameView;
 import com.cmcm.cmgame.IAppCallback;
@@ -55,9 +61,12 @@ import com.feiyou.headstyle.ui.base.BaseFragmentActivity;
 import com.feiyou.headstyle.ui.custom.GameProfitDialog;
 import com.feiyou.headstyle.ui.custom.NotEnoughDialog;
 import com.feiyou.headstyle.ui.custom.SimpleRoundProgress;
+import com.feiyou.headstyle.utils.TTAdManagerHolder;
 import com.orhanobut.logger.Logger;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 import com.qmuiteam.qmui.widget.QMUITopBar;
+
+import java.util.List;
 
 import butterknife.BindView;
 
@@ -143,6 +152,12 @@ public class GameTestActivity extends BaseFragmentActivity implements IAppCallba
 
     private int todayVideoGold;//当天看视频获得的金币数
 
+    private View gameProfitView;
+
+    private TTNativeExpressAd mBannerTTAd;
+
+    private TTAdNative mTTAdNative;
+
     @Override
     protected int getContextViewId() {
         return R.layout.activity_classify;
@@ -175,6 +190,14 @@ public class GameTestActivity extends BaseFragmentActivity implements IAppCallba
     }
 
     public void initData() {
+        TTAdManager ttAdManager = TTAdManagerHolder.get();
+
+        //step3:创建TTAdNative对象,用于调用广告请求接口
+        mTTAdNative = ttAdManager.createAdNative(this);
+
+        //加载广告
+        loadBannerExpressAd("945147445");
+
         if (!StringUtils.isEmpty(SPUtils.getInstance().getString(Constants.USER_INFO))) {
             Logger.i(SPUtils.getInstance().getString(Constants.USER_INFO));
             userInfo = JSON.parseObject(SPUtils.getInstance().getString(Constants.USER_INFO), new TypeReference<UserInfo>() {
@@ -284,10 +307,14 @@ public class GameTestActivity extends BaseFragmentActivity implements IAppCallba
                     }
                 } else {
                     if (lastGameId.equals(logoutGameId)) {
-                        gameProfitDialog = new GameProfitDialog(GameTestActivity.this, R.style.login_dialog);
+                        if (gameProfitDialog == null) {
+                            gameProfitDialog = new GameProfitDialog(GameTestActivity.this, R.style.login_dialog);
+                            gameProfitDialog.setGameSeeVideoListener(GameTestActivity.this);
+                        }
                         gameProfitDialog.setGameSeeVideoListener(GameTestActivity.this);
                         gameProfitDialog.show();
                         gameProfitDialog.setTitleValue("本次游戏收益", playGameGoldNumber);
+                        gameProfitDialog.updateSignAdView(gameProfitView);
                         lastGameId = "";
                         playGameGoldNumber = 0;
                         totalSecond = 0;
@@ -320,7 +347,7 @@ public class GameTestActivity extends BaseFragmentActivity implements IAppCallba
     /**
      * 游戏账号信息回调，需要接入方保存，下次进入或卸载重装后设置给SDK使用，可以支持APP卸载后，游戏信息不丢失
      *
-     * @param token     用户token
+     * @param token 用户token
      */
     @Override
     public void onGameAccount(String token) {
@@ -383,7 +410,7 @@ public class GameTestActivity extends BaseFragmentActivity implements IAppCallba
 
                 int progress = (int) ((double) (100 / 18) * isPlaySecond);
 
-                simpleRoundProgress.setProgress(progress > 100 ? 100:progress);
+                simpleRoundProgress.setProgress(progress > 100 ? 100 : progress);
                 Logger.i("倒计时--->" + surplusSecond + "s");
                 isPause = false;
             }
@@ -438,9 +465,14 @@ public class GameTestActivity extends BaseFragmentActivity implements IAppCallba
             public void onClick(View v) {
 
                 if (mGamePointIv.getVisibility() == View.VISIBLE) {
-                    if (gameProfitDialog != null && !gameProfitDialog.isShowing()) {
+                    if (gameProfitDialog == null) {
+                        gameProfitDialog = new GameProfitDialog(GameTestActivity.this, R.style.login_dialog);
+                        gameProfitDialog.setGameSeeVideoListener(GameTestActivity.this);
+                    }
+                    if (!gameProfitDialog.isShowing()) {
                         gameProfitDialog.show();
                         gameProfitDialog.setTitleValue("游戏收益", currentGameCount);
+                        gameProfitDialog.updateSignAdView(gameProfitView);
                         mGamePointIv.setVisibility(View.GONE);
                         simpleRoundProgress.setProgress(0);
                         mProfitNum.setText("+" + currentTodayGold);
@@ -729,6 +761,134 @@ public class GameTestActivity extends BaseFragmentActivity implements IAppCallba
             taskId = gameSeeVideoInfo.getId() + "";
             seeVideoIsFinish = true;
             taskRecordInfoPresenterImp.addTaskRecord(userInfo.getId(), userInfo.getOpenid(), taskId, gameSeeVideoInfo.getGoldnum(), 0, 1, recordId);
+        }
+    }
+
+    private void loadBannerExpressAd(String codeId) {
+        Logger.i("load ad home banner ID--->--->" + codeId);
+
+        float expressViewWidth = 270;
+        float expressViewHeight = 135;
+
+        //step4:创建广告请求参数AdSlot,具体参数含义参考文档
+        AdSlot adSlot = new AdSlot.Builder()
+                .setCodeId(codeId) //广告位id
+                .setSupportDeepLink(true)
+                .setAdCount(1) //请求广告数量为1到3条
+                .setExpressViewAcceptedSize(expressViewWidth, expressViewHeight) //期望模板广告view的size,单位dp
+                .setImageAcceptedSize(640, 320)//这个参数设置即可，不影响模板广告的size
+                .build();
+        //step5:请求广告，对请求回调的广告作渲染处理
+        mTTAdNative.loadBannerExpressAd(adSlot, new TTAdNative.NativeExpressAdListener() {
+            @Override
+            public void onError(int code, String message) {
+                Logger.i("load error : " + code + ", " + message);
+                if (gameProfitView != null) {
+                    gameProfitView = null;
+                }
+            }
+
+            @Override
+            public void onNativeExpressAdLoad(List<TTNativeExpressAd> ads) {
+                Logger.i("home_banner load--->");
+                if (ads == null || ads.size() == 0) {
+                    return;
+                }
+                mBannerTTAd = ads.get(0);
+                //mBannerTTAd.setSlideIntervalTime(30 * 1000);
+                bindBannerAdListener(mBannerTTAd);
+                startBannerTime = System.currentTimeMillis();
+                if (mBannerTTAd != null) {
+                    mBannerTTAd.render();
+                }
+            }
+        });
+    }
+
+    private long startBannerTime = 0;
+
+    private boolean mBannerHasShowDownloadActive = false;
+
+    private void bindBannerAdListener(TTNativeExpressAd ad) {
+        ad.setExpressInteractionListener(new TTNativeExpressAd.ExpressAdInteractionListener() {
+            @Override
+            public void onAdClicked(View view, int type) {
+                Logger.i("home_banner广告被点击");
+            }
+
+            @Override
+            public void onAdShow(View view, int type) {
+                Logger.i("home_banner广告展示");
+            }
+
+            @Override
+            public void onRenderFail(View view, String msg, int code) {
+                Log.e("home_bannerExpressView", "render fail:" + (System.currentTimeMillis() - startBannerTime));
+                Logger.i(msg + " code:" + code);
+            }
+
+            @Override
+            public void onRenderSuccess(View view, float width, float height) {
+                Log.e("home_bannerExpressView", "home_banner_render suc:" + (System.currentTimeMillis() - startBannerTime));
+                //返回view的宽高 单位 dp
+                Logger.i("common banner渲染成功");
+                if (gameProfitView != null) {
+                    gameProfitView = null;
+                }
+                gameProfitView = view;
+
+                if (gameProfitView != null && gameProfitDialog != null && gameProfitDialog.isShowing()) {
+                    gameProfitDialog.updateSignAdView(gameProfitView);
+                }
+            }
+        });
+
+        if (ad.getInteractionType() != TTAdConstant.INTERACTION_TYPE_DOWNLOAD) {
+            return;
+        }
+        ad.setDownloadListener(new TTAppDownloadListener() {
+            @Override
+            public void onIdle() {
+                Logger.i("home_banner点击开始下载");
+                //logInfoPresenterImp.addLogInfo(App.mUserInfo != null ? App.mUserInfo.getId() : "", "", "", "home_bottom_banner", "click");
+            }
+
+            @Override
+            public void onDownloadActive(long totalBytes, long currBytes, String fileName, String appName) {
+                if (!mBannerHasShowDownloadActive) {
+                    mBannerHasShowDownloadActive = true;
+                    Logger.i("home_banner下载中，点击暂停");
+                }
+            }
+
+            @Override
+            public void onDownloadPaused(long totalBytes, long currBytes, String fileName, String appName) {
+                Logger.i("home_banner下载暂停，点击继续");
+            }
+
+            @Override
+            public void onDownloadFailed(long totalBytes, long currBytes, String fileName, String appName) {
+                Logger.i("home_banner下载失败，点击重新下载");
+            }
+
+            @Override
+            public void onInstalled(String fileName, String appName) {
+                Logger.i("home_banner安装完成，点击图片打开");
+            }
+
+            @Override
+            public void onDownloadFinished(long totalBytes, String fileName, String appName) {
+                Logger.i("home_banner点击安装");
+            }
+        });
+    }
+
+    @Override
+    public void closeProfit() {
+        loadBannerExpressAd("945147445");
+        if (gameProfitDialog != null && gameProfitDialog.isShowing()) {
+            gameProfitDialog.dismiss();
+            gameProfitDialog = null;
         }
     }
 }

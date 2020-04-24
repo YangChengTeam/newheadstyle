@@ -13,9 +13,9 @@ import rx.Observable;
 
 public interface ExchangeInfoServiceApi {
 
-    @POST("v1.welfare/addgoodschange")
+    @POST("v2.welfare/addgoodschange")
     Observable<ExchangeInfoRet> exchangeGood(@Body RequestBody requestBody);
 
-    @POST("v1.welfare/getorderinfo")
+    @POST("v2.welfare/getorderinfo")
     Observable<ExchangeInfoRet> exchangeList(@Body RequestBody requestBody);
 }

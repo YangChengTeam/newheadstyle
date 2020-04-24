@@ -4,6 +4,8 @@ import android.content.Context;
 
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
+import com.blankj.utilcode.util.AppUtils;
+import com.blankj.utilcode.util.DeviceUtils;
 import com.feiyou.headstyle.api.HomeDataServiceApi;
 import com.feiyou.headstyle.api.LetterDataServiceApi;
 import com.feiyou.headstyle.base.BaseModel;
@@ -45,6 +47,10 @@ public class HomeDataModelImp extends BaseModel implements HomeDataModel<HomeDat
             params.put("pagesize", pageSize);
             params.put("change", change);
             params.put("is_detail", isDetail + "");
+
+            params.put("versioncode", AppUtils.getAppVersionCode() + "");
+            params.put("versionname", AppUtils.getAppVersionName());
+            params.put("phone_version_name", DeviceUtils.getSDKVersionName());
         } catch (JSONException e) {
             e.printStackTrace();
         }
