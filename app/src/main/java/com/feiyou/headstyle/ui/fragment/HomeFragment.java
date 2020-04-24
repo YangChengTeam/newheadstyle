@@ -726,6 +726,7 @@ public class HomeFragment extends BaseFragment implements IBaseView, View.OnClic
             Logger.i("home login success--->");
             isAlertHongBao = true;
             if (App.getApp().getmUserInfo() != null) {
+                mUserInfo = App.getApp().getmUserInfo();
                 Logger.i(JSON.toJSONString(App.getApp().getmUserInfo()));
             }
         }
@@ -747,6 +748,7 @@ public class HomeFragment extends BaseFragment implements IBaseView, View.OnClic
                     if (!todayIsCloseHB && App.getApp().getmUserInfo().getGetDlhb() == 0) {
                         if (hongBaoDialog != null && !hongBaoDialog.isShowing()) {
                             hongBaoDialog.show();
+                            showHBType =2;
                             hongBaoDialog.setHBConfigInfo(2, clickAnyWhere);
                         }
                     }
