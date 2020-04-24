@@ -38,6 +38,7 @@ import com.feiyou.headstyle.bean.MessageEvent;
 import com.feiyou.headstyle.bean.NoteInfo;
 import com.feiyou.headstyle.bean.NoteInfoRet;
 import com.feiyou.headstyle.bean.ResultInfo;
+import com.feiyou.headstyle.bean.TopicInfo;
 import com.feiyou.headstyle.bean.UserInfo;
 import com.feiyou.headstyle.bean.ZanResultRet;
 import com.feiyou.headstyle.common.Constants;
@@ -71,6 +72,7 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -144,6 +146,12 @@ public class RecommendFragment extends BaseFragment implements NoteDataView, Swi
         return new RecommendFragment();
     }
 
+    public String[] topicNames = {"处Q友", "游戏圈", "爆照啦", "头像吧", "句子控"};
+
+    public int[] topicIds = {1, 3, 2, 4, 5};
+
+    public int[] topicIcoRes = {R.mipmap.top1, R.mipmap.top3, R.mipmap.top2, R.mipmap.top4, R.mipmap.top5};
+
     public static RecommendFragment newInstance(int type) {
         RecommendFragment fragment = new RecommendFragment();
         Bundle bundle = new Bundle();
@@ -166,6 +174,8 @@ public class RecommendFragment extends BaseFragment implements NoteDataView, Swi
     }
 
     public void initData() {
+        userInfo = App.getApp().getmUserInfo();
+
         //step1:初始化sdk
         TTAdManager ttAdManager = TTAdManagerHolder.get();
         mTTAdNative = ttAdManager.createAdNative(getActivity());
@@ -222,8 +232,10 @@ public class RecommendFragment extends BaseFragment implements NoteDataView, Swi
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, SizeUtils.dp2px(80));
             topView.setLayoutParams(params);
 
+            List<TopicInfo> topicList = initTopic();
+
             mTopicListView = topView.findViewById(R.id.topic_list_view);
-            topicAdapter = new TopicAdapter(getActivity(), null);
+            topicAdapter = new TopicAdapter(getActivity(), topicList);
             mTopicListView.setLayoutManager(new GridLayoutManager(getActivity(), 5));
             mTopicListView.setAdapter(topicAdapter);
             topicAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
@@ -323,15 +335,21 @@ public class RecommendFragment extends BaseFragment implements NoteDataView, Swi
         noteDataPresenterImp.getNoteData(currentPage, pageSize, 2, userInfo != null ? userInfo.getId() : "");
     }
 
+    public List<TopicInfo> initTopic() {
+        List<TopicInfo> list = new ArrayList<>();
+        for (int i = 0; i < topicNames.length; i++) {
+            TopicInfo topicInfo = new TopicInfo();
+            topicInfo.setId(topicIds[i] + "");
+            topicInfo.setName(topicNames[i]);
+            topicInfo.setLocalIcoRes(topicIcoRes[i]);
+            list.add(topicInfo);
+        }
+        return list;
+    }
+
     @Override
     public void onResume() {
         super.onResume();
-
-        if (!StringUtils.isEmpty(SPUtils.getInstance().getString(Constants.USER_INFO))) {
-            Logger.i(SPUtils.getInstance().getString(Constants.USER_INFO));
-            userInfo = JSON.parseObject(SPUtils.getInstance().getString(Constants.USER_INFO), new TypeReference<UserInfo>() {
-            });
-        }
 
         if (loginDialog != null && loginDialog.isShowing()) {
             loginDialog.dismiss();
@@ -348,9 +366,9 @@ public class RecommendFragment extends BaseFragment implements NoteDataView, Swi
             addNote.setItemType(NoteInfo.NOTE_NORMAL);
             noteMultipleAdapter.addData(0, addNote);
         } else {
-            if (communityType == 2) {
+            /*if (communityType == 2) {
                 topicAdapter.setNewData(App.topicInfoList);
-            }
+            }*/
         }
     }
 
@@ -656,9 +674,9 @@ public class RecommendFragment extends BaseFragment implements NoteDataView, Swi
                 return;
             }*/
 
-            NoteInfo tempHeadInfo = noteMultipleAdapter.getData().get(noteMultipleAdapter.getData().size()-1);
+            NoteInfo tempHeadInfo = noteMultipleAdapter.getData().get(noteMultipleAdapter.getData().size() - 1);
             tempHeadInfo.setTtNativeExpressAd(adTmp);
-            noteMultipleAdapter.getData().set(noteMultipleAdapter.getData().size()-1, tempHeadInfo);
+            noteMultipleAdapter.getData().set(noteMultipleAdapter.getData().size() - 1, tempHeadInfo);
 
             adTmp.setExpressInteractionListener(new TTNativeExpressAd.ExpressAdInteractionListener() {
                 @Override

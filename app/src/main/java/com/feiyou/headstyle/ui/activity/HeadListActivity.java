@@ -176,11 +176,17 @@ public class HeadListActivity extends BaseFragmentActivity implements HeadListDa
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
 
                 if (position > 21) {
+
+                    int tempX = 0;
+                    if (position == 462 || (position > 462 && (position - 462) % (pageSize + 1) == 0)) {
+                        tempX = 1;
+                    }
+
                     int tempPos = position - 21 - (position / pageSize);
                     Logger.i("current tempPos--->" + tempPos);
                     int temp = tempPos / pageSize;
 
-                    position = position - temp - 1;
+                    position = position - temp - 1 - tempX;
                 }
 
                 int jumpPage = position / pageSize;

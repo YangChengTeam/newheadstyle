@@ -3,12 +3,14 @@ package com.feiyou.headstyle.ui.custom;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -96,6 +98,9 @@ public class NewSignSuccessDialog extends Dialog implements View.OnClickListener
     public void updateSignAdView(View view) {
         if (view != null) {
             mBannerContainer.removeAllViews();
+            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            view.setLayoutParams(params);
+            params.gravity = Gravity.CENTER;
             mBannerContainer.addView(view);
         }
     }

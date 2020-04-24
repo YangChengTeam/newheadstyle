@@ -152,7 +152,7 @@ public class MainActivity extends BaseFragmentActivity implements VersionView, V
         }
     }
 
-    public void setViewPagerItem(int pos){
+    public void setViewPagerItem(int pos) {
         viewPager.setCurrentItem(pos);
         currentIndex = pos;
     }
@@ -180,15 +180,8 @@ public class MainActivity extends BaseFragmentActivity implements VersionView, V
     @Override
     public void onResume() {
         super.onResume();
-        Logger.i("main onresume--->");
-
-        if (!StringUtils.isEmpty(SPUtils.getInstance().getString(Constants.USER_INFO))) {
-            Logger.i(SPUtils.getInstance().getString(Constants.USER_INFO));
-            userInfo = JSON.parseObject(SPUtils.getInstance().getString(Constants.USER_INFO), new TypeReference<UserInfo>() {
-            });
-            App.getApp().setmUserInfo(userInfo);
-            App.getApp().setLogin(true);
-        }
+        Logger.i("main onResume--->");
+        userInfo = App.getApp().getmUserInfo();
         showScore();
     }
 

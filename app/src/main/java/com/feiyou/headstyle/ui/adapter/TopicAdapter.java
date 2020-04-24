@@ -35,7 +35,7 @@ public class TopicAdapter extends BaseQuickAdapter<TopicInfo, BaseViewHolder> {
         itemLayout.setLayoutParams(new LinearLayout.LayoutParams(ScreenUtils.getScreenWidth() / 5, LinearLayout.LayoutParams.MATCH_PARENT));
 
         RequestOptions options = new RequestOptions().skipMemoryCache(true);
-        Glide.with(mContext).load(item.getIco()).apply(options).into((ImageView) helper.getView(R.id.iv_topic_img));
+        Glide.with(mContext).load(item.getLocalIcoRes()).apply(options).into((ImageView) helper.getView(R.id.iv_topic_img));
         helper.setText(R.id.tv_topic_name, item.getName());
     }
 }

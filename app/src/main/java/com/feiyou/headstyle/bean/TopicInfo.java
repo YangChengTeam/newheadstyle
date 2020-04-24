@@ -11,6 +11,7 @@ public class TopicInfo {
     private String num;
 
     private boolean isSelected;
+    public int localIcoRes;
 
     public String getIco() {
         return ico;
@@ -54,6 +55,14 @@ public class TopicInfo {
 
     public boolean isSelected() {
         return isSelected;
+    }
+
+    public int getLocalIcoRes() {
+        return localIcoRes;
+    }
+
+    public void setLocalIcoRes(int localIcoRes) {
+        this.localIcoRes = localIcoRes;
     }
 
     public void setSelected(boolean selected) {

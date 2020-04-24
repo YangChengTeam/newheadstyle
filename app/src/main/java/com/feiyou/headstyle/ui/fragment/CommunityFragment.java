@@ -15,6 +15,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
 
+import com.alibaba.fastjson.JSON;
 import com.blankj.utilcode.util.BarUtils;
 import com.blankj.utilcode.util.SizeUtils;
 import com.feiyou.headstyle.App;
@@ -235,6 +236,7 @@ public class CommunityFragment extends BaseFragment implements ViewPager.OnPageC
         if (tData != null) {
             if (tData.getCode() == Constants.SUCCESS) {
                 App.topicInfoList = tData.getData();
+                Logger.i("topic--->" + JSON.toJSONString(App.topicInfoList));
                 //if (RecommendFragment.getInstance().isVisible()) {
                 // RecommendFragment.getInstance().onRefresh();
                 //}

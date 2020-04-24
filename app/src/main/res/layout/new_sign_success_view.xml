@@ -27,7 +27,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/tv_title"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="18dp"
             android:layout_marginBottom="12dp"
             android:gravity="center"
             android:orientation="vertical">
@@ -71,7 +71,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_margin="10dp"
+                    android:layout_margin="4dp"
                     android:text="精品推荐"
                     android:textColor="@color/delete_bg_color"
                     android:textSize="14sp" />
@@ -86,8 +86,8 @@
             <FrameLayout
                 android:id="@+id/layout_ad"
                 android:layout_width="match_parent"
-                android:layout_height="120dp"
-                android:layout_marginTop="6dp"></FrameLayout>
+                android:layout_height="145dp"
+                android:layout_marginTop="2dp"></FrameLayout>
         </LinearLayout>
 
         <LinearLayout

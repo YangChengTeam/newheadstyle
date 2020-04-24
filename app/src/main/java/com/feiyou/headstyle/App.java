@@ -6,6 +6,10 @@ import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
+import com.blankj.utilcode.util.SPUtils;
+import com.blankj.utilcode.util.StringUtils;
 import com.blankj.utilcode.util.Utils;
 
 import com.cmcm.cmgame.CmGameSdk;
@@ -16,6 +20,7 @@ import com.feiyou.headstyle.bean.TestDetailInfoWrapper;
 import com.feiyou.headstyle.bean.TestInfo;
 import com.feiyou.headstyle.bean.TopicInfo;
 import com.feiyou.headstyle.bean.UserInfo;
+import com.feiyou.headstyle.common.Constants;
 import com.feiyou.headstyle.ui.custom.CmGameImageLoader;
 import com.feiyou.headstyle.utils.AppContextUtil;
 import com.feiyou.headstyle.utils.AppUtils;
@@ -138,6 +143,18 @@ public class App extends Application {
         CmGameSdk.initCmGameSdk(this, cmGameAppInfo, new CmGameImageLoader(), BuildConfig.DEBUG);
         Log.d("cmgamesdk", "current sdk version : " + CmGameSdk.getVersion());
         appChannel = AppUtils.getMetaDataValue(this, "UMENG_CHANNEL");
+
+        loadUserInfo();
+    }
+
+    public void loadUserInfo(){
+        if (!StringUtils.isEmpty(SPUtils.getInstance().getString(Constants.USER_INFO))) {
+            Logger.i(SPUtils.getInstance().getString(Constants.USER_INFO));
+                mUserInfo = JSON.parseObject(SPUtils.getInstance().getString(Constants.USER_INFO), new TypeReference<UserInfo>() {
+            });
+            App.getApp().setmUserInfo(mUserInfo);
+            App.getApp().setLogin(true);
+        }
     }
 
     public UserInfo getmUserInfo() {
